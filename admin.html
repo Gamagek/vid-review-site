@@ -1,0 +1,1 @@
+<!doctype html><html><body><input id=t><input id=u><button onclick='save()'>Save</button><script>async function save(){await fetch('/api/videos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:t.value,url:u.value})});alert('saved')}</script></body></html>
