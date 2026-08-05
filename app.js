@@ -1,1 +1,0 @@
-fetch('/api/videos').then(r=>r.json()).then(d=>videos.innerHTML=d.map(v=>`<p><a href='${v.url}'>${v.title}</a></p>`).join(''))
