@@ -100,24 +100,12 @@ router.post('/api/generate-seo', async (request, env, ctx) => {
     const { title, category, subcategory } = await request.json();
     const model = initializeGemini(env);
 
-    const prompt = `Generate professional content for a video review platform called "Vid.Best". 
-    
-Video Title: ${title}
-Category: ${category}
-Subcategory: ${subcategory}
-
-Please provide in JSON format:
-{
-  "seo_description": "A compelling 160-character meta description for SEO",
-  "seo_tags": "comma,separated,seo,keywords",
-  "review_text": "A 300-500 word professional review of this type of content"
-}`;
+    const prompt = `Generate professional content for a video review platform called "Vid.Best". Video Title: ${title}. Category: ${category}. Subcategory: ${subcategory}. Please provide JSON with seo_description, seo_tags, and review_text.`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
     
-    // Parse JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     const contentData = jsonMatch ? JSON.parse(jsonMatch[0]) : {
       seo_description: "Professional video review",
@@ -212,7 +200,7 @@ router.get('/api/videos', async (request, env, ctx) => {
   }
 });
 
-// API: Get single video with SEO metadata
+// API: Get single video
 router.get('/api/videos/:id', async (request, env, ctx) => {
   try {
     const { id } = request.params;
@@ -222,7 +210,6 @@ router.get('/api/videos/:id', async (request, env, ctx) => {
       return new Response(JSON.stringify({ error: 'Video not found' }), { status: 404 });
     }
 
-    // Increment views
     await env.DB.prepare('UPDATE video_reviews SET views = views + 1 WHERE id = ?').bind(id).run();
 
     return new Response(JSON.stringify({
@@ -240,7 +227,6 @@ router.get('/api/videos/:id', async (request, env, ctx) => {
 router.post('/api/videos/:id/react', async (request, env, ctx) => {
   try {
     const { id } = request.params;
-    const { reaction_type } = await request.json();
 
     await env.DB.prepare('UPDATE video_reviews SET reactions = reactions + 1 WHERE id = ?').bind(id).run();
 
@@ -267,5 +253,53 @@ router.post('/api/videos/:id/comments', async (request, env, ctx) => {
 
     return new Response(JSON.stringify({ 
       success: true, 
-      comment_id: result.meta`*
-
+      comment_id: result.meta.last_row_id 
+    }), { 
+      headers: { 'Content-Type': 'application/json' } 
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+  }
+});
+
+// API: Get comments
+router.get('/api/videos/:id/comments', async (request, env, ctx) => {
+  try {
+    const { id } = request.params;
+    const result = await env.DB.prepare('SELECT * FROM comments WHERE video_id = ? ORDER BY created_at DESC').bind(id).all();
+
+    return new Response(JSON.stringify({
+      success: true,
+      data: result.results
+    }), { 
+      headers: { 'Content-Type': 'application/json' } 
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+  }
+});
+
+// Fallback: Serve index.html
+router.get('*', async (request, env) => {
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vid.Best</title>
+</head>
+<body>
+  <h1>Vid.Best - Video Review Platform</h1>
+  <p>Welcome! Visit the admin panel or use the API.</p>
+</body>
+</html>`;
+
+  return new Response(html, { 
+    headers: { 'Content-Type': 'text/html' } 
+  });
+});
+
+// Export handler
+export default {
+  fetch: router.handle
+};
