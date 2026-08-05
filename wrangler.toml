@@ -6,7 +6,7 @@ type = "javascript"
 [[d1_databases]]
 binding = "DB"
 database_name = "video-reviews-db"
-database_id = "YOUR_D1_ID"
+database_id = "d1a91eb2-1c41-44b8-aff1-24166f2c91f4"
 
 [[r2_buckets]]
 binding = "BUCKET"
