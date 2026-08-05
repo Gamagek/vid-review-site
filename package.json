@@ -1,0 +1,27 @@
+{
+  "name": "vid-best",
+  "version": "1.0.0",
+  "description": "Video Review & Discovery Platform on Cloudflare Workers",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler publish --dry-run"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.7.1"
+  },
+  "devDependencies": {
+    "wrangler": "^3.65.0"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "video",
+    "reviews",
+    "discovery"
+  ],
+  "author": "Gamagek",
+  "license": "MIT"
+}
