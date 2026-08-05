@@ -8,12 +8,27 @@ const initializeGemini = (env) => {
   return genAI.getGenerativeModel({ model: 'gemini-pro' });
 };
 
+// Verify password helper
+const verifyPassword = (authHeader, envPassword) => {
+  if (!envPassword) {
+    return false;
+  }
+  if (!authHeader) {
+    return false;
+  }
+  const [scheme, credentials] = authHeader.split(' ');
+  if (scheme !== 'Bearer') {
+    return false;
+  }
+  return credentials === envPassword;
+};
+
 // POST: Generate SEO content
 router.post('/api/generate-seo', async (request, env) => {
   try {
     const auth = request.headers.get('Authorization');
-    if (auth !== `Bearer ${env.ADMIN_PASSWORD}`) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    if (!verifyPassword(auth, env.ADMIN_PASSWORD)) {
+      return new Response(JSON.stringify({ error: 'Unauthorized - Invalid or missing password' }), { status: 401 });
     }
     const { title, category } = await request.json();
     const model = initializeGemini(env);
@@ -29,8 +44,8 @@ router.post('/api/generate-seo', async (request, env) => {
 router.post('/api/videos', async (request, env) => {
   try {
     const auth = request.headers.get('Authorization');
-    if (auth !== `Bearer ${env.ADMIN_PASSWORD}`) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    if (!verifyPassword(auth, env.ADMIN_PASSWORD)) {
+      return new Response(JSON.stringify({ error: 'Unauthorized - Invalid or missing password. Make sure ADMIN_PASSWORD is set in Cloudflare.' }), { status: 401 });
     }
     const data = await request.json();
     const result = await env.DB.prepare('INSERT INTO video_reviews (title, description, video_url, primary_category, subcategory, seo_description, seo_tags, review_text) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(data.title, data.description, data.video_url, data.primary_category, data.subcategory, data.seo_description || '', data.seo_tags || '', data.review_text || '').run();
@@ -160,6 +175,11 @@ router.get('/admin.html', async () => {
     document.getElementById('videoForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const password = prompt('Enter admin password:');
+      if (!password) {
+        document.getElementById('statusMessage').textContent = 'Password is required!';
+        document.getElementById('statusMessage').className = 'status-message error';
+        return;
+      }
       try {
         const res = await fetch('/api/videos', {
           method: 'POST',
@@ -178,7 +198,8 @@ router.get('/admin.html', async () => {
           msg.className = 'status-message success';
           document.getElementById('videoForm').reset();
         } else {
-          msg.textContent = 'Error: ' + (await res.json()).error;
+          const errorData = await res.json();
+          msg.textContent = 'Error: ' + (errorData.error || 'Unknown error');
           msg.className = 'status-message error';
         }
       } catch (e) {
