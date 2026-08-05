@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vid.Best - Video Review & Discovery Platform</title>
+  <meta name="description" content="Discover the best video reviews across entertainment, lifestyle, technology, food, and more on Vid.Best.">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+  <div class="stars"></div>
+  
+  <nav class="navbar">
+    <div class="logo">
+      <span class="logo-icon">🎬</span>
+      <span>Vid.Best</span>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="active">Discover</a>
+      <a href="#trending">Trending</a>
+      <a href="/admin.html" class="admin-btn">Admin Panel</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-content">
+      <h1>Discover <span class="gradient-text">Extraordinary</span> Video Reviews</h1>
+      <p>Your gateway to the best video content across every category imaginable</p>
+      <div class="search-box">
+        <input type="text" placeholder="Search videos...">
+        <button>Search</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="carousel-section">
+    <h2>Featured & Trending</h2>
+    <div class="carousel-3d">
+      <div class="carousel-wrapper">
+        <div class="carousel-container" id="mainCarousel">
+          <!-- Videos will be inserted here -->
+        </div>
+      </div>
+      <button class="carousel-btn prev" id="prevBtn">◀</button>
+      <button class="carousel-btn next" id="nextBtn">▶</button>
+    </div>
+  </section>
+
+  <section class="filters-section">
+    <h2>Browse by Category</h2>
+    <div class="filter-container">
+      <div class="filter-column">
+        <h3>Primary Category</h3>
+        <select id="primaryFilter">
+          <option value="">All Categories</option>
+          <option value="Entertainment">🎬 Entertainment, Movies & Games</option>
+          <option value="Lifestyle">💪 Lifestyle, Health & Fitness</option>
+          <option value="Environment">🌍 Environment & Sustainability</option>
+          <option value="Technology">🤖 Technology</option>
+          <option value="Food">🍕 Food & Recipes</option>
+          <option value="Education">📚 Education</option>
+          <option value="Comedy">😂 Funny & Comedy</option>
+          <option value="Music">🎵 Music</option>
+          <option value="Arts">🎨 Arts & Culture</option>
+          <option value="Adventure">🏕️ Adventure & Travel</option>
+          <option value="Business">💼 Business & Economy</option>
+          <option value="Social">📱 Social Media & Trending</option>
+        </select>
+      </div>
+      <div class="filter-column">
+        <h3>Subcategory</h3>
+        <select id="subcategoryFilter">
+          <option value="">All Subcategories</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section class="videos-grid">
+    <div class="grid-container" id="videosGrid">
+      <!-- Video tiles will be inserted here -->
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>&copy; 2024 Vid.Best. All rights reserved. Powered by Cloudflare Workers.</p>
+  </footer>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
