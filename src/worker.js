@@ -117,7 +117,7 @@ router.get('/admin.html', async () => {
 </head>
 <body>
   <nav class="admin-nav">
-    <div class="admin-logo">🔐 Vid.Best Admin</div>
+    <div class="admin-logo"> Vid.Best Admin</div>
     <a href="/" class="back-home">← Back to Home</a>
   </nav>
   <div class="admin-container">
