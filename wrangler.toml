@@ -1,7 +1,6 @@
 name = "vid-review-site"
-main = "src/index.js"
+main = "src/worker.js"
 compatibility_date = "2024-08-05"
-type = "javascript"
 
 [[d1_databases]]
 binding = "DB"
