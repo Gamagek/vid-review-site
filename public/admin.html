@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Vid.Best</title>
+  <link rel="stylesheet" href="/css/admin-styles.css">
+</head>
+<body>
+  <nav class="admin-nav">
+    <div class="admin-logo">🔐 Vid.Best Admin</div>
+    <a href="/" class="back-home">← Back to Home</a>
+  </nav>
+
+  <div class="admin-container">
+    <div class="admin-panel">
+      <h1>Add New Video Review</h1>
+
+      <form id="videoForm">
+        <div class="form-group">
+          <label>Video URL (YouTube, TikTok, Facebook, or raw link)</label>
+          <input type="url" id="videoUrl" required placeholder="https://youtube.com/watch?v=...">
+        </div>
+
+        <div class="form-group">
+          <label>Video Title</label>
+          <input type="text" id="videoTitle" required placeholder="Enter video title">
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="videoDescription" placeholder="Brief description" rows="3"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Primary Category</label>
+            <select id="primaryCategory" required>
+              <option>Select Category</option>
+              <option value="Entertainment">🎬 Entertainment, Movies & Games</option>
+              <option value="Lifestyle">💪 Lifestyle, Health & Fitness</option>
+              <option value="Environment">🌍 Environment & Sustainability</option>
+              <option value="Technology">🤖 Technology</option>
+              <option value="Food">🍕 Food & Recipes</option>
+              <option value="Education">📚 Education</option>
+              <option value="Comedy">😂 Funny & Comedy</option>
+              <option value="Music">🎵 Music</option>
+              <option value="Arts">🎨 Arts & Culture</option>
+              <option value="Adventure">🏕️ Adventure & Travel</option>
+              <option value="Business">💼 Business & Economy</option>
+              <option value="Social">📱 Social Media & Trending</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Subcategory</label>
+            <select id="subcategory" required>
+              <option>Select Subcategory</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ai-section">
+          <h3>AI-Generated Content</h3>
+          <button type="button" id="generateBtn" class="btn-generate">🤖 Generate SEO Content & Review</button>
+          
+          <div class="form-group">
+            <label>SEO Description</label>
+            <textarea id="seoDescription" placeholder="AI will generate this..." rows="2"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>SEO Tags</label>
+            <input type="text" id="seoTags" placeholder="AI will generate these...">
+          </div>
+
+          <div class="form-group">
+            <label>Review Text</label>
+            <textarea id="reviewText" placeholder="AI will generate this..." rows="5"></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">💾 Save Video Review</button>
+      </form>
+
+      <div id="statusMessage" class="status-message"></div>
+    </div>
+
+    <div class="recent-videos">
+      <h2>Recent Videos</h2>
+      <div id="recentList"></div>
+    </div>
+  </div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
