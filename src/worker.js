@@ -8,28 +8,9 @@ const initializeGemini = (env) => {
   return genAI.getGenerativeModel({ model: 'gemini-pro' });
 };
 
-// Verify password helper
-const verifyPassword = (authHeader, envPassword) => {
-  if (!envPassword) {
-    return false;
-  }
-  if (!authHeader) {
-    return false;
-  }
-  const [scheme, credentials] = authHeader.split(' ');
-  if (scheme !== 'Bearer') {
-    return false;
-  }
-  return credentials === envPassword;
-};
-
 // POST: Generate SEO content
 router.post('/api/generate-seo', async (request, env) => {
   try {
-    const auth = request.headers.get('Authorization');
-    if (!verifyPassword(auth, env.ADMIN_PASSWORD)) {
-      return new Response(JSON.stringify({ error: 'Unauthorized - Invalid or missing password' }), { status: 401 });
-    }
     const { title, category } = await request.json();
     const model = initializeGemini(env);
     const result = await model.generateContent(`Generate SEO content for: ${title}`);
@@ -40,13 +21,9 @@ router.post('/api/generate-seo', async (request, env) => {
   }
 });
 
-// POST: Save video
+// POST: Save video - NO PASSWORD REQUIRED
 router.post('/api/videos', async (request, env) => {
   try {
-    const auth = request.headers.get('Authorization');
-    if (!verifyPassword(auth, env.ADMIN_PASSWORD)) {
-      return new Response(JSON.stringify({ error: 'Unauthorized - Invalid or missing password. Make sure ADMIN_PASSWORD is set in Cloudflare.' }), { status: 401 });
-    }
     const data = await request.json();
     const result = await env.DB.prepare('INSERT INTO video_reviews (title, description, video_url, primary_category, subcategory, seo_description, seo_tags, review_text) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(data.title, data.description, data.video_url, data.primary_category, data.subcategory, data.seo_description || '', data.seo_tags || '', data.review_text || '').run();
     return new Response(JSON.stringify({ success: true, id: result.meta.last_row_id }), { headers: { 'Content-Type': 'application/json' } });
@@ -148,23 +125,28 @@ router.get('/admin.html', async () => {
     <form id="videoForm">
       <div class="form-group">
         <label>Video URL</label>
-        <input type="url" id="videoUrl" required>
+        <input type="url" id="videoUrl" required placeholder="https://youtube.com/watch?v=...">
       </div>
       <div class="form-group">
         <label>Title</label>
-        <input type="text" id="videoTitle" required>
+        <input type="text" id="videoTitle" required placeholder="Video title">
       </div>
       <div class="form-group">
         <label>Description</label>
-        <textarea id="videoDescription" rows="3"></textarea>
+        <textarea id="videoDescription" rows="3" placeholder="Video description"></textarea>
       </div>
       <div class="form-group">
         <label>Category</label>
         <select id="primaryCategory" required>
-          <option>Entertainment</option>
-          <option>Technology</option>
-          <option>Food</option>
-          <option>Lifestyle</option>
+          <option value="">Select Category</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Technology">Technology</option>
+          <option value="Food">Food</option>
+          <option value="Lifestyle">Lifestyle</option>
+          <option value="Education">Education</option>
+          <option value="Music">Music</option>
+          <option value="Sports">Sports</option>
+          <option value="Travel">Travel</option>
         </select>
       </div>
       <button type="submit">Save Video</button>
@@ -174,16 +156,10 @@ router.get('/admin.html', async () => {
   <script>
     document.getElementById('videoForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const password = prompt('Enter admin password:');
-      if (!password) {
-        document.getElementById('statusMessage').textContent = 'Password is required!';
-        document.getElementById('statusMessage').className = 'status-message error';
-        return;
-      }
       try {
         const res = await fetch('/api/videos', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + password },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             video_url: document.getElementById('videoUrl').value,
             title: document.getElementById('videoTitle').value,
@@ -194,16 +170,16 @@ router.get('/admin.html', async () => {
         });
         const msg = document.getElementById('statusMessage');
         if (res.ok) {
-          msg.textContent = 'Video saved!';
+          msg.textContent = '✅ Video saved successfully!';
           msg.className = 'status-message success';
           document.getElementById('videoForm').reset();
         } else {
           const errorData = await res.json();
-          msg.textContent = 'Error: ' + (errorData.error || 'Unknown error');
+          msg.textContent = '❌ Error: ' + (errorData.error || 'Unknown error');
           msg.className = 'status-message error';
         }
       } catch (e) {
-        document.getElementById('statusMessage').textContent = 'Error: ' + e.message;
+        document.getElementById('statusMessage').textContent = '❌ Error: ' + e.message;
         document.getElementById('statusMessage').className = 'status-message error';
       }
     });
@@ -224,25 +200,30 @@ router.get('/', async () => {
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 100%); color: #fff; }
-    .navbar { padding: 1.5rem 3rem; background: rgba(10, 14, 39, 0.8); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+    .navbar { padding: 1.5rem 3rem; background: rgba(10, 14, 39, 0.8); border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center; }
     .navbar h1 { color: #00d4ff; }
+    .nav-links { display: flex; gap: 1rem; }
+    .admin-btn { padding: 0.7rem 1.5rem; background: linear-gradient(45deg, #00d4ff, #ff006e); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; }
     .hero { padding: 4rem 3rem; text-align: center; }
     .hero h1 { font-size: 3rem; margin-bottom: 1rem; }
     .hero p { font-size: 1.2rem; color: #b0b0b0; margin-bottom: 2rem; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; padding: 4rem 3rem; }
-    .card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 1.5rem; }
+    .card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 1.5rem; cursor: pointer; transition: all 0.3s; }
+    .card:hover { transform: translateY(-10px); border-color: #00d4ff; }
     .card h3 { color: #00d4ff; margin-bottom: 1rem; }
-    .admin-btn { padding: 0.7rem 1.5rem; background: linear-gradient(45deg, #00d4ff, #ff006e); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; }
+    .card-meta { color: #b0b0b0; font-size: 0.9rem; margin-top: 1rem; }
   </style>
 </head>
 <body>
   <nav class="navbar">
-    <h1>🎬 Vid.Best - Video Review Platform</h1>
+    <h1>🎬 Vid.Best</h1>
+    <div class="nav-links">
+      <a href="/admin.html"><button class="admin-btn">+ Add Video</button></a>
+    </div>
   </nav>
   <header class="hero">
     <h1>Discover Extraordinary <span style="color: #00d4ff;">Video Reviews</span></h1>
     <p>Your gateway to the best video content across every category</p>
-    <a href="/admin.html"><button class="admin-btn">Admin Panel</button></a>
   </header>
   <section class="grid" id="videosGrid">
     <div class="card">
@@ -251,20 +232,24 @@ router.get('/', async () => {
     </div>
   </section>
   <script>
-    fetch('/api/videos').then(r => r.json()).then(data => {
-      const grid = document.getElementById('videosGrid');
-      grid.innerHTML = '';
-      if (data.success && data.data.length > 0) {
-        data.data.forEach(video => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = '<h3>' + video.title + '</h3><p>' + (video.description || 'No description') + '</p><p style="color: #00d4ff; margin-top: 1rem;">Views: ' + video.views + ' | Reactions: ' + video.reactions + '</p>';
-          grid.appendChild(card);
-        });
-      } else {
-        grid.innerHTML = '<div class="card"><h3>No videos yet</h3><p>Add videos from the admin panel</p></div>';
-      }
-    }).catch(e => console.error('Error loading videos:', e));
+    function loadVideos() {
+      fetch('/api/videos').then(r => r.json()).then(data => {
+        const grid = document.getElementById('videosGrid');
+        grid.innerHTML = '';
+        if (data.success && data.data.length > 0) {
+          data.data.forEach(video => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = '<h3>' + video.title + '</h3><p>' + (video.description || 'No description') + '</p><div class="card-meta">👁️ ' + video.views + ' views | ❤️ ' + video.reactions + ' reactions</div>';
+            grid.appendChild(card);
+          });
+        } else {
+          grid.innerHTML = '<div class="card"><h3>No videos yet</h3><p>Be the first to add a video!</p></div>';
+        }
+      }).catch(e => console.error('Error loading videos:', e));
+    }
+    loadVideos();
+    setInterval(loadVideos, 3000);
   </script>
 </body>
 </html>`;
