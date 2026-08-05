@@ -1,0 +1,51 @@
+name = "vid-best"
+main = "src/index.js"
+compatibility_date = "2024-08-05"
+
+[env.production]
+name = "vid-best-prod"
+route = "vidbest.com/*"
+zone_id = "YOUR_ZONE_ID"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "video-reviews-db"
+database_id = "YOUR_D1_ID"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "vid-assets"
+
+[env.production.d1_databases]
+binding = "DB"
+database_name = "video-reviews-db"
+database_id = "YOUR_D1_ID"
+
+[env.production.r2_buckets]
+binding = "BUCKET"
+bucket_name = "vid-assets"
+
+[build]
+command = "npm install"
+
+[build.upload]
+format = "modules"
+main = "src/index.js"
+
+[[triggers.crons]]
+cron = "0 */12 * * *"
+
+[[routes]]
+pattern = "example.com/api/*"
+zone_name = "example.com"
+
+[env.staging]
+name = "vid-best-staging"
+
+[vars]
+ENVIRONMENT = "production"
+API_RATE_LIMIT = "1000"
+
+[secrets]
+GEMINI_KEY = "YOUR_GEMINI_API_KEY"
+ADMIN_PASSWORD = "YOUR_ADMIN_PASSWORD"
