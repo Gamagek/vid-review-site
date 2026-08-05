@@ -1,17 +1,13 @@
 name = "vid-best"
 main = "src/index.js"
 compatibility_date = "2024-08-05"
-type = "javascript"Good! The `wrangler.toml` is clean now. The issue is that you
+type = "javascript"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "video-reviews-db"
-database_id have **placeholder IDs** that need to be replaced with your **actual Cloudflare I = "YOUR_D1_ID"
+database_id = "YOUR_D1_ID"
 
 [[r2_buckets]]
-bindingDs**. That's why it's still failing.
-
-**Follow these steps:**
-
-1. ** = "BUCKET"
+binding = "BUCKET"
 bucket_name = "vid-assets"
