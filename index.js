@@ -1221,7 +1221,7 @@ function renderWatchHtml(video, request, env) {
       <div id="watch-comments" class="comment-list" aria-live="polite"></div>
     </section>
   </main>
-  <footer class="site-footer">© ${new Date().getUTCFullYear()} Vid.Best · Human-curated video discovery</footer>
+  <footer class="site-footer">Vid.Best · Human-curated video discovery</footer>
 </body>
 </html>`;
 }
