@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="theme-color" content="#070913">
+  <title>Vid.Best Admin</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/admin.js" defer></script>
+</head>
+<body class="admin-page">
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <header class="site-header compact">
+    <a class="brand" href="/"><span class="brand-mark">V</span><span>Vid.Best</span></a>
+    <span class="admin-label">Publisher Console</span>
+    <a class="button ghost" href="/">View site</a>
+  </header>
+
+  <main class="admin-shell">
+    <section id="login-panel" class="login-panel glass-panel">
+      <p class="eyebrow">Protected area</p>
+      <h1>Administrator access</h1>
+      <p>Enter the long secret stored as the Cloudflare Worker secret <code>ADMIN_SECRET_KEY</code>.</p>
+      <form id="login-form">
+        <label><span>Admin secret</span><input id="admin-secret" type="password" minlength="16" required autocomplete="current-password"></label>
+        <button class="button primary" type="submit">Unlock console</button>
+        <p id="login-status" class="form-status" role="status"></p>
+      </form>
+    </section>
+
+    <div id="admin-workspace" hidden>
+      <div class="admin-toolbar">
+        <div><p class="eyebrow">Content studio</p><h1>Publish a video review</h1></div>
+        <button id="logout-button" class="button ghost" type="button">Lock console</button>
+      </div>
+
+      <div class="admin-grid">
+        <section class="editor-panel glass-panel">
+          <form id="video-form">
+            <input id="editing-id" type="hidden">
+            <input id="active-discovery-request" type="hidden">
+            <div class="form-section">
+              <div class="form-section-heading"><span>01</span><div><h2>Media source</h2><p>Paste a supported link or upload to your private R2 bucket.</p></div></div>
+              <div class="video-search-box">
+                <label><span>Find a public video or paste its URL</span><input id="video-search" type="search" maxlength="500" placeholder="Search YouTube or paste a YouTube, TikTok or Facebook URL"></label>
+                <button id="video-search-button" class="button ghost" type="button">Search videos</button>
+                <p id="video-search-status" class="form-status" role="status"></p>
+                <div id="video-search-results" class="video-search-results" aria-live="polite"></div>
+              </div>
+              <div class="source-tabs" role="tablist">
+                <button class="source-tab active" type="button" data-mode="link">Media link</button>
+                <button class="source-tab" type="button" data-mode="upload">R2 upload</button>
+              </div>
+              <div id="link-source-panel">
+                <label><span>YouTube, TikTok, Facebook or raw media URL</span><input id="source-url" name="source_url" type="url" maxlength="2000" placeholder="https://…"></label>
+              </div>
+              <div id="upload-source-panel" hidden>
+                <label class="upload-dropzone" id="upload-dropzone">
+                  <input id="asset-file" type="file" accept="video/*,image/*">
+                  <strong>Choose a video or image</strong>
+                  <span>Files stream securely into the bound vid-assets bucket.</span>
+                </label>
+                <button id="upload-button" class="button ghost" type="button">Upload selected file</button>
+                <div class="progress-track" aria-hidden="true"><span id="upload-progress"></span></div>
+                <p id="upload-status" class="form-status" role="status"></p>
+                <input id="r2-key" name="r2_key" type="hidden">
+              </div>
+              <div id="media-preview" class="admin-preview"><span>Secure media preview appears here</span></div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-heading"><span>02</span><div><h2>Classification</h2><p>Place the review in a focused discovery path.</p></div></div>
+              <div class="form-row two">
+                <label><span>Primary category</span><select id="admin-category" name="primary_category" required><option value="">Choose category</option></select></label>
+                <label><span>Subcategory</span><select id="admin-subcategory" name="subcategory" required disabled><option value="">Choose subcategory</option></select></label>
+              </div>
+              <label><span>Video title</span><input id="video-title" name="title" maxlength="160" required placeholder="Clear, specific review title"></label>
+              <label><span>Thumbnail URL (optional)</span><input id="thumbnail-url" name="thumbnail_url" maxlength="2000" placeholder="https://…"></label>
+              <label><span>Private notes for AI context (not published)</span><textarea id="ai-notes" maxlength="1500" placeholder="Facts you verified, key themes, products or speakers…"></textarea></label>
+            </div>
+
+            <div class="form-section ai-section">
+              <div class="form-section-heading"><span>03</span><div><h2>Editorial & SEO</h2><p>Generate a careful draft, then review every claim before publishing.</p></div></div>
+              <button id="ai-generate" class="button ai-button" type="button"><span>✦</span> AI Generate</button>
+              <p id="ai-status" class="form-status" role="status"></p>
+              <label><span>SEO title</span><input id="seo-title" name="seo_title" maxlength="70"></label>
+              <label><span>SEO description</span><textarea id="seo-description" name="seo_description" maxlength="180"></textarea></label>
+              <label><span>Listing description</span><textarea id="description" name="description" maxlength="2400" rows="5"></textarea></label>
+              <label><span>Review text</span><textarea id="review-text" name="review_text" maxlength="7000" rows="9"></textarea></label>
+              <label><span>SEO tags, separated by commas</span><input id="seo-tags" name="seo_tags" maxlength="900" placeholder="video review, technology, tutorial"></label>
+            </div>
+
+            <div class="publish-options">
+              <label class="switch-label"><input id="featured" name="featured" type="checkbox"><span></span>Featured</label>
+              <label class="switch-label"><input id="trending" name="trending" type="checkbox"><span></span>Trending</label>
+              <label class="switch-label"><input id="published" name="published" type="checkbox" checked><span></span>Published</label>
+            </div>
+            <div class="editor-actions">
+              <button class="button primary" type="submit">Save video review</button>
+              <button id="reset-form" class="button ghost" type="button">New record</button>
+            </div>
+            <p id="save-status" class="form-status" role="status"></p>
+          </form>
+        </section>
+
+        <aside class="admin-side">
+          <section class="glass-panel queue-panel">
+            <div class="side-heading"><div><p class="eyebrow">Programmatic SEO</p><h2>Discovery requests</h2></div><button id="refresh-discoveries" type="button" aria-label="Refresh discovery requests">↻</button></div>
+            <div id="discovery-request-list" class="admin-list"></div>
+          </section>
+          <section class="glass-panel queue-panel">
+            <div class="side-heading"><div><p class="eyebrow">Library</p><h2>Recent records</h2></div><button id="refresh-videos" type="button" aria-label="Refresh videos">↻</button></div>
+            <div id="admin-video-list" class="admin-list"></div>
+          </section>
+          <section class="glass-panel queue-panel">
+            <div class="side-heading"><div><p class="eyebrow">Moderation</p><h2>Pending comments</h2></div><button id="refresh-comments" type="button" aria-label="Refresh comments">↻</button></div>
+            <div id="moderation-list" class="admin-list"></div>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

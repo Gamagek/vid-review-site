@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070913">
+  <meta name="description" content="Discover thoughtful video reviews, tutorials, culture, technology, education and trending stories on Vid.Best.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Vid.Best">
+  <meta property="og:title" content="Vid.Best — Video Review & Discovery">
+  <meta property="og:description" content="Human-curated video reviews and discoveries across technology, education, culture, travel and more.">
+  <title>Vid.Best — Video Review & Discovery</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Vid.Best homepage">
+      <span class="brand-mark">V</span>
+      <span>Vid.Best</span>
+    </a>
+    <nav class="top-nav" aria-label="Primary navigation">
+      <a href="#featured">Featured</a>
+      <a href="#discover">Discover</a>
+      <a href="#categories">Categories</a>
+    </nav>
+    <a class="button ghost desktop-only" href="/admin.html" rel="nofollow">Admin</a>
+  </header>
+
+  <main>
+    <section class="hero" id="featured">
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span> Curated video intelligence</p>
+        <h1>Find videos worth <em>your time.</em></h1>
+        <p>Reviews, tutorials and discoveries organized into one calm, responsive experience—without the endless feed.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#discover">Start exploring</a>
+          <button class="button ghost" id="surprise-button" type="button">Surprise me</button>
+        </div>
+        <dl class="hero-stats" aria-label="Platform highlights">
+          <div><dt>12</dt><dd>worlds to explore</dd></div>
+          <div><dt>60+</dt><dd>focused topics</dd></div>
+          <div><dt>Human</dt><dd>curated reviews</dd></div>
+        </dl>
+      </div>
+
+      <div class="carousel-shell" aria-label="Featured video reviews">
+        <div class="carousel-glow" aria-hidden="true"></div>
+        <div id="featured-carousel" class="carousel-stage" aria-live="polite"></div>
+        <div class="carousel-controls">
+          <button id="carousel-prev" type="button" aria-label="Previous featured video">←</button>
+          <div id="carousel-dots" class="carousel-dots" aria-label="Carousel pages"></div>
+          <button id="carousel-next" type="button" aria-label="Next featured video">→</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="category-orbit section-pad" id="categories">
+      <div class="section-heading">
+        <div><p class="eyebrow">Browse the map</p><h2>Twelve ways to discover</h2></div>
+        <p>Choose a world, then narrow it to exactly what interests you.</p>
+      </div>
+      <div id="category-chips" class="category-chips" role="list"></div>
+    </section>
+
+    <section class="discover section-pad" id="discover">
+      <div class="section-heading discover-heading">
+        <div><p class="eyebrow">Fresh discoveries</p><h2>Explore the library</h2></div>
+        <p id="result-summary" aria-live="polite">Loading video reviews…</p>
+      </div>
+
+      <form id="filter-form" class="filter-panel glass-panel" role="search">
+        <label class="search-field">
+          <span>Search</span>
+          <input id="search-input" name="q" type="search" maxlength="120" placeholder="Search titles, descriptions or tags">
+        </label>
+        <label>
+          <span>Primary category</span>
+          <select id="category-select" name="category"><option value="">All categories</option></select>
+        </label>
+        <label>
+          <span>Subcategory</span>
+          <select id="subcategory-select" name="subcategory" disabled><option value="">All subcategories</option></select>
+        </label>
+        <label>
+          <span>Sort</span>
+          <select id="sort-select" name="sort">
+            <option value="newest">Newest first</option>
+            <option value="trending">Trending</option>
+            <option value="popular">Most watched</option>
+            <option value="reactions">Most reacted</option>
+          </select>
+        </label>
+        <button class="button primary filter-submit" type="submit">Apply filters</button>
+        <button class="button text-button" id="clear-filters" type="button">Clear</button>
+      </form>
+
+      <div id="video-grid" class="video-grid" aria-live="polite"></div>
+      <div id="empty-state" class="empty-state glass-panel" hidden>
+        <div class="empty-icon">◇</div>
+        <h3>No videos found</h3>
+        <p id="empty-message">Try a broader category or a different search phrase.</p>
+        <button id="request-discovery" class="button ghost" type="button" hidden>Request this video review</button>
+        <p id="request-discovery-status" class="form-status" role="status"></p>
+      </div>
+      <div class="load-more-wrap"><button id="load-more" class="button ghost" type="button" hidden>Load more discoveries</button></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="brand small" href="/"><span class="brand-mark">V</span><span>Vid.Best</span></a>
+    <p>Video review and discovery, designed for curiosity.</p>
+    <a href="/admin.html" rel="nofollow">Admin panel</a>
+  </footer>
+
+  <template id="video-card-template">
+    <article class="video-tile glass-panel">
+      <a class="tile-media" href="#">
+        <img alt="" loading="lazy" decoding="async">
+        <span class="media-fallback" aria-hidden="true">▶</span>
+        <span class="media-type"></span>
+        <span class="play-orb" aria-hidden="true">▶</span>
+      </a>
+      <div class="tile-content">
+        <div class="tile-badges"><span class="badge category-badge"></span><span class="badge secondary subcategory-badge"></span></div>
+        <h3><a class="tile-title" href="#"></a></h3>
+        <p class="tile-description"></p>
+        <div class="tile-meta"><span class="views-count"></span><time></time></div>
+        <div class="reaction-row" aria-label="React to this review">
+          <button type="button" data-reaction="like" aria-label="Like">👍 <span>0</span></button>
+          <button type="button" data-reaction="love" aria-label="Sparkle">✨ <span>0</span></button>
+          <button type="button" data-reaction="useful" aria-label="Useful">💡 <span>0</span></button>
+        </div>
+        <form class="quick-comment-form">
+          <label class="sr-only">Quick comment</label>
+          <input name="body" maxlength="800" required placeholder="Add a helpful comment…">
+          <input class="honeypot" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <button type="submit" aria-label="Send comment">↗</button>
+          <p class="form-status" role="status"></p>
+        </form>
+      </div>
+    </article>
+  </template>
+</body>
+</html>

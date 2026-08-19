@@ -1,0 +1,21 @@
+{
+  "name": "vid-best",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Vid.Best video review and discovery platform on Cloudflare Workers, D1 and R2.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "check": "wrangler deploy --dry-run --outdir .wrangler-dry-run",
+    "db:migrate:local": "wrangler d1 migrations apply video-reviews-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply video-reviews-db --remote",
+    "db:list": "wrangler d1 migrations list video-reviews-db --remote"
+  },
+  "devDependencies": {
+    "wrangler": "^4.32.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
