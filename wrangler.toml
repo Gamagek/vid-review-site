@@ -17,7 +17,7 @@ run_worker_first = true
 [[d1_databases]]
 binding = "DB"
 database_name = "video-reviews-db"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "d1a91eb2-1c41-44b8-aff1-24166f2c91f4"
 migrations_dir = "migrations"
 
 [[r2_buckets]]
