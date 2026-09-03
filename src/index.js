@@ -102,10 +102,11 @@ const ADMIN_SESSION_COOKIE = "__Host-vidbest_admin";
 const ADMIN_SESSION_SECONDS = 60 * 60 * 8;
 
 class AppError extends Error {
-  constructor(status, message, details) {
+  constructor(status, message, details, headers = {}) {
     super(message);
     this.status = status;
     this.details = details;
+    this.headers = headers;
   }
 }
 
@@ -195,7 +196,17 @@ async function route(request, env, ctx) {
   }
 
   if (path === "/api/admin/session" && request.method === "POST") {
-    const authentication = await requireAdmin(request, env);
+    const fingerprint = await assertLoginAllowed(request, env);
+    let authentication;
+    try {
+      authentication = await requireAdmin(request, env);
+    } catch (error) {
+      if (error instanceof AppError && error.status === 401) {
+        await recordRateLimit(env, "admin-login", fingerprint, 5, 900, false);
+      }
+      throw error;
+    }
+    await clearRateLimit(env, "admin-login", fingerprint);
     const response = json({ success: true });
     if (authentication === "bearer") response.headers.append("Set-Cookie", await createAdminSessionCookie(env));
     return response;
@@ -269,6 +280,7 @@ function handleError(error) {
     return json(
       { success: false, error: error.message, ...(error.details ? { details: error.details } : {}) },
       error.status,
+      error.headers,
     );
   }
   if (error?.name === "AbortError" || error?.name === "TimeoutError") {
@@ -285,16 +297,17 @@ function json(payload, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(payload), { status, headers });
 }
 
-function securityHeaders(headers, html = false) {
+function securityHeaders(headers, html = false, scriptNonce = "") {
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Frame-Options", "DENY");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=()");
   headers.set("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
   if (html) {
+    const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://www.facebook.com; upgrade-insecure-requests",
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://www.facebook.com; upgrade-insecure-requests`,
     );
   }
   return headers;
@@ -399,6 +412,64 @@ async function secureEqual(a, b) {
   return difference === 0;
 }
 
+async function requestFingerprint(request, secret) {
+  const salt = String(secret || "");
+  if (salt.length < 16) throw new AppError(503, "Rate-limit secret is not configured");
+  return sha256Hex([
+    salt,
+    request.headers.get("CF-Connecting-IP") || "unknown",
+    request.headers.get("User-Agent") || "unknown",
+  ].join("|"));
+}
+
+function rateLimitError(windowSeconds) {
+  return new AppError(
+    429,
+    "Too many requests. Please wait and try again.",
+    undefined,
+    { "Retry-After": String(windowSeconds) },
+  );
+}
+
+async function recordRateLimit(env, scope, fingerprint, limit, windowSeconds, rejectExceeded = true) {
+  const windowStartedAt = Math.floor(Date.now() / 1000 / windowSeconds) * windowSeconds;
+  const row = await env.DB.prepare(
+    `INSERT INTO rate_limits (scope, fingerprint, window_started_at, request_count)
+     VALUES (?, ?, ?, 1)
+     ON CONFLICT(scope, fingerprint) DO UPDATE SET
+       request_count = CASE
+         WHEN rate_limits.window_started_at < excluded.window_started_at THEN 1
+         ELSE rate_limits.request_count + 1
+       END,
+       window_started_at = MAX(rate_limits.window_started_at, excluded.window_started_at)
+     RETURNING request_count`,
+  ).bind(scope, fingerprint, windowStartedAt).first();
+  if (rejectExceeded && Number(row?.request_count || 0) > limit) throw rateLimitError(windowSeconds);
+  return Number(row?.request_count || 0);
+}
+
+async function consumeRateLimit(request, env, scope, limit, windowSeconds) {
+  const fingerprint = await requestFingerprint(request, env.REACTION_SALT);
+  await recordRateLimit(env, scope, fingerprint, limit, windowSeconds);
+  return fingerprint;
+}
+
+async function assertLoginAllowed(request, env) {
+  const fingerprint = await requestFingerprint(request, env.ADMIN_SECRET_KEY);
+  const windowSeconds = 900;
+  const windowStartedAt = Math.floor(Date.now() / 1000 / windowSeconds) * windowSeconds;
+  const row = await env.DB.prepare(
+    "SELECT request_count FROM rate_limits WHERE scope = ? AND fingerprint = ? AND window_started_at = ?",
+  ).bind("admin-login", fingerprint, windowStartedAt).first();
+  if (Number(row?.request_count || 0) >= 5) throw rateLimitError(windowSeconds);
+  return fingerprint;
+}
+
+async function clearRateLimit(env, scope, fingerprint) {
+  await env.DB.prepare("DELETE FROM rate_limits WHERE scope = ? AND fingerprint = ?")
+    .bind(scope, fingerprint).run();
+}
+
 async function sha256(value) {
   return new Uint8Array(await crypto.subtle.digest("SHA-256", encoder.encode(value)));
 }
@@ -469,24 +540,29 @@ async function requestDiscovery(request, env) {
   const possibleUrl = cleanText(data.source_url || query, 2000);
   const parsedUrl = optionalHttpUrl(possibleUrl);
   const normalized = normalizeDiscoveryQuery(query);
-  const salt = String(env.REACTION_SALT || "");
-  if (salt.length < 16) throw new AppError(503, "REACTION_SALT is not configured");
-  const fingerprint = await sha256Hex([
-    salt,
-    request.headers.get("CF-Connecting-IP") || "unknown",
-    request.headers.get("User-Agent") || "unknown",
-  ].join("|"));
+  const fingerprint = await consumeRateLimit(request, env, "discovery", 5, 600);
 
-  const row = await env.DB.prepare(
+  let row = await env.DB.prepare(
     `INSERT INTO discovery_requests (
        query, normalized_query, source_url, fingerprint, request_count
-     ) VALUES (?, ?, ?, ?, 1)
+     ) VALUES (?, ?, ?, ?, 0)
      ON CONFLICT(normalized_query) DO UPDATE SET
-       request_count = MIN(discovery_requests.request_count + 1, 9999),
-       source_url = COALESCE(excluded.source_url, discovery_requests.source_url),
-       updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+       source_url = COALESCE(excluded.source_url, discovery_requests.source_url)
      RETURNING id, query, source_url, status, request_count, created_at, updated_at`,
   ).bind(query, normalized, parsedUrl?.toString() || null, fingerprint).first();
+
+  const visitor = await env.DB.prepare(
+    "INSERT OR IGNORE INTO discovery_request_visitors (discovery_request_id, fingerprint) VALUES (?, ?)",
+  ).bind(row.id, fingerprint).run();
+  if (Number(visitor.meta?.changes || 0) > 0) {
+    row = await env.DB.prepare(
+      `UPDATE discovery_requests SET
+         request_count = MIN(request_count + 1, 9999),
+         updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+       WHERE id = ?
+       RETURNING id, query, source_url, status, request_count, created_at, updated_at`,
+    ).bind(row.id).first();
+  }
 
   return json({
     success: true,
@@ -941,11 +1017,7 @@ async function toggleReaction(request, env, videoId) {
   const reaction = cleanText(body.reaction, 20);
   if (!REACTIONS.has(reaction)) throw new AppError(400, "Unsupported reaction");
 
-  const salt = String(env.REACTION_SALT || "");
-  if (salt.length < 16) throw new AppError(503, "REACTION_SALT is not configured");
-  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
-  const agent = request.headers.get("User-Agent") || "unknown";
-  const fingerprint = await sha256Hex(`${salt}|${ip}|${agent}`);
+  const fingerprint = await consumeRateLimit(request, env, "reaction", 30, 60);
   const existing = await env.DB.prepare(
     "SELECT id FROM reactions WHERE video_id = ? AND fingerprint = ? AND reaction = ?",
   ).bind(videoId, fingerprint, reaction).first();
@@ -984,6 +1056,7 @@ async function submitComment(request, env, videoId) {
   if (!video) throw new AppError(404, "Video not found");
   const data = await readJson(request, 8192);
   if (cleanText(data.website, 200)) return json({ success: true, status: "pending" }, 202);
+  await consumeRateLimit(request, env, "comment", 5, 600);
   const author = cleanText(data.author, 50, "Guest") || "Guest";
   const body = cleanLongText(data.body, 800);
   if (body.length < 2) throw new AppError(400, "Comment is too short");
@@ -1159,7 +1232,7 @@ async function deleteAsset(env, keyInput) {
 
 async function serveR2Object(request, env, keyInput) {
   const key = validateR2Key(safeDecode(keyInput));
-  if (!key) throw new AppError(404, "Asset not found");
+  if (!key || !key.startsWith("uploads/")) throw new AppError(404, "Asset not found");
   if (request.method === "HEAD") {
     const object = await env.BUCKET.head(key);
     if (!object) throw new AppError(404, "Asset not found");
@@ -1210,10 +1283,11 @@ async function watchPage(request, env, ctx, slugInput) {
   if (!row) return dynamicHtml(notFoundPage(), 404);
   const [video] = await hydrateVideos(env, [row]);
   ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
-  return dynamicHtml(renderWatchHtml(video, request, env));
+  const scriptNonce = createCspNonce();
+  return dynamicHtml(renderWatchHtml(video, request, env, scriptNonce), 200, scriptNonce);
 }
 
-function renderWatchHtml(video, request, env) {
+function renderWatchHtml(video, request, env, scriptNonce) {
   const baseUrl = getBaseUrl(request, env);
   const canonical = `${baseUrl}/watch/${encodeURIComponent(video.slug)}`;
   const title = cleanText(video.seo_title || video.title, 70);
@@ -1264,7 +1338,7 @@ function renderWatchHtml(video, request, env) {
   <meta name="twitter:image" content="${escapeHtml(thumbnail)}">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
-  <script type="application/ld+json">${jsonForHtml(schema)}</script>
+  <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   <script src="/watch.js" defer></script>
 </head>
 <body class="watch-page" data-video-id="${Number(video.id)}">
@@ -1315,9 +1389,14 @@ function paragraphs(text) {
   return cleanLongText(text, 7000).split(/\n{2,}/).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("");
 }
 
-function dynamicHtml(html, status = 200) {
-  const headers = securityHeaders(new Headers({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "public, max-age=60" }), true);
+function dynamicHtml(html, status = 200, scriptNonce = "") {
+  const headers = securityHeaders(new Headers({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "public, max-age=60" }), true, scriptNonce);
   return new Response(html, { status, headers });
+}
+
+function createCspNonce() {
+  const bytes = crypto.getRandomValues(new Uint8Array(18));
+  return btoa(String.fromCharCode(...bytes));
 }
 
 function notFoundPage() {

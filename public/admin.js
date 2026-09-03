@@ -663,7 +663,8 @@ async function adminApi(url, options = {}) {
 
 async function requestJson(url, options = {}) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
+  const timeoutMs = url.startsWith("/api/ai/generate") ? 35000 : 15000;
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   let response;
   try {
     response = await fetch(url, { credentials: "same-origin", ...options, signal: controller.signal });
