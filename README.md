@@ -78,7 +78,7 @@ In Cloudflare Dashboard, open **Workers & Pages → vid-best → Settings → Do
 
 ## How publishing works
 
-1. Open `/admin.html` and enter `ADMIN_SECRET_KEY`.
+1. Open `/admin.html` and enter `ADMIN_SECRET_KEY`. The secret is exchanged once for an eight-hour, HttpOnly, same-site session cookie and is not retained in browser storage.
 2. Search YouTube or paste a full public video URL.
 3. Select the video and choose its category and subcategory.
 4. Add factual notes, then press **AI Generate**.

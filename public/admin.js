@@ -1,5 +1,4 @@
 const adminState = {
-  secret: sessionStorage.getItem("vidbest_admin_secret") || "",
   categories: {},
   videos: [],
   sourceMode: "link",
@@ -66,7 +65,7 @@ async function initializeAdmin() {
   } catch (error) {
     setStatus(ui.loginStatus, error.message, "error");
   }
-  if (adminState.secret) await verifySavedSession();
+  await verifySavedSession();
 }
 
 function bindAdminEvents() {
@@ -108,16 +107,17 @@ async function verifySavedSession() {
 
 async function login(event) {
   event.preventDefault();
-  adminState.secret = ui.secretInput.value;
   setStatus(ui.loginStatus, "Checking…");
   try {
-    await adminApi("/api/admin/session", { method: "POST" });
-    sessionStorage.setItem("vidbest_admin_secret", adminState.secret);
+    await requestJson("/api/admin/session", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${ui.secretInput.value}` },
+    });
     ui.secretInput.value = "";
     setStatus(ui.loginStatus, "Access granted.", "success");
     await unlockAdmin();
   } catch (error) {
-    adminState.secret = "";
+    ui.secretInput.value = "";
     setStatus(ui.loginStatus, error.message, "error");
   }
 }
@@ -128,9 +128,8 @@ async function unlockAdmin() {
   await Promise.all([loadAdminVideos(), loadPendingComments(), loadDiscoveryRequests()]);
 }
 
-function lockAdmin() {
-  adminState.secret = "";
-  sessionStorage.removeItem("vidbest_admin_secret");
+async function lockAdmin() {
+  try { await adminApi("/api/admin/session", { method: "DELETE" }); } catch { /* Clear the local UI even if logout fails. */ }
   ui.workspace.hidden = true;
   ui.loginPanel.hidden = false;
   ui.secretInput.focus();
@@ -320,7 +319,7 @@ function uploadFile() {
   setStatus(ui.uploadStatus, "Uploading securely…");
   const request = new XMLHttpRequest();
   request.open("PUT", `/api/assets?filename=${encodeURIComponent(file.name)}`);
-  request.setRequestHeader("Authorization", `Bearer ${adminState.secret}`);
+  request.withCredentials = true;
   request.setRequestHeader("X-File-Name", file.name);
   request.setRequestHeader("Content-Type", file.type || "application/octet-stream");
   request.upload.addEventListener("progress", (event) => {
@@ -659,13 +658,20 @@ async function publicApi(url, options = {}) {
 }
 
 async function adminApi(url, options = {}) {
-  const headers = new Headers(options.headers || {});
-  headers.set("Authorization", `Bearer ${adminState.secret}`);
-  return requestJson(url, { ...options, headers });
+  return requestJson(url, options);
 }
 
 async function requestJson(url, options = {}) {
-  const response = await fetch(url, options);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  let response;
+  try {
+    response = await fetch(url, { credentials: "same-origin", ...options, signal: controller.signal });
+  } catch (error) {
+    throw new Error(error.name === "AbortError" ? "Request timed out. Please try again." : "Network request failed. Please try again.");
+  } finally {
+    clearTimeout(timeout);
+  }
   const text = await response.text();
   let payload;
   try { payload = text ? JSON.parse(text) : {}; } catch { payload = {}; }

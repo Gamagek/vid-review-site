@@ -93,7 +93,13 @@ const CATEGORIES = Object.freeze({
 const REACTIONS = new Set(["like", "love", "useful"]);
 const COMMENT_STATUSES = new Set(["pending", "approved", "rejected"]);
 const DISCOVERY_STATUSES = new Set(["pending", "resolved", "rejected"]);
+const SAFE_UPLOAD_TYPES = new Set([
+  "image/avif", "image/gif", "image/jpeg", "image/png", "image/webp",
+  "video/mp4", "video/ogg", "video/quicktime", "video/webm",
+]);
 const encoder = new TextEncoder();
+const ADMIN_SESSION_COOKIE = "__Host-vidbest_admin";
+const ADMIN_SESSION_SECONDS = 60 * 60 * 8;
 
 class AppError extends Error {
   constructor(status, message, details) {
@@ -189,8 +195,16 @@ async function route(request, env, ctx) {
   }
 
   if (path === "/api/admin/session" && request.method === "POST") {
-    await requireAdmin(request, env);
-    return json({ success: true });
+    const authentication = await requireAdmin(request, env);
+    const response = json({ success: true });
+    if (authentication === "bearer") response.headers.append("Set-Cookie", await createAdminSessionCookie(env));
+    return response;
+  }
+
+  if (path === "/api/admin/session" && request.method === "DELETE") {
+    const response = json({ success: true });
+    response.headers.append("Set-Cookie", clearAdminSessionCookie());
+    return response;
   }
 
   if (path === "/api/admin/videos" && request.method === "GET") {
@@ -257,6 +271,9 @@ function handleError(error) {
       error.status,
     );
   }
+  if (error?.name === "AbortError" || error?.name === "TimeoutError") {
+    return json({ success: false, error: "An upstream service timed out" }, 504);
+  }
   console.error("Unhandled Worker error", error?.stack || error);
   return json({ success: false, error: "Internal server error" }, 500);
 }
@@ -310,8 +327,13 @@ async function readJson(request, maxBytes = 65536) {
   const text = await request.text();
   if (encoder.encode(text).byteLength > maxBytes) throw new AppError(413, "Request body is too large");
   try {
-    return JSON.parse(text || "{}");
-  } catch {
+    const value = JSON.parse(text || "{}");
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      throw new AppError(400, "JSON body must be an object");
+    }
+    return value;
+  } catch (error) {
+    if (error instanceof AppError) throw error;
     throw new AppError(400, "Invalid JSON body");
   }
 }
@@ -323,9 +345,51 @@ async function requireAdmin(request, env) {
   }
   const authorization = request.headers.get("Authorization") || "";
   const supplied = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
-  if (!(await secureEqual(supplied, expected))) {
-    throw new AppError(401, "Invalid administrator credentials");
+  if (supplied && await secureEqual(supplied, expected)) return "bearer";
+  const cookie = readCookie(request, ADMIN_SESSION_COOKIE);
+  if (cookie && await verifyAdminSession(cookie, expected)) {
+    requireSameOrigin(request);
+    return "session";
   }
+  throw new AppError(401, "Invalid or expired administrator credentials");
+}
+
+function requireSameOrigin(request) {
+  if (["GET", "HEAD", "OPTIONS"].includes(request.method)) return;
+  const origin = request.headers.get("Origin");
+  if (!origin || origin !== new URL(request.url).origin) throw new AppError(403, "Cross-origin request rejected");
+}
+
+function readCookie(request, name) {
+  for (const part of (request.headers.get("Cookie") || "").split(";")) {
+    const separator = part.indexOf("=");
+    if (separator > 0 && part.slice(0, separator).trim() === name) return part.slice(separator + 1).trim();
+  }
+  return "";
+}
+
+async function createAdminSessionCookie(env) {
+  const expires = Math.floor(Date.now() / 1000) + ADMIN_SESSION_SECONDS;
+  const payload = `${expires}.${crypto.randomUUID()}`;
+  const signature = await hmacHex(String(env.ADMIN_SECRET_KEY), payload);
+  return `${ADMIN_SESSION_COOKIE}=${payload}.${signature}; Path=/; Max-Age=${ADMIN_SESSION_SECONDS}; HttpOnly; Secure; SameSite=Strict`;
+}
+
+function clearAdminSessionCookie() {
+  return `${ADMIN_SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Strict`;
+}
+
+async function verifyAdminSession(value, secret) {
+  const match = String(value).match(/^(\d{10})\.([0-9a-f-]{36})\.([0-9a-f]{64})$/);
+  if (!match || Number(match[1]) < Math.floor(Date.now() / 1000)) return false;
+  const expected = await hmacHex(secret, `${match[1]}.${match[2]}`);
+  return secureEqual(match[3], expected);
+}
+
+async function hmacHex(secret, value) {
+  const key = await crypto.subtle.importKey("raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const bytes = new Uint8Array(await crypto.subtle.sign("HMAC", key, encoder.encode(value)));
+  return [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 async function secureEqual(a, b) {
@@ -405,7 +469,7 @@ async function requestDiscovery(request, env) {
   const possibleUrl = cleanText(data.source_url || query, 2000);
   const parsedUrl = optionalHttpUrl(possibleUrl);
   const normalized = normalizeDiscoveryQuery(query);
-  const salt = String(env.REACTION_SALT || env.ADMIN_SECRET_KEY || "");
+  const salt = String(env.REACTION_SALT || "");
   if (salt.length < 16) throw new AppError(503, "REACTION_SALT is not configured");
   const fingerprint = await sha256Hex([
     salt,
@@ -598,8 +662,8 @@ async function listVideos(request, env, includeUnpublished) {
     bindings.push(subcategory);
   }
   if (query) {
-    where.push("(v.title LIKE ? COLLATE NOCASE OR v.description LIKE ? COLLATE NOCASE OR v.seo_tags LIKE ? COLLATE NOCASE)");
-    const searchValue = `%${query}%`;
+    where.push("(v.title LIKE ? ESCAPE '\\' COLLATE NOCASE OR v.description LIKE ? ESCAPE '\\' COLLATE NOCASE OR v.seo_tags LIKE ? ESCAPE '\\' COLLATE NOCASE)");
+    const searchValue = `%${query.replace(/[\\%_]/g, "\\$&")}%`;
     bindings.push(searchValue, searchValue, searchValue);
   }
   if (url.searchParams.get("featured") === "1") where.push("v.featured = 1");
@@ -877,7 +941,7 @@ async function toggleReaction(request, env, videoId) {
   const reaction = cleanText(body.reaction, 20);
   if (!REACTIONS.has(reaction)) throw new AppError(400, "Unsupported reaction");
 
-  const salt = String(env.REACTION_SALT || env.ADMIN_SECRET_KEY || "");
+  const salt = String(env.REACTION_SALT || "");
   if (salt.length < 16) throw new AppError(503, "REACTION_SALT is not configured");
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   const agent = request.headers.get("User-Agent") || "unknown";
@@ -1043,12 +1107,15 @@ async function uploadAsset(request, env) {
   if (!filename) throw new AppError(400, "X-File-Name header is required");
   if (!request.body) throw new AppError(400, "Upload body is empty");
   const contentType = cleanText(request.headers.get("Content-Type"), 100, "application/octet-stream").toLowerCase();
-  if (!contentType.startsWith("video/") && !contentType.startsWith("image/")) {
-    throw new AppError(415, "Only video and image uploads are accepted");
+  if (!SAFE_UPLOAD_TYPES.has(contentType)) {
+    throw new AppError(415, "Unsupported video or raster image type");
   }
   const maximum = clampInteger(env.MAX_UPLOAD_BYTES, 1_000_000, 500_000_000, 104_857_600);
-  const contentLength = Number(request.headers.get("Content-Length") || 0);
-  if (contentLength && contentLength > maximum) {
+  const contentLength = Number(request.headers.get("Content-Length"));
+  if (!Number.isSafeInteger(contentLength) || contentLength < 1) {
+    throw new AppError(411, "A valid Content-Length header is required");
+  }
+  if (contentLength > maximum) {
     throw new AppError(413, `File exceeds the ${Math.floor(maximum / 1_048_576)} MB upload limit`);
   }
 
@@ -1098,6 +1165,7 @@ async function serveR2Object(request, env, keyInput) {
     if (!object) throw new AppError(404, "Asset not found");
     const headers = new Headers();
     object.writeHttpMetadata(headers);
+    secureStoredContentType(headers);
     headers.set("ETag", object.httpEtag);
     headers.set("Content-Length", String(object.size));
     headers.set("Accept-Ranges", "bytes");
@@ -1110,6 +1178,7 @@ async function serveR2Object(request, env, keyInput) {
   if (!object) throw new AppError(404, "Asset not found");
   const headers = new Headers();
   object.writeHttpMetadata(headers);
+  secureStoredContentType(headers);
   headers.set("ETag", object.httpEtag);
   headers.set("Accept-Ranges", "bytes");
   headers.set("X-Content-Type-Options", "nosniff");
@@ -1125,6 +1194,14 @@ async function serveR2Object(request, env, keyInput) {
     headers.set("Content-Length", String(object.size));
   }
   return new Response(object.body, { status, headers });
+}
+
+function secureStoredContentType(headers) {
+  const contentType = (headers.get("Content-Type") || "").split(";", 1)[0].trim().toLowerCase();
+  if (!SAFE_UPLOAD_TYPES.has(contentType)) {
+    headers.set("Content-Type", "application/octet-stream");
+    headers.set("Content-Disposition", "attachment");
+  }
 }
 
 async function watchPage(request, env, ctx, slugInput) {
