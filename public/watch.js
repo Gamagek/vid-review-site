@@ -6,12 +6,70 @@ const commentList = document.querySelector("#watch-comments");
 document.addEventListener("DOMContentLoaded", initializeWatchPage);
 
 function initializeWatchPage() {
+  enhanceNativePlayer();
   if (!videoId) return;
   reactionPanel?.querySelectorAll("[data-reaction]").forEach((button) => {
     button.addEventListener("click", () => react(button.dataset.reaction, button));
   });
   commentForm?.addEventListener("submit", submitComment);
   loadComments();
+}
+
+function enhanceNativePlayer() {
+  const video = document.querySelector(".watch-player video");
+  if (!video) return;
+
+  const tools = document.createElement("div");
+  tools.className = "watch-reactions player-tools";
+  tools.setAttribute("aria-label", "Video playback tools");
+
+  const rewind = playerButton("↶ 10s", "Rewind 10 seconds", () => {
+    video.currentTime = Math.max(0, video.currentTime - 10);
+  });
+  const playPause = playerButton(video.paused ? "▶ Play" : "❚❚ Pause", "Play or pause", async () => {
+    if (video.paused) await video.play();
+    else video.pause();
+  });
+  const forward = playerButton("10s ↷", "Forward 10 seconds", () => {
+    const end = Number.isFinite(video.duration) ? video.duration : video.currentTime + 10;
+    video.currentTime = Math.min(end, video.currentTime + 10);
+  });
+
+  const rates = [0.75, 1, 1.25, 1.5, 2];
+  const speed = playerButton("1×", "Change playback speed", () => {
+    const current = rates.findIndex((rate) => Math.abs(rate - video.playbackRate) < 0.01);
+    const next = rates[(current + 1 + rates.length) % rates.length];
+    video.playbackRate = next;
+    speed.textContent = `${next}×`;
+  });
+
+  tools.append(rewind, playPause, forward, speed);
+
+  if (document.pictureInPictureEnabled && typeof video.requestPictureInPicture === "function") {
+    const pip = playerButton("▣ PiP", "Picture in picture", async () => {
+      try {
+        if (document.pictureInPictureElement) await document.exitPictureInPicture();
+        else await video.requestPictureInPicture();
+      } catch (error) {
+        console.warn("Picture-in-picture unavailable", error?.message || error);
+      }
+    });
+    tools.append(pip);
+  }
+
+  video.addEventListener("play", () => { playPause.textContent = "❚❚ Pause"; });
+  video.addEventListener("pause", () => { playPause.textContent = "▶ Play"; });
+  video.insertAdjacentElement("afterend", tools);
+}
+
+function playerButton(label, ariaLabel, handler) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "button ghost";
+  button.textContent = label;
+  button.setAttribute("aria-label", ariaLabel);
+  button.addEventListener("click", handler);
+  return button;
 }
 
 async function react(reaction, button) {
