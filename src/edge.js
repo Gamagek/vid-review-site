@@ -235,7 +235,7 @@ async function fetchHandler(request, env, ctx) {
       const html = sanitizeWatchHtml(rawHtml, sourceMetadata);
       const headers = new Headers(response.headers);
       headers.delete("Content-Length");
-      headers.set("Cache-Control", "public, max-age=60, stale-while-revalidate=3600");
+      headers.set("Cache-Control", "public, max-age=60");
       return new Response(html, {
         status: response.status,
         statusText: response.statusText,
