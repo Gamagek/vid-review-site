@@ -13,4 +13,6 @@ Open a private GitHub security advisory for the repository instead of filing a p
 - Review generated text before publishing and reject unsafe, inaccurate or rights-infringing submissions.
 - Keep dependencies and Wrangler updated, and review Cloudflare deployment logs without recording request authorization headers.
 
-The admin secret is kept only in the browser tab's `sessionStorage`; using the site over HTTPS is required.
+The admin secret is exchanged for a signed, eight-hour `HttpOnly`, `Secure`, `SameSite=Strict` cookie and is not retained in browser storage. State-changing cookie-authenticated requests also require a same-origin `Origin` header. Using the site over HTTPS is required.
+
+Uploads are restricted to a small allowlist of raster image and video MIME types. Keep active formats such as SVG and HTML out of the same-origin media bucket.

@@ -1,5 +1,5 @@
 name = "vid-review-site"
-main = "src/index.js"
+main = "src/edge.js"
 compatibility_date = "2026-08-19"
 workers_dev = true
 
@@ -13,6 +13,9 @@ MAX_UPLOAD_BYTES = "104857600"
 directory = "./public"
 binding = "ASSETS"
 run_worker_first = true
+
+[triggers]
+crons = ["17 3 * * *"]
 
 [[d1_databases]]
 binding = "DB"

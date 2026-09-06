@@ -93,13 +93,20 @@ const CATEGORIES = Object.freeze({
 const REACTIONS = new Set(["like", "love", "useful"]);
 const COMMENT_STATUSES = new Set(["pending", "approved", "rejected"]);
 const DISCOVERY_STATUSES = new Set(["pending", "resolved", "rejected"]);
+const SAFE_UPLOAD_TYPES = new Set([
+  "image/avif", "image/gif", "image/jpeg", "image/png", "image/webp",
+  "video/mp4", "video/ogg", "video/quicktime", "video/webm",
+]);
 const encoder = new TextEncoder();
+const ADMIN_SESSION_COOKIE = "__Host-vidbest_admin";
+const ADMIN_SESSION_SECONDS = 60 * 60 * 8;
 
 class AppError extends Error {
-  constructor(status, message, details) {
+  constructor(status, message, details, headers = {}) {
     super(message);
     this.status = status;
     this.details = details;
+    this.headers = headers;
   }
 }
 
@@ -189,8 +196,26 @@ async function route(request, env, ctx) {
   }
 
   if (path === "/api/admin/session" && request.method === "POST") {
-    await requireAdmin(request, env);
-    return json({ success: true });
+    const fingerprint = await assertLoginAllowed(request, env);
+    let authentication;
+    try {
+      authentication = await requireAdmin(request, env);
+    } catch (error) {
+      if (error instanceof AppError && error.status === 401) {
+        await recordRateLimit(env, "admin-login", fingerprint, 5, 900, false);
+      }
+      throw error;
+    }
+    await clearRateLimit(env, "admin-login", fingerprint);
+    const response = json({ success: true });
+    if (authentication === "bearer") response.headers.append("Set-Cookie", await createAdminSessionCookie(env));
+    return response;
+  }
+
+  if (path === "/api/admin/session" && request.method === "DELETE") {
+    const response = json({ success: true });
+    response.headers.append("Set-Cookie", clearAdminSessionCookie());
+    return response;
   }
 
   if (path === "/api/admin/videos" && request.method === "GET") {
@@ -255,7 +280,11 @@ function handleError(error) {
     return json(
       { success: false, error: error.message, ...(error.details ? { details: error.details } : {}) },
       error.status,
+      error.headers,
     );
+  }
+  if (error?.name === "AbortError" || error?.name === "TimeoutError") {
+    return json({ success: false, error: "An upstream service timed out" }, 504);
   }
   console.error("Unhandled Worker error", error?.stack || error);
   return json({ success: false, error: "Internal server error" }, 500);
@@ -268,16 +297,17 @@ function json(payload, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(payload), { status, headers });
 }
 
-function securityHeaders(headers, html = false) {
+function securityHeaders(headers, html = false, scriptNonce = "") {
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Frame-Options", "DENY");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=()");
   headers.set("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
   if (html) {
+    const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://www.facebook.com; upgrade-insecure-requests",
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://www.facebook.com; upgrade-insecure-requests`,
     );
   }
   return headers;
@@ -310,8 +340,13 @@ async function readJson(request, maxBytes = 65536) {
   const text = await request.text();
   if (encoder.encode(text).byteLength > maxBytes) throw new AppError(413, "Request body is too large");
   try {
-    return JSON.parse(text || "{}");
-  } catch {
+    const value = JSON.parse(text || "{}");
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      throw new AppError(400, "JSON body must be an object");
+    }
+    return value;
+  } catch (error) {
+    if (error instanceof AppError) throw error;
     throw new AppError(400, "Invalid JSON body");
   }
 }
@@ -323,9 +358,51 @@ async function requireAdmin(request, env) {
   }
   const authorization = request.headers.get("Authorization") || "";
   const supplied = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
-  if (!(await secureEqual(supplied, expected))) {
-    throw new AppError(401, "Invalid administrator credentials");
+  if (supplied && await secureEqual(supplied, expected)) return "bearer";
+  const cookie = readCookie(request, ADMIN_SESSION_COOKIE);
+  if (cookie && await verifyAdminSession(cookie, expected)) {
+    requireSameOrigin(request);
+    return "session";
   }
+  throw new AppError(401, "Invalid or expired administrator credentials");
+}
+
+function requireSameOrigin(request) {
+  if (["GET", "HEAD", "OPTIONS"].includes(request.method)) return;
+  const origin = request.headers.get("Origin");
+  if (!origin || origin !== new URL(request.url).origin) throw new AppError(403, "Cross-origin request rejected");
+}
+
+function readCookie(request, name) {
+  for (const part of (request.headers.get("Cookie") || "").split(";")) {
+    const separator = part.indexOf("=");
+    if (separator > 0 && part.slice(0, separator).trim() === name) return part.slice(separator + 1).trim();
+  }
+  return "";
+}
+
+async function createAdminSessionCookie(env) {
+  const expires = Math.floor(Date.now() / 1000) + ADMIN_SESSION_SECONDS;
+  const payload = `${expires}.${crypto.randomUUID()}`;
+  const signature = await hmacHex(String(env.ADMIN_SECRET_KEY), payload);
+  return `${ADMIN_SESSION_COOKIE}=${payload}.${signature}; Path=/; Max-Age=${ADMIN_SESSION_SECONDS}; HttpOnly; Secure; SameSite=Strict`;
+}
+
+function clearAdminSessionCookie() {
+  return `${ADMIN_SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Strict`;
+}
+
+async function verifyAdminSession(value, secret) {
+  const match = String(value).match(/^(\d{10})\.([0-9a-f-]{36})\.([0-9a-f]{64})$/);
+  if (!match || Number(match[1]) < Math.floor(Date.now() / 1000)) return false;
+  const expected = await hmacHex(secret, `${match[1]}.${match[2]}`);
+  return secureEqual(match[3], expected);
+}
+
+async function hmacHex(secret, value) {
+  const key = await crypto.subtle.importKey("raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const bytes = new Uint8Array(await crypto.subtle.sign("HMAC", key, encoder.encode(value)));
+  return [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 async function secureEqual(a, b) {
@@ -333,6 +410,64 @@ async function secureEqual(a, b) {
   let difference = 0;
   for (let index = 0; index < hashA.length; index += 1) difference |= hashA[index] ^ hashB[index];
   return difference === 0;
+}
+
+async function requestFingerprint(request, secret) {
+  const salt = String(secret || "");
+  if (salt.length < 16) throw new AppError(503, "Rate-limit secret is not configured");
+  return sha256Hex([
+    salt,
+    request.headers.get("CF-Connecting-IP") || "unknown",
+    request.headers.get("User-Agent") || "unknown",
+  ].join("|"));
+}
+
+function rateLimitError(windowSeconds) {
+  return new AppError(
+    429,
+    "Too many requests. Please wait and try again.",
+    undefined,
+    { "Retry-After": String(windowSeconds) },
+  );
+}
+
+async function recordRateLimit(env, scope, fingerprint, limit, windowSeconds, rejectExceeded = true) {
+  const windowStartedAt = Math.floor(Date.now() / 1000 / windowSeconds) * windowSeconds;
+  const row = await env.DB.prepare(
+    `INSERT INTO rate_limits (scope, fingerprint, window_started_at, request_count)
+     VALUES (?, ?, ?, 1)
+     ON CONFLICT(scope, fingerprint) DO UPDATE SET
+       request_count = CASE
+         WHEN rate_limits.window_started_at < excluded.window_started_at THEN 1
+         ELSE rate_limits.request_count + 1
+       END,
+       window_started_at = MAX(rate_limits.window_started_at, excluded.window_started_at)
+     RETURNING request_count`,
+  ).bind(scope, fingerprint, windowStartedAt).first();
+  if (rejectExceeded && Number(row?.request_count || 0) > limit) throw rateLimitError(windowSeconds);
+  return Number(row?.request_count || 0);
+}
+
+async function consumeRateLimit(request, env, scope, limit, windowSeconds) {
+  const fingerprint = await requestFingerprint(request, env.REACTION_SALT);
+  await recordRateLimit(env, scope, fingerprint, limit, windowSeconds);
+  return fingerprint;
+}
+
+async function assertLoginAllowed(request, env) {
+  const fingerprint = await requestFingerprint(request, env.ADMIN_SECRET_KEY);
+  const windowSeconds = 900;
+  const windowStartedAt = Math.floor(Date.now() / 1000 / windowSeconds) * windowSeconds;
+  const row = await env.DB.prepare(
+    "SELECT request_count FROM rate_limits WHERE scope = ? AND fingerprint = ? AND window_started_at = ?",
+  ).bind("admin-login", fingerprint, windowStartedAt).first();
+  if (Number(row?.request_count || 0) >= 5) throw rateLimitError(windowSeconds);
+  return fingerprint;
+}
+
+async function clearRateLimit(env, scope, fingerprint) {
+  await env.DB.prepare("DELETE FROM rate_limits WHERE scope = ? AND fingerprint = ?")
+    .bind(scope, fingerprint).run();
 }
 
 async function sha256(value) {
@@ -405,24 +540,29 @@ async function requestDiscovery(request, env) {
   const possibleUrl = cleanText(data.source_url || query, 2000);
   const parsedUrl = optionalHttpUrl(possibleUrl);
   const normalized = normalizeDiscoveryQuery(query);
-  const salt = String(env.REACTION_SALT || env.ADMIN_SECRET_KEY || "");
-  if (salt.length < 16) throw new AppError(503, "REACTION_SALT is not configured");
-  const fingerprint = await sha256Hex([
-    salt,
-    request.headers.get("CF-Connecting-IP") || "unknown",
-    request.headers.get("User-Agent") || "unknown",
-  ].join("|"));
+  const fingerprint = await consumeRateLimit(request, env, "discovery", 5, 600);
 
-  const row = await env.DB.prepare(
+  let row = await env.DB.prepare(
     `INSERT INTO discovery_requests (
        query, normalized_query, source_url, fingerprint, request_count
-     ) VALUES (?, ?, ?, ?, 1)
+     ) VALUES (?, ?, ?, ?, 0)
      ON CONFLICT(normalized_query) DO UPDATE SET
-       request_count = MIN(discovery_requests.request_count + 1, 9999),
-       source_url = COALESCE(excluded.source_url, discovery_requests.source_url),
-       updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+       source_url = COALESCE(excluded.source_url, discovery_requests.source_url)
      RETURNING id, query, source_url, status, request_count, created_at, updated_at`,
   ).bind(query, normalized, parsedUrl?.toString() || null, fingerprint).first();
+
+  const visitor = await env.DB.prepare(
+    "INSERT OR IGNORE INTO discovery_request_visitors (discovery_request_id, fingerprint) VALUES (?, ?)",
+  ).bind(row.id, fingerprint).run();
+  if (Number(visitor.meta?.changes || 0) > 0) {
+    row = await env.DB.prepare(
+      `UPDATE discovery_requests SET
+         request_count = MIN(request_count + 1, 9999),
+         updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+       WHERE id = ?
+       RETURNING id, query, source_url, status, request_count, created_at, updated_at`,
+    ).bind(row.id).first();
+  }
 
   return json({
     success: true,
@@ -598,8 +738,8 @@ async function listVideos(request, env, includeUnpublished) {
     bindings.push(subcategory);
   }
   if (query) {
-    where.push("(v.title LIKE ? COLLATE NOCASE OR v.description LIKE ? COLLATE NOCASE OR v.seo_tags LIKE ? COLLATE NOCASE)");
-    const searchValue = `%${query}%`;
+    where.push("(v.title LIKE ? ESCAPE '\\' COLLATE NOCASE OR v.description LIKE ? ESCAPE '\\' COLLATE NOCASE OR v.seo_tags LIKE ? ESCAPE '\\' COLLATE NOCASE)");
+    const searchValue = `%${query.replace(/[\\%_]/g, "\\$&")}%`;
     bindings.push(searchValue, searchValue, searchValue);
   }
   if (url.searchParams.get("featured") === "1") where.push("v.featured = 1");
@@ -877,11 +1017,7 @@ async function toggleReaction(request, env, videoId) {
   const reaction = cleanText(body.reaction, 20);
   if (!REACTIONS.has(reaction)) throw new AppError(400, "Unsupported reaction");
 
-  const salt = String(env.REACTION_SALT || env.ADMIN_SECRET_KEY || "");
-  if (salt.length < 16) throw new AppError(503, "REACTION_SALT is not configured");
-  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
-  const agent = request.headers.get("User-Agent") || "unknown";
-  const fingerprint = await sha256Hex(`${salt}|${ip}|${agent}`);
+  const fingerprint = await consumeRateLimit(request, env, "reaction", 30, 60);
   const existing = await env.DB.prepare(
     "SELECT id FROM reactions WHERE video_id = ? AND fingerprint = ? AND reaction = ?",
   ).bind(videoId, fingerprint, reaction).first();
@@ -920,6 +1056,7 @@ async function submitComment(request, env, videoId) {
   if (!video) throw new AppError(404, "Video not found");
   const data = await readJson(request, 8192);
   if (cleanText(data.website, 200)) return json({ success: true, status: "pending" }, 202);
+  await consumeRateLimit(request, env, "comment", 5, 600);
   const author = cleanText(data.author, 50, "Guest") || "Guest";
   const body = cleanLongText(data.body, 800);
   if (body.length < 2) throw new AppError(400, "Comment is too short");
@@ -1043,12 +1180,15 @@ async function uploadAsset(request, env) {
   if (!filename) throw new AppError(400, "X-File-Name header is required");
   if (!request.body) throw new AppError(400, "Upload body is empty");
   const contentType = cleanText(request.headers.get("Content-Type"), 100, "application/octet-stream").toLowerCase();
-  if (!contentType.startsWith("video/") && !contentType.startsWith("image/")) {
-    throw new AppError(415, "Only video and image uploads are accepted");
+  if (!SAFE_UPLOAD_TYPES.has(contentType)) {
+    throw new AppError(415, "Unsupported video or raster image type");
   }
   const maximum = clampInteger(env.MAX_UPLOAD_BYTES, 1_000_000, 500_000_000, 104_857_600);
-  const contentLength = Number(request.headers.get("Content-Length") || 0);
-  if (contentLength && contentLength > maximum) {
+  const contentLength = Number(request.headers.get("Content-Length"));
+  if (!Number.isSafeInteger(contentLength) || contentLength < 1) {
+    throw new AppError(411, "A valid Content-Length header is required");
+  }
+  if (contentLength > maximum) {
     throw new AppError(413, `File exceeds the ${Math.floor(maximum / 1_048_576)} MB upload limit`);
   }
 
@@ -1092,12 +1232,13 @@ async function deleteAsset(env, keyInput) {
 
 async function serveR2Object(request, env, keyInput) {
   const key = validateR2Key(safeDecode(keyInput));
-  if (!key) throw new AppError(404, "Asset not found");
+  if (!key || !key.startsWith("uploads/")) throw new AppError(404, "Asset not found");
   if (request.method === "HEAD") {
     const object = await env.BUCKET.head(key);
     if (!object) throw new AppError(404, "Asset not found");
     const headers = new Headers();
     object.writeHttpMetadata(headers);
+    secureStoredContentType(headers);
     headers.set("ETag", object.httpEtag);
     headers.set("Content-Length", String(object.size));
     headers.set("Accept-Ranges", "bytes");
@@ -1110,6 +1251,7 @@ async function serveR2Object(request, env, keyInput) {
   if (!object) throw new AppError(404, "Asset not found");
   const headers = new Headers();
   object.writeHttpMetadata(headers);
+  secureStoredContentType(headers);
   headers.set("ETag", object.httpEtag);
   headers.set("Accept-Ranges", "bytes");
   headers.set("X-Content-Type-Options", "nosniff");
@@ -1127,16 +1269,25 @@ async function serveR2Object(request, env, keyInput) {
   return new Response(object.body, { status, headers });
 }
 
+function secureStoredContentType(headers) {
+  const contentType = (headers.get("Content-Type") || "").split(";", 1)[0].trim().toLowerCase();
+  if (!SAFE_UPLOAD_TYPES.has(contentType)) {
+    headers.set("Content-Type", "application/octet-stream");
+    headers.set("Content-Disposition", "attachment");
+  }
+}
+
 async function watchPage(request, env, ctx, slugInput) {
   const slug = safeDecode(slugInput).split("/")[0];
   const row = await env.DB.prepare("SELECT * FROM videos WHERE slug = ? AND published = 1").bind(slug).first();
   if (!row) return dynamicHtml(notFoundPage(), 404);
   const [video] = await hydrateVideos(env, [row]);
   ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
-  return dynamicHtml(renderWatchHtml(video, request, env));
+  const scriptNonce = createCspNonce();
+  return dynamicHtml(renderWatchHtml(video, request, env, scriptNonce), 200, scriptNonce);
 }
 
-function renderWatchHtml(video, request, env) {
+function renderWatchHtml(video, request, env, scriptNonce) {
   const baseUrl = getBaseUrl(request, env);
   const canonical = `${baseUrl}/watch/${encodeURIComponent(video.slug)}`;
   const title = cleanText(video.seo_title || video.title, 70);
@@ -1187,7 +1338,7 @@ function renderWatchHtml(video, request, env) {
   <meta name="twitter:image" content="${escapeHtml(thumbnail)}">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
-  <script type="application/ld+json">${jsonForHtml(schema)}</script>
+  <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   <script src="/watch.js" defer></script>
 </head>
 <body class="watch-page" data-video-id="${Number(video.id)}">
@@ -1238,9 +1389,14 @@ function paragraphs(text) {
   return cleanLongText(text, 7000).split(/\n{2,}/).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("");
 }
 
-function dynamicHtml(html, status = 200) {
-  const headers = securityHeaders(new Headers({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "public, max-age=60" }), true);
+function dynamicHtml(html, status = 200, scriptNonce = "") {
+  const headers = securityHeaders(new Headers({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "public, max-age=60" }), true, scriptNonce);
   return new Response(html, { status, headers });
+}
+
+function createCspNonce() {
+  const bytes = crypto.getRandomValues(new Uint8Array(18));
+  return btoa(String.fromCharCode(...bytes));
 }
 
 function notFoundPage() {
