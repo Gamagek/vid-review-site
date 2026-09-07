@@ -5,7 +5,7 @@ workers_dev = true
 
 [vars]
 APP_NAME = "Vid.Best"
-PUBLIC_BASE_URL = "https://YOUR-DOMAIN.example"
+PUBLIC_BASE_URL = "https://home.vid.best"
 GEMINI_MODEL = "gemini-3.1-flash-lite"
 MAX_UPLOAD_BYTES = "104857600"
 
@@ -26,3 +26,7 @@ migrations_dir = "migrations"
 [[r2_buckets]]
 binding = "BUCKET"
 bucket_name = "vid-assets"
+
+[[r2_buckets]]
+binding = "LAB_MEDIA"
+bucket_name = "lab-review-media"
