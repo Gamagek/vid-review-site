@@ -48,6 +48,10 @@ jobs:
           npx wrangler d1 execute video-reviews-db --remote
           --command "SELECT type, name, sql FROM sqlite_master WHERE type IN ('table','index') AND name NOT LIKE 'sqlite_%' ORDER BY type, name;"
 
+      - name: Bootstrap legacy D1 schema
+        if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
+        run: node scripts/bootstrap-legacy-d1.mjs
+
       - name: Apply D1 migrations
         if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
         run: npm run db:migrate:remote
