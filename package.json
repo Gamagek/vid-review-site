@@ -8,7 +8,7 @@
     "test": "node --test",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "check": "wrangler deploy --dry-run --outdir .wrangler-dry-run",
+    "check": "node --check scripts/bootstrap-legacy-d1.mjs && wrangler deploy --dry-run --outdir .wrangler-dry-run",
     "db:migrate:local": "wrangler d1 migrations apply video-reviews-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply video-reviews-db --remote",
     "db:list": "wrangler d1 migrations list video-reviews-db --remote"
