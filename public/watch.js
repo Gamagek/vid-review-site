@@ -3,10 +3,18 @@ const reactionPanel = document.querySelector(".watch-reactions");
 const commentForm = document.querySelector("#watch-comment-form");
 const commentList = document.querySelector("#watch-comments");
 
+const watchPlayerState = {
+  rates: [0.5, 0.75, 1, 1.25, 1.5, 2],
+  zooms: [1, 1.25, 1.5, 2],
+  rateIndex: 2,
+  zoomIndex: 0,
+};
+
 document.addEventListener("DOMContentLoaded", initializeWatchPage);
 
 function initializeWatchPage() {
   enhanceNativePlayer();
+  enhanceCommentForm();
   if (!videoId) return;
   reactionPanel?.querySelectorAll("[data-reaction]").forEach((button) => {
     button.addEventListener("click", () => react(button.dataset.reaction, button));
@@ -18,10 +26,12 @@ function initializeWatchPage() {
 function enhanceNativePlayer() {
   const video = document.querySelector(".watch-player video");
   if (!video) return;
+  const stage = video.closest(".watch-player");
+  stage.style.overflow = "hidden";
 
   const tools = document.createElement("div");
   tools.className = "watch-reactions player-tools";
-  tools.setAttribute("aria-label", "Video playback tools");
+  tools.setAttribute("aria-label", "Advanced video playback tools");
 
   const rewind = playerButton("↶ 10s", "Rewind 10 seconds", () => {
     video.currentTime = Math.max(0, video.currentTime - 10);
@@ -34,16 +44,36 @@ function enhanceNativePlayer() {
     const end = Number.isFinite(video.duration) ? video.duration : video.currentTime + 10;
     video.currentTime = Math.min(end, video.currentTime + 10);
   });
-
-  const rates = [0.75, 1, 1.25, 1.5, 2];
-  const speed = playerButton("1×", "Change playback speed", () => {
-    const current = rates.findIndex((rate) => Math.abs(rate - video.playbackRate) < 0.01);
-    const next = rates[(current + 1 + rates.length) % rates.length];
+  const speed = playerButton("1× speed", "Change playback speed", () => {
+    watchPlayerState.rateIndex = (watchPlayerState.rateIndex + 1) % watchPlayerState.rates.length;
+    const next = watchPlayerState.rates[watchPlayerState.rateIndex];
     video.playbackRate = next;
-    speed.textContent = `${next}×`;
+    speed.textContent = `${next}× speed`;
+  });
+  const zoom = playerButton("1× zoom", "Zoom video", () => {
+    watchPlayerState.zoomIndex = (watchPlayerState.zoomIndex + 1) % watchPlayerState.zooms.length;
+    const next = watchPlayerState.zooms[watchPlayerState.zoomIndex];
+    video.style.transform = `scale(${next})`;
+    video.style.transformOrigin = "center center";
+    zoom.textContent = `${next}× zoom`;
+  });
+  const captions = playerButton("CC", "Toggle captions", () => toggleCaptions(video, captions));
+  captions.disabled = !(video.textTracks?.length > 0);
+  const translate = playerButton("Translate captions", "Automatic caption translation", () => {
+    setPlayerMessage(tools, "Auto-translation will activate when the Teamwork transcription/translation engine supplies caption tracks.");
+  });
+  translate.disabled = true;
+  const share = playerButton("Share", "Share this video", () => shareWatchPage());
+  const fullscreen = playerButton("Fullscreen", "Enter fullscreen", async () => {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else if (stage.requestFullscreen) await stage.requestFullscreen();
+    } catch (error) {
+      console.warn("Fullscreen unavailable", error?.message || error);
+    }
   });
 
-  tools.append(rewind, playPause, forward, speed);
+  tools.append(rewind, playPause, forward, speed, zoom, captions, translate);
 
   if (document.pictureInPictureEnabled && typeof video.requestPictureInPicture === "function") {
     const pip = playerButton("▣ PiP", "Picture in picture", async () => {
@@ -56,6 +86,14 @@ function enhanceNativePlayer() {
     });
     tools.append(pip);
   }
+  tools.append(fullscreen, share);
+
+  const note = document.createElement("p");
+  note.className = "form-status player-tool-note";
+  note.textContent = captions.disabled
+    ? "No caption track is stored for this video yet. Auto captions and translation will be connected through the Teamwork engine."
+    : "Caption track detected. Use CC to show or hide it.";
+  tools.append(note);
 
   video.addEventListener("play", () => { playPause.textContent = "❚❚ Pause"; });
   video.addEventListener("pause", () => { playPause.textContent = "▶ Play"; });
@@ -70,6 +108,64 @@ function playerButton(label, ariaLabel, handler) {
   button.setAttribute("aria-label", ariaLabel);
   button.addEventListener("click", handler);
   return button;
+}
+
+function toggleCaptions(video, button) {
+  const tracks = [...video.textTracks];
+  if (!tracks.length) return;
+  const showing = tracks.some((track) => track.mode === "showing");
+  tracks.forEach((track, index) => { track.mode = !showing && index === 0 ? "showing" : "hidden"; });
+  button.textContent = showing ? "CC off" : "CC on";
+}
+
+function setPlayerMessage(container, message) {
+  const note = container.querySelector(".player-tool-note");
+  if (note) note.textContent = message;
+}
+
+async function shareWatchPage() {
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: document.title, url: location.href });
+      return;
+    }
+    await navigator.clipboard.writeText(location.href);
+  } catch (error) {
+    if (error?.name !== "AbortError") console.warn("Share unavailable", error?.message || error);
+  }
+}
+
+function enhanceCommentForm() {
+  if (!commentForm || commentForm.elements.image) return;
+  const imageLabel = document.createElement("label");
+  imageLabel.className = "comment-image-field";
+  imageLabel.innerHTML = '<span>Attach a picture (optional, max 5 MB)</span><input name="image" type="file" accept="image/avif,image/gif,image/jpeg,image/png,image/webp">';
+  const submit = commentForm.querySelector('button[type="submit"]');
+  commentForm.insertBefore(imageLabel, submit);
+
+  const preview = document.createElement("img");
+  preview.className = "comment-image-preview";
+  preview.alt = "Selected comment picture preview";
+  preview.hidden = true;
+  commentForm.insertBefore(preview, submit);
+
+  imageLabel.querySelector("input").addEventListener("change", (event) => {
+    if (preview.dataset.objectUrl) URL.revokeObjectURL(preview.dataset.objectUrl);
+    const file = event.target.files?.[0];
+    if (!file) {
+      preview.hidden = true;
+      preview.removeAttribute("src");
+      return;
+    }
+    const objectUrl = URL.createObjectURL(file);
+    preview.dataset.objectUrl = objectUrl;
+    preview.src = objectUrl;
+    preview.hidden = false;
+    preview.style.maxWidth = "220px";
+    preview.style.maxHeight = "160px";
+    preview.style.objectFit = "cover";
+    preview.style.borderRadius = "12px";
+  });
 }
 
 async function react(reaction, button) {
@@ -119,6 +215,17 @@ function renderComment(comment) {
   const body = document.createElement("p");
   body.textContent = comment.body || "";
   article.append(header, body);
+  if (comment.image_url) {
+    const image = document.createElement("img");
+    image.src = comment.image_url;
+    image.alt = "Image attached to this approved comment";
+    image.loading = "lazy";
+    image.style.maxWidth = "min(100%, 520px)";
+    image.style.maxHeight = "420px";
+    image.style.objectFit = "contain";
+    image.style.borderRadius = "14px";
+    article.append(image);
+  }
   return article;
 }
 
@@ -133,19 +240,39 @@ async function submitComment(event) {
   event.preventDefault();
   const status = commentForm.querySelector(".form-status");
   const submit = commentForm.querySelector('button[type="submit"]');
+  const image = commentForm.elements.image?.files?.[0];
+  if (image && image.size > 5 * 1024 * 1024) {
+    setStatus(status, "Picture must be 5 MB or smaller.", "error");
+    return;
+  }
   submit.disabled = true;
   setStatus(status, "Sending…");
   try {
-    const result = await api(`/api/videos/${videoId}/comments`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        author: commentForm.elements.author.value,
-        body: commentForm.elements.body.value,
-        website: commentForm.elements.website.value,
-      }),
-    });
+    let result;
+    if (image) {
+      const data = new FormData();
+      data.set("author", commentForm.elements.author.value);
+      data.set("body", commentForm.elements.body.value);
+      data.set("website", commentForm.elements.website.value);
+      data.set("image", image, image.name);
+      result = await api(`/api/videos/${videoId}/comments`, { method: "POST", body: data });
+    } else {
+      result = await api(`/api/videos/${videoId}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          author: commentForm.elements.author.value,
+          body: commentForm.elements.body.value,
+          website: commentForm.elements.website.value,
+        }),
+      });
+    }
     commentForm.reset();
+    const preview = commentForm.querySelector(".comment-image-preview");
+    if (preview) {
+      preview.hidden = true;
+      preview.removeAttribute("src");
+    }
     setStatus(status, result.message || "Comment submitted for moderation.", "success");
   } catch (error) {
     setStatus(status, error.message, "error");
