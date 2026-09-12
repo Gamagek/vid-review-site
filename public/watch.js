@@ -2,12 +2,20 @@ const videoId = Number(document.body.dataset.videoId || 0);
 const reactionPanel = document.querySelector(".watch-reactions");
 const commentForm = document.querySelector("#watch-comment-form");
 const commentList = document.querySelector("#watch-comments");
+const persistentPlayer = document.querySelector("#watch-player");
+const playerPlaceholder = document.querySelector("#watch-player-anchor");
+const relatedList = document.querySelector("#watch-related");
+const relatedFilter = document.querySelector("#related-filter");
+const interestStatus = document.querySelector("#interest-status");
 
 const watchPlayerState = {
   rates: [0.5, 0.75, 1, 1.25, 1.5, 2],
   zooms: [1, 1.25, 1.5, 2],
   rateIndex: 2,
   zoomIndex: 0,
+  miniTimer: null,
+  originalBottom: 0,
+  dismissed: false,
 };
 
 document.addEventListener("DOMContentLoaded", initializeWatchPage);
@@ -15,18 +23,238 @@ document.addEventListener("DOMContentLoaded", initializeWatchPage);
 function initializeWatchPage() {
   enhanceNativePlayer();
   enhanceCommentForm();
+  initializePersistentPlayer();
+  initializeDiscovery();
   if (!videoId) return;
   reactionPanel?.querySelectorAll("[data-reaction]").forEach((button) => {
     button.addEventListener("click", () => react(button.dataset.reaction, button));
   });
   commentForm?.addEventListener("submit", submitComment);
+  document.querySelectorAll("[data-interest]").forEach((button) => {
+    button.addEventListener("click", () => recordInterest(button.dataset.interest, button));
+  });
   loadComments();
+  loadRecommendations();
+}
+
+function initializePersistentPlayer() {
+  if (!persistentPlayer || !playerPlaceholder) return;
+  const status = persistentPlayer.querySelector("#persistent-player-status");
+  const restore = persistentPlayer.querySelector('[data-player-mode="restore"]');
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const rememberPosition = () => {
+    if (persistentPlayer.classList.contains("is-mini") || persistentPlayer.classList.contains("is-theater")) return;
+    watchPlayerState.originalBottom = persistentPlayer.getBoundingClientRect().bottom + scrollY;
+  };
+  rememberPosition();
+
+  const leavePersistentMode = () => {
+    clearTimeout(watchPlayerState.miniTimer);
+    watchPlayerState.miniTimer = null;
+    persistentPlayer.classList.remove("is-mini", "is-theater");
+    playerPlaceholder.classList.remove("is-active");
+    playerPlaceholder.style.height = "";
+    document.body.classList.remove("player-theater-open");
+    restore.hidden = true;
+    status.textContent = "Scroll to keep watching";
+  };
+
+  const activateMini = () => {
+    watchPlayerState.miniTimer = null;
+    if (watchPlayerState.dismissed || scrollY + 90 < watchPlayerState.originalBottom) return;
+    playerPlaceholder.style.height = `${persistentPlayer.offsetHeight}px`;
+    playerPlaceholder.classList.add("is-active");
+    persistentPlayer.classList.add("is-mini");
+    restore.hidden = false;
+    const started = !reduceMotion && document.visibilityState === "visible" && startMutedPlayback();
+    status.textContent = started ? "Mini-player playing muted" : "Mini-player ready";
+  };
+
+  const evaluateScroll = () => {
+    if (watchPlayerState.dismissed || persistentPlayer.classList.contains("is-theater")) return;
+    const passedPlayer = scrollY + 90 >= watchPlayerState.originalBottom;
+    if (!passedPlayer) {
+      if (persistentPlayer.classList.contains("is-mini")) leavePersistentMode();
+      if (watchPlayerState.miniTimer) {
+        clearTimeout(watchPlayerState.miniTimer);
+        watchPlayerState.miniTimer = null;
+        status.textContent = "Scroll to keep watching";
+      }
+      return;
+    }
+    if (!persistentPlayer.classList.contains("is-mini") && !watchPlayerState.miniTimer) {
+      status.textContent = "Mini-player starts in 3 seconds";
+      watchPlayerState.miniTimer = setTimeout(activateMini, 3000);
+    }
+  };
+
+  persistentPlayer.addEventListener("click", (event) => {
+    const action = event.target.closest("[data-player-mode]")?.dataset.playerMode;
+    if (!action) return;
+    if (action === "restore") {
+      leavePersistentMode();
+      persistentPlayer.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+    }
+    if (action === "theater") {
+      playerPlaceholder.style.height = `${persistentPlayer.offsetHeight}px`;
+      playerPlaceholder.classList.add("is-active");
+      persistentPlayer.classList.remove("is-mini");
+      persistentPlayer.classList.add("is-theater");
+      document.body.classList.add("player-theater-open");
+      restore.hidden = false;
+      status.textContent = "Theater player — playback continues";
+    }
+    if (action === "close") {
+      watchPlayerState.dismissed = true;
+      pausePlayback();
+      leavePersistentMode();
+      status.textContent = "Persistent playback stopped";
+    }
+  });
+
+  addEventListener("scroll", evaluateScroll, { passive: true });
+  addEventListener("resize", rememberPosition, { passive: true });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden" && watchPlayerState.miniTimer) {
+      clearTimeout(watchPlayerState.miniTimer);
+      watchPlayerState.miniTimer = null;
+      status.textContent = "Mini-player paused while this tab is hidden";
+      return;
+    }
+    if (document.visibilityState === "visible") evaluateScroll();
+  });
+}
+
+function startMutedPlayback() {
+  const video = persistentPlayer.querySelector("video");
+  if (video) {
+    video.muted = true;
+    video.play().catch(() => {});
+    return true;
+  }
+  if (document.body.dataset.videoProvider === "youtube") {
+    youtubeCommand("mute");
+    youtubeCommand("playVideo");
+    return true;
+  }
+  return false;
+}
+
+function pausePlayback() {
+  const video = persistentPlayer?.querySelector("video");
+  if (video) video.pause();
+  youtubeCommand("pauseVideo");
+}
+
+function youtubeCommand(func, args = []) {
+  const frame = persistentPlayer?.querySelector("iframe");
+  if (!frame || document.body.dataset.videoProvider !== "youtube") return;
+  try {
+    const targetOrigin = new URL(frame.src).origin;
+    frame.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args }), targetOrigin);
+  } catch {
+    // The provider's built-in controls remain available if its API is unavailable.
+  }
+}
+
+async function initializeDiscovery() {
+  if (!relatedFilter) return;
+  try {
+    const result = await api("/api/categories");
+    const select = relatedFilter.elements.category;
+    Object.keys(result.categories || {}).forEach((category) => {
+      const option = document.createElement("option");
+      option.value = category;
+      option.textContent = category;
+      select.append(option);
+    });
+  } catch {
+    // The default personalized list remains usable if categories cannot load.
+  }
+  relatedFilter.addEventListener("submit", (event) => {
+    event.preventDefault();
+    loadRecommendations({
+      query: relatedFilter.elements.q.value.trim(),
+      category: relatedFilter.elements.category.value,
+    });
+  });
+}
+
+async function recordInterest(signal, button) {
+  document.querySelectorAll("[data-interest]").forEach((item) => { item.disabled = true; });
+  setStatus(interestStatus, "Saving your preference…");
+  try {
+    const result = await api(`/api/videos/${videoId}/interest`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ signal }),
+    });
+    button.classList.add("active");
+    setStatus(interestStatus, result.message, "success");
+    await loadRecommendations();
+  } catch (error) {
+    setStatus(interestStatus, error.message, "error");
+  } finally {
+    document.querySelectorAll("[data-interest]").forEach((item) => { item.disabled = false; });
+  }
+}
+
+async function loadRecommendations(filters = null) {
+  if (!relatedList || !videoId) return;
+  relatedList.replaceChildren(messageItem("Finding useful videos…"));
+  try {
+    let endpoint = `/api/videos/${videoId}/recommendations?limit=10`;
+    if (filters?.query || filters?.category) {
+      const params = new URLSearchParams({ limit: "10", sort: "popular" });
+      if (filters.query) params.set("q", filters.query);
+      if (filters.category) params.set("category", filters.category);
+      endpoint = `/api/videos?${params}`;
+    }
+    const result = await api(endpoint);
+    const videos = (result.videos || []).filter((video) => Number(video.id) !== videoId);
+    relatedList.replaceChildren();
+    if (!videos.length) {
+      relatedList.append(messageItem("No other matching videos yet."));
+      return;
+    }
+    videos.forEach((video) => relatedList.append(buildRelatedVideo(video)));
+  } catch (error) {
+    relatedList.replaceChildren(messageItem(error.message));
+  }
+}
+
+function buildRelatedVideo(video) {
+  const link = document.createElement("a");
+  link.className = "related-video-card";
+  link.href = `/watch/${encodeURIComponent(video.slug)}`;
+  const media = document.createElement("span");
+  media.className = "related-video-media";
+  if (video.thumbnail_url) {
+    const image = document.createElement("img");
+    image.src = video.thumbnail_url;
+    image.alt = "";
+    image.loading = "lazy";
+    image.decoding = "async";
+    media.append(image);
+  } else {
+    media.textContent = "▶";
+  }
+  const copy = document.createElement("span");
+  const title = document.createElement("strong");
+  title.textContent = video.title;
+  const detail = document.createElement("small");
+  detail.textContent = `${video.subcategory} · ${formatNumber(video.views)} views`;
+  copy.append(title, detail);
+  link.append(media, copy);
+  return link;
 }
 
 function enhanceNativePlayer() {
   const video = document.querySelector(".watch-player video");
   if (!video) return;
-  const stage = video.closest(".watch-player");
+  const stage = video.closest(".watch-player-stage");
+  if (!stage) return;
   stage.style.overflow = "hidden";
 
   const tools = document.createElement("div");
@@ -97,7 +325,7 @@ function enhanceNativePlayer() {
 
   video.addEventListener("play", () => { playPause.textContent = "❚❚ Pause"; });
   video.addEventListener("pause", () => { playPause.textContent = "▶ Play"; });
-  video.insertAdjacentElement("afterend", tools);
+  stage.insertAdjacentElement("afterend", tools);
 }
 
 function playerButton(label, ariaLabel, handler) {

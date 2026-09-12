@@ -10,6 +10,14 @@ const EXTERNAL_VIDEO_HOSTS = new Set([
   "www.tiktok.com",
   "facebook.com",
   "www.facebook.com",
+  "player.vimeo.com",
+  "vimeo.com",
+  "www.dailymotion.com",
+  "dailymotion.com",
+  "player.twitch.tv",
+  "clips.twitch.tv",
+  "www.instagram.com",
+  "instagram.com",
 ]);
 const COMMENT_IMAGE_TYPES = new Set([
   "image/avif",
@@ -37,7 +45,11 @@ function isExternalEmbed(value) {
     return EXTERNAL_VIDEO_HOSTS.has(hostname)
       || hostname.endsWith(".youtube.com")
       || hostname.endsWith(".tiktok.com")
-      || hostname.endsWith(".facebook.com");
+      || hostname.endsWith(".facebook.com")
+      || hostname.endsWith(".vimeo.com")
+      || hostname.endsWith(".dailymotion.com")
+      || hostname.endsWith(".twitch.tv")
+      || hostname.endsWith(".instagram.com");
   } catch {
     return false;
   }
@@ -53,11 +65,6 @@ export function sanitizeWatchHtml(html, sourceMetadata = null) {
   const scriptMatch = output.match(scriptPattern);
   if (!scriptMatch) return output;
 
-  const usesFallbackThumbnail = /<meta property="og:image" content="[^"]*\/favicon\.svg(?:\?[^"]*)?">/i.test(output);
-  if (usesFallbackThumbnail) {
-    return output.replace(scriptPattern, "");
-  }
-
   let schema;
   try {
     schema = JSON.parse(scriptMatch[2]);
@@ -65,15 +72,36 @@ export function sanitizeWatchHtml(html, sourceMetadata = null) {
     return output.replace(scriptPattern, "");
   }
 
-  if (isExternalEmbed(schema.embedUrl)) {
-    if (!sourceMetadata?.source_published_at) return output.replace(scriptPattern, "");
-    schema.uploadDate = sourceMetadata.source_published_at;
-    if (sourceMetadata.source_duration) schema.duration = sourceMetadata.source_duration;
+  const graph = Array.isArray(schema?.["@graph"]) ? schema["@graph"] : null;
+  const videoSchema = graph
+    ? graph.find((item) => item?.["@type"] === "VideoObject")
+    : schema?.["@type"] === "VideoObject" ? schema : null;
+  if (!videoSchema) return output;
+
+  const replaceSchema = () => {
+    const safeJson = JSON.stringify(schema).replace(/</g, "\\u003c").replace(/-->/g, "--\\u003e");
+    const replacement = `\n  <script type="application/ld+json" nonce="${scriptMatch[1]}">${safeJson}</script>`;
+    return output.replace(scriptPattern, replacement);
+  };
+  const omitVideoSchema = () => {
+    if (!graph) return output.replace(scriptPattern, "");
+    schema["@graph"] = graph.filter((item) => item !== videoSchema);
+    for (const item of schema["@graph"]) {
+      if (item?.mainEntity?.["@id"] === videoSchema["@id"]) delete item.mainEntity;
+    }
+    return replaceSchema();
+  };
+
+  const usesFallbackThumbnail = /<meta property="og:image" content="[^"]*\/favicon\.svg(?:\?[^"]*)?">/i.test(output);
+  if (usesFallbackThumbnail) return omitVideoSchema();
+
+  if (isExternalEmbed(videoSchema.embedUrl)) {
+    if (!sourceMetadata?.source_published_at) return omitVideoSchema();
+    videoSchema.uploadDate = sourceMetadata.source_published_at;
+    if (sourceMetadata.source_duration) videoSchema.duration = sourceMetadata.source_duration;
   }
 
-  const safeJson = JSON.stringify(schema).replace(/</g, "\\u003c").replace(/-->/g, "--\\u003e");
-  const replacement = `\n  <script type="application/ld+json" nonce="${scriptMatch[1]}">${safeJson}</script>`;
-  return output.replace(scriptPattern, replacement);
+  return replaceSchema();
 }
 
 function sameOriginMutationAllowed(request) {
@@ -554,6 +582,8 @@ async function scheduledHandler(_controller, env, ctx) {
     env.DB.prepare("DELETE FROM rate_limits WHERE window_started_at < ?")
       .bind(twoDaysAgo).run(),
     env.DB.prepare("DELETE FROM discovery_request_visitors WHERE created_at < datetime('now', '-90 days')")
+      .run(),
+    env.DB.prepare("DELETE FROM viewer_interests WHERE updated_at < datetime('now', '-180 days')")
       .run(),
   ]);
   ctx.waitUntil(cleanup);

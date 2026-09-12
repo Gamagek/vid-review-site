@@ -38,3 +38,24 @@ test("omits external VideoObject markup when original publication date is unveri
   </head><body data-video-id="1"></body>`;
   assert.doesNotMatch(sanitizeWatchHtml(html), /application\/ld\+json/);
 });
+
+test("keeps crawlable WebPage and breadcrumb schema when an external VideoObject is unverified", () => {
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      { "@type": "WebPage", "@id": "https://example.com/watch/test", mainEntity: { "@id": "https://example.com/watch/test#video" } },
+      { "@type": "VideoObject", "@id": "https://example.com/watch/test#video", thumbnailUrl: ["https://example.com/video.jpg"], embedUrl: "https://player.vimeo.com/video/123" },
+      { "@type": "BreadcrumbList", itemListElement: [] },
+    ],
+  };
+  const html = `<!doctype html><head>
+    <meta property="og:image" content="https://example.com/video.jpg">
+    <script type="application/ld+json" nonce="abc">${JSON.stringify(schema)}</script>
+  </head><body data-video-id="1"></body>`;
+  const result = sanitizeWatchHtml(html);
+  assert.match(result, /application\/ld\+json/);
+  assert.match(result, /WebPage/);
+  assert.match(result, /BreadcrumbList/);
+  assert.doesNotMatch(result, /VideoObject/);
+  assert.doesNotMatch(result, /mainEntity/);
+});

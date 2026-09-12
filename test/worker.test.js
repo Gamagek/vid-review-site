@@ -314,3 +314,80 @@ test("gives AI generation a longer browser timeout than ordinary requests", () =
   const source = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
   assert.match(source, /url\.startsWith\("\/api\/ai\/generate"\) \? 35000 : 15000/);
 });
+
+test("normalizes trusted provider URLs into provider-owned embeds", async () => {
+  const context = createTestContext();
+  const cases = [
+    ["Vimeo", "https://vimeo.com/76979871", "vimeo", /^https:\/\/player\.vimeo\.com\/video\/76979871/],
+    ["Dailymotion", "https://www.dailymotion.com/video/x84sh87", "dailymotion", /^https:\/\/www\.dailymotion\.com\/embed\/video\/x84sh87/],
+    ["Twitch", "https://www.twitch.tv/videos/123456789", "twitch", /^https:\/\/player\.twitch\.tv\/\?video=v123456789/],
+    ["Instagram", "https://www.instagram.com/reel/ABC_def-123/", "instagram", /^https:\/\/www\.instagram\.com\/reel\/ABC_def-123\/embed/],
+  ];
+
+  for (const [title, sourceUrl, provider, embedPattern] of cases) {
+    const response = await send(context, "/api/videos", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: `${title} provider test`,
+        source_url: sourceUrl,
+        primary_category: "Technology",
+        subcategory: "Web Development",
+        published: false,
+      }),
+    });
+    assert.equal(response.status, 201, `${title} should be accepted`);
+    const result = await response.json();
+    assert.equal(result.video.provider, provider);
+    assert.match(result.video.embed_url, embedPattern);
+  }
+});
+
+test("serves the seeded YouTube demo and records privacy-hashed interests", async () => {
+  const context = createTestContext();
+  context.sqlite.exec(readFileSync(new URL("../migrations/0007_universal_video_experience.sql", import.meta.url), "utf8"));
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+       slug, title, source_url, media_type, primary_category, subcategory, description, published, views
+     ) VALUES (?, ?, ?, 'raw', 'Technology', 'Web Development', ?, 1, 200),
+              (?, ?, ?, 'raw', 'Science', 'Space', ?, 1, 10)`,
+  ).run(
+    "related-web-video", "Related web video", "https://example.com/related.mp4", "A related recommendation",
+    "unrelated-space-video", "Unrelated space video", "https://example.com/space.mp4", "A different recommendation",
+  );
+
+  const demo = context.sqlite.prepare(
+    "SELECT id FROM videos WHERE slug = 'youtube-embed-experience-demo'",
+  ).get();
+  assert.ok(demo?.id);
+
+  const page = await send(context, "/watch/youtube-embed-experience-demo");
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.match(html, /youtube-nocookie\.com\/embed\/M7lc1UVf-VE/);
+  assert.match(html, /<meta name="robots" content="index,follow,max-image-preview:large,max-video-preview:-1">/);
+  assert.match(html, /"@graph"/);
+  assert.match(html, /id="watch-related"/);
+
+  const headers = {
+    "Content-Type": "application/json",
+    "CF-Connecting-IP": "192.0.2.70",
+    "User-Agent": "recommendation-test-browser",
+  };
+  const saved = await send(context, `/api/videos/${demo.id}/interest`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ signal: "more" }),
+  });
+  assert.equal(saved.status, 200);
+  assert.equal((await saved.json()).score, 5);
+  const interest = context.sqlite.prepare("SELECT fingerprint, score FROM viewer_interests").get();
+  assert.match(interest.fingerprint, /^[0-9a-f]{64}$/);
+  assert.equal(interest.score, 5);
+
+  const recommended = await send(context, `/api/videos/${demo.id}/recommendations?limit=2`, { headers });
+  assert.equal(recommended.status, 200);
+  const result = await recommended.json();
+  assert.equal(result.personalized, true);
+  assert.equal(result.videos[0].slug, "related-web-video");
+});

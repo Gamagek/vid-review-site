@@ -44,9 +44,9 @@
             <input id="editing-id" type="hidden">
             <input id="active-discovery-request" type="hidden">
             <div class="form-section">
-              <div class="form-section-heading"><span>01</span><div><h2>Media source</h2><p>Paste a supported link or upload to your private R2 bucket.</p></div></div>
+              <div class="form-section-heading"><span>01</span><div><h2>Media source</h2><p>Paste a trusted provider link or upload media to your private R2 bucket.</p></div></div>
               <div class="video-search-box">
-                <label><span>Find a public video or paste its URL</span><input id="video-search" type="search" maxlength="500" placeholder="Search YouTube or paste a YouTube, TikTok or Facebook URL"></label>
+                <label><span>Find a public video or paste its URL</span><input id="video-search" type="search" maxlength="500" placeholder="Search YouTube or paste a supported video URL"></label>
                 <button id="video-search-button" class="button ghost" type="button">Search videos</button>
                 <p id="video-search-status" class="form-status" role="status"></p>
                 <div id="video-search-results" class="video-search-results" aria-live="polite"></div>
@@ -56,7 +56,8 @@
                 <button class="source-tab" type="button" data-mode="upload">R2 upload</button>
               </div>
               <div id="link-source-panel">
-                <label><span>YouTube, TikTok, Facebook or raw media URL</span><input id="source-url" name="source_url" type="url" maxlength="2000" placeholder="https://…"></label>
+                <label><span>Video page or direct media URL</span><input id="source-url" name="source_url" type="url" maxlength="2000" placeholder="https://…"></label>
+                <p class="field-help">Trusted embeds: YouTube, Vimeo, Dailymotion, Twitch, Instagram, TikTok and Facebook. Direct MP4/WebM links and your R2 uploads use the native player. For safety, iframe HTML is never accepted.</p>
               </div>
               <div id="upload-source-panel" hidden>
                 <label class="upload-dropzone" id="upload-dropzone">
@@ -80,6 +81,11 @@
               </div>
               <label><span>Video title</span><input id="video-title" name="title" maxlength="160" required placeholder="Clear, specific review title"></label>
               <label><span>Thumbnail URL (optional)</span><input id="thumbnail-url" name="thumbnail_url" maxlength="2000" placeholder="https://…"></label>
+              <div class="thumbnail-upload">
+                <label><span>Or upload a custom thumbnail</span><input id="thumbnail-file" type="file" accept="image/avif,image/gif,image/jpeg,image/png,image/webp"></label>
+                <button id="thumbnail-upload-button" class="button ghost" type="button">Upload thumbnail</button>
+                <p id="thumbnail-upload-status" class="form-status" role="status"></p>
+              </div>
               <label><span>Private notes for AI context (not published)</span><textarea id="ai-notes" maxlength="1500" placeholder="Facts you verified, transcript/OCR notes, key themes, products or speakers…"></textarea></label>
             </div>
 
