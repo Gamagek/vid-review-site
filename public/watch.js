@@ -16,6 +16,7 @@ const watchPlayerState = {
   miniTimer: null,
   originalBottom: 0,
   dismissed: false,
+  focusReturn: null,
 };
 
 document.addEventListener("DOMContentLoaded", initializeWatchPage);
@@ -49,25 +50,35 @@ function initializePersistentPlayer() {
   };
   rememberPosition();
 
-  const leavePersistentMode = () => {
+  const leavePersistentMode = ({ restoreFocus = false } = {}) => {
+    const wasTheater = persistentPlayer.classList.contains("is-theater");
     clearTimeout(watchPlayerState.miniTimer);
     watchPlayerState.miniTimer = null;
     persistentPlayer.classList.remove("is-mini", "is-theater");
+    persistentPlayer.removeAttribute("role");
+    persistentPlayer.removeAttribute("aria-modal");
+    persistentPlayer.setAttribute("aria-label", "Video player");
     playerPlaceholder.classList.remove("is-active");
     playerPlaceholder.style.height = "";
     document.body.classList.remove("player-theater-open");
     restore.hidden = true;
     status.textContent = "Scroll to keep watching";
+    if (wasTheater && restoreFocus && watchPlayerState.focusReturn instanceof HTMLElement) {
+      watchPlayerState.focusReturn.focus();
+    }
+    if (wasTheater) watchPlayerState.focusReturn = null;
   };
 
-  const activateMini = () => {
+  const activateMini = async () => {
     watchPlayerState.miniTimer = null;
     if (watchPlayerState.dismissed || scrollY + 90 < watchPlayerState.originalBottom) return;
     playerPlaceholder.style.height = `${persistentPlayer.offsetHeight}px`;
     playerPlaceholder.classList.add("is-active");
     persistentPlayer.classList.add("is-mini");
     restore.hidden = false;
-    const started = !reduceMotion && document.visibilityState === "visible" && startMutedPlayback();
+    const started = !reduceMotion && document.visibilityState === "visible"
+      ? await startMutedPlayback()
+      : false;
     status.textContent = started ? "Mini-player playing muted" : "Mini-player ready";
   };
 
@@ -85,7 +96,7 @@ function initializePersistentPlayer() {
     }
     if (!persistentPlayer.classList.contains("is-mini") && !watchPlayerState.miniTimer) {
       status.textContent = "Mini-player starts in 3 seconds";
-      watchPlayerState.miniTimer = setTimeout(activateMini, 3000);
+      watchPlayerState.miniTimer = setTimeout(() => { void activateMini(); }, 3000);
     }
   };
 
@@ -93,23 +104,51 @@ function initializePersistentPlayer() {
     const action = event.target.closest("[data-player-mode]")?.dataset.playerMode;
     if (!action) return;
     if (action === "restore") {
-      leavePersistentMode();
+      leavePersistentMode({ restoreFocus: true });
       persistentPlayer.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
     }
     if (action === "theater") {
+      watchPlayerState.focusReturn = document.activeElement;
       playerPlaceholder.style.height = `${persistentPlayer.offsetHeight}px`;
       playerPlaceholder.classList.add("is-active");
       persistentPlayer.classList.remove("is-mini");
       persistentPlayer.classList.add("is-theater");
+      persistentPlayer.setAttribute("role", "dialog");
+      persistentPlayer.setAttribute("aria-modal", "true");
+      persistentPlayer.setAttribute("aria-label", "Expanded video player");
       document.body.classList.add("player-theater-open");
       restore.hidden = false;
       status.textContent = "Theater player — playback continues";
+      persistentPlayer.querySelector('[data-player-mode="close"]')?.focus();
     }
     if (action === "close") {
       watchPlayerState.dismissed = true;
       pausePlayback();
-      leavePersistentMode();
+      leavePersistentMode({ restoreFocus: true });
       status.textContent = "Persistent playback stopped";
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (!persistentPlayer.classList.contains("is-theater")) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      leavePersistentMode({ restoreFocus: true });
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusable = [...persistentPlayer.querySelectorAll(
+      'button:not([hidden]):not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), iframe, video[controls]',
+    )].filter((element) => element.getClientRects().length > 0);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable.at(-1);
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
     }
   });
 
@@ -126,12 +165,16 @@ function initializePersistentPlayer() {
   });
 }
 
-function startMutedPlayback() {
+async function startMutedPlayback() {
   const video = persistentPlayer.querySelector("video");
   if (video) {
     video.muted = true;
-    video.play().catch(() => {});
-    return true;
+    try {
+      await video.play();
+      return !video.paused;
+    } catch {
+      return false;
+    }
   }
   if (document.body.dataset.videoProvider === "youtube") {
     youtubeCommand("mute");

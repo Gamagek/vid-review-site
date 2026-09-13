@@ -522,6 +522,7 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
 .form-section-heading h2 { margin: 0; font-size: 1.2rem; }
 .form-section-heading p { margin: 5px 0 0; color: var(--muted); font-size: .78rem; }
 .field-help { margin: 8px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.55; }
+.admin-page label small { display: block; margin-top: 6px; color: var(--muted); font-size: .68rem; line-height: 1.45; }
 .thumbnail-upload { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: end; padding: 13px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.02); }
 .thumbnail-upload .form-status { grid-column: 1 / -1; }
 .form-row.two { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }

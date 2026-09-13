@@ -197,7 +197,7 @@ async function route(request, env, ctx) {
   if (match && ["PATCH", "DELETE"].includes(request.method)) {
     await requireAdmin(request, env);
     if (request.method === "PATCH") return updateVideo(request, env, Number(match[1]));
-    if (request.method === "DELETE") return deleteVideo(env, Number(match[1]));
+    if (request.method === "DELETE") return deleteVideo(request, env, Number(match[1]));
   }
 
   match = path.match(/^\/api\/videos\/([^/]+)$/);
@@ -781,9 +781,13 @@ async function listVideos(request, env, includeUnpublished) {
   if (url.searchParams.get("trending") === "1") where.push("v.trending = 1");
 
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
-  const listStatement = env.DB.prepare(
-    `SELECT v.* FROM videos v ${whereSql} ORDER BY ${sortSql} LIMIT ? OFFSET ?`,
-  ).bind(...bindings, limit, offset);
+  const selectSql = includeUnpublished
+    ? `SELECT v.*, m.source_published_at, m.source_duration
+       FROM videos v
+       LEFT JOIN video_source_metadata m ON m.video_id = v.id
+       ${whereSql} ORDER BY ${sortSql} LIMIT ? OFFSET ?`
+    : `SELECT v.* FROM videos v ${whereSql} ORDER BY ${sortSql} LIMIT ? OFFSET ?`;
+  const listStatement = env.DB.prepare(selectSql).bind(...bindings, limit, offset);
   const countStatement = env.DB.prepare(`SELECT COUNT(*) AS total FROM videos v ${whereSql}`).bind(...bindings);
   const [listResult, countRow] = await env.DB.batch([listStatement, countStatement]);
   const videos = await hydrateVideos(env, listResult.results || []);
@@ -950,14 +954,63 @@ async function updateVideo(request, env, id) {
     id,
   ).first();
 
+  const replacedKeys = [
+    existing.r2_key && existing.r2_key !== data.r2_key ? existing.r2_key : null,
+    existing.thumbnail_url && existing.thumbnail_url !== data.thumbnail_url
+      ? managedAssetKeyFromUrl(existing.thumbnail_url, request, env)
+      : null,
+  ];
+  await cleanupUnusedManagedAssets(env, replacedKeys);
+
   return json({ success: true, video: serializeVideo(row) });
 }
 
-async function deleteVideo(env, id) {
-  const existing = await env.DB.prepare("SELECT id FROM videos WHERE id = ?").bind(id).first();
+async function deleteVideo(request, env, id) {
+  const existing = await env.DB.prepare(
+    "SELECT id, r2_key, thumbnail_url FROM videos WHERE id = ?",
+  ).bind(id).first();
   if (!existing) throw new AppError(404, "Video not found");
   await env.DB.prepare("DELETE FROM videos WHERE id = ?").bind(id).run();
+  await cleanupUnusedManagedAssets(env, [
+    existing.r2_key,
+    managedAssetKeyFromUrl(existing.thumbnail_url, request, env),
+  ]);
   return json({ success: true });
+}
+
+function managedAssetKeyFromUrl(value, request, env) {
+  const raw = cleanText(value, 2000);
+  if (!raw) return null;
+  try {
+    const currentOrigin = new URL(request.url).origin;
+    const configuredOrigin = getBaseUrl(request, env);
+    const url = new URL(raw, currentOrigin);
+    if (![currentOrigin, configuredOrigin].includes(url.origin) || !url.pathname.startsWith("/media/")) return null;
+    const key = validateR2Key(safeDecode(url.pathname.slice("/media/".length)));
+    return key?.startsWith("uploads/") ? key : null;
+  } catch {
+    return null;
+  }
+}
+
+async function cleanupUnusedManagedAssets(env, values) {
+  if (!env.BUCKET) return;
+  const keys = [...new Set(values.filter((key) => typeof key === "string" && key.startsWith("uploads/")))];
+  for (const key of keys) {
+    try {
+      const relativeUrl = `/media/${encodeR2Key(key)}`;
+      const reference = await env.DB.prepare(
+        `SELECT 1 FROM videos
+         WHERE r2_key = ?
+            OR thumbnail_url = ?
+            OR substr(thumbnail_url, -length(?)) = ?
+         LIMIT 1`,
+      ).bind(key, relativeUrl, relativeUrl, relativeUrl).first();
+      if (!reference) await env.BUCKET.delete(key);
+    } catch (error) {
+      console.error("Managed asset cleanup failed", error?.message || error);
+    }
+  }
 }
 
 async function validateVideoPayload(body, existing, baseUrl, env) {
@@ -1459,6 +1512,7 @@ async function watchPage(request, env, ctx, slugInput) {
 
 function renderWatchHtml(video, request, env, scriptNonce) {
   const baseUrl = getBaseUrl(request, env);
+  const playbackOrigin = new URL(request.url).origin;
   const canonical = `${baseUrl}/watch/${encodeURIComponent(video.slug)}`;
   const title = cleanText(video.seo_title || video.title, 70);
   const description = cleanText(video.seo_description || video.description || `Discover ${video.title} on Vid.Best.`, 180);
@@ -1551,7 +1605,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   </header>
   <main class="watch-shell">
     <div id="watch-player-anchor" class="watch-player-anchor" aria-hidden="true"></div>
-    <section id="watch-player" class="watch-player glass-panel" data-provider="${escapeHtml(video.provider)}">
+    <section id="watch-player" class="watch-player glass-panel" data-provider="${escapeHtml(video.provider)}" aria-label="Video player">
       <div class="persistent-player-bar">
         <strong>Now playing</strong>
         <span id="persistent-player-status" role="status">Scroll to keep watching</span>
@@ -1559,7 +1613,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
         <button type="button" data-player-mode="theater">Pop-up</button>
         <button type="button" data-player-mode="close" aria-label="Close persistent player">Close</button>
       </div>
-      <div class="watch-player-stage">${renderMedia(video, baseUrl)}</div>
+      <div class="watch-player-stage">${renderMedia(video, playbackOrigin)}</div>
     </section>
     <article class="watch-copy glass-panel">
       <div class="tile-badges"><span class="badge">${escapeHtml(video.primary_category)}</span><span class="badge secondary">${escapeHtml(video.subcategory)}</span></div>
@@ -1607,22 +1661,26 @@ function renderWatchHtml(video, request, env, scriptNonce) {
 </html>`;
 }
 
-function renderMedia(video, baseUrl) {
+function renderMedia(video, playbackOrigin) {
   if (video.embed_url) {
-    const embedUrl = preparePlaybackEmbed(video.embed_url, baseUrl);
+    const embedUrl = preparePlaybackEmbed(video.embed_url, playbackOrigin);
     return `<iframe id="watch-media-frame" src="${escapeHtml(embedUrl)}" title="${escapeHtml(video.title)}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"></iframe>`;
   }
   const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}"` : "";
   return `<video id="watch-media-video" controls playsinline preload="metadata"${poster}><source src="${escapeHtml(video.source_url)}">Your browser does not support this video.</video>`;
 }
 
-function preparePlaybackEmbed(value, baseUrl) {
+function preparePlaybackEmbed(value, playbackOrigin) {
   try {
     const url = new URL(value);
+    const pageUrl = new URL(playbackOrigin);
     if (url.hostname === "www.youtube-nocookie.com" || url.hostname.endsWith(".youtube.com")) {
       url.searchParams.set("enablejsapi", "1");
       url.searchParams.set("playsinline", "1");
-      url.searchParams.set("origin", new URL(baseUrl).origin);
+      url.searchParams.set("origin", pageUrl.origin);
+    }
+    if (url.hostname === "player.twitch.tv" || url.hostname === "clips.twitch.tv") {
+      url.searchParams.set("parent", pageUrl.hostname);
     }
     return url.toString();
   } catch {

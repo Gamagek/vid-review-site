@@ -86,6 +86,10 @@
                 <button id="thumbnail-upload-button" class="button ghost" type="button">Upload thumbnail</button>
                 <p id="thumbnail-upload-status" class="form-status" role="status"></p>
               </div>
+              <div class="form-row two">
+                <label><span>Original publish date</span><input id="source-published-at" type="date"><small>Used for verified VideoObject SEO. Check the source before entering it.</small></label>
+                <label><span>Video duration (seconds)</span><input id="source-duration-seconds" type="number" min="1" max="604800" inputmode="numeric" placeholder="For example: 951"><small>Optional. Provider data is preferred when available.</small></label>
+              </div>
               <label><span>Private notes for AI context (not published)</span><textarea id="ai-notes" maxlength="1500" placeholder="Facts you verified, transcript/OCR notes, key themes, products or speakers…"></textarea></label>
             </div>
 

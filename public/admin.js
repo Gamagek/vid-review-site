@@ -36,6 +36,8 @@ const ui = {
   thumbnailFile: document.querySelector("#thumbnail-file"),
   thumbnailUploadButton: document.querySelector("#thumbnail-upload-button"),
   thumbnailUploadStatus: document.querySelector("#thumbnail-upload-status"),
+  sourcePublishedAt: document.querySelector("#source-published-at"),
+  sourceDurationSeconds: document.querySelector("#source-duration-seconds"),
   notes: document.querySelector("#ai-notes"),
   aiButton: document.querySelector("#ai-generate"),
   aiStatus: document.querySelector("#ai-status"),
@@ -240,6 +242,8 @@ function selectDiscoveredVideo(video) {
   ui.sourceUrl.value = video.source_url || "";
   ui.title.value = video.title || "";
   ui.thumbnail.value = video.thumbnail_url || "";
+  ui.sourcePublishedAt.value = dateInputValue(video.published_at);
+  ui.sourceDurationSeconds.value = "";
   ui.notes.value = [
     video.channel ? `Verified public channel: ${video.channel}` : "",
     video.published_at ? `Original publish date: ${video.published_at}` : "",
@@ -465,6 +469,8 @@ async function saveVideo(event) {
     primary_category: ui.category.value,
     subcategory: ui.subcategory.value,
     thumbnail_url: ui.thumbnail.value,
+    source_published_at: ui.sourcePublishedAt.value,
+    source_duration_seconds: ui.sourceDurationSeconds.value,
     seo_title: ui.seoTitle.value,
     seo_description: ui.seoDescription.value,
     description: ui.description.value,
@@ -563,6 +569,8 @@ function editVideo(video) {
   ui.category.value = video.primary_category;
   fillSubcategories(video.primary_category, video.subcategory);
   ui.thumbnail.value = video.thumbnail_url || "";
+  ui.sourcePublishedAt.value = dateInputValue(video.source_published_at);
+  ui.sourceDurationSeconds.value = isoDurationToSeconds(video.source_duration);
   ui.seoTitle.value = video.seo_title || "";
   ui.seoDescription.value = video.seo_description || "";
   ui.description.value = video.description || "";
@@ -586,6 +594,17 @@ async function deleteVideo(video) {
   } catch (error) {
     setStatus(ui.saveStatus, error.message, "error");
   }
+}
+
+function dateInputValue(value) {
+  const match = String(value || "").match(/^\d{4}-\d{2}-\d{2}/);
+  return match?.[0] || "";
+}
+
+function isoDurationToSeconds(value) {
+  const match = String(value || "").match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/i);
+  if (!match) return "";
+  return String((Number(match[1]) || 0) * 3600 + (Number(match[2]) || 0) * 60 + (Number(match[3]) || 0));
 }
 
 async function loadPendingComments() {

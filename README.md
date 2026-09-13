@@ -40,6 +40,7 @@ The watch page includes canonical, Open Graph and X/Twitter metadata. `VideoObje
 
 - a real video thumbnail is required; the site favicon is never used as a fake video thumbnail in structured data;
 - for YouTube sources, the Worker can verify the original publication date and duration through the YouTube Data API and store them in D1;
+- for other trusted providers, an administrator can supply the verified original publication date and duration when the provider API is unavailable;
 - external embeds without a verified original publication date remain normal indexable pages, but their potentially inaccurate `VideoObject` block is omitted;
 - only published D1 records appear in the sitemap.
 
@@ -123,10 +124,11 @@ In Cloudflare, attach the final custom domain to the Worker, then make `PUBLIC_B
 5. Add verified notes, transcript/OCR text if available, then use **AI Generate**.
 6. Check and edit all generated claims, title, description and tags.
 7. Supply a genuine thumbnail URL or upload a PNG/JPEG/WebP/AVIF/GIF thumbnail from the admin form.
-8. Enable **Published** only after the record is useful and verified.
-9. Save. The Worker serves `/watch/the-generated-slug` immediately from D1 and includes published pages in the sitemap.
+8. For a non-YouTube provider, enter the verified original publish date and duration in seconds so the page can safely emit `VideoObject` metadata.
+9. Enable **Published** only after the record is useful and verified.
+10. Save. The Worker serves `/watch/the-generated-slug` immediately from D1 and includes published pages in the sitemap.
 
-After migration `0007`, `/watch/youtube-embed-experience-demo` is a published test page using the sample YouTube video ID from Google's IFrame Player API documentation. It demonstrates custom editorial SEO, reactions, moderated comments, persistent playback and recommendations.
+After migrations `0007` and `0008`, `/watch/youtube-embed-experience-demo` is a published test page using the sample YouTube video ID from Google's IFrame Player API documentation. It demonstrates verified video metadata, custom editorial SEO, reactions, moderated comments, persistent playback and recommendations.
 
 ## Upload types
 
@@ -186,7 +188,8 @@ Vid.Best/
 │   ├── 0004_maintenance_indexes.sql
 │   ├── 0005_source_video_metadata.sql
 │   ├── 0006_test_player_and_comment_images.sql
-│   └── 0007_universal_video_experience.sql
+│   ├── 0007_universal_video_experience.sql
+│   └── 0008_verified_demo_metadata.sql
 ├── public/
 │   ├── index.html
 │   ├── admin.html

@@ -3,10 +3,17 @@ import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 import worker from "../src/index.js";
+import { refreshSourceMetadata, sanitizeWatchHtml } from "../src/edge.js";
 
 const secret = "correct-horse-battery-staple-admin-secret";
 const reactionSalt = "separate-rate-limit-and-reaction-secret";
-const migrations = ["0001_initial.sql", "0002_discovery_requests.sql", "0003_security_rate_limits.sql"];
+const migrations = [
+  "0001_initial.sql",
+  "0002_discovery_requests.sql",
+  "0003_security_rate_limits.sql",
+  "0004_maintenance_indexes.sql",
+  "0005_source_video_metadata.sql",
+];
 
 class TestD1Statement {
   constructor(database, sql, bindings = []) {
@@ -82,6 +89,9 @@ function createBucket() {
           headers.set("Content-Type", item.options.httpMetadata.contentType);
         },
       };
+    },
+    async delete(key) {
+      objects.delete(key);
     },
   };
 }
@@ -343,9 +353,88 @@ test("normalizes trusted provider URLs into provider-owned embeds", async () => 
   }
 });
 
+test("uses the current request hostname for Twitch playback", async () => {
+  const context = createTestContext({ PUBLIC_BASE_URL: "https://home.vid.best" });
+  const created = await send(context, "/api/videos", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "Twitch playback origin test",
+      source_url: "https://www.twitch.tv/videos/123456789",
+      primary_category: "Technology",
+      subcategory: "Web Development",
+      published: true,
+    }),
+  });
+  assert.equal(created.status, 201);
+
+  const page = await send(context, "/watch/twitch-playback-origin-test");
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  const iframeSource = html.match(/<iframe[^>]+src="([^"]+)"/)?.[1] || "";
+  assert.match(iframeSource, /parent=example\.com/);
+  assert.doesNotMatch(iframeSource, /parent=home\.vid\.best/);
+});
+
+test("stores administrator-verified source metadata for non-YouTube providers", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, published)
+     VALUES ('manual-metadata', 'Manual metadata', 'https://vimeo.com/76979871', 'raw', 'Technology', 'Web Development', 0)`,
+  ).run();
+  await refreshSourceMetadata(1, "https://vimeo.com/76979871", context.env, {
+    source_published_at: "2013-10-15",
+    source_duration_seconds: 62,
+  }, { replaceExisting: true });
+
+  const metadata = context.sqlite.prepare(
+    "SELECT source_published_at, source_duration FROM video_source_metadata WHERE video_id = 1",
+  ).get();
+  assert.equal(metadata.source_published_at, "2013-10-15T00:00:00.000Z");
+  assert.equal(metadata.source_duration, "PT1M2S");
+});
+
+test("deleting a video removes its unreferenced managed R2 thumbnail", async () => {
+  const context = createTestContext();
+  const upload = await send(context, "/api/assets?filename=delete-me.png", {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${secret}`,
+      "Content-Type": "image/png",
+      "Content-Length": "8",
+      "X-File-Name": "delete-me.png",
+    },
+    body: "png-data",
+  });
+  const uploaded = await upload.json();
+  assert.equal(context.bucket.objects.has(uploaded.key), true);
+
+  const created = await send(context, "/api/videos", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "Managed thumbnail cleanup",
+      source_url: "https://example.com/video.mp4",
+      thumbnail_url: uploaded.url,
+      primary_category: "Technology",
+      subcategory: "Web Development",
+      published: false,
+    }),
+  });
+  const video = (await created.json()).video;
+
+  const removed = await send(context, `/api/videos/${video.id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${secret}` },
+  });
+  assert.equal(removed.status, 200);
+  assert.equal(context.bucket.objects.has(uploaded.key), false);
+});
+
 test("serves the seeded YouTube demo and records privacy-hashed interests", async () => {
   const context = createTestContext();
   context.sqlite.exec(readFileSync(new URL("../migrations/0007_universal_video_experience.sql", import.meta.url), "utf8"));
+  context.sqlite.exec(readFileSync(new URL("../migrations/0008_verified_demo_metadata.sql", import.meta.url), "utf8"));
   context.sqlite.prepare(
     `INSERT INTO videos (
        slug, title, source_url, media_type, primary_category, subcategory, description, published, views
@@ -368,6 +457,13 @@ test("serves the seeded YouTube demo and records privacy-hashed interests", asyn
   assert.match(html, /<meta name="robots" content="index,follow,max-image-preview:large,max-video-preview:-1">/);
   assert.match(html, /"@graph"/);
   assert.match(html, /id="watch-related"/);
+  const sourceMetadata = context.sqlite.prepare(
+    "SELECT source_published_at, source_duration FROM video_source_metadata WHERE video_id = ?",
+  ).get(demo.id);
+  const sanitized = sanitizeWatchHtml(html, sourceMetadata);
+  assert.match(sanitized, /VideoObject/);
+  assert.match(sanitized, /2013-04-10T17:25:04\.000Z/);
+  assert.match(sanitized, /PT15M51S/);
 
   const headers = {
     "Content-Type": "application/json",
@@ -390,4 +486,12 @@ test("serves the seeded YouTube demo and records privacy-hashed interests", asyn
   const result = await recommended.json();
   assert.equal(result.personalized, true);
   assert.equal(result.videos[0].slug, "related-web-video");
+});
+
+test("the theater player has modal keyboard and focus behavior", () => {
+  const source = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
+  assert.match(source, /setAttribute\("aria-modal", "true"\)/);
+  assert.match(source, /event\.key === "Escape"/);
+  assert.match(source, /event\.key !== "Tab"/);
+  assert.match(source, /focusReturn/);
 });
