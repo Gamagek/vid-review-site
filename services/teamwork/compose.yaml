@@ -1,0 +1,41 @@
+services:
+  teamwork:
+    build: .
+    restart: unless-stopped
+    init: true
+    environment:
+      TEAMWORK_API_KEY: ${TEAMWORK_API_KEY:?set TEAMWORK_API_KEY}
+      TEAMWORK_MEDIA_HOSTS: ${TEAMWORK_MEDIA_HOSTS:-home.vid.best}
+      TEAMWORK_MAX_MEDIA_BYTES: ${TEAMWORK_MAX_MEDIA_BYTES:-262144000}
+      TEAMWORK_MAX_MEDIA_SECONDS: ${TEAMWORK_MAX_MEDIA_SECONDS:-1800}
+      TEAMWORK_FRAME_INTERVAL_SECONDS: ${TEAMWORK_FRAME_INTERVAL_SECONDS:-8}
+      WHISPER_CPP_BIN: ${WHISPER_CPP_BIN:-/opt/whisper.cpp/build/bin/whisper-cli}
+      WHISPER_MODEL_PATH: ${WHISPER_MODEL_PATH:-/models/ggml-tiny.en-q5_1.bin}
+      WHISPER_THREADS: ${WHISPER_THREADS:-2}
+      TESSERACT_LANGUAGES: ${TESSERACT_LANGUAGES:-eng}
+      FOURGET_SEARCH_URL_TEMPLATE: ${FOURGET_SEARCH_URL_TEMPLATE:-}
+      OLLAMA_URL: ${OLLAMA_URL:-}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-}
+    ports:
+      - "127.0.0.1:8090:8000"
+    volumes:
+      - teamwork-data:/data
+      - ${WHISPER_CPP_DIR:-/opt/whisper.cpp}:/opt/whisper.cpp:ro
+      - ${WHISPER_MODEL_DIR:-/opt/whisper-models}:/models:ro
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 128
+    mem_limit: 1536m
+    cpus: 2.0
+    networks:
+      - comparison-net
+
+volumes:
+  teamwork-data:
+
+networks:
+  comparison-net:
+    external: true
+    name: ${TEAMWORK_DOCKER_NETWORK:-comparison-net}

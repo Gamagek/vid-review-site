@@ -15,7 +15,6 @@
   <link rel="stylesheet" href="/home-player.css">
   <script src="/app.js" defer></script>
   <script src="/home-player.js" defer></script>
-  <script src="/home-player-no-autoplay.js" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -244,8 +243,10 @@
       <a class="tile-media" href="#">
         <img alt="" loading="lazy" decoding="async">
         <span class="media-fallback" aria-hidden="true">▶</span>
+        <span class="preview-surface" aria-hidden="true"></span>
         <span class="media-type"></span>
         <span class="play-orb" aria-hidden="true">▶</span>
+        <span class="preview-status" aria-live="polite"></span>
       </a>
 
       <div class="tile-content">
@@ -279,13 +280,19 @@
           </button>
         </div>
 
-        <form class="quick-comment-form">
-          <label class="sr-only">Quick comment</label>
+        <div class="tile-interest-row">
+          <button class="interest-button" type="button">
+            ＋ More like this
+          </button>
+          <span class="interest-status" role="status"></span>
+        </div>
 
+        <form class="quick-comment-form">
           <input
             name="body"
             maxlength="800"
             required
+            aria-label="Quick comment"
             placeholder="Add a helpful comment…"
           >
 

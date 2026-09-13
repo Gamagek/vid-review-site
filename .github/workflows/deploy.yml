@@ -34,6 +34,9 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Check Teamwork Python syntax
+        run: python -m compileall -q services/teamwork/app
+
       - name: Validate Worker bundle
         run: npm run check
 

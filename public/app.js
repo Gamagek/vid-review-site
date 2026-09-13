@@ -290,6 +290,7 @@ async function loadVideos({ reset }) {
 function renderVideoGrid() {
   elements.grid.replaceChildren();
   state.videos.forEach((video) => elements.grid.append(buildVideoCard(video)));
+  document.dispatchEvent(new CustomEvent("vidbest:grid-rendered"));
   const shown = state.videos.length;
   elements.resultSummary.textContent = state.total === 1 ? "1 curated video" : `${state.total.toLocaleString()} curated videos`;
   elements.emptyState.hidden = shown > 0;
@@ -307,6 +308,10 @@ function buildVideoCard(video) {
   const card = fragment.querySelector(".video-tile");
   const pageUrl = `/watch/${encodeURIComponent(video.slug)}`;
   card.dataset.videoId = String(video.id);
+  card.dataset.videoTitle = video.title || "Video";
+  card.dataset.videoProvider = video.provider || video.media_type || "direct";
+  card.dataset.videoSource = video.source_url || "";
+  card.dataset.videoEmbed = video.embed_url || "";
   card.querySelector(".tile-media").href = pageUrl;
   card.querySelector(".tile-title").href = pageUrl;
   card.querySelector(".tile-title").textContent = video.title;
@@ -339,6 +344,7 @@ function buildVideoCard(video) {
     button.querySelector("span").textContent = formatNumber(video.reactions?.[type] || 0);
     button.addEventListener("click", () => react(video.id, type, card));
   });
+  card.querySelector(".interest-button").addEventListener("click", () => saveInterest(video.id, card));
   card.querySelector(".quick-comment-form").addEventListener("submit", (event) => submitQuickComment(event, video.id));
   return fragment;
 }
@@ -389,6 +395,27 @@ async function submitQuickComment(event, videoId) {
     setStatus(status, result.message || "Sent for moderation.", "success");
   } catch (error) {
     setStatus(status, error.message, "error");
+  }
+}
+
+async function saveInterest(videoId, card) {
+  const button = card.querySelector(".interest-button");
+  const status = card.querySelector(".interest-status");
+  button.disabled = true;
+  setStatus(status, "Saving…");
+  try {
+    await api(`/api/videos/${videoId}/interest`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ signal: "more" }),
+    });
+    button.classList.add("active");
+    button.textContent = "✓ More like this";
+    setStatus(status, "Preference saved", "success");
+  } catch (error) {
+    setStatus(status, error.message, "error");
+  } finally {
+    button.disabled = false;
   }
 }
 

@@ -91,6 +91,17 @@
                 <label><span>Video duration (seconds)</span><input id="source-duration-seconds" type="number" min="1" max="604800" inputmode="numeric" placeholder="For example: 951"><small>Optional. Provider data is preferred when available.</small></label>
               </div>
               <label><span>Private notes for AI context (not published)</span><textarea id="ai-notes" maxlength="1500" placeholder="Facts you verified, transcript/OCR notes, key themes, products or speakers…"></textarea></label>
+              <div class="analysis-controls">
+                <div>
+                  <strong>Teamwork media analysis</strong>
+                  <p>R2 uploads can be transcribed and scanned for visible text. External embeds are read only as public pages and are never copied.</p>
+                </div>
+                <label class="switch-label"><input id="analysis-ground-search" type="checkbox"><span></span>Include private 4get grounding</label>
+                <button id="scan-media" class="button ghost" type="button">Scan media</button>
+                <p id="analysis-status" class="form-status" role="status"></p>
+              </div>
+              <label><span>Transcript (review before publishing)</span><textarea id="analysis-transcript" maxlength="60000" rows="8" placeholder="Generated transcript appears here"></textarea></label>
+              <label><span>Visible text found by OCR (private evidence)</span><textarea id="analysis-ocr" maxlength="20000" rows="5" placeholder="Time-coded text detected in your uploaded video appears here"></textarea></label>
             </div>
 
             <div class="form-section ai-section">
