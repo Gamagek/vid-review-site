@@ -13,6 +13,8 @@ const migrations = [
   "0003_security_rate_limits.sql",
   "0004_maintenance_indexes.sql",
   "0005_source_video_metadata.sql",
+  "0009_app_settings.sql",
+  "0010_video_analysis.sql",
 ];
 
 class TestD1Statement {
@@ -379,8 +381,8 @@ test("uses the current request hostname for Twitch playback", async () => {
 test("stores administrator-verified source metadata for non-YouTube providers", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
-    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, published)
-     VALUES ('manual-metadata', 'Manual metadata', 'https://vimeo.com/76979871', 'raw', 'Technology', 'Web Development', 0)`,
+    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, thumbnail_url, published)
+     VALUES ('manual-metadata', 'Manual metadata', 'https://vimeo.com/76979871', 'raw', 'Technology', 'Web Development', 'https://example.com/thumb.jpg', 1)`,
   ).run();
   await refreshSourceMetadata(1, "https://vimeo.com/76979871", context.env, {
     source_published_at: "2013-10-15",
@@ -392,6 +394,35 @@ test("stores administrator-verified source metadata for non-YouTube providers", 
   ).get();
   assert.equal(metadata.source_published_at, "2013-10-15T00:00:00.000Z");
   assert.equal(metadata.source_duration, "PT1M2S");
+
+  const sitemap = await send(context, "/sitemaps/videos-1.xml");
+  const sitemapXml = await sitemap.text();
+  assert.match(sitemapXml, /<video:publication_date>2013-10-15T00:00:00\.000Z<\/video:publication_date>/);
+  assert.doesNotMatch(sitemapXml, /parent=home\.vid\.best/);
+});
+
+test("creates a persistent D1 salt when REACTION_SALT is not configured", async () => {
+  const context = createTestContext({ REACTION_SALT: "" });
+  context.sqlite.prepare(
+    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, published)
+     VALUES ('salt-test', 'Salt test', 'https://example.com/salt.mp4', 'raw', 'Technology', 'Web Development', 1)`,
+  ).run();
+
+  const response = await send(context, "/api/videos/1/reactions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "CF-Connecting-IP": "192.0.2.90",
+      "User-Agent": "salt-test-browser",
+    },
+    body: JSON.stringify({ reaction: "like" }),
+  });
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).active, true);
+  const stored = context.sqlite.prepare(
+    "SELECT setting_value FROM app_settings WHERE setting_key = 'reaction_salt'",
+  ).get();
+  assert.match(stored.setting_value, /^[0-9a-f]{64}$/);
 });
 
 test("deleting a video removes its unreferenced managed R2 thumbnail", async () => {
@@ -494,4 +525,114 @@ test("the theater player has modal keyboard and focus behavior", () => {
   assert.match(source, /event\.key === "Escape"/);
   assert.match(source, /event\.key !== "Tab"/);
   assert.match(source, /focusReturn/);
+});
+
+test("stores matching analysis and serves crawlable transcripts with WebVTT captions", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, thumbnail_url, published)
+     VALUES ('caption-test', 'Caption test', 'https://example.com/media/uploads/test.mp4', 'raw', 'Technology', 'Web Development', 'https://example.com/thumb.jpg', 1)`,
+  ).run();
+
+  const stored = await send(context, "/api/admin/videos/1/analysis", {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      source_url: "https://example.com/media/uploads/test.mp4",
+      transcript: "A reviewed transcript for search visitors.",
+      ocr_text: "[0s] Visible title",
+      captions_vtt: "WEBVTT\n\n00:00:00.000 --> 00:00:02.000\nWelcome to Vid.Best",
+      language: "en",
+      analysis_provider: "teamwork",
+    }),
+  });
+  assert.equal(stored.status, 200);
+
+  const captions = await send(context, "/captions/caption-test.vtt");
+  assert.equal(captions.status, 200);
+  assert.match(captions.headers.get("Content-Type"), /^text\/vtt/);
+  assert.match(await captions.text(), /Welcome to Vid\.Best/);
+
+  const page = await send(context, "/watch/caption-test");
+  const html = await page.text();
+  assert.match(html, /Read transcript/);
+  assert.match(html, /A reviewed transcript for search visitors\./);
+  assert.match(html, /<track kind="captions"/);
+  assert.match(html, /"transcript":"A reviewed transcript for search visitors\."/);
+});
+
+test("removes stale analysis when an administrator changes the media source", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, published)
+     VALUES ('source-change', 'Source change', 'https://example.com/old.mp4', 'raw', 'Technology', 'Web Development', 0)`,
+  ).run();
+  context.sqlite.prepare(
+    `INSERT INTO video_analysis (video_id, source_url, transcript) VALUES (1, 'https://example.com/old.mp4', 'Old transcript')`,
+  ).run();
+  const response = await send(context, "/api/videos/1", {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "Source change",
+      source_url: "https://example.com/new.mp4",
+      primary_category: "Technology",
+      subcategory: "Web Development",
+      published: false,
+    }),
+  });
+  assert.equal(response.status, 200);
+  assert.equal(context.sqlite.prepare("SELECT COUNT(*) AS total FROM video_analysis").get().total, 0);
+});
+
+test("starts owned R2 analysis through the authenticated Teamwork API", async () => {
+  const teamworkKey = "teamwork-test-key-that-is-longer-than-thirty-two-characters";
+  const context = createTestContext({
+    TEAMWORK_API_URL: "https://teamwork.example",
+    TEAMWORK_API_KEY: teamworkKey,
+  });
+  const originalFetch = globalThis.fetch;
+  let outgoing;
+  globalThis.fetch = async (url, options) => {
+    outgoing = { url: String(url), options, body: JSON.parse(options.body) };
+    return new Response(JSON.stringify({
+      id: "0123456789abcdef0123456789abcdef",
+      status: "queued",
+      result: null,
+      error: null,
+      created_at: "2026-09-13T00:00:00Z",
+      updated_at: "2026-09-13T00:00:00Z",
+    }), { status: 202, headers: { "Content-Type": "application/json" } });
+  };
+  try {
+    const response = await send(context, "/api/ai/analyze-media", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: "Owned upload",
+        source_url: "https://example.com/media/uploads/test.mp4",
+        r2_key: "uploads/2026-09-13/test.mp4",
+      }),
+    });
+    assert.equal(response.status, 202);
+    assert.equal(outgoing.url, "https://teamwork.example/v1/jobs");
+    assert.equal(outgoing.options.headers.Authorization, `Bearer ${teamworkKey}`);
+    assert.equal(outgoing.body.media_owned, true);
+    assert.equal(outgoing.body.transcribe, true);
+    assert.match(outgoing.body.source_url, /\/media\/uploads\/2026-09-13\/test\.mp4$/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("homepage previews wait three seconds and respect reduced-data preferences", () => {
+  const player = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
+  const appSource = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
+  assert.match(player, /PREVIEW_DELAY_MS = 3000/);
+  assert.match(player, /connection\?\.saveData/);
+  assert.match(player, /prefers-reduced-motion: reduce/);
+  assert.match(player, /previewState\.activeCard/);
+  assert.match(appSource, /\/interest`/);
+  assert.match(appSource, /\/comments`/);
+  assert.match(appSource, /\/reactions`/);
 });

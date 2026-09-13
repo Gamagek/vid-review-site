@@ -1,4 +1,4 @@
-import app from "./index.js";
+import app, { resolveReactionSalt } from "./index.js";
 
 const CRAWLER_PATTERN = /\b(?:bot|crawler|spider|slurp|bingpreview|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|pinterestbot|duckduckbot|baiduspider|yandexbot)\b/i;
 const EXTERNAL_VIDEO_HOSTS = new Set([
@@ -146,8 +146,7 @@ async function sha256Hex(value) {
 }
 
 async function publicFingerprint(request, env) {
-  const salt = String(env.REACTION_SALT || "");
-  if (salt.length < 16) return null;
+  const salt = await resolveReactionSalt(env);
   return sha256Hex([
     salt,
     request.headers.get("CF-Connecting-IP") || "unknown",
