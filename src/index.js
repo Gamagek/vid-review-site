@@ -177,6 +177,16 @@ async function route(request, env, ctx) {
     return toggleReaction(request, env, Number(match[1]));
   }
 
+  match = path.match(/^\/api\/videos\/(\d+)\/recommendations$/);
+  if (match && request.method === "GET") {
+    return recommendVideos(request, env, Number(match[1]));
+  }
+
+  match = path.match(/^\/api\/videos\/(\d+)\/interest$/);
+  if (match && request.method === "POST") {
+    return recordVideoInterest(request, env, Number(match[1]));
+  }
+
   match = path.match(/^\/api\/videos\/(\d+)\/comments$/);
   if (match) {
     if (request.method === "GET") return listComments(env, Number(match[1]));
@@ -187,7 +197,7 @@ async function route(request, env, ctx) {
   if (match && ["PATCH", "DELETE"].includes(request.method)) {
     await requireAdmin(request, env);
     if (request.method === "PATCH") return updateVideo(request, env, Number(match[1]));
-    if (request.method === "DELETE") return deleteVideo(env, Number(match[1]));
+    if (request.method === "DELETE") return deleteVideo(request, env, Number(match[1]));
   }
 
   match = path.match(/^\/api\/videos\/([^/]+)$/);
@@ -307,7 +317,7 @@ function securityHeaders(headers, html = false, scriptNonce = "") {
     const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://www.facebook.com; upgrade-insecure-requests`,
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
     );
   }
   return headers;
@@ -524,12 +534,28 @@ function serializeVideo(row) {
   if (!row) return null;
   return {
     ...row,
+    provider: detectMediaProvider(row),
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
     published: Boolean(row.published),
     seo_tags: parseTags(row.seo_tags),
     reactions: row.reactions || { like: 0, love: 0, useful: 0 },
   };
+}
+
+function detectMediaProvider(video) {
+  if (video.media_type && video.media_type !== "raw") return video.media_type;
+  const value = video.embed_url || video.source_url || "";
+  try {
+    const host = new URL(value, "https://example.com").hostname.toLowerCase().replace(/^www\./, "");
+    if (host === "player.vimeo.com" || host === "vimeo.com") return "vimeo";
+    if (host === "dailymotion.com" || host === "dai.ly") return "dailymotion";
+    if (host === "player.twitch.tv" || host === "clips.twitch.tv" || host === "twitch.tv") return "twitch";
+    if (host === "instagram.com" || host.endsWith(".instagram.com")) return "instagram";
+  } catch {
+    // Relative and malformed values are handled by their existing media type.
+  }
+  return video.embed_url ? "embed" : "direct";
 }
 
 async function requestDiscovery(request, env) {
@@ -651,11 +677,20 @@ async function discoverFromUrl(url, request, env) {
       console.error("oEmbed metadata request failed", error?.name || "unknown");
     }
   }
-  const providerNames = { youtube: "YouTube", tiktok: "TikTok", facebook: "Facebook", raw: "Web video" };
+  const providerNames = {
+    youtube: "YouTube",
+    tiktok: "TikTok",
+    facebook: "Facebook",
+    vimeo: "Vimeo",
+    dailymotion: "Dailymotion",
+    twitch: "Twitch",
+    instagram: "Instagram",
+    direct: "Web video",
+  };
   return {
-    provider: media.media_type,
+    provider: media.provider || media.media_type,
     video_id: extractYoutubeId(url, url.hostname.toLowerCase().replace(/^www\./, "")) || url.pathname.match(/\/video\/(\d+)/)?.[1] || "",
-    title: cleanText(metadata.title, 160, `${providerNames[media.media_type] || "Video"} discovery`),
+    title: cleanText(metadata.title, 160, `${providerNames[media.provider] || "Video"} discovery`),
     description: "",
     source_url: media.source_url,
     thumbnail_url: validateSearchThumbnail(metadata.thumbnail_url) || media.thumbnail_url,
@@ -746,9 +781,13 @@ async function listVideos(request, env, includeUnpublished) {
   if (url.searchParams.get("trending") === "1") where.push("v.trending = 1");
 
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
-  const listStatement = env.DB.prepare(
-    `SELECT v.* FROM videos v ${whereSql} ORDER BY ${sortSql} LIMIT ? OFFSET ?`,
-  ).bind(...bindings, limit, offset);
+  const selectSql = includeUnpublished
+    ? `SELECT v.*, m.source_published_at, m.source_duration
+       FROM videos v
+       LEFT JOIN video_source_metadata m ON m.video_id = v.id
+       ${whereSql} ORDER BY ${sortSql} LIMIT ? OFFSET ?`
+    : `SELECT v.* FROM videos v ${whereSql} ORDER BY ${sortSql} LIMIT ? OFFSET ?`;
+  const listStatement = env.DB.prepare(selectSql).bind(...bindings, limit, offset);
   const countStatement = env.DB.prepare(`SELECT COUNT(*) AS total FROM videos v ${whereSql}`).bind(...bindings);
   const [listResult, countRow] = await env.DB.batch([listStatement, countStatement]);
   const videos = await hydrateVideos(env, listResult.results || []);
@@ -779,6 +818,69 @@ async function getPublicVideo(env, slug) {
   if (!row) throw new AppError(404, "Video not found");
   const [video] = await hydrateVideos(env, [row]);
   return json({ video });
+}
+
+async function recommendVideos(request, env, videoId) {
+  const current = await env.DB.prepare(
+    "SELECT id, primary_category, subcategory FROM videos WHERE id = ? AND published = 1",
+  ).bind(videoId).first();
+  if (!current) throw new AppError(404, "Video not found");
+
+  const limit = clampInteger(new URL(request.url).searchParams.get("limit"), 1, 16, 8);
+  let fingerprint = "";
+  try {
+    fingerprint = await requestFingerprint(request, env.REACTION_SALT);
+  } catch {
+    // Recommendations still work without personalization when the salt is unavailable.
+  }
+
+  const result = await env.DB.prepare(
+    `SELECT v.*,
+       (CASE WHEN v.subcategory = ? THEN 60 WHEN v.primary_category = ? THEN 30 ELSE 0 END
+        + COALESCE(i.score, 0) * 8
+        + MIN(v.reaction_count, 20)
+        + MIN(CAST(v.views / 20 AS INTEGER), 20)
+        + v.featured * 4
+        + v.trending * 6) AS recommendation_score
+     FROM videos v
+     LEFT JOIN viewer_interests i
+       ON i.fingerprint = ?
+      AND i.primary_category = v.primary_category
+      AND i.subcategory = v.subcategory
+     WHERE v.published = 1 AND v.id <> ?
+     ORDER BY recommendation_score DESC, v.updated_at DESC
+     LIMIT ?`,
+  ).bind(current.subcategory, current.primary_category, fingerprint, videoId, limit).all();
+  const videos = await hydrateVideos(env, result.results || []);
+  return json({ videos, personalized: Boolean(fingerprint) }, 200, { "Cache-Control": "private, max-age=30" });
+}
+
+async function recordVideoInterest(request, env, videoId) {
+  const video = await env.DB.prepare(
+    "SELECT id, primary_category, subcategory FROM videos WHERE id = ? AND published = 1",
+  ).bind(videoId).first();
+  if (!video) throw new AppError(404, "Video not found");
+
+  const body = await readJson(request, 2048);
+  const signal = cleanText(body.signal, 20, "more");
+  if (!new Set(["more", "less"]).has(signal)) throw new AppError(400, "Interest signal must be more or less");
+  const fingerprint = await consumeRateLimit(request, env, "interest", 30, 3600);
+  const delta = signal === "more" ? 5 : -5;
+  const row = await env.DB.prepare(
+    `INSERT INTO viewer_interests (
+       fingerprint, primary_category, subcategory, score, updated_at
+     ) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+     ON CONFLICT(fingerprint, primary_category, subcategory) DO UPDATE SET
+       score = MAX(-20, MIN(100, viewer_interests.score + excluded.score)),
+       updated_at = excluded.updated_at
+     RETURNING score`,
+  ).bind(fingerprint, video.primary_category, video.subcategory, delta).first();
+  return json({
+    success: true,
+    signal,
+    score: Number(row?.score || 0),
+    message: signal === "more" ? "Your suggestions will show more videos like this." : "Your suggestions will show fewer videos like this.",
+  });
 }
 
 async function createVideo(request, env) {
@@ -852,14 +954,63 @@ async function updateVideo(request, env, id) {
     id,
   ).first();
 
+  const replacedKeys = [
+    existing.r2_key && existing.r2_key !== data.r2_key ? existing.r2_key : null,
+    existing.thumbnail_url && existing.thumbnail_url !== data.thumbnail_url
+      ? managedAssetKeyFromUrl(existing.thumbnail_url, request, env)
+      : null,
+  ];
+  await cleanupUnusedManagedAssets(env, replacedKeys);
+
   return json({ success: true, video: serializeVideo(row) });
 }
 
-async function deleteVideo(env, id) {
-  const existing = await env.DB.prepare("SELECT id FROM videos WHERE id = ?").bind(id).first();
+async function deleteVideo(request, env, id) {
+  const existing = await env.DB.prepare(
+    "SELECT id, r2_key, thumbnail_url FROM videos WHERE id = ?",
+  ).bind(id).first();
   if (!existing) throw new AppError(404, "Video not found");
   await env.DB.prepare("DELETE FROM videos WHERE id = ?").bind(id).run();
+  await cleanupUnusedManagedAssets(env, [
+    existing.r2_key,
+    managedAssetKeyFromUrl(existing.thumbnail_url, request, env),
+  ]);
   return json({ success: true });
+}
+
+function managedAssetKeyFromUrl(value, request, env) {
+  const raw = cleanText(value, 2000);
+  if (!raw) return null;
+  try {
+    const currentOrigin = new URL(request.url).origin;
+    const configuredOrigin = getBaseUrl(request, env);
+    const url = new URL(raw, currentOrigin);
+    if (![currentOrigin, configuredOrigin].includes(url.origin) || !url.pathname.startsWith("/media/")) return null;
+    const key = validateR2Key(safeDecode(url.pathname.slice("/media/".length)));
+    return key?.startsWith("uploads/") ? key : null;
+  } catch {
+    return null;
+  }
+}
+
+async function cleanupUnusedManagedAssets(env, values) {
+  if (!env.BUCKET) return;
+  const keys = [...new Set(values.filter((key) => typeof key === "string" && key.startsWith("uploads/")))];
+  for (const key of keys) {
+    try {
+      const relativeUrl = `/media/${encodeR2Key(key)}`;
+      const reference = await env.DB.prepare(
+        `SELECT 1 FROM videos
+         WHERE r2_key = ?
+            OR thumbnail_url = ?
+            OR substr(thumbnail_url, -length(?)) = ?
+         LIMIT 1`,
+      ).bind(key, relativeUrl, relativeUrl, relativeUrl).first();
+      if (!reference) await env.BUCKET.delete(key);
+    } catch (error) {
+      console.error("Managed asset cleanup failed", error?.message || error);
+    }
+  }
 }
 
 async function validateVideoPayload(body, existing, baseUrl, env) {
@@ -903,6 +1054,7 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
       source_url: `${baseUrl}/media/${encodeR2Key(r2Key)}`,
       embed_url: null,
       media_type: "r2",
+      provider: "r2",
       r2_key: r2Key,
       thumbnail_url: null,
     };
@@ -917,13 +1069,16 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
   }
   if (!["http:", "https:"].includes(url.protocol)) throw new AppError(400, "Only HTTP and HTTPS media links are allowed");
   const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+  const siteOrigin = new URL(baseUrl).origin;
+  const siteHostname = new URL(baseUrl).hostname;
 
   const youtubeId = extractYoutubeId(url, hostname);
   if (youtubeId) {
     return {
       source_url: url.toString(),
-      embed_url: `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&playsinline=1`,
+      embed_url: `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(siteOrigin)}`,
       media_type: "youtube",
+      provider: "youtube",
       r2_key: null,
       thumbnail_url: `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`,
     };
@@ -936,6 +1091,7 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
       source_url: url.toString(),
       embed_url: `https://www.tiktok.com/player/v1/${id}?description=1&music_info=1`,
       media_type: "tiktok",
+      provider: "tiktok",
       r2_key: null,
       thumbnail_url: null,
     };
@@ -946,6 +1102,72 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
       source_url: url.toString(),
       embed_url: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url.toString())}&show_text=false&width=1280`,
       media_type: "facebook",
+      provider: "facebook",
+      r2_key: null,
+      thumbnail_url: null,
+    };
+  }
+
+  if (hostname === "vimeo.com" || hostname.endsWith(".vimeo.com")) {
+    const id = url.pathname.match(/\/(?:video\/)?(\d+)/)?.[1];
+    if (!id) throw new AppError(400, "Use a full Vimeo video URL containing the numeric video ID");
+    const pathParts = url.pathname.split("/").filter(Boolean);
+    const privacyHash = cleanText(url.searchParams.get("h") || pathParts[pathParts.indexOf(id) + 1], 80);
+    const privacyQuery = privacyHash && /^[A-Za-z0-9]+$/.test(privacyHash)
+      ? `&h=${encodeURIComponent(privacyHash)}`
+      : "";
+    return {
+      source_url: url.toString(),
+      embed_url: `https://player.vimeo.com/video/${id}?dnt=1${privacyQuery}`,
+      media_type: "raw",
+      provider: "vimeo",
+      r2_key: null,
+      thumbnail_url: null,
+    };
+  }
+
+  if (hostname === "dailymotion.com" || hostname.endsWith(".dailymotion.com") || hostname === "dai.ly") {
+    const id = hostname === "dai.ly"
+      ? url.pathname.split("/").filter(Boolean)[0]
+      : url.pathname.match(/\/(?:embed\/)?video\/([A-Za-z0-9]+)/)?.[1];
+    if (!id || !/^[A-Za-z0-9]+$/.test(id)) throw new AppError(400, "Use a full Dailymotion video URL containing the video ID");
+    return {
+      source_url: url.toString(),
+      embed_url: `https://www.dailymotion.com/embed/video/${id}`,
+      media_type: "raw",
+      provider: "dailymotion",
+      r2_key: null,
+      thumbnail_url: null,
+    };
+  }
+
+  if (hostname === "twitch.tv" || hostname.endsWith(".twitch.tv")) {
+    const videoId = url.pathname.match(/\/videos\/(\d+)/)?.[1];
+    const clipId = hostname === "clips.twitch.tv"
+      ? url.pathname.split("/").filter(Boolean)[0]
+      : url.pathname.match(/\/clip\/([A-Za-z0-9_-]+)/)?.[1];
+    if (!videoId && !clipId) throw new AppError(400, "Use a full Twitch video or clip URL");
+    return {
+      source_url: url.toString(),
+      embed_url: videoId
+        ? `https://player.twitch.tv/?video=v${videoId}&parent=${encodeURIComponent(siteHostname)}&autoplay=false`
+        : `https://clips.twitch.tv/embed?clip=${encodeURIComponent(clipId)}&parent=${encodeURIComponent(siteHostname)}&autoplay=false`,
+      media_type: "raw",
+      provider: "twitch",
+      r2_key: null,
+      thumbnail_url: null,
+    };
+  }
+
+  if (hostname === "instagram.com" || hostname.endsWith(".instagram.com")) {
+    const match = url.pathname.match(/^\/(p|reel|reels)\/([A-Za-z0-9_-]+)/);
+    if (!match) throw new AppError(400, "Use a full public Instagram post or Reel URL");
+    const kind = match[1] === "p" ? "p" : "reel";
+    return {
+      source_url: url.toString(),
+      embed_url: `https://www.instagram.com/${kind}/${match[2]}/embed`,
+      media_type: "raw",
+      provider: "instagram",
       r2_key: null,
       thumbnail_url: null,
     };
@@ -955,6 +1177,7 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
     source_url: url.toString(),
     embed_url: null,
     media_type: "raw",
+    provider: "direct",
     r2_key: null,
     thumbnail_url: null,
   };
@@ -1289,13 +1512,14 @@ async function watchPage(request, env, ctx, slugInput) {
 
 function renderWatchHtml(video, request, env, scriptNonce) {
   const baseUrl = getBaseUrl(request, env);
+  const playbackOrigin = new URL(request.url).origin;
   const canonical = `${baseUrl}/watch/${encodeURIComponent(video.slug)}`;
   const title = cleanText(video.seo_title || video.title, 70);
   const description = cleanText(video.seo_description || video.description || `Discover ${video.title} on Vid.Best.`, 180);
   const thumbnail = video.thumbnail_url ? absoluteUrl(video.thumbnail_url, baseUrl) : `${baseUrl}/favicon.svg`;
-  const schema = {
-    "@context": "https://schema.org",
+  const videoSchema = {
     "@type": "VideoObject",
+    "@id": `${canonical}#video`,
     name: video.title,
     description,
     thumbnailUrl: [thumbnail],
@@ -1317,6 +1541,33 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     ],
     publisher: { "@type": "Organization", name: env.APP_NAME || "Vid.Best", url: baseUrl },
   };
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": canonical,
+        url: canonical,
+        name: title,
+        description,
+        inLanguage: "en",
+        datePublished: video.created_at,
+        dateModified: video.updated_at,
+        primaryImageOfPage: thumbnail,
+        mainEntity: { "@id": `${canonical}#video` },
+        isPartOf: { "@type": "WebSite", name: env.APP_NAME || "Vid.Best", url: baseUrl },
+      },
+      videoSchema,
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: baseUrl },
+          { "@type": "ListItem", position: 2, name: video.primary_category, item: `${baseUrl}/?category=${encodeURIComponent(video.primary_category)}` },
+          { "@type": "ListItem", position: 3, name: video.title, item: canonical },
+        ],
+      },
+    ],
+  };
 
   return `<!doctype html>
 <html lang="en">
@@ -1325,6 +1576,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>${escapeHtml(title)} | Vid.Best</title>
   <meta name="description" content="${escapeHtml(description)}">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-video-preview:-1">
   <link rel="canonical" href="${escapeHtml(canonical)}">
   <meta property="og:type" content="video.other">
   <meta property="og:site_name" content="Vid.Best">
@@ -1341,13 +1593,28 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   <script src="/watch.js" defer></script>
 </head>
-<body class="watch-page" data-video-id="${Number(video.id)}">
+<body class="watch-page" data-video-id="${Number(video.id)}" data-video-provider="${escapeHtml(video.provider)}">
   <header class="site-header compact">
     <a class="brand" href="/" aria-label="Vid.Best homepage"><span class="brand-mark">V</span><span>Vid.Best</span></a>
+    <form class="watch-search" action="/" method="get" role="search">
+      <label class="sr-only" for="watch-site-search">Search all videos</label>
+      <input id="watch-site-search" name="q" type="search" maxlength="120" placeholder="Search videos">
+      <button type="submit" aria-label="Search">Search</button>
+    </form>
     <a class="button ghost" href="/">Explore videos</a>
   </header>
   <main class="watch-shell">
-    <section class="watch-player glass-panel">${renderMedia(video)}</section>
+    <div id="watch-player-anchor" class="watch-player-anchor" aria-hidden="true"></div>
+    <section id="watch-player" class="watch-player glass-panel" data-provider="${escapeHtml(video.provider)}" aria-label="Video player">
+      <div class="persistent-player-bar">
+        <strong>Now playing</strong>
+        <span id="persistent-player-status" role="status">Scroll to keep watching</span>
+        <button type="button" data-player-mode="restore" hidden>Return</button>
+        <button type="button" data-player-mode="theater">Pop-up</button>
+        <button type="button" data-player-mode="close" aria-label="Close persistent player">Close</button>
+      </div>
+      <div class="watch-player-stage">${renderMedia(video, playbackOrigin)}</div>
+    </section>
     <article class="watch-copy glass-panel">
       <div class="tile-badges"><span class="badge">${escapeHtml(video.primary_category)}</span><span class="badge secondary">${escapeHtml(video.subcategory)}</span></div>
       <h1>${escapeHtml(video.title)}</h1>
@@ -1356,6 +1623,11 @@ function renderWatchHtml(video, request, env, scriptNonce) {
         <button type="button" data-reaction="like">👍 <span>${video.reactions.like}</span></button>
         <button type="button" data-reaction="love">✨ <span>${video.reactions.love}</span></button>
         <button type="button" data-reaction="useful">💡 <span>${video.reactions.useful}</span></button>
+      </div>
+      <div class="interest-actions" aria-label="Personalize video suggestions">
+        <button class="button ghost" type="button" data-interest="more">Show more like this</button>
+        <button class="button text-button" type="button" data-interest="less">Show fewer like this</button>
+        <p id="interest-status" class="form-status" role="status"></p>
       </div>
       ${video.review_text ? `<section class="review-copy"><h2>Review & discovery notes</h2>${paragraphs(video.review_text)}</section>` : ""}
       <a class="source-link" href="${escapeHtml(video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open original source ↗</a>
@@ -1371,18 +1643,49 @@ function renderWatchHtml(video, request, env, scriptNonce) {
       </form>
       <div id="watch-comments" class="comment-list" aria-live="polite"></div>
     </section>
+    <aside class="related-panel glass-panel" aria-labelledby="related-heading">
+      <div class="related-heading">
+        <div><p class="eyebrow">Smart discovery</p><h2 id="related-heading">Watch next</h2></div>
+        <p>Category, popularity and your privacy-hashed preferences shape these suggestions.</p>
+      </div>
+      <form id="related-filter" class="related-filter" role="search">
+        <label><span>Search suggestions</span><input name="q" type="search" maxlength="120" placeholder="Topic or keyword"></label>
+        <label><span>Category</span><select name="category"><option value="">Recommended</option></select></label>
+        <button class="button ghost" type="submit">Filter</button>
+      </form>
+      <div id="watch-related" class="related-video-list" aria-live="polite"></div>
+    </aside>
   </main>
   <footer class="site-footer">Vid.Best · Human-curated video discovery</footer>
 </body>
 </html>`;
 }
 
-function renderMedia(video) {
+function renderMedia(video, playbackOrigin) {
   if (video.embed_url) {
-    return `<iframe src="${escapeHtml(video.embed_url)}" title="${escapeHtml(video.title)}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"></iframe>`;
+    const embedUrl = preparePlaybackEmbed(video.embed_url, playbackOrigin);
+    return `<iframe id="watch-media-frame" src="${escapeHtml(embedUrl)}" title="${escapeHtml(video.title)}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"></iframe>`;
   }
   const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}"` : "";
-  return `<video controls playsinline preload="metadata"${poster}><source src="${escapeHtml(video.source_url)}">Your browser does not support this video.</video>`;
+  return `<video id="watch-media-video" controls playsinline preload="metadata"${poster}><source src="${escapeHtml(video.source_url)}">Your browser does not support this video.</video>`;
+}
+
+function preparePlaybackEmbed(value, playbackOrigin) {
+  try {
+    const url = new URL(value);
+    const pageUrl = new URL(playbackOrigin);
+    if (url.hostname === "www.youtube-nocookie.com" || url.hostname.endsWith(".youtube.com")) {
+      url.searchParams.set("enablejsapi", "1");
+      url.searchParams.set("playsinline", "1");
+      url.searchParams.set("origin", pageUrl.origin);
+    }
+    if (url.hostname === "player.twitch.tv" || url.hostname === "clips.twitch.tv") {
+      url.searchParams.set("parent", pageUrl.hostname);
+    }
+    return url.toString();
+  } catch {
+    return value;
+  }
 }
 
 function paragraphs(text) {

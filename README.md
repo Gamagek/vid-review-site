@@ -8,6 +8,8 @@ Vid.Best is a Cloudflare-native video review and discovery platform built with:
 - Cloudflare R2 (`vid-assets`) for uploaded video/image assets
 - Gemini, through the Worker secret `GEMINI_KEY`, for structured editorial drafts
 - Dynamic `/watch/:slug` pages with unique metadata and canonical URLs
+- Trusted provider embeds plus direct/R2 media in a persistent watch experience
+- Privacy-hashed category preferences for related-video ranking
 - Published-only XML/video sitemaps
 
 There is **no need to create or commit one physical HTML file per video**. A request such as `/watch/example-video` is rendered by the Worker from its D1 record and returned as normal HTML to browsers and search crawlers.
@@ -38,18 +40,25 @@ The watch page includes canonical, Open Graph and X/Twitter metadata. `VideoObje
 
 - a real video thumbnail is required; the site favicon is never used as a fake video thumbnail in structured data;
 - for YouTube sources, the Worker can verify the original publication date and duration through the YouTube Data API and store them in D1;
+- for other trusted providers, an administrator can supply the verified original publication date and duration when the provider API is unavailable;
 - external embeds without a verified original publication date remain normal indexable pages, but their potentially inaccurate `VideoObject` block is omitted;
 - only published D1 records appear in the sitemap.
 
 ### Player
 
-Self-hosted/raw video uses the browser's native player plus Vid.Best controls for play/pause, 10-second rewind/forward, playback speed and picture-in-picture when the browser supports it. YouTube/TikTok/Facebook use their embed players.
+Self-hosted/raw video uses the browser's native player plus Vid.Best controls for play/pause, 10-second rewind/forward, playback speed, zoom, fullscreen and picture-in-picture when the browser supports it. Trusted provider links are converted into provider-owned embeds for YouTube, Vimeo, Dailymotion, Twitch, Instagram, TikTok and Facebook. Arbitrary iframe HTML is never accepted.
+
+On a watch page, scrolling beyond the player starts a three-second delay. The player then becomes a mini-player; native media and YouTube can begin muted when browser policy allows. **Return**, **Pop-up** and **Close** controls preserve a deliberate user escape path. Reduced-motion visitors do not get automatic playback.
 
 Automatic captions/transcription and adaptive low-bandwidth quality switching are **not yet implemented**. Those require caption files such as WebVTT and, for adaptive playback, multiple encoded renditions/HLS or DASH rather than a single MP4 object.
 
+### Recommendations and privacy
+
+Each watch page has search/category filtering and a **Watch next** panel. Ranking combines matching category/subcategory, popularity and optional **Show more/fewer like this** signals. The Worker stores a salted one-way fingerprint derived from the request IP and user agent; it does not store the raw IP address in the preference table. Preferences expire after 180 days.
+
 ### Comments
 
-Public comments are never shown immediately. They are stored as `pending`, rate-limited, and only `approved` comments are returned publicly. Image comments are not currently supported. This is intentionally safer than auto-publishing and hiding content later.
+Public comments are never shown immediately. Text and optional allowlisted image attachments are stored as `pending`, rate-limited, and only `approved` comments are returned publicly. Rejected comment images are removed from R2. This is intentionally safer than auto-publishing and hiding content later.
 
 ## Important security step
 
@@ -114,9 +123,12 @@ In Cloudflare, attach the final custom domain to the Worker, then make `PUBLIC_B
 4. Choose category/subcategory.
 5. Add verified notes, transcript/OCR text if available, then use **AI Generate**.
 6. Check and edit all generated claims, title, description and tags.
-7. Supply a genuine thumbnail when possible.
-8. Enable **Published** only after the record is useful and verified.
-9. Save. The Worker serves `/watch/the-generated-slug` immediately from D1 and includes published pages in the sitemap.
+7. Supply a genuine thumbnail URL or upload a PNG/JPEG/WebP/AVIF/GIF thumbnail from the admin form.
+8. For a non-YouTube provider, enter the verified original publish date and duration in seconds so the page can safely emit `VideoObject` metadata.
+9. Enable **Published** only after the record is useful and verified.
+10. Save. The Worker serves `/watch/the-generated-slug` immediately from D1 and includes published pages in the sitemap.
+
+After migrations `0007` and `0008`, `/watch/youtube-embed-experience-demo` is a published test page using the sample YouTube video ID from Google's IFrame Player API documentation. It demonstrates verified video metadata, custom editorial SEO, reactions, moderated comments, persistent playback and recommendations.
 
 ## Upload types
 
@@ -144,6 +156,8 @@ Worker runtime secrets such as `GEMINI_KEY`, `ADMIN_SECRET_KEY`, `REACTION_SALT`
 | `GET /api/videos/:slug` | Public | Retrieve one published review |
 | `POST /api/discovery-requests` | Public | Request review of a missing video |
 | `POST /api/videos/:id/reactions` | Public | Toggle a privacy-hashed reaction |
+| `GET /api/videos/:id/recommendations` | Public | Retrieve ranked related videos |
+| `POST /api/videos/:id/interest` | Public | Store a privacy-hashed more/fewer preference |
 | `GET/POST /api/videos/:id/comments` | Public | Read approved / submit pending comments |
 | `GET /api/admin/discover?q=...` | Admin | Search YouTube or inspect a direct URL |
 | `POST /api/ai/generate` | Admin | Generate a structured Gemini draft |
@@ -172,7 +186,10 @@ Vid.Best/
 │   ├── 0002_discovery_requests.sql
 │   ├── 0003_security_rate_limits.sql
 │   ├── 0004_maintenance_indexes.sql
-│   └── 0005_source_video_metadata.sql
+│   ├── 0005_source_video_metadata.sql
+│   ├── 0006_test_player_and_comment_images.sql
+│   ├── 0007_universal_video_experience.sql
+│   └── 0008_verified_demo_metadata.sql
 ├── public/
 │   ├── index.html
 │   ├── admin.html

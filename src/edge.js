@@ -10,6 +10,14 @@ const EXTERNAL_VIDEO_HOSTS = new Set([
   "www.tiktok.com",
   "facebook.com",
   "www.facebook.com",
+  "player.vimeo.com",
+  "vimeo.com",
+  "www.dailymotion.com",
+  "dailymotion.com",
+  "player.twitch.tv",
+  "clips.twitch.tv",
+  "www.instagram.com",
+  "instagram.com",
 ]);
 const COMMENT_IMAGE_TYPES = new Set([
   "image/avif",
@@ -37,7 +45,11 @@ function isExternalEmbed(value) {
     return EXTERNAL_VIDEO_HOSTS.has(hostname)
       || hostname.endsWith(".youtube.com")
       || hostname.endsWith(".tiktok.com")
-      || hostname.endsWith(".facebook.com");
+      || hostname.endsWith(".facebook.com")
+      || hostname.endsWith(".vimeo.com")
+      || hostname.endsWith(".dailymotion.com")
+      || hostname.endsWith(".twitch.tv")
+      || hostname.endsWith(".instagram.com");
   } catch {
     return false;
   }
@@ -53,11 +65,6 @@ export function sanitizeWatchHtml(html, sourceMetadata = null) {
   const scriptMatch = output.match(scriptPattern);
   if (!scriptMatch) return output;
 
-  const usesFallbackThumbnail = /<meta property="og:image" content="[^"]*\/favicon\.svg(?:\?[^"]*)?">/i.test(output);
-  if (usesFallbackThumbnail) {
-    return output.replace(scriptPattern, "");
-  }
-
   let schema;
   try {
     schema = JSON.parse(scriptMatch[2]);
@@ -65,15 +72,36 @@ export function sanitizeWatchHtml(html, sourceMetadata = null) {
     return output.replace(scriptPattern, "");
   }
 
-  if (isExternalEmbed(schema.embedUrl)) {
-    if (!sourceMetadata?.source_published_at) return output.replace(scriptPattern, "");
-    schema.uploadDate = sourceMetadata.source_published_at;
-    if (sourceMetadata.source_duration) schema.duration = sourceMetadata.source_duration;
+  const graph = Array.isArray(schema?.["@graph"]) ? schema["@graph"] : null;
+  const videoSchema = graph
+    ? graph.find((item) => item?.["@type"] === "VideoObject")
+    : schema?.["@type"] === "VideoObject" ? schema : null;
+  if (!videoSchema) return output;
+
+  const replaceSchema = () => {
+    const safeJson = JSON.stringify(schema).replace(/</g, "\\u003c").replace(/-->/g, "--\\u003e");
+    const replacement = `\n  <script type="application/ld+json" nonce="${scriptMatch[1]}">${safeJson}</script>`;
+    return output.replace(scriptPattern, replacement);
+  };
+  const omitVideoSchema = () => {
+    if (!graph) return output.replace(scriptPattern, "");
+    schema["@graph"] = graph.filter((item) => item !== videoSchema);
+    for (const item of schema["@graph"]) {
+      if (item?.mainEntity?.["@id"] === videoSchema["@id"]) delete item.mainEntity;
+    }
+    return replaceSchema();
+  };
+
+  const usesFallbackThumbnail = /<meta property="og:image" content="[^"]*\/favicon\.svg(?:\?[^"]*)?">/i.test(output);
+  if (usesFallbackThumbnail) return omitVideoSchema();
+
+  if (isExternalEmbed(videoSchema.embedUrl)) {
+    if (!sourceMetadata?.source_published_at) return omitVideoSchema();
+    videoSchema.uploadDate = sourceMetadata.source_published_at;
+    if (sourceMetadata.source_duration) videoSchema.duration = sourceMetadata.source_duration;
   }
 
-  const safeJson = JSON.stringify(schema).replace(/</g, "\\u003c").replace(/-->/g, "--\\u003e");
-  const replacement = `\n  <script type="application/ld+json" nonce="${scriptMatch[1]}">${safeJson}</script>`;
-  return output.replace(scriptPattern, replacement);
+  return replaceSchema();
 }
 
 function sameOriginMutationAllowed(request) {
@@ -370,41 +398,28 @@ function extractYoutubeId(value) {
   }
 }
 
-async function refreshSourceMetadata(videoId, sourceUrl, env) {
-  if (!Number.isSafeInteger(Number(videoId)) || Number(videoId) < 1) return;
-  const youtubeId = extractYoutubeId(sourceUrl);
-  if (!youtubeId || !env.YOUTUBE_API_KEY) {
-    await env.DB.prepare("DELETE FROM video_source_metadata WHERE video_id = ?")
-      .bind(videoId).run();
-    return;
-  }
+function normalizeSourcePublishedAt(value) {
+  const supplied = cleanText(value, 40);
+  if (!supplied) return null;
+  const timestamp = Date.parse(supplied);
+  if (!Number.isFinite(timestamp) || timestamp > Date.now() + 86_400_000) return null;
+  const normalized = new Date(timestamp);
+  if (normalized.getUTCFullYear() < 1900) return null;
+  return /^\d{4}-\d{2}-\d{2}$/.test(supplied)
+    ? `${supplied}T00:00:00.000Z`
+    : normalized.toISOString();
+}
 
-  const params = new URLSearchParams({
-    part: "snippet,contentDetails",
-    id: youtubeId,
-    key: env.YOUTUBE_API_KEY,
-  });
-  let response;
-  try {
-    response = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params}`, {
-      headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(10000),
-    });
-  } catch (error) {
-    console.error("YouTube metadata request failed", error?.name || "unknown");
-    return;
-  }
-  if (!response.ok) {
-    console.error("YouTube metadata request returned", response.status);
-    return;
-  }
+function durationSecondsToIso(value) {
+  const seconds = Math.round(Number(value));
+  if (!Number.isSafeInteger(seconds) || seconds < 1 || seconds > 604_800) return null;
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainder = seconds % 60;
+  return `PT${hours ? `${hours}H` : ""}${minutes ? `${minutes}M` : ""}${remainder || (!hours && !minutes) ? `${remainder}S` : ""}`;
+}
 
-  const payload = await response.json();
-  const item = payload.items?.[0];
-  const publishedAt = String(item?.snippet?.publishedAt || "").trim();
-  const duration = String(item?.contentDetails?.duration || "").trim();
-  if (!publishedAt) return;
-
+async function saveSourceMetadata(videoId, publishedAt, duration, env) {
   await env.DB.prepare(
     `INSERT INTO video_source_metadata (video_id, source_published_at, source_duration, updated_at)
      VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
@@ -413,6 +428,50 @@ async function refreshSourceMetadata(videoId, sourceUrl, env) {
        source_duration = excluded.source_duration,
        updated_at = excluded.updated_at`,
   ).bind(videoId, publishedAt, duration || null).run();
+}
+
+export async function refreshSourceMetadata(videoId, sourceUrl, env, suppliedMetadata = {}, options = {}) {
+  if (!Number.isSafeInteger(Number(videoId)) || Number(videoId) < 1) return;
+  const manualPublishedAt = normalizeSourcePublishedAt(suppliedMetadata.source_published_at);
+  const manualDuration = durationSecondsToIso(suppliedMetadata.source_duration_seconds);
+  const youtubeId = extractYoutubeId(sourceUrl);
+  if (youtubeId && env.YOUTUBE_API_KEY) {
+    const params = new URLSearchParams({
+      part: "snippet,contentDetails",
+      id: youtubeId,
+      key: env.YOUTUBE_API_KEY,
+    });
+    try {
+      const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params}`, {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(10000),
+      });
+      if (response.ok) {
+        const payload = await response.json();
+        const item = payload.items?.[0];
+        const publishedAt = normalizeSourcePublishedAt(item?.snippet?.publishedAt);
+        const duration = cleanText(item?.contentDetails?.duration, 80);
+        if (publishedAt) {
+          await saveSourceMetadata(videoId, publishedAt, duration || manualDuration, env);
+          return;
+        }
+      } else {
+        console.error("YouTube metadata request returned", response.status);
+      }
+    } catch (error) {
+      console.error("YouTube metadata request failed", error?.name || "unknown");
+    }
+  }
+
+  if (manualPublishedAt) {
+    await saveSourceMetadata(videoId, manualPublishedAt, manualDuration, env);
+    return;
+  }
+
+  if (options.replaceExisting) {
+    await env.DB.prepare("DELETE FROM video_source_metadata WHERE video_id = ?")
+      .bind(videoId).run();
+  }
 }
 
 async function loadSourceMetadata(html, env) {
@@ -482,8 +541,14 @@ async function fetchHandler(request, env, ctx) {
   }
 
   const videoMutation = isVideoMutation(url, request.method);
+  const mutationVideoId = request.method === "PATCH"
+    ? Number(url.pathname.match(/^\/api\/videos\/(\d+)$/)?.[1] || 0)
+    : 0;
   const mutationPayloadPromise = videoMutation
     ? request.clone().json().catch(() => null)
+    : Promise.resolve(null);
+  const previousVideoPromise = mutationVideoId > 0
+    ? env.DB.prepare("SELECT source_url FROM videos WHERE id = ?").bind(mutationVideoId).first().catch(() => null)
     : Promise.resolve(null);
 
   const rejectedCommentMatch = url.pathname.match(/^\/api\/admin\/comments\/(\d+)$/);
@@ -498,13 +563,17 @@ async function fetchHandler(request, env, ctx) {
   const response = await app.fetch(request, env, delegatedContext);
 
   if (videoMutation && response.ok) {
-    const [mutationPayload, responsePayload] = await Promise.all([
+    const [mutationPayload, responsePayload, previousVideo] = await Promise.all([
       mutationPayloadPromise,
       response.clone().json().catch(() => null),
+      previousVideoPromise,
     ]);
     const videoId = Number(responsePayload?.video?.id || 0);
-    if (videoId > 0 && mutationPayload?.source_url) {
-      const work = refreshSourceMetadata(videoId, mutationPayload.source_url, env)
+    const sourceUrl = responsePayload?.video?.source_url;
+    if (videoId > 0 && sourceUrl) {
+      const work = refreshSourceMetadata(videoId, sourceUrl, env, mutationPayload || {}, {
+        replaceExisting: !previousVideo || previousVideo.source_url !== sourceUrl,
+      })
         .catch((error) => console.error("Source metadata enrichment failed", error?.message || error));
       if (ctx?.waitUntil) ctx.waitUntil(work);
       else await work;
@@ -554,6 +623,8 @@ async function scheduledHandler(_controller, env, ctx) {
     env.DB.prepare("DELETE FROM rate_limits WHERE window_started_at < ?")
       .bind(twoDaysAgo).run(),
     env.DB.prepare("DELETE FROM discovery_request_visitors WHERE created_at < datetime('now', '-90 days')")
+      .run(),
+    env.DB.prepare("DELETE FROM viewer_interests WHERE updated_at < datetime('now', '-180 days')")
       .run(),
   ]);
   ctx.waitUntil(cleanup);

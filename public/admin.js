@@ -33,6 +33,11 @@ const ui = {
   subcategory: document.querySelector("#admin-subcategory"),
   title: document.querySelector("#video-title"),
   thumbnail: document.querySelector("#thumbnail-url"),
+  thumbnailFile: document.querySelector("#thumbnail-file"),
+  thumbnailUploadButton: document.querySelector("#thumbnail-upload-button"),
+  thumbnailUploadStatus: document.querySelector("#thumbnail-upload-status"),
+  sourcePublishedAt: document.querySelector("#source-published-at"),
+  sourceDurationSeconds: document.querySelector("#source-duration-seconds"),
   notes: document.querySelector("#ai-notes"),
   aiButton: document.querySelector("#ai-generate"),
   aiStatus: document.querySelector("#ai-status"),
@@ -83,6 +88,7 @@ function bindAdminEvents() {
     }
   });
   ui.thumbnail.addEventListener("change", updatePreview);
+  ui.thumbnailUploadButton.addEventListener("click", uploadThumbnail);
   ui.file.addEventListener("change", () => {
     const file = ui.file.files[0];
     setStatus(ui.uploadStatus, file ? `${file.name} · ${formatBytes(file.size)}` : "");
@@ -236,6 +242,8 @@ function selectDiscoveredVideo(video) {
   ui.sourceUrl.value = video.source_url || "";
   ui.title.value = video.title || "";
   ui.thumbnail.value = video.thumbnail_url || "";
+  ui.sourcePublishedAt.value = dateInputValue(video.published_at);
+  ui.sourceDurationSeconds.value = "";
   ui.notes.value = [
     video.channel ? `Verified public channel: ${video.channel}` : "",
     video.published_at ? `Original publish date: ${video.published_at}` : "",
@@ -293,7 +301,8 @@ function parseEmbed(value) {
       youtubeId = url.searchParams.get("v") || url.pathname.match(/\/(?:embed|shorts|live)\/([A-Za-z0-9_-]{11})/)?.[1];
     }
     if (youtubeId && /^[A-Za-z0-9_-]{11}$/.test(youtubeId)) {
-      return { embed: `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&playsinline=1` };
+      const origin = encodeURIComponent(location.origin);
+      return { embed: `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&playsinline=1&enablejsapi=1&origin=${origin}` };
     }
     if (host === "tiktok.com" || host.endsWith(".tiktok.com")) {
       const id = url.pathname.match(/\/video\/(\d+)/)?.[1] || url.pathname.match(/\/player\/v1\/(\d+)/)?.[1];
@@ -301,6 +310,37 @@ function parseEmbed(value) {
     }
     if (host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch") {
       return { embed: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url.toString())}&show_text=false&width=1280` };
+    }
+    if (host === "vimeo.com" || host.endsWith(".vimeo.com")) {
+      const id = url.pathname.match(/\/(?:video\/)?(\d+)/)?.[1];
+      const pathParts = url.pathname.split("/").filter(Boolean);
+      const privacyHash = url.searchParams.get("h") || pathParts[pathParts.indexOf(id) + 1];
+      const privacyQuery = privacyHash && /^[A-Za-z0-9]+$/.test(privacyHash)
+        ? `&h=${encodeURIComponent(privacyHash)}`
+        : "";
+      return id ? { embed: `https://player.vimeo.com/video/${id}?dnt=1${privacyQuery}` } : {};
+    }
+    if (host === "dailymotion.com" || host.endsWith(".dailymotion.com") || host === "dai.ly") {
+      const id = host === "dai.ly"
+        ? url.pathname.split("/").filter(Boolean)[0]
+        : url.pathname.match(/\/(?:embed\/)?video\/([A-Za-z0-9]+)/)?.[1];
+      return id && /^[A-Za-z0-9]+$/.test(id)
+        ? { embed: `https://www.dailymotion.com/embed/video/${id}` }
+        : {};
+    }
+    if (host === "twitch.tv" || host.endsWith(".twitch.tv")) {
+      const videoId = url.pathname.match(/\/videos\/(\d+)/)?.[1];
+      const clipId = host === "clips.twitch.tv"
+        ? url.pathname.split("/").filter(Boolean)[0]
+        : url.pathname.match(/\/clip\/([A-Za-z0-9_-]+)/)?.[1];
+      if (videoId) return { embed: `https://player.twitch.tv/?video=v${videoId}&parent=${encodeURIComponent(location.hostname)}&autoplay=false` };
+      if (clipId) return { embed: `https://clips.twitch.tv/embed?clip=${encodeURIComponent(clipId)}&parent=${encodeURIComponent(location.hostname)}&autoplay=false` };
+      return {};
+    }
+    if (host === "instagram.com" || host.endsWith(".instagram.com")) {
+      const match = url.pathname.match(/^\/(p|reel|reels)\/([A-Za-z0-9_-]+)/);
+      const kind = match?.[1] === "p" ? "p" : "reel";
+      return match ? { embed: `https://www.instagram.com/${kind}/${match[2]}/embed` } : {};
     }
     return { image: url.pathname.match(/\.(?:jpe?g|png|webp|gif|avif)$/i) };
   } catch {
@@ -347,6 +387,48 @@ function uploadFile() {
   request.send(file);
 }
 
+function uploadThumbnail() {
+  const file = ui.thumbnailFile.files[0];
+  const allowed = new Set(["image/avif", "image/gif", "image/jpeg", "image/png", "image/webp"]);
+  if (!file) {
+    setStatus(ui.thumbnailUploadStatus, "Choose a thumbnail image first.", "error");
+    return;
+  }
+  if (!allowed.has(file.type)) {
+    setStatus(ui.thumbnailUploadStatus, "Use PNG, JPEG, WebP, AVIF or GIF.", "error");
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    setStatus(ui.thumbnailUploadStatus, "Thumbnail must be 10 MB or smaller.", "error");
+    return;
+  }
+
+  ui.thumbnailUploadButton.disabled = true;
+  setStatus(ui.thumbnailUploadStatus, "Uploading thumbnail…");
+  const request = new XMLHttpRequest();
+  request.open("PUT", `/api/assets?filename=${encodeURIComponent(file.name)}`);
+  request.withCredentials = true;
+  request.setRequestHeader("X-File-Name", file.name);
+  request.setRequestHeader("Content-Type", file.type);
+  request.addEventListener("load", () => {
+    ui.thumbnailUploadButton.disabled = false;
+    let result = {};
+    try { result = JSON.parse(request.responseText || "{}"); } catch { /* Ignore malformed error payload. */ }
+    if (request.status >= 200 && request.status < 300 && result.url) {
+      ui.thumbnail.value = result.url;
+      setStatus(ui.thumbnailUploadStatus, "Thumbnail uploaded and selected.", "success");
+      updatePreview();
+    } else {
+      setStatus(ui.thumbnailUploadStatus, result.error || `Upload failed with HTTP ${request.status}`, "error");
+    }
+  });
+  request.addEventListener("error", () => {
+    ui.thumbnailUploadButton.disabled = false;
+    setStatus(ui.thumbnailUploadStatus, "Network error during thumbnail upload.", "error");
+  });
+  request.send(file);
+}
+
 async function generateCopy() {
   ui.aiButton.disabled = true;
   setStatus(ui.aiStatus, "Gemini is drafting careful editorial copy…");
@@ -387,6 +469,8 @@ async function saveVideo(event) {
     primary_category: ui.category.value,
     subcategory: ui.subcategory.value,
     thumbnail_url: ui.thumbnail.value,
+    source_published_at: ui.sourcePublishedAt.value,
+    source_duration_seconds: ui.sourceDurationSeconds.value,
     seo_title: ui.seoTitle.value,
     seo_description: ui.seoDescription.value,
     description: ui.description.value,
@@ -485,6 +569,8 @@ function editVideo(video) {
   ui.category.value = video.primary_category;
   fillSubcategories(video.primary_category, video.subcategory);
   ui.thumbnail.value = video.thumbnail_url || "";
+  ui.sourcePublishedAt.value = dateInputValue(video.source_published_at);
+  ui.sourceDurationSeconds.value = isoDurationToSeconds(video.source_duration);
   ui.seoTitle.value = video.seo_title || "";
   ui.seoDescription.value = video.seo_description || "";
   ui.description.value = video.description || "";
@@ -508,6 +594,17 @@ async function deleteVideo(video) {
   } catch (error) {
     setStatus(ui.saveStatus, error.message, "error");
   }
+}
+
+function dateInputValue(value) {
+  const match = String(value || "").match(/^\d{4}-\d{2}-\d{2}/);
+  return match?.[0] || "";
+}
+
+function isoDurationToSeconds(value) {
+  const match = String(value || "").match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/i);
+  if (!match) return "";
+  return String((Number(match[1]) || 0) * 3600 + (Number(match[2]) || 0) * 60 + (Number(match[3]) || 0));
 }
 
 async function loadPendingComments() {
@@ -640,6 +737,7 @@ function resetEditor(clearStatus = true) {
   ui.uploadProgress.style.width = "0%";
   setSourceMode("link");
   setStatus(ui.uploadStatus, "");
+  setStatus(ui.thumbnailUploadStatus, "");
   setStatus(ui.aiStatus, "");
   setStatus(ui.videoSearchStatus, "");
   ui.videoSearchResults.replaceChildren();
