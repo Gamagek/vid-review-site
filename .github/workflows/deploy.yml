@@ -32,7 +32,6 @@ jobs:
         run: npm ci
 
       - name: Apply final player patch
-        if: github.event.head_commit.message != 'fix: finalize embedded player and audio lab'
         run: node scripts/patch-player-final.mjs
 
       - name: Run tests
@@ -44,16 +43,18 @@ jobs:
       - name: Validate Worker bundle
         run: npm run check
 
-      - name: Commit final player patch
-        if: github.event.head_commit.message != 'fix: finalize embedded player and audio lab'
+      - name: Commit generated player changes when needed
         shell: bash
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/watch.js
-          git rm scripts/patch-player-final.mjs
-          git commit -m "fix: finalize embedded player and audio lab"
-          git push
+          if git diff --quiet -- public/watch.js; then
+            echo "Player source already contains the final patch."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add public/watch.js
+            git commit -m "fix: finalize embedded player and audio lab"
+            git push
+          fi
 
       - name: Explain missing deployment credentials
         if: env.CLOUDFLARE_API_TOKEN == '' || env.CLOUDFLARE_ACCOUNT_ID == ''
