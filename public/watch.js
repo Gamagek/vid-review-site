@@ -86,7 +86,7 @@ function initializePersistentPlayer() {
     if (watchPlayerState.dismissed || persistentPlayer.classList.contains("is-theater")) return;
     const passedPlayer = scrollY + 90 >= watchPlayerState.originalBottom;
     if (!passedPlayer) {
-      if (persistentPlayer.classList.contains("is-mini")) leavePersistentMode();
+      if (persistentPlayer.classList.contains("is-mini") && !persistentPlayer.dataset.explicitMini) leavePersistentMode();
       if (watchPlayerState.miniTimer) {
         clearTimeout(watchPlayerState.miniTimer);
         watchPlayerState.miniTimer = null;
@@ -94,7 +94,7 @@ function initializePersistentPlayer() {
       }
       return;
     }
-    if (!persistentPlayer.classList.contains("is-mini") && !watchPlayerState.miniTimer) {
+    if (!persistentPlayer.classList.contains("is-mini") && !watchPlayerState.miniTimer && !persistentPlayer.dataset.explicitMini) {
       status.textContent = "Mini-player starts in 3 seconds";
       watchPlayerState.miniTimer = setTimeout(() => { void activateMini(); }, 3000);
     }
@@ -104,6 +104,7 @@ function initializePersistentPlayer() {
     const action = event.target.closest("[data-player-mode]")?.dataset.playerMode;
     if (!action) return;
     if (action === "restore") {
+      persistentPlayer.removeAttribute("data-explicit-mini");
       leavePersistentMode({ restoreFocus: true });
       persistentPlayer.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
     }
@@ -111,6 +112,7 @@ function initializePersistentPlayer() {
       watchPlayerState.focusReturn = document.activeElement;
       playerPlaceholder.style.height = `${persistentPlayer.offsetHeight}px`;
       playerPlaceholder.classList.add("is-active");
+      persistentPlayer.removeAttribute("data-explicit-mini");
       persistentPlayer.classList.remove("is-mini");
       persistentPlayer.classList.add("is-theater");
       persistentPlayer.setAttribute("role", "dialog");
@@ -122,6 +124,7 @@ function initializePersistentPlayer() {
       persistentPlayer.querySelector('[data-player-mode="close"]')?.focus();
     }
     if (action === "close") {
+      persistentPlayer.removeAttribute("data-explicit-mini");
       watchPlayerState.dismissed = true;
       pausePlayback();
       leavePersistentMode({ restoreFocus: true });
@@ -158,7 +161,7 @@ function initializePersistentPlayer() {
     if (document.visibilityState === "hidden" && watchPlayerState.miniTimer) {
       clearTimeout(watchPlayerState.miniTimer);
       watchPlayerState.miniTimer = null;
-      status.textContent = "Mini-player paused while this tab is hidden";
+      status.textContent = "Mini-player timer paused while this tab is hidden";
       return;
     }
     if (document.visibilityState === "visible") evaluateScroll();
@@ -166,7 +169,7 @@ function initializePersistentPlayer() {
 }
 
 async function startMutedPlayback() {
-  const video = persistentPlayer.querySelector("video");
+  const video = persistentPlayer?.querySelector("video");
   if (video) {
     video.muted = true;
     try {
@@ -176,9 +179,11 @@ async function startMutedPlayback() {
       return false;
     }
   }
-  if (document.body.dataset.videoProvider === "youtube") {
-    youtubeCommand("mute");
-    youtubeCommand("playVideo");
+  const frame = persistentPlayer?.querySelector("iframe");
+  const provider = String(document.body.dataset.videoProvider || "").toLowerCase();
+  if (frame && ["youtube", "vimeo"].includes(provider)) {
+    playerProviderCommand("mute");
+    playerProviderCommand("playVideo");
     return true;
   }
   return false;
@@ -187,18 +192,36 @@ async function startMutedPlayback() {
 function pausePlayback() {
   const video = persistentPlayer?.querySelector("video");
   if (video) video.pause();
-  youtubeCommand("pauseVideo");
+  playerProviderCommand("pauseVideo");
+}
+
+function playerProviderCommand(method, args = []) {
+  const frame = persistentPlayer?.querySelector("iframe");
+  if (!frame) return;
+  const provider = String(document.body.dataset.videoProvider || "").toLowerCase();
+  try {
+    if (provider === "youtube") {
+      const targetOrigin = new URL(frame.src).origin;
+      frame.contentWindow?.postMessage(JSON.stringify({ event: "command", func: method, args }), targetOrigin);
+      return;
+    }
+    if (provider === "vimeo") {
+      const payload = method === "playVideo" ? { method: "play" }
+        : method === "pauseVideo" ? { method: "pause" }
+          : method === "mute" ? { method: "setVolume", value: 0 }
+            : method === "unMute" ? { method: "setVolume", value: 1 }
+              : method === "setPlaybackRate" ? { method: "setPlaybackRate", value: Number(args[0]) }
+                : method === "seekTo" ? { method: "setCurrentTime", value: Number(args[0]) }
+                  : { method };
+      frame.contentWindow?.postMessage(JSON.stringify(payload), "https://player.vimeo.com");
+    }
+  } catch {
+    // Provider controls remain the fallback when its API rejects a command.
+  }
 }
 
 function youtubeCommand(func, args = []) {
-  const frame = persistentPlayer?.querySelector("iframe");
-  if (!frame || document.body.dataset.videoProvider !== "youtube") return;
-  try {
-    const targetOrigin = new URL(frame.src).origin;
-    frame.contentWindow?.postMessage(JSON.stringify({ event: "command", func, args }), targetOrigin);
-  } catch {
-    // The provider's built-in controls remain available if its API is unavailable.
-  }
+  playerProviderCommand(func, args);
 }
 
 async function initializeDiscovery() {
@@ -579,3 +602,370 @@ function formatDate(value) {
     ? "Recently"
     : new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(date);
 }
+
+// VIDBEST LINKED PLAYER UPGRADE v1
+// Adds a unified control bar for iframe embeds, converts direct linked media to native video,
+// keeps the floating player persistent while browsing, and exposes Media Session controls.
+(() => {
+  const upgrade = () => {
+    const player = document.querySelector("#watch-player");
+    if (!player || player.dataset.linkedPlayerReady === "1") return;
+
+    const state = window.__vidBestPlayer = window.__vidBestPlayer || {
+      remoteCurrentTime: 0,
+      remoteDuration: 0,
+      remotePlaying: false,
+      remoteRate: 1,
+      remoteMuted: false,
+      provider: "",
+    };
+
+    const stage = () => player.querySelector(".watch-player-stage") || player;
+    const media = () => player.querySelector("video");
+    const frame = () => player.querySelector("iframe");
+
+    const inferProvider = () => {
+      const explicit = String(document.body.dataset.videoProvider || "").toLowerCase();
+      if (explicit) return explicit;
+      try {
+        const host = new URL(frame()?.src || "").hostname.toLowerCase();
+        if (host.includes("youtube")) return "youtube";
+        if (host.includes("vimeo")) return "vimeo";
+        if (host.includes("dailymotion")) return "dailymotion";
+        if (host.includes("tiktok")) return "tiktok";
+        if (host.includes("facebook")) return "facebook";
+        if (host.includes("instagram")) return "instagram";
+        if (host.includes("twitch")) return "twitch";
+      } catch {}
+      return "external";
+    };
+
+    const isDirectMediaUrl = (value) => /\.(?:mp4|webm|ogg|ogv|m4v|mov)(?:$|[?#])/i.test(String(value || ""));
+
+    const convertDirectMedia = () => {
+      const currentFrame = frame();
+      if (!currentFrame || !isDirectMediaUrl(currentFrame.src)) return;
+      const video = document.createElement("video");
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+      video.src = currentFrame.src;
+      video.setAttribute("aria-label", "Linked video");
+      currentFrame.replaceWith(video);
+    };
+
+    state.provider = inferProvider();
+    convertDirectMedia();
+
+    const currentFrame = frame();
+    if (state.provider === "youtube" && currentFrame) {
+      try {
+        const url = new URL(currentFrame.src);
+        url.searchParams.set("enablejsapi", "1");
+        url.searchParams.set("playsinline", "1");
+        url.searchParams.set("origin", location.origin);
+        url.searchParams.set("cc_load_policy", "1");
+        if (!url.searchParams.has("rel")) url.searchParams.set("rel", "0");
+        currentFrame.src = url.toString();
+      } catch {}
+    }
+    if (currentFrame) {
+      currentFrame.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; clipboard-write");
+      currentFrame.setAttribute("allowfullscreen", "");
+      currentFrame.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+    }
+
+    const sendProvider = (method, args = []) => {
+      const activeFrame = frame();
+      if (!activeFrame) return;
+      try {
+        if (state.provider === "youtube") {
+          activeFrame.contentWindow?.postMessage(JSON.stringify({ event: "command", func: method, args }), new URL(activeFrame.src).origin);
+          return;
+        }
+        if (state.provider === "vimeo") {
+          const payload = method === "playVideo" ? { method: "play" }
+            : method === "pauseVideo" ? { method: "pause" }
+              : method === "mute" ? { method: "setVolume", value: 0 }
+                : method === "unMute" ? { method: "setVolume", value: 1 }
+                  : method === "setPlaybackRate" ? { method: "setPlaybackRate", value: Number(args[0]) }
+                    : method === "seekTo" ? { method: "setCurrentTime", value: Number(args[0]) }
+                      : method === "getCurrentTime" ? { method: "getCurrentTime" }
+                        : { method };
+          activeFrame.contentWindow?.postMessage(JSON.stringify(payload), "https://player.vimeo.com");
+        }
+      } catch {}
+    };
+
+    const onProviderMessage = (event) => {
+      const activeFrame = frame();
+      if (!activeFrame || event.source !== activeFrame.contentWindow || typeof event.data !== "string") return;
+      let data;
+      try { data = JSON.parse(event.data); } catch { return; }
+      if (state.provider === "youtube" && data.event === "infoDelivery" && data.info) {
+        if (Number.isFinite(Number(data.info.currentTime))) state.remoteCurrentTime = Number(data.info.currentTime);
+        if (Number.isFinite(Number(data.info.duration))) state.remoteDuration = Number(data.info.duration);
+        if (Number.isFinite(Number(data.info.playerState))) state.remotePlaying = Number(data.info.playerState) === 1;
+      }
+      if (state.provider === "vimeo") {
+        if (["timeupdate", "playProgress"].includes(data.event)) {
+          const seconds = Number(data.data?.seconds);
+          const duration = Number(data.data?.duration);
+          if (Number.isFinite(seconds)) state.remoteCurrentTime = seconds;
+          if (Number.isFinite(duration)) state.remoteDuration = duration;
+        }
+        if (data.event === "play") state.remotePlaying = true;
+        if (data.event === "pause") state.remotePlaying = false;
+        if (data.method === "getCurrentTime" && Number.isFinite(Number(data.value))) state.remoteCurrentTime = Number(data.value);
+      }
+    };
+    window.addEventListener("message", onProviderMessage);
+
+    const installCss = () => {
+      if (document.querySelector("#vidbest-linked-player-css")) return;
+      const style = document.createElement("style");
+      style.id = "vidbest-linked-player-css";
+      style.textContent = `
+        #watch-player .player-tools { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; margin-top:.75rem; }
+        #watch-player .player-tools .button { min-height:40px; }
+        #watch-player .player-tool-note { flex-basis:100%; margin:.15rem 0 0; }
+      `;
+      document.head.append(style);
+    };
+
+    const message = (text) => {
+      const note = player.querySelector(".player-tool-note");
+      if (note) note.textContent = text;
+    };
+
+    const makeButton = (label, title, handler, disabled = false) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "button ghost";
+      button.textContent = label;
+      button.title = title;
+      button.setAttribute("aria-label", title);
+      button.disabled = disabled;
+      button.addEventListener("click", () => void handler());
+      return button;
+    };
+
+    const seekBy = (delta) => {
+      const video = media();
+      if (video) {
+        const end = Number.isFinite(video.duration) ? video.duration : Infinity;
+        video.currentTime = Math.min(end, Math.max(0, video.currentTime + delta));
+        return;
+      }
+      if (!["youtube", "vimeo"].includes(state.provider)) return;
+      sendProvider("getCurrentTime");
+      const end = Number(state.remoteDuration || 0);
+      const target = end > 0 ? Math.min(end, Math.max(0, state.remoteCurrentTime + delta)) : Math.max(0, state.remoteCurrentTime + delta);
+      sendProvider("seekTo", [target, true]);
+      state.remoteCurrentTime = target;
+    };
+
+    const toggleFloating = () => {
+      const anchor = document.querySelector("#watch-player-anchor");
+      if (!anchor) return false;
+      const enabled = !player.classList.contains("is-mini");
+      if (enabled) {
+        anchor.style.height = `${player.offsetHeight}px`;
+        anchor.classList.add("is-active");
+        player.classList.add("is-mini");
+        player.dataset.explicitMini = "1";
+      } else {
+        player.classList.remove("is-mini");
+        player.removeAttribute("data-explicit-mini");
+        anchor.classList.remove("is-active");
+        anchor.style.height = "";
+      }
+      return enabled;
+    };
+
+    const setupMediaSession = () => {
+      if (!("mediaSession" in navigator)) return;
+      try {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: document.title.slice(0, 120),
+          artist: "Vid.Best",
+          album: "Vid.Best Video Review",
+        });
+        const action = (name, handler) => {
+          try { navigator.mediaSession.setActionHandler(name, handler); } catch {}
+        };
+        action("play", async () => {
+          const video = media();
+          if (video) await video.play();
+          else { sendProvider("playVideo"); state.remotePlaying = true; }
+        });
+        action("pause", () => {
+          const video = media();
+          if (video) video.pause();
+          else { sendProvider("pauseVideo"); state.remotePlaying = false; }
+        });
+        action("seekbackward", () => seekBy(-10));
+        action("seekforward", () => seekBy(10));
+        action("seekto", (event) => {
+          const target = Number(event?.seekTime);
+          if (!Number.isFinite(target)) return;
+          const video = media();
+          if (video) video.currentTime = target;
+          else { sendProvider("seekTo", [target, true]); state.remoteCurrentTime = target; }
+        });
+        action("stop", () => {
+          const video = media();
+          if (video) video.pause();
+          else { sendProvider("pauseVideo"); state.remotePlaying = false; }
+        });
+        action("enterpictureinpicture", async () => {
+          const video = media();
+          if (!video || !document.pictureInPictureEnabled || typeof video.requestPictureInPicture !== "function") return;
+          try { await video.requestPictureInPicture(); } catch {}
+        });
+      } catch {}
+    };
+
+    const controlsStage = stage();
+    const currentMedia = media();
+    const currentIframe = frame();
+    if (!currentMedia && !currentIframe) return;
+
+    player.querySelector(".player-tools")?.remove();
+    const tools = document.createElement("div");
+    tools.className = "watch-reactions player-tools";
+    tools.setAttribute("aria-label", "Video playback controls");
+
+    const remoteSupported = ["youtube", "vimeo"].includes(state.provider);
+    const playPause = makeButton("▶ Play", "Play or pause", async () => {
+      const video = media();
+      if (video) {
+        if (video.paused) await video.play(); else video.pause();
+      } else if (remoteSupported) {
+        if (state.remotePlaying) { sendProvider("pauseVideo"); state.remotePlaying = false; }
+        else { sendProvider("playVideo"); state.remotePlaying = true; }
+      }
+    });
+    const rewind = makeButton("↶ 10s", "Rewind 10 seconds", () => seekBy(-10), !currentMedia && !remoteSupported);
+    const forward = makeButton("10s ↷", "Forward 10 seconds", () => seekBy(10), !currentMedia && !remoteSupported);
+
+    const rates = [0.5, 0.75, 1, 1.25, 1.5, 2];
+    const speed = makeButton("1× speed", "Cycle playback speed", () => {
+      const video = media();
+      const current = video ? Number(video.playbackRate || 1) : Number(state.remoteRate || 1);
+      let index = rates.findIndex((value) => Math.abs(value - current) < 0.01);
+      index = (index + 1) % rates.length;
+      const next = rates[index];
+      if (video) video.playbackRate = next;
+      else { state.remoteRate = next; sendProvider("setPlaybackRate", [next]); }
+      speed.textContent = `${next}× speed`;
+    }, !currentMedia && !remoteSupported);
+
+    const zoom = makeButton("1× zoom", "Cycle video zoom", () => {
+      const values = [1, 1.25, 1.5, 2];
+      const current = Number(player.dataset.zoom || 1);
+      let index = values.findIndex((value) => Math.abs(value - current) < 0.01);
+      index = (index + 1) % values.length;
+      const next = values[index];
+      player.dataset.zoom = String(next);
+      const target = media() || frame();
+      if (target) target.style.transform = `scale(${next})`;
+      zoom.textContent = `${next}× zoom`;
+    });
+
+    const captions = makeButton("CC", "Captions", () => {
+      const video = media();
+      if (video) {
+        const tracks = [...video.textTracks];
+        if (!tracks.length) { message("No stored caption track is available yet."); return; }
+        const showing = tracks.some((track) => track.mode === "showing");
+        tracks.forEach((track, index) => { track.mode = !showing && index === 0 ? "showing" : "hidden"; });
+        captions.textContent = showing ? "CC off" : "CC on";
+        return;
+      }
+      message(`${state.provider === "youtube" ? "YouTube" : "Linked provider"} captions stay inside the provider player so its language and accessibility controls remain available.`);
+    });
+
+    const translate = makeButton("Translate", "Translate captions", () => {
+      message("Caption translation will activate when Vid.Best receives a caption track from the Teamwork transcription/translation engine.");
+    }, true);
+
+    const mute = makeButton("Mute", "Mute or unmute", () => {
+      const video = media();
+      if (video) {
+        video.muted = !video.muted;
+        mute.textContent = video.muted ? "Unmute" : "Mute";
+      } else if (remoteSupported) {
+        if (state.remoteMuted) { sendProvider("unMute"); state.remoteMuted = false; mute.textContent = "Mute"; }
+        else { sendProvider("mute"); state.remoteMuted = true; mute.textContent = "Unmute"; }
+      } else message("Mute control is supplied by the linked provider.");
+    });
+
+    const popout = makeButton("Pop-out", "Open the video in the floating player", () => {
+      popout.textContent = toggleFloating() ? "Return" : "Pop-out";
+    });
+
+    const pip = makeButton("▣ PiP", "Picture in picture", async () => {
+      const video = media();
+      if (!video || !document.pictureInPictureEnabled || typeof video.requestPictureInPicture !== "function") {
+        message("Browser Picture-in-Picture is available for native/direct media when supported. Linked providers use Pop-out or their own PiP control.");
+        return;
+      }
+      try {
+        if (document.pictureInPictureElement) await document.exitPictureInPicture();
+        else await video.requestPictureInPicture();
+      } catch { message("Picture-in-Picture was not available in this browser/session."); }
+    }, !currentMedia);
+
+    const fullscreen = makeButton("Fullscreen", "Toggle fullscreen", async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else if (controlsStage.requestFullscreen) await controlsStage.requestFullscreen();
+      } catch { message("Fullscreen is unavailable for this linked provider."); }
+    });
+    const share = makeButton("Share", "Share this video", () => {
+      if (typeof shareWatchPage === "function") void shareWatchPage();
+    });
+
+    tools.append(rewind, playPause, forward, speed, zoom, captions, translate, mute, popout, pip, fullscreen, share);
+    const note = document.createElement("p");
+    note.className = "form-status player-tool-note";
+    note.textContent = currentMedia
+      ? "Full native controls enabled. Background/lock-screen playback follows browser and device policy."
+      : remoteSupported
+        ? `Linked ${state.provider} controls enabled where the provider API allows. Provider policies still apply to background playback and PiP.`
+        : "Linked provider controls remain available. Vid.Best supplies Pop-out, fullscreen and sharing; advanced controls depend on provider support.";
+    tools.append(note);
+    controlsStage.insertAdjacentElement("afterend", tools);
+
+    if (currentMedia) {
+      currentMedia.addEventListener("play", () => { playPause.textContent = "❚❚ Pause"; state.remotePlaying = true; });
+      currentMedia.addEventListener("pause", () => { playPause.textContent = "▶ Play"; state.remotePlaying = false; });
+      currentMedia.addEventListener("ratechange", () => { speed.textContent = `${Number(currentMedia.playbackRate || 1)}× speed`; });
+    }
+
+    setupMediaSession();
+    if (remoteSupported) {
+      const poll = setInterval(() => {
+        sendProvider("getCurrentTime");
+        if (state.provider === "youtube") sendProvider("getDuration");
+      }, 1000);
+      setTimeout(() => clearInterval(poll), 120000);
+    }
+
+    window.addEventListener("scroll", () => {
+      const anchor = document.querySelector("#watch-player-anchor");
+      if (!anchor || player.dataset.explicitMini !== "1") return;
+      if (!player.classList.contains("is-mini") && !player.classList.contains("is-theater")) {
+        anchor.style.height = `${player.offsetHeight}px`;
+        anchor.classList.add("is-active");
+        player.classList.add("is-mini");
+      }
+    }, { passive: true });
+
+    player.dataset.linkedPlayerReady = "1";
+  };
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", upgrade, { once: true });
+  else upgrade();
+})();
