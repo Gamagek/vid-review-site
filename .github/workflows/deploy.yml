@@ -31,9 +31,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Apply final player patch
-        run: node scripts/patch-player-final.mjs
-
       - name: Apply player polish v4
         run: node scripts/patch-player-v4.mjs
 
