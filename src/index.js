@@ -100,6 +100,7 @@ const SAFE_UPLOAD_TYPES = new Set([
 const encoder = new TextEncoder();
 const ADMIN_SESSION_COOKIE = "__Host-vidbest_admin";
 const ADMIN_SESSION_SECONDS = 60 * 60 * 8;
+const REACTION_SALT_SETTING = "reaction_salt";
 
 class AppError extends Error {
   constructor(status, message, details, headers = {}) {
@@ -162,6 +163,10 @@ async function route(request, env, ctx) {
 
   if (path.startsWith("/media/") && ["GET", "HEAD"].includes(request.method)) {
     return serveR2Object(request, env, path.slice("/media/".length));
+  }
+
+  if (path.startsWith("/captions/") && path.endsWith(".vtt") && request.method === "GET") {
+    return serveCaptions(env, safeDecode(path.slice("/captions/".length, -4)));
   }
 
   if (path === "/api/videos") {
@@ -263,6 +268,24 @@ async function route(request, env, ctx) {
   if (path === "/api/ai/generate" && request.method === "POST") {
     await requireAdmin(request, env);
     return generateAiCopy(request, env);
+  }
+
+  if (path === "/api/ai/analyze-media" && request.method === "POST") {
+    await requireAdmin(request, env);
+    return startMediaAnalysis(request, env);
+  }
+
+  match = path.match(/^\/api\/ai\/analyze-media\/([0-9a-f]{32})$/);
+  if (match && request.method === "GET") {
+    await requireAdmin(request, env);
+    return getMediaAnalysis(env, match[1]);
+  }
+
+  match = path.match(/^\/api\/admin\/videos\/(\d+)\/analysis$/);
+  if (match && ["GET", "PUT"].includes(request.method)) {
+    await requireAdmin(request, env);
+    if (request.method === "GET") return getStoredVideoAnalysis(env, Number(match[1]));
+    return storeVideoAnalysis(request, env, Number(match[1]));
   }
 
   if (path === "/api/assets") {
@@ -432,6 +455,31 @@ async function requestFingerprint(request, secret) {
   ].join("|"));
 }
 
+export async function resolveReactionSalt(env) {
+  const configured = String(env.REACTION_SALT || "");
+  if (configured.length >= 16) return configured;
+  if (!env.DB) throw new AppError(503, "Rate-limit storage is not configured");
+
+  const existing = await env.DB.prepare(
+    "SELECT setting_value FROM app_settings WHERE setting_key = ?",
+  ).bind(REACTION_SALT_SETTING).first();
+  if (String(existing?.setting_value || "").length >= 16) return existing.setting_value;
+
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  const generated = [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  await env.DB.prepare(
+    `INSERT OR IGNORE INTO app_settings (setting_key, setting_value)
+     VALUES (?, ?)`,
+  ).bind(REACTION_SALT_SETTING, generated).run();
+  const stored = await env.DB.prepare(
+    "SELECT setting_value FROM app_settings WHERE setting_key = ?",
+  ).bind(REACTION_SALT_SETTING).first();
+  if (String(stored?.setting_value || "").length < 16) {
+    throw new AppError(503, "Rate-limit secret could not be initialized");
+  }
+  return stored.setting_value;
+}
+
 function rateLimitError(windowSeconds) {
   return new AppError(
     429,
@@ -459,7 +507,7 @@ async function recordRateLimit(env, scope, fingerprint, limit, windowSeconds, re
 }
 
 async function consumeRateLimit(request, env, scope, limit, windowSeconds) {
-  const fingerprint = await requestFingerprint(request, env.REACTION_SALT);
+  const fingerprint = await requestFingerprint(request, await resolveReactionSalt(env));
   await recordRateLimit(env, scope, fingerprint, limit, windowSeconds);
   return fingerprint;
 }
@@ -538,6 +586,7 @@ function serializeVideo(row) {
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
     published: Boolean(row.published),
+    has_captions: Boolean(row.has_captions),
     seo_tags: parseTags(row.seo_tags),
     reactions: row.reactions || { like: 0, love: 0, useful: 0 },
   };
@@ -814,7 +863,12 @@ async function hydrateVideos(env, rows) {
 }
 
 async function getPublicVideo(env, slug) {
-  const row = await env.DB.prepare("SELECT * FROM videos WHERE slug = ? AND published = 1").bind(slug).first();
+  const row = await env.DB.prepare(
+    `SELECT v.*, a.transcript, a.language AS transcript_language,
+            CASE WHEN length(a.captions_vtt) > 0 THEN 1 ELSE 0 END AS has_captions
+     FROM videos v LEFT JOIN video_analysis a ON a.video_id = v.id AND a.source_url = v.source_url
+     WHERE v.slug = ? AND v.published = 1`,
+  ).bind(slug).first();
   if (!row) throw new AppError(404, "Video not found");
   const [video] = await hydrateVideos(env, [row]);
   return json({ video });
@@ -829,7 +883,7 @@ async function recommendVideos(request, env, videoId) {
   const limit = clampInteger(new URL(request.url).searchParams.get("limit"), 1, 16, 8);
   let fingerprint = "";
   try {
-    fingerprint = await requestFingerprint(request, env.REACTION_SALT);
+    fingerprint = await requestFingerprint(request, await resolveReactionSalt(env));
   } catch {
     // Recommendations still work without personalization when the salt is unavailable.
   }
@@ -960,6 +1014,9 @@ async function updateVideo(request, env, id) {
       ? managedAssetKeyFromUrl(existing.thumbnail_url, request, env)
       : null,
   ];
+  if (existing.source_url !== row.source_url) {
+    await env.DB.prepare("DELETE FROM video_analysis WHERE video_id = ?").bind(id).run();
+  }
   await cleanupUnusedManagedAssets(env, replacedKeys);
 
   return json({ success: true, video: serializeVideo(row) });
@@ -1398,6 +1455,180 @@ async function generateAiCopy(request, env) {
   });
 }
 
+function teamworkConfiguration(env) {
+  const secret = String(env.TEAMWORK_API_KEY || "");
+  let base;
+  try {
+    base = new URL(String(env.TEAMWORK_API_URL || ""));
+  } catch {
+    throw new AppError(503, "TEAMWORK_API_URL is not configured");
+  }
+  if (base.protocol !== "https:" || base.username || base.password) {
+    throw new AppError(503, "TEAMWORK_API_URL must be a credential-free HTTPS URL");
+  }
+  if (secret.length < 32) throw new AppError(503, "TEAMWORK_API_KEY is not configured");
+  base.pathname = base.pathname.replace(/\/$/, "");
+  base.search = "";
+  base.hash = "";
+  return { base: base.toString().replace(/\/$/, ""), secret };
+}
+
+async function readTeamworkResponse(response) {
+  const text = await response.text();
+  if (encoder.encode(text).byteLength > 300_000) throw new AppError(502, "Teamwork response is too large");
+  let payload;
+  try {
+    payload = JSON.parse(text || "{}");
+  } catch {
+    throw new AppError(502, "Teamwork returned invalid JSON");
+  }
+  if (!response.ok) {
+    const message = cleanText(payload.detail || payload.error, 240, `HTTP ${response.status}`);
+    throw new AppError(502, `Teamwork analysis failed: ${message}`);
+  }
+  return payload;
+}
+
+async function callTeamwork(env, pathname, options = {}) {
+  const { base, secret } = teamworkConfiguration(env);
+  let response;
+  try {
+    response = await fetch(`${base}${pathname}`, {
+      ...options,
+      redirect: "error",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${secret}`,
+        ...(options.body ? { "Content-Type": "application/json" } : {}),
+      },
+      signal: AbortSignal.timeout(15000),
+    });
+  } catch (error) {
+    if (error?.name === "TimeoutError" || error?.name === "AbortError") throw new AppError(504, "Teamwork API timed out");
+    throw new AppError(502, "Teamwork API is unavailable");
+  }
+  return readTeamworkResponse(response);
+}
+
+async function startMediaAnalysis(request, env) {
+  const data = await readJson(request, 8192);
+  const title = cleanText(data.title, 160);
+  const r2Key = validateR2Key(data.r2_key);
+  const baseUrl = getBaseUrl(request, env);
+  let sourceUrl = cleanText(data.source_url, 2000);
+  let mediaOwned = false;
+  if (r2Key) {
+    if (!r2Key.startsWith("uploads/")) throw new AppError(400, "Only administrator uploads can be deeply scanned");
+    sourceUrl = `${baseUrl}/media/${encodeR2Key(r2Key)}`;
+    mediaOwned = true;
+  }
+  if (!optionalHttpUrl(sourceUrl)) throw new AppError(400, "Enter or upload a valid media URL first");
+  const job = await callTeamwork(env, "/v1/jobs", {
+    method: "POST",
+    body: JSON.stringify({
+      source_url: sourceUrl,
+      title,
+      media_owned: mediaOwned,
+      scan_frames: mediaOwned,
+      transcribe: mediaOwned,
+      crawl_page: !mediaOwned,
+      ground_search: toBoolean(data.ground_search, false),
+      search_query: cleanText(data.search_query || title, 200),
+    }),
+  });
+  return json({ success: true, job }, 202);
+}
+
+async function getMediaAnalysis(env, jobId) {
+  const job = await callTeamwork(env, `/v1/jobs/${jobId}`);
+  return json({ success: true, job });
+}
+
+function normalizeAnalysisLanguage(value) {
+  const language = cleanText(value, 20).toLowerCase();
+  return /^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$/.test(language) ? language : "";
+}
+
+function normalizeCaptions(value) {
+  const captions = cleanLongText(value, 120_000);
+  if (!captions) return "";
+  if (!/^WEBVTT(?:\s|$)/.test(captions)) throw new AppError(400, "Captions must use WebVTT format");
+  return captions;
+}
+
+function parseWarnings(value) {
+  const list = Array.isArray(value) ? value : [];
+  return list.map((item) => cleanText(item, 300)).filter(Boolean).slice(0, 20);
+}
+
+async function getStoredVideoAnalysis(env, videoId) {
+  const video = await env.DB.prepare("SELECT id FROM videos WHERE id = ?").bind(videoId).first();
+  if (!video) throw new AppError(404, "Video not found");
+  const row = await env.DB.prepare(
+    `SELECT source_url, transcript, ocr_text, captions_vtt, language, analysis_provider, warnings_json, updated_at
+     FROM video_analysis WHERE video_id = ?`,
+  ).bind(videoId).first();
+  if (!row) return json({ analysis: null });
+  let storedWarnings = [];
+  try {
+    storedWarnings = JSON.parse(row.warnings_json || "[]");
+  } catch {
+    storedWarnings = [];
+  }
+  return json({
+    analysis: {
+      ...row,
+      warnings: parseWarnings(storedWarnings),
+      warnings_json: undefined,
+    },
+  });
+}
+
+async function storeVideoAnalysis(request, env, videoId) {
+  const video = await env.DB.prepare("SELECT id FROM videos WHERE id = ?").bind(videoId).first();
+  if (!video) throw new AppError(404, "Video not found");
+  const data = await readJson(request, 240_000);
+  const sourceUrl = cleanText(data.source_url, 2000);
+  const current = await env.DB.prepare("SELECT source_url FROM videos WHERE id = ?").bind(videoId).first();
+  if (!sourceUrl || sourceUrl !== current?.source_url) throw new AppError(409, "Analysis does not match the current video source");
+  const transcript = cleanLongText(data.transcript, 60_000);
+  const ocrText = cleanLongText(data.ocr_text, 20_000);
+  const captions = normalizeCaptions(data.captions_vtt);
+  const language = normalizeAnalysisLanguage(data.language);
+  const provider = cleanText(data.analysis_provider, 80, "teamwork");
+  const warnings = parseWarnings(data.warnings);
+  await env.DB.prepare(
+    `INSERT INTO video_analysis (
+       video_id, source_url, transcript, ocr_text, captions_vtt, language, analysis_provider, warnings_json, updated_at
+     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+     ON CONFLICT(video_id) DO UPDATE SET
+       source_url = excluded.source_url,
+       transcript = excluded.transcript,
+       ocr_text = excluded.ocr_text,
+       captions_vtt = excluded.captions_vtt,
+       language = excluded.language,
+       analysis_provider = excluded.analysis_provider,
+       warnings_json = excluded.warnings_json,
+       updated_at = excluded.updated_at`,
+  ).bind(videoId, sourceUrl, transcript, ocrText, captions, language, provider, JSON.stringify(warnings)).run();
+  return json({ success: true });
+}
+
+async function serveCaptions(env, slug) {
+  const row = await env.DB.prepare(
+    `SELECT a.captions_vtt FROM video_analysis a
+     JOIN videos v ON v.id = a.video_id
+     WHERE v.slug = ? AND v.published = 1 AND a.source_url = v.source_url`,
+  ).bind(slug).first();
+  if (!row?.captions_vtt) throw new AppError(404, "Captions not found");
+  const headers = securityHeaders(new Headers({
+    "Content-Type": "text/vtt; charset=utf-8",
+    "Cache-Control": "public, max-age=300",
+    "Content-Disposition": "inline",
+  }));
+  return new Response(row.captions_vtt, { headers });
+}
+
 async function uploadAsset(request, env) {
   const filename = cleanText(request.headers.get("X-File-Name") || new URL(request.url).searchParams.get("filename"), 180);
   if (!filename) throw new AppError(400, "X-File-Name header is required");
@@ -1502,7 +1733,12 @@ function secureStoredContentType(headers) {
 
 async function watchPage(request, env, ctx, slugInput) {
   const slug = safeDecode(slugInput).split("/")[0];
-  const row = await env.DB.prepare("SELECT * FROM videos WHERE slug = ? AND published = 1").bind(slug).first();
+  const row = await env.DB.prepare(
+    `SELECT v.*, a.transcript, a.language AS transcript_language,
+            CASE WHEN length(a.captions_vtt) > 0 THEN 1 ELSE 0 END AS has_captions
+     FROM videos v LEFT JOIN video_analysis a ON a.video_id = v.id AND a.source_url = v.source_url
+     WHERE v.slug = ? AND v.published = 1`,
+  ).bind(slug).first();
   if (!row) return dynamicHtml(notFoundPage(), 404);
   const [video] = await hydrateVideos(env, [row]);
   ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
@@ -1540,6 +1776,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
       },
     ],
     publisher: { "@type": "Organization", name: env.APP_NAME || "Vid.Best", url: baseUrl },
+    ...(video.transcript ? { transcript: cleanLongText(video.transcript, 5000) } : {}),
   };
   const schema = {
     "@context": "https://schema.org",
@@ -1630,6 +1867,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
         <p id="interest-status" class="form-status" role="status"></p>
       </div>
       ${video.review_text ? `<section class="review-copy"><h2>Review & discovery notes</h2>${paragraphs(video.review_text)}</section>` : ""}
+      ${video.transcript ? `<details class="transcript-panel"><summary>Read transcript</summary><div>${paragraphs(video.transcript)}</div></details>` : ""}
       <a class="source-link" href="${escapeHtml(video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open original source ↗</a>
     </article>
     <section class="comments-panel glass-panel">
@@ -1667,7 +1905,10 @@ function renderMedia(video, playbackOrigin) {
     return `<iframe id="watch-media-frame" src="${escapeHtml(embedUrl)}" title="${escapeHtml(video.title)}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"></iframe>`;
   }
   const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}"` : "";
-  return `<video id="watch-media-video" controls playsinline preload="metadata"${poster}><source src="${escapeHtml(video.source_url)}">Your browser does not support this video.</video>`;
+  const captions = video.has_captions
+    ? `<track kind="captions" src="/captions/${encodeURIComponent(video.slug)}.vtt" srclang="${escapeHtml(video.transcript_language || "en")}" label="Generated captions">`
+    : "";
+  return `<video id="watch-media-video" controls playsinline preload="metadata"${poster}><source src="${escapeHtml(video.source_url)}">${captions}Your browser does not support this video.</video>`;
 }
 
 function preparePlaybackEmbed(value, playbackOrigin) {
@@ -1722,9 +1963,12 @@ async function videoSitemapResponse(request, env, page) {
   if (!Number.isSafeInteger(page) || page < 1 || page > 50000) throw new AppError(404, "Sitemap page not found");
   const base = getBaseUrl(request, env);
   const result = await env.DB.prepare(
-    `SELECT slug, title, description, seo_description, thumbnail_url, embed_url, source_url,
-            media_type, created_at, updated_at
-     FROM videos WHERE published = 1 ORDER BY id ASC LIMIT 1000 OFFSET ?`,
+    `SELECT v.slug, v.title, v.description, v.seo_description, v.thumbnail_url,
+            v.embed_url, v.source_url, v.media_type, v.created_at, v.updated_at,
+            m.source_published_at
+     FROM videos v
+     LEFT JOIN video_source_metadata m ON m.video_id = v.id
+     WHERE v.published = 1 ORDER BY v.id ASC LIMIT 1000 OFFSET ?`,
   ).bind((page - 1) * 1000).all();
   const rows = result.results || [];
   if (page > 1 && !rows.length) throw new AppError(404, "Sitemap page not found");
@@ -1734,11 +1978,13 @@ async function videoSitemapResponse(request, env, page) {
     const thumbnail = row.thumbnail_url ? absoluteUrl(row.thumbnail_url, base) : "";
     const description = cleanText(row.seo_description || row.description || `Discover ${row.title} on Vid.Best.`, 180);
     let videoEntry = "";
-    if (thumbnail) {
+    const canDescribeVideo = thumbnail && (!row.embed_url || row.source_published_at);
+    if (canDescribeVideo) {
       const location = row.embed_url
-        ? `<video:player_loc allow_embed="yes">${escapeXml(row.embed_url)}</video:player_loc>`
+        ? `<video:player_loc allow_embed="yes">${escapeXml(preparePlaybackEmbed(row.embed_url, base))}</video:player_loc>`
         : `<video:content_loc>${escapeXml(absoluteUrl(row.source_url, base))}</video:content_loc>`;
-      videoEntry = `<video:video><video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc><video:title>${escapeXml(row.title)}</video:title><video:description>${escapeXml(description)}</video:description>${location}<video:publication_date>${escapeXml(row.created_at)}</video:publication_date></video:video>`;
+      const publicationDate = row.source_published_at || row.created_at;
+      videoEntry = `<video:video><video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc><video:title>${escapeXml(row.title)}</video:title><video:description>${escapeXml(description)}</video:description>${location}<video:publication_date>${escapeXml(publicationDate)}</video:publication_date></video:video>`;
     }
     return `<url><loc>${escapeXml(canonical)}</loc><lastmod>${escapeXml(row.updated_at)}</lastmod>${videoEntry}</url>`;
   }).join("");

@@ -7,6 +7,7 @@ Vid.Best is a Cloudflare-native video review and discovery platform built with:
 - Cloudflare D1 (`video-reviews-db`) for reviews, reactions, comments, discovery requests and verified source metadata
 - Cloudflare R2 (`vid-assets`) for uploaded video/image assets
 - Gemini, through the Worker secret `GEMINI_KEY`, for structured editorial drafts
+- A private, optional Teamwork API for administrator-requested OCR, transcription and page evidence
 - Dynamic `/watch/:slug` pages with unique metadata and canonical URLs
 - Trusted provider embeds plus direct/R2 media in a persistent watch experience
 - Privacy-hashed category preferences for related-video ranking
@@ -22,13 +23,13 @@ A public search that finds nothing does not create an indexable page. Visitors c
 
 New records are draft-first. This avoids turning arbitrary visitor searches into thousands of thin public pages.
 
-### AI stays serverless
+### Editorial AI and media analysis
 
-Gemini runs through the Worker; this repository does not run Ollama or another local LLM. If a small Oracle/VPS service is added later, keep it focused on lightweight fetching/extraction and return raw captions/transcript/OCR metadata to the Worker. Do not make that VPS responsible for page publishing or local LLM generation on a low-memory machine.
+Gemini drafting runs through the Worker. The optional service in `services/teamwork/` performs administrator-requested frame OCR, transcription and page extraction on Oracle Linux, then returns evidence for human review. It never publishes pages. Ollama is optional and disabled by default; on a very small machine, leave it disabled and let Gemini create the editorial draft from the extracted evidence.
 
 ### 4get / external crawler integration
 
-No 4get or Oracle scraper endpoint is currently wired into this repository. The safe integration point is the administrator discovery/ingestion workflow, not the public search route. An external search result should remain temporary until an administrator chooses **Analyze & Save** (or an equivalent moderated action).
+The Teamwork API can query an operator-configured 4get JSON endpoint during an administrator analysis job. Results remain private evidence until the administrator verifies and saves a draft. Public searches never trigger crawling or automatic page publication.
 
 ### Edge SSR and caching
 
@@ -50,7 +51,7 @@ Self-hosted/raw video uses the browser's native player plus Vid.Best controls fo
 
 On a watch page, scrolling beyond the player starts a three-second delay. The player then becomes a mini-player; native media and YouTube can begin muted when browser policy allows. **Return**, **Pop-up** and **Close** controls preserve a deliberate user escape path. Reduced-motion visitors do not get automatic playback.
 
-Automatic captions/transcription and adaptive low-bandwidth quality switching are **not yet implemented**. Those require caption files such as WebVTT and, for adaptive playback, multiple encoded renditions/HLS or DASH rather than a single MP4 object.
+For owned R2 media, the optional Teamwork API can generate WebVTT captions through a mounted `whisper.cpp` model. Provider embeds continue to use provider-supplied captions. Adaptive low-bandwidth switching still requires multiple encoded renditions/HLS or DASH rather than a single MP4 object.
 
 ### Recommendations and privacy
 
@@ -92,15 +93,18 @@ Set `PUBLIC_BASE_URL` to the final HTTPS site origin. Until the custom domain is
 npx wrangler secret put GEMINI_KEY
 npx wrangler secret put ADMIN_SECRET_KEY
 npx wrangler secret put REACTION_SALT
+npx wrangler secret put TEAMWORK_API_KEY
 ```
 
-Use long, different values for the administrator secret and reaction/rate-limit salt.
+Use long, different values for the administrator secret and reaction/rate-limit salt. If `REACTION_SALT` is absent, migration `0009` lets the Worker create a separate random installation salt in private D1 storage so comments, reactions and recommendations still work. A Cloudflare secret remains the preferred production setting.
 
 For YouTube text search and verified YouTube publication metadata:
 
 ```bash
 npx wrangler secret put YOUTUBE_API_KEY
 ```
+
+Set `TEAMWORK_API_URL` as a Worker environment variable only after the private service has been deployed behind HTTPS. Use the same random 32-byte-or-longer value for `TEAMWORK_API_KEY` on both systems. The Worker remains usable when the optional service is absent; only **Scan media** is disabled.
 
 ### 4. Apply migrations before deployment
 
@@ -109,7 +113,7 @@ npm run db:migrate:remote
 npm run deploy
 ```
 
-PR #1 adds migrations for security rate limits, maintenance indexing, and verified external-video metadata. Do not deploy the updated Worker before applying all pending migrations.
+Apply all migrations through `0010_video_analysis.sql` before deploying the updated Worker.
 
 ### 5. Custom domain
 
@@ -121,12 +125,13 @@ In Cloudflare, attach the final custom domain to the Worker, then make `PUBLIC_B
 2. The secret is exchanged for an eight-hour `HttpOnly`, `Secure`, `SameSite=Strict` session cookie and is not kept in browser storage.
 3. Search YouTube or paste a supported public URL, or upload a supported asset to R2.
 4. Choose category/subcategory.
-5. Add verified notes, transcript/OCR text if available, then use **AI Generate**.
-6. Check and edit all generated claims, title, description and tags.
-7. Supply a genuine thumbnail URL or upload a PNG/JPEG/WebP/AVIF/GIF thumbnail from the admin form.
-8. For a non-YouTube provider, enter the verified original publish date and duration in seconds so the page can safely emit `VideoObject` metadata.
-9. Enable **Published** only after the record is useful and verified.
-10. Save. The Worker serves `/watch/the-generated-slug` immediately from D1 and includes published pages in the sitemap.
+5. Optionally choose **Scan media**. Owned R2 video can be transcribed and OCR-scanned; external provider pages are crawl-only and are not downloaded.
+6. Review the private OCR/transcript evidence, add verified notes, then use **AI Generate**.
+7. Check and edit all generated claims, title, description and tags.
+8. Supply a genuine thumbnail URL or upload a PNG/JPEG/WebP/AVIF/GIF thumbnail from the admin form.
+9. For a non-YouTube provider, enter the verified original publish date and duration in seconds so the page can safely emit `VideoObject` metadata.
+10. Enable **Published** only after the record is useful and verified.
+11. Save. The Worker serves `/watch/the-generated-slug` immediately from D1 and includes published pages in the sitemap.
 
 After migrations `0007` and `0008`, `/watch/youtube-embed-experience-demo` is a published test page using the sample YouTube video ID from Google's IFrame Player API documentation. It demonstrates verified video metadata, custom editorial SEO, reactions, moderated comments, persistent playback and recommendations.
 
@@ -161,6 +166,9 @@ Worker runtime secrets such as `GEMINI_KEY`, `ADMIN_SECRET_KEY`, `REACTION_SALT`
 | `GET/POST /api/videos/:id/comments` | Public | Read approved / submit pending comments |
 | `GET /api/admin/discover?q=...` | Admin | Search YouTube or inspect a direct URL |
 | `POST /api/ai/generate` | Admin | Generate a structured Gemini draft |
+| `POST/GET /api/ai/analyze-media...` | Admin | Start and poll a private Teamwork analysis job |
+| `GET/PUT /api/admin/videos/:id/analysis` | Admin | Read or save reviewed transcript/OCR evidence |
+| `GET /captions/:slug.vtt` | Public | Serve generated captions for a published matching source |
 | `POST/PATCH/DELETE /api/videos...` | Admin | Manage review records |
 | `GET/PATCH /api/admin/discovery-requests...` | Admin | Process visitor requests |
 | `PUT/GET/DELETE /api/assets...` | Admin | Manage R2 assets |
@@ -189,7 +197,9 @@ Vid.Best/
 │   ├── 0005_source_video_metadata.sql
 │   ├── 0006_test_player_and_comment_images.sql
 │   ├── 0007_universal_video_experience.sql
-│   └── 0008_verified_demo_metadata.sql
+│   ├── 0008_verified_demo_metadata.sql
+│   ├── 0009_app_settings.sql
+│   └── 0010_video_analysis.sql
 ├── public/
 │   ├── index.html
 │   ├── admin.html
@@ -202,6 +212,7 @@ Vid.Best/
 ├── src/
 │   ├── index.js
 │   └── edge.js
+├── services/teamwork/       # Optional private Oracle media-analysis API
 ├── test/
 │   ├── worker.test.js
 │   └── edge.test.js

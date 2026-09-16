@@ -3,6 +3,9 @@ const adminState = {
   videos: [],
   sourceMode: "link",
   activeDiscoveryRequestId: null,
+  analysisDraft: null,
+  analysisSource: "",
+  analysisPollTimer: null,
 };
 
 const ui = {
@@ -39,6 +42,11 @@ const ui = {
   sourcePublishedAt: document.querySelector("#source-published-at"),
   sourceDurationSeconds: document.querySelector("#source-duration-seconds"),
   notes: document.querySelector("#ai-notes"),
+  scanMedia: document.querySelector("#scan-media"),
+  analysisGroundSearch: document.querySelector("#analysis-ground-search"),
+  analysisStatus: document.querySelector("#analysis-status"),
+  analysisTranscript: document.querySelector("#analysis-transcript"),
+  analysisOcr: document.querySelector("#analysis-ocr"),
   aiButton: document.querySelector("#ai-generate"),
   aiStatus: document.querySelector("#ai-status"),
   seoTitle: document.querySelector("#seo-title"),
@@ -79,6 +87,7 @@ function bindAdminEvents() {
   ui.category.addEventListener("change", () => fillSubcategories(ui.category.value));
   ui.sourceTabs.forEach((tab) => tab.addEventListener("click", () => setSourceMode(tab.dataset.mode)));
   ui.sourceUrl.addEventListener("change", updatePreview);
+  ui.sourceUrl.addEventListener("input", clearAnalysisIfSourceChanged);
   ui.sourceUrl.addEventListener("paste", () => setTimeout(updatePreview, 0));
   ui.videoSearchButton.addEventListener("click", searchPublicVideos);
   ui.videoSearch.addEventListener("keydown", (event) => {
@@ -95,6 +104,7 @@ function bindAdminEvents() {
   });
   ui.uploadButton.addEventListener("click", uploadFile);
   ui.aiButton.addEventListener("click", generateCopy);
+  ui.scanMedia.addEventListener("click", startMediaAnalysis);
   ui.videoForm.addEventListener("submit", saveVideo);
   ui.reset.addEventListener("click", resetEditor);
   ui.refreshVideos.addEventListener("click", loadAdminVideos);
@@ -370,6 +380,7 @@ function uploadFile() {
     let result = {};
     try { result = JSON.parse(request.responseText || "{}"); } catch { /* Ignore malformed error payload. */ }
     if (request.status >= 200 && request.status < 300) {
+      clearAnalysisDraft();
       ui.r2Key.value = result.key;
       ui.r2Key.dataset.url = result.url;
       ui.sourceUrl.value = result.url;
@@ -458,6 +469,128 @@ async function generateCopy() {
   }
 }
 
+function currentAnalysisSource() {
+  return adminState.sourceMode === "upload"
+    ? ui.r2Key.dataset.url || ui.sourceUrl.value.trim()
+    : ui.sourceUrl.value.trim();
+}
+
+function clearAnalysisIfSourceChanged() {
+  if (adminState.analysisSource && currentAnalysisSource() !== adminState.analysisSource) clearAnalysisDraft();
+}
+
+function clearAnalysisDraft() {
+  window.clearTimeout(adminState.analysisPollTimer);
+  adminState.analysisPollTimer = null;
+  adminState.analysisDraft = null;
+  adminState.analysisSource = "";
+  ui.analysisTranscript.value = "";
+  ui.analysisOcr.value = "";
+  setStatus(ui.analysisStatus, "");
+}
+
+async function startMediaAnalysis() {
+  const source = currentAnalysisSource();
+  if (!source) {
+    setStatus(ui.analysisStatus, "Paste a media link or finish the R2 upload first.", "error");
+    return;
+  }
+  ui.scanMedia.disabled = true;
+  setStatus(ui.analysisStatus, adminState.sourceMode === "upload"
+    ? "Starting private OCR and transcription job…"
+    : "Starting public page analysis without downloading the embedded video…");
+  try {
+    const result = await adminApi("/api/ai/analyze-media", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        source_url: source,
+        r2_key: adminState.sourceMode === "upload" ? ui.r2Key.value : "",
+        title: ui.title.value,
+        ground_search: ui.analysisGroundSearch.checked,
+        search_query: ui.title.value || ui.videoSearch.value,
+      }),
+    });
+    adminState.analysisSource = source;
+    await pollMediaAnalysis(result.job.id);
+  } catch (error) {
+    setStatus(ui.analysisStatus, error.message, "error");
+    ui.scanMedia.disabled = false;
+  }
+}
+
+async function pollMediaAnalysis(jobId) {
+  try {
+    const result = await adminApi(`/api/ai/analyze-media/${jobId}`);
+    const job = result.job;
+    if (job.status === "failed") throw new Error(job.error || "Media analysis failed");
+    if (job.status !== "complete") {
+      setStatus(ui.analysisStatus, job.status === "running" ? "Scanning media evidence…" : "Analysis queued…");
+      adminState.analysisPollTimer = window.setTimeout(() => pollMediaAnalysis(jobId), 2500);
+      return;
+    }
+    applyMediaAnalysis(job.result || {});
+  } catch (error) {
+    setStatus(ui.analysisStatus, error.message, "error");
+  } finally {
+    if (!adminState.analysisPollTimer) ui.scanMedia.disabled = false;
+  }
+}
+
+function applyMediaAnalysis(analysis) {
+  window.clearTimeout(adminState.analysisPollTimer);
+  adminState.analysisPollTimer = null;
+  adminState.analysisDraft = {
+    transcript: analysis.transcript || "",
+    ocr_text: analysis.ocr_text || "",
+    captions_vtt: analysis.captions_vtt || "",
+    language: analysis.language || "",
+    analysis_provider: "teamwork",
+    warnings: analysis.warnings || [],
+  };
+  ui.analysisTranscript.value = adminState.analysisDraft.transcript;
+  ui.analysisOcr.value = adminState.analysisDraft.ocr_text;
+  if (analysis.duration_seconds && !ui.sourceDurationSeconds.value) {
+    ui.sourceDurationSeconds.value = String(Math.round(analysis.duration_seconds));
+  }
+  const localSummary = analysis.local_summary?.summary || "";
+  const evidenceNotes = [
+    localSummary ? `Local evidence summary: ${localSummary}` : "",
+    analysis.ocr_text ? `Visible text: ${analysis.ocr_text}` : "",
+    analysis.transcript ? `Transcript excerpt: ${analysis.transcript}` : "",
+    analysis.page_text ? `Source page: ${analysis.page_text}` : "",
+  ].filter(Boolean).join("\n\n").slice(0, 1500);
+  if (evidenceNotes) ui.notes.value = evidenceNotes;
+  const warningCount = adminState.analysisDraft.warnings.length;
+  setStatus(
+    ui.analysisStatus,
+    `Analysis complete${warningCount ? ` with ${warningCount} note${warningCount === 1 ? "" : "s"}` : ""}. Review the evidence, then use AI Generate.`,
+    warningCount ? "" : "success",
+  );
+}
+
+async function saveAnalysis(video) {
+  const draft = adminState.analysisDraft || {};
+  const source = currentAnalysisSource();
+  const transcript = ui.analysisTranscript.value.trim();
+  const ocrText = ui.analysisOcr.value.trim();
+  if (!transcript && !ocrText && !draft.captions_vtt) return;
+  if (!source || source !== adminState.analysisSource) throw new Error("The analysis belongs to a different media source. Scan this source again.");
+  await adminApi(`/api/admin/videos/${video.id}/analysis`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      source_url: video.source_url,
+      transcript,
+      ocr_text: ocrText,
+      captions_vtt: draft.captions_vtt || "",
+      language: draft.language || "",
+      analysis_provider: draft.analysis_provider || "teamwork",
+      warnings: draft.warnings || [],
+    }),
+  });
+}
+
 async function saveVideo(event) {
   event.preventDefault();
   const id = ui.editingId.value;
@@ -489,6 +622,12 @@ async function saveVideo(event) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+    let analysisWarning = "";
+    try {
+      await saveAnalysis(result.video);
+    } catch (error) {
+      analysisWarning = ` Analysis was not saved: ${error.message}`;
+    }
     const discoveryRequestId = Number(ui.activeDiscoveryRequest.value || adminState.activeDiscoveryRequestId || 0);
     let queueWarning = "";
     if (discoveryRequestId) {
@@ -502,7 +641,7 @@ async function saveVideo(event) {
         queueWarning = ` The discovery queue was not updated: ${error.message}`;
       }
     }
-    setStatus(ui.saveStatus, `Saved: ${result.video.title}.${queueWarning}`, queueWarning ? "error" : "success");
+    setStatus(ui.saveStatus, `Saved: ${result.video.title}.${queueWarning}${analysisWarning}`, queueWarning || analysisWarning ? "error" : "success");
     resetEditor(false);
     await Promise.all([loadAdminVideos(), loadDiscoveryRequests()]);
   } catch (error) {
@@ -558,7 +697,7 @@ function renderAdminVideo(video) {
   return item;
 }
 
-function editVideo(video) {
+async function editVideo(video) {
   adminState.activeDiscoveryRequestId = null;
   ui.activeDiscoveryRequest.value = "";
   ui.editingId.value = video.id;
@@ -580,6 +719,24 @@ function editVideo(video) {
   ui.trending.checked = Boolean(video.trending);
   ui.published.checked = Boolean(video.published);
   setSourceMode(video.media_type === "r2" ? "upload" : "link");
+  adminState.analysisSource = video.source_url || "";
+  adminState.analysisDraft = null;
+  ui.analysisTranscript.value = "";
+  ui.analysisOcr.value = "";
+  try {
+    const result = await adminApi(`/api/admin/videos/${video.id}/analysis`);
+    if (result.analysis) {
+      adminState.analysisDraft = result.analysis;
+      adminState.analysisSource = result.analysis.source_url || video.source_url || "";
+      ui.analysisTranscript.value = result.analysis.transcript || "";
+      ui.analysisOcr.value = result.analysis.ocr_text || "";
+      setStatus(ui.analysisStatus, "Saved analysis loaded.", "success");
+    } else {
+      setStatus(ui.analysisStatus, "No saved analysis for this video.");
+    }
+  } catch (error) {
+    setStatus(ui.analysisStatus, error.message, "error");
+  }
   updatePreview();
   setStatus(ui.saveStatus, `Editing “${video.title}”`);
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -724,6 +881,7 @@ async function moderateComment(id, status) {
 }
 
 function resetEditor(clearStatus = true) {
+  clearAnalysisDraft();
   ui.videoForm.reset();
   ui.editingId.value = "";
   ui.activeDiscoveryRequest.value = "";
