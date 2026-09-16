@@ -768,6 +768,7 @@ function initializeEmbeddedMediaTools() {
   }
 
   const pip = button("▣ PiP", "Picture in Picture", embeddedPiP);
+  const share = button("Share", "Share this Vid.Best page", function() { shareWatchPage(); });
   const pop = button("Pop-out", "Float player while scrolling", function() {
     const anchor = document.querySelector("#watch-player-anchor");
     if (!anchor) return;
@@ -795,7 +796,7 @@ function initializeEmbeddedMediaTools() {
   const note = document.createElement("span");
   note.className = "vidbest-embed-note";
   note.textContent = remote ? "Embedded " + provider + " · enhanced controls" : "Embedded " + provider + " · provider controls remain authoritative";
-  overlay.append(play, back, forward, speed, captions, mute, pip, pop, full, note);
+  overlay.append(play, back, forward, speed, captions, mute, pip, share, pop, full, note);
   stage.style.position = stage.style.position || "relative";
   stage.append(overlay);
 
