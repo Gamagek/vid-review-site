@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: vid-best-production
@@ -31,6 +31,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Apply final player patch
+        if: ${{ !contains(github.event.head_commit.message, 'fix: finalize embedded player and audio lab') }}
+        run: node scripts/patch-player-final.mjs
+
       - name: Run tests
         run: npm test
 
@@ -39,6 +43,17 @@ jobs:
 
       - name: Validate Worker bundle
         run: npm run check
+
+      - name: Commit final player patch
+        if: ${{ !contains(github.event.head_commit.message, 'fix: finalize embedded player and audio lab') }}
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/watch.js
+          git rm scripts/patch-player-final.mjs
+          git commit -m "fix: finalize embedded player and audio lab"
+          git push
 
       - name: Explain missing deployment credentials
         if: env.CLOUDFLARE_API_TOKEN == '' || env.CLOUDFLARE_ACCOUNT_ID == ''
