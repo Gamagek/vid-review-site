@@ -34,6 +34,9 @@ jobs:
       - name: Apply final player patch
         run: node scripts/patch-player-final.mjs
 
+      - name: Apply player polish v4
+        run: node scripts/patch-player-v4.mjs
+
       - name: Run tests
         run: npm test
 
@@ -52,7 +55,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add public/watch.js
-            git commit -m "fix: finalize embedded player and audio lab"
+            git commit -m "fix: player controls and embedded audio lab"
             git push
           fi
 
