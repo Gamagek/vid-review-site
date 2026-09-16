@@ -32,7 +32,7 @@ jobs:
         run: npm ci
 
       - name: Apply final player patch
-        if: ${{ !contains(github.event.head_commit.message, 'fix: finalize embedded player and audio lab') }}
+        if: github.event.head_commit.message != 'fix: finalize embedded player and audio lab'
         run: node scripts/patch-player-final.mjs
 
       - name: Run tests
@@ -45,7 +45,7 @@ jobs:
         run: npm run check
 
       - name: Commit final player patch
-        if: ${{ !contains(github.event.head_commit.message, 'fix: finalize embedded player and audio lab') }}
+        if: github.event.head_commit.message != 'fix: finalize embedded player and audio lab'
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -59,7 +59,6 @@ jobs:
         if: env.CLOUDFLARE_API_TOKEN == '' || env.CLOUDFLARE_ACCOUNT_ID == ''
         run: echo "Cloudflare deployment skipped because CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID is not configured in GitHub Actions secrets."
 
-      # Read-only preflight: prints the current D1 schema before any migration is attempted.
       - name: Inspect remote D1 schema
         if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
         run: >-
