@@ -43,13 +43,12 @@ jobs:
       - name: Validate Worker bundle
         run: npm run check
 
-      - name: Clean temporary player patch and restore read-only workflow
+      - name: Commit generated embedded share player
         run: |
           rm -f scripts/patch-embedded-share.mjs
-          sed -i 's/^  contents: write$/  contents: read/' .github/workflows/deploy.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/watch.js scripts/patch-embedded-share.mjs .github/workflows/deploy.yml
+          git add public/watch.js scripts/patch-embedded-share.mjs
           git commit -m "feat: add embedded video sharing" || true
           git push
 
