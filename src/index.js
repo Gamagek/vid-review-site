@@ -513,7 +513,7 @@ async function consumeRateLimit(request, env, scope, limit, windowSeconds) {
 }
 
 async function assertLoginAllowed(request, env) {
-  const fingerprint = await requestFingerprint(request, env.ADMIN_SECRET_KEY);
+  const fingerprint = await requestFingerprint(request, await resolveReactionSalt(env));
   const windowSeconds = 900;
   const windowStartedAt = Math.floor(Date.now() / 1000 / windowSeconds) * windowSeconds;
   const row = await env.DB.prepare(
