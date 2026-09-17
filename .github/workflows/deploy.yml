@@ -55,9 +55,13 @@ jobs:
           sed -i 's/contents: write/contents: read/' .github/workflows/deploy.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/watch.js public/index.html public/admin.html public/admin.js src/index.js .github/workflows/deploy.yml scripts/patch-embedded-share.mjs scripts/patch-other-category.mjs
-          git commit -m "feat: add Other category with custom subcategories" || true
-          git push
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+          else
+            git commit -m "feat: add Other category with custom subcategories"
+            git push
+          fi
 
       - name: Explain missing deployment credentials
         if: env.CLOUDFLARE_API_TOKEN == '' || env.CLOUDFLARE_ACCOUNT_ID == ''
