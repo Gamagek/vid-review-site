@@ -88,6 +88,18 @@ const CATEGORIES = Object.freeze({
     "Instagram Reels",
     "Creator News & Drama",
   ],
+  Spirituality: [
+    "Buddhism",
+    "Hinduism",
+    "Christianity",
+    "Islam",
+    "Meditation & Mindfulness",
+    "Spiritual Philosophy",
+    "Sacred Texts & Teachings",
+    "Devotional Practices",
+    "Contemplative Traditions",
+    "Interfaith & Comparative Spirituality",
+  ],
 });
 
 const REACTIONS = new Set(["like", "love", "useful"]);
