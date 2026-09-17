@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: vid-best-production
@@ -31,15 +31,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Apply one-time player and category patches
-        run: |
-          if [ -f scripts/patch-embedded-share.mjs ]; then
-            node scripts/patch-embedded-share.mjs
-          fi
-          if [ -f scripts/patch-other-category.mjs ]; then
-            node scripts/patch-other-category.mjs
-          fi
-
       - name: Run tests
         run: npm test
 
@@ -48,19 +39,6 @@ jobs:
 
       - name: Validate Worker bundle
         run: npm run check
-
-      - name: Commit generated patches
-        run: |
-          rm -f scripts/patch-embedded-share.mjs scripts/patch-other-category.mjs
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then
-            echo "No generated changes to commit."
-          else
-            git commit -m "feat: apply generated site patches"
-            git push
-          fi
 
       - name: Explain missing deployment credentials
         if: env.CLOUDFLARE_API_TOKEN == '' || env.CLOUDFLARE_ACCOUNT_ID == ''
