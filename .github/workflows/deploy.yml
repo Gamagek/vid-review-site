@@ -29,10 +29,23 @@ jobs:
           cache: npm
 
       - name: Install dependencies
+        uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
         run: npm ci
 
-      - name: Apply embedded share polish
-        run: node scripts/patch-embedded-share.mjs
+      - name: Apply one-time player and category patches
+        run: |
+          if [ -f scripts/patch-embedded-share.mjs ]; then
+            node scripts/patch-embedded-share.mjs
+          else
+            echo "No one-time patch file present; using committed source."
+          fi
 
       - name: Run tests
         run: npm test
@@ -43,14 +56,18 @@ jobs:
       - name: Validate Worker bundle
         run: npm run check
 
-      - name: Commit generated embedded share player
+      - name: Commit generated patches when present
         run: |
-          rm -f scripts/patch-embedded-share.mjs
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/watch.js scripts/patch-embedded-share.mjs
-          git commit -m "feat: add embedded video sharing" || true
-          git push
+          if [ -f scripts/patch-embedded-share.mjs ]; then
+            rm -f scripts/patch-embedded-share.mjs
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add public/watch.js public/index.html src/index.js .github/workflows/deploy.yml scripts/patch-embedded-share.mjs
+            git commit -m "feat: add embedded sharing and spirituality categories"
+            git push
+          else
+            echo "No generated patch commit required."
+          fi
 
       - name: Explain missing deployment credentials
         if: env.CLOUDFLARE_API_TOKEN == '' || env.CLOUDFLARE_ACCOUNT_ID == ''
