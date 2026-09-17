@@ -34,6 +34,7 @@ const ui = {
   preview: document.querySelector("#media-preview"),
   category: document.querySelector("#admin-category"),
   subcategory: document.querySelector("#admin-subcategory"),
+  otherSubcategory: document.querySelector("#admin-other-subcategory"),
   title: document.querySelector("#video-title"),
   thumbnail: document.querySelector("#thumbnail-url"),
   thumbnailFile: document.querySelector("#thumbnail-file"),
@@ -85,6 +86,7 @@ function bindAdminEvents() {
   ui.loginForm.addEventListener("submit", login);
   ui.logout.addEventListener("click", lockAdmin);
   ui.category.addEventListener("change", () => fillSubcategories(ui.category.value));
+  ui.otherSubcategory.addEventListener("input", syncOtherSubcategory);
   ui.sourceTabs.forEach((tab) => tab.addEventListener("click", () => setSourceMode(tab.dataset.mode)));
   ui.sourceUrl.addEventListener("change", updatePreview);
   ui.sourceUrl.addEventListener("input", clearAnalysisIfSourceChanged);
@@ -164,6 +166,9 @@ function fillSubcategories(category, selected = "") {
   ui.subcategory.innerHTML = '<option value="">Choose subcategory</option>';
   const list = adminState.categories[category] || [];
   ui.subcategory.disabled = list.length === 0;
+  ui.otherSubcategory.hidden = category !== "Other";
+  ui.otherSubcategory.required = category === "Other";
+  ui.otherSubcategory.value = category === "Other" && selected && selected !== "Other" ? selected : "";
   list.forEach((subcategory) => {
     const option = document.createElement("option");
     option.value = subcategory;
@@ -171,6 +176,20 @@ function fillSubcategories(category, selected = "") {
     ui.subcategory.append(option);
   });
   if (selected && list.includes(selected)) ui.subcategory.value = selected;
+}
+
+function syncOtherSubcategory() {
+  if (ui.category.value !== "Other") return;
+  const value = ui.otherSubcategory.value.trim();
+  const existing = [...ui.subcategory.options].find((option) => option.dataset.custom === "1");
+  if (existing) existing.remove();
+  const option = document.createElement("option");
+  option.value = value;
+  option.textContent = value || "Type your subcategory";
+  option.dataset.custom = "1";
+  option.hidden = !value;
+  ui.subcategory.append(option);
+  ui.subcategory.value = value;
 }
 
 function setSourceMode(mode) {
@@ -451,7 +470,7 @@ async function generateCopy() {
         title: ui.title.value,
         source_url: ui.sourceUrl.value,
         primary_category: ui.category.value,
-        subcategory: ui.subcategory.value,
+        subcategory: ui.category.value === "Other" ? ui.otherSubcategory.value.trim() : ui.subcategory.value,
         notes: ui.notes.value,
       }),
     });

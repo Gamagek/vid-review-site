@@ -100,6 +100,9 @@ const CATEGORIES = Object.freeze({
     "Contemplative Traditions",
     "Interfaith & Comparative Spirituality",
   ],
+  Other: [
+    "Other",
+  ],
 });
 
 const REACTIONS = new Set(["like", "love", "useful"]);
@@ -818,7 +821,7 @@ async function listVideos(request, env, includeUnpublished) {
   }[sort] || "v.created_at DESC";
 
   if (category && !Object.hasOwn(CATEGORIES, category)) throw new AppError(400, "Unknown category");
-  if (subcategory && (!category || !CATEGORIES[category].includes(subcategory))) {
+  if (subcategory && category !== "Other" && (!category || !CATEGORIES[category].includes(subcategory))) {
     throw new AppError(400, "Unknown subcategory for the selected category");
   }
 
@@ -1088,7 +1091,8 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
   const subcategory = cleanText(body.subcategory, 80, existing?.subcategory || "");
   if (!title) throw new AppError(400, "Title is required");
   if (!Object.hasOwn(CATEGORIES, category)) throw new AppError(400, "Select a valid primary category");
-  if (!CATEGORIES[category].includes(subcategory)) throw new AppError(400, "Select a valid subcategory");
+  if (category !== "Other" && !CATEGORIES[category].includes(subcategory)) throw new AppError(400, "Select a valid subcategory");
+  if (category === "Other" && (!subcategory || subcategory.length > 80)) throw new AppError(400, "Enter a valid custom subcategory");
 
   const suppliedR2Key = cleanText(body.r2_key, 500, existing?.r2_key || "");
   const suppliedSource = cleanText(body.source_url, 2000, existing?.source_url || "");
