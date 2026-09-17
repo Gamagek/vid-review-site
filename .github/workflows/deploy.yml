@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: vid-best-production
@@ -35,8 +35,9 @@ jobs:
         run: |
           if [ -f scripts/patch-embedded-share.mjs ]; then
             node scripts/patch-embedded-share.mjs
-          else
-            echo "No one-time patch file present; using committed source."
+          fi
+          if [ -f scripts/patch-other-category.mjs ]; then
+            node scripts/patch-other-category.mjs
           fi
 
       - name: Run tests
@@ -48,18 +49,15 @@ jobs:
       - name: Validate Worker bundle
         run: npm run check
 
-      - name: Commit generated patches when present
+      - name: Commit generated patches and restore workflow permissions
         run: |
-          if [ -f scripts/patch-embedded-share.mjs ]; then
-            rm -f scripts/patch-embedded-share.mjs
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add public/watch.js public/index.html src/index.js scripts/patch-embedded-share.mjs
-            git commit -m "feat: add embedded sharing and spirituality categories"
-            git push
-          else
-            echo "No generated patch commit required."
-          fi
+          rm -f scripts/patch-embedded-share.mjs scripts/patch-other-category.mjs
+          sed -i 's/contents: write/contents: read/' .github/workflows/deploy.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/watch.js public/index.html public/admin.html public/admin.js src/index.js .github/workflows/deploy.yml scripts/patch-embedded-share.mjs scripts/patch-other-category.mjs
+          git commit -m "feat: add Other category with custom subcategories" || true
+          git push
 
       - name: Explain missing deployment credentials
         if: env.CLOUDFLARE_API_TOKEN == '' || env.CLOUDFLARE_ACCOUNT_ID == ''
