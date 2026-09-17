@@ -43,7 +43,15 @@ async function patchHomepageText() {
   await writeFile(path, source);
 }
 
+async function restoreDeployPermissions() {
+  const path = ".github/workflows/deploy.yml";
+  let source = await readFile(path, "utf8");
+  source = source.replace(/permissions:\n  contents: write/, "permissions:\n  contents: read");
+  await writeFile(path, source);
+}
+
 await patchEmbeddedShare();
 await patchCategories();
 await patchHomepageText();
-console.log("Applied embedded Share and Spirituality category patches.");
+await restoreDeployPermissions();
+console.log("Applied embedded Share and Spirituality category patches and restored read-only deployment permissions.");
