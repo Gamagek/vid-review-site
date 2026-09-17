@@ -619,7 +619,7 @@ async function saveVideo(event) {
     source_url: ui.sourceUrl.value,
     r2_key: r2Key,
     primary_category: ui.category.value,
-    subcategory: ui.subcategory.value,
+    subcategory: ui.category.value === "Other" ? ui.otherSubcategory.value.trim() : ui.subcategory.value,
     thumbnail_url: ui.thumbnail.value,
     source_published_at: ui.sourcePublishedAt.value,
     source_duration_seconds: ui.sourceDurationSeconds.value,
