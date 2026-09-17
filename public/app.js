@@ -38,8 +38,9 @@ async function initialize() {
   bindEvents();
   restoreFiltersFromUrl();
   try {
-    const response = await api("/api/categories");
+    const response = await api("/api/categories?version=14");
     state.categories = response.categories || {};
+    if (!Object.hasOwn(state.categories, "Other")) state.categories.Other = ["Other"];
     populateCategoryControls();
     await Promise.all([loadFeatured(), loadVideos({ reset: true })]);
   } catch (error) {

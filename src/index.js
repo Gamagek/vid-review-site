@@ -152,7 +152,7 @@ async function route(request, env, ctx) {
   }
 
   if (path === "/api/categories" && request.method === "GET") {
-    return json({ categories: CATEGORIES }, 200, { "Cache-Control": "public, max-age=3600" });
+    return json({ categories: CATEGORIES }, 200, { "Cache-Control": "no-store, max-age=0" });
   }
 
   if (path === "/api/discovery-requests" && request.method === "POST") {
