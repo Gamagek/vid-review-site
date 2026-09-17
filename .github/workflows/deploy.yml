@@ -49,17 +49,16 @@ jobs:
       - name: Validate Worker bundle
         run: npm run check
 
-      - name: Commit generated patches and restore workflow permissions
+      - name: Commit generated patches
         run: |
           rm -f scripts/patch-embedded-share.mjs scripts/patch-other-category.mjs
-          sed -i 's/contents: write/contents: read/' .github/workflows/deploy.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           if git diff --cached --quiet; then
             echo "No generated changes to commit."
           else
-            git commit -m "feat: add Other category with custom subcategories"
+            git commit -m "feat: apply generated site patches"
             git push
           fi
 
