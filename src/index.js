@@ -1772,7 +1772,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   const title = cleanText(video.seo_title || video.title, 70);
   const description = cleanText(video.seo_description || video.description || `Discover ${video.title} on Vid.Best.`, 180);
   const thumbnail = video.thumbnail_url ? absoluteUrl(video.thumbnail_url, baseUrl) : `${baseUrl}/favicon.svg`;
-  const tags = Array.isArray(video.seo_tags) ? video.seo_tags.slice(0, 20) : [];\n  const uploadDate = video.source_published_at || video.created_at;\n  const tags = Array.isArray(video.seo_tags) ? video.seo_tags.slice(0, 20) : [];
+  const tags = Array.isArray(video.seo_tags) ? video.seo_tags.slice(0, 20) : [];
   const uploadDate = video.source_published_at || video.created_at;
   const videoSchema = {
     "@type": "VideoObject",
