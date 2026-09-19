@@ -1749,13 +1749,7 @@ function secureStoredContentType(headers) {
 
 async function watchPage(request, env, ctx, slugInput) {
   const slug = safeDecode(slugInput).split("/")[0];
-  const row = await env.DB.prepare(
-    `SELECT v.*, a.transcript, a.language AS transcript_language,
-            CASE WHEN length(a.captions_vtt) > 0 THEN 1 ELSE 0 END AS has_captions
-     FROM videos v LEFT JOIN video_analysis a ON a.video_id = v.id AND a.source_url = v.source_url
-     WHERE v.slug = ? AND v.published = 1`,
-  ).bind(slug).first();
-  if (!row) return dynamicHtml(notFoundPage(), 404);
+  const row = await env.DB.prepare(\n    `SELECT v.*, a.transcript, a.language AS transcript_language,\n            CASE WHEN length(a.captions_vtt) > 0 THEN 1 ELSE 0 END AS has_captions,\n            m.source_published_at, m.source_duration\n     FROM videos v\n     LEFT JOIN video_analysis a ON a.video_id = v.id AND a.source_url = v.source_url\n     LEFT JOIN video_source_metadata m ON m.video_id = v.id\n     WHERE v.slug = ? AND v.published = 1`,\n  ).bind(slug).first();\n  if (!row) return dynamicHtml(notFoundPage(), 404);
   const [video] = await hydrateVideos(env, [row]);
   ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
   const scriptNonce = createCspNonce();
@@ -1769,74 +1763,21 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   const title = cleanText(video.seo_title || video.title, 70);
   const description = cleanText(video.seo_description || video.description || `Discover ${video.title} on Vid.Best.`, 180);
   const thumbnail = video.thumbnail_url ? absoluteUrl(video.thumbnail_url, baseUrl) : `${baseUrl}/favicon.svg`;
-  const videoSchema = {
-    "@type": "VideoObject",
-    "@id": `${canonical}#video`,
-    name: video.title,
-    description,
-    thumbnailUrl: [thumbnail],
-    uploadDate: video.created_at,
-    url: canonical,
-    ...(video.embed_url ? { embedUrl: video.embed_url } : {}),
-    ...(!video.embed_url ? { contentUrl: video.source_url } : {}),
-    interactionStatistic: [
-      {
-        "@type": "InteractionCounter",
-        interactionType: { "@type": "WatchAction" },
-        userInteractionCount: Number(video.views) + 1,
-      },
-      {
-        "@type": "InteractionCounter",
-        interactionType: { "@type": "LikeAction" },
-        userInteractionCount: Number(video.reaction_count),
-      },
-    ],
-    publisher: { "@type": "Organization", name: env.APP_NAME || "Vid.Best", url: baseUrl },
-    ...(video.transcript ? { transcript: cleanLongText(video.transcript, 5000) } : {}),
-  };
-  const schema = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebPage",
-        "@id": canonical,
-        url: canonical,
-        name: title,
-        description,
-        inLanguage: "en",
-        datePublished: video.created_at,
-        dateModified: video.updated_at,
-        primaryImageOfPage: thumbnail,
-        mainEntity: { "@id": `${canonical}#video` },
-        isPartOf: { "@type": "WebSite", name: env.APP_NAME || "Vid.Best", url: baseUrl },
-      },
-      videoSchema,
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: baseUrl },
-          { "@type": "ListItem", position: 2, name: video.primary_category, item: `${baseUrl}/?category=${encodeURIComponent(video.primary_category)}` },
-          { "@type": "ListItem", position: 3, name: video.title, item: canonical },
-        ],
-      },
-    ],
-  };
-
-  return `<!doctype html>
+  const tags = Array.isArray(video.seo_tags) ? video.seo_tags.slice(0, 20) : [];\n  const uploadDate = video.source_published_at || video.created_at;\n  const videoSchema = {\n    "@type": "VideoObject",\n    "@id": `${canonical}#video`,\n    name: video.title,\n    description,\n    thumbnailUrl: [thumbnail],\n    uploadDate,\n    url: canonical,\n    mainEntityOfPage: canonical,\n    ...(video.source_duration ? { duration: video.source_duration } : {}),\n    ...(video.embed_url ? { embedUrl: video.embed_url } : {}),\n    ...(!video.embed_url ? { contentUrl: video.source_url } : {}),\n    ...(tags.length ? { keywords: tags.join(", ") } : {}),\n    ...(video.primary_category ? { genre: [video.primary_category, video.subcategory].filter(Boolean) } : {}),\n    interactionStatistic: [\n      {\n        "@type": "InteractionCounter",\n        interactionType: { "@type": "WatchAction" },\n        userInteractionCount: Number(video.views) + 1,\n      },\n      {\n        "@type": "InteractionCounter",\n        interactionType: { "@type": "LikeAction" },\n        userInteractionCount: Number(video.reaction_count),\n      },\n    ],\n    publisher: { "@type": "Organization", name: env.APP_NAME || "Vid.Best", url: baseUrl },\n    ...(video.transcript ? { transcript: cleanLongText(video.transcript, 5000) } : {}),\n  };\n  const schema = {\n    "@context": "https://schema.org",\n    "@graph": [\n      {\n        "@type": "WebSite",\n        "@id": `${baseUrl}#website`,\n        url: baseUrl,\n        name: env.APP_NAME || "Vid.Best",\n        inLanguage: "en",\n        publisher: { "@id": `${baseUrl}#organization` },\n      },\n      {\n        "@type": "Organization",\n        "@id": `${baseUrl}#organization`,\n        name: env.APP_NAME || "Vid.Best",\n        url: baseUrl,\n      },\n      {\n        "@type": "WebPage",\n        "@id": canonical,\n        url: canonical,\n        name: title,\n        description,\n        inLanguage: video.transcript_language || "en",\n        datePublished: video.created_at,\n        dateModified: video.updated_at,\n        primaryImageOfPage: thumbnail,\n        mainEntity: { "@id": `${canonical}#video` },\n        isPartOf: { "@id": `${baseUrl}#website` },\n      },\n      videoSchema,\n      {\n        "@type": "BreadcrumbList",\n        itemListElement: [\n          { "@type": "ListItem", position: 1, name: "Home", item: baseUrl },\n          { "@type": "ListItem", position: 2, name: video.primary_category, item: `${baseUrl}/?category=${encodeURIComponent(video.primary_category)}` },\n          { "@type": "ListItem", position: 3, name: video.title, item: canonical },\n        ],\n      },\n    ],\n  };\n\n  return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>${escapeHtml(title)} | Vid.Best</title>
   <meta name="description" content="${escapeHtml(description)}">
-  <meta name="robots" content="index,follow,max-image-preview:large,max-video-preview:-1">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-video-preview:-1,max-snippet:-1">
   <link rel="canonical" href="${escapeHtml(canonical)}">
   <meta property="og:type" content="video.other">
   <meta property="og:site_name" content="Vid.Best">
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description)}">
   <meta property="og:url" content="${escapeHtml(canonical)}">
-  <meta property="og:image" content="${escapeHtml(thumbnail)}">
+  <meta property="og:image" content="${escapeHtml(thumbnail)}">\n  <meta property="og:updated_time" content="${escapeHtml(video.updated_at)}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${escapeHtml(title)}">
   <meta name="twitter:description" content="${escapeHtml(description)}">
