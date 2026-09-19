@@ -485,7 +485,7 @@ test("serves the seeded YouTube demo and records privacy-hashed interests", asyn
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /youtube-nocookie\.com\/embed\/M7lc1UVf-VE/);
-  assert.match(html, /<meta name="robots" content="index,follow,max-image-preview:large,max-video-preview:-1">/);
+  assert.match(html, /<meta name="robots" content="index,follow,max-image-preview:large,max-video-preview:-1,max-snippet:-1">/);
   assert.match(html, /"@graph"/);
   assert.match(html, /id="watch-related"/);
   const sourceMetadata = context.sqlite.prepare(
