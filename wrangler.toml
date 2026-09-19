@@ -5,7 +5,7 @@ workers_dev = true
 
 [vars]
 APP_NAME = "Vid.Best"
-PUBLIC_BASE_URL = "https://home.vid.best"
+PUBLIC_BASE_URL = "https://vid.best"
 GEMINI_MODEL = "gemini-3.1-flash-lite"
 MAX_UPLOAD_BYTES = "104857600"
 
