@@ -24,6 +24,8 @@ jobs:
         run: npm ci
       - name: Run regression tests
         run: npm test
+      - name: Temporary read-only Saiyaara production probe
+        run: node scripts/live-probe-saiyaara.mjs
       - name: Check Teamwork Python syntax
         run: python -m compileall -q services/teamwork/app
       - name: Test Teamwork service
