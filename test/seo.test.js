@@ -4,7 +4,7 @@ import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 import seoWorker from "../src/seo-edge.js";
 
-const migrations = ["0001_initial.sql"];
+const migrations = [\n  "0001_initial.sql",\n  "0002_discovery_requests.sql",\n  "0003_security_rate_limits.sql",\n  "0004_maintenance_indexes.sql",\n  "0005_source_video_metadata.sql",\n  "0006_test_player_and_comment_images.sql",\n  "0007_universal_video_experience.sql",\n  "0008_verified_demo_metadata.sql",\n  "0009_app_settings.sql",\n  "0010_video_analysis.sql",\n  "0011_spirituality_buddhism.sql",\n];
 
 class TestD1Statement {
   constructor(database, sql, bindings = []) {
@@ -84,7 +84,7 @@ test("homepage query/filter URLs are noindex while the root remains crawlable", 
   assert.equal(response.status, 200);
   assert.match(response.headers.get("X-Robots-Tag"), /noindex,follow/);
   const html = await response.text();
-  assert.match(html, /Vid\.Best — Video Reviews, Tutorials &amp; Discoveries/);
+  assert.match(html, /Vid\.Best — Video Reviews, Tutorials & Discoveries/);
   assert.match(html, /Video reviews, tutorials &amp; discoveries worth <em>your time\.<\/em>/);
   assert.match(html, /href="https:\/\/vid\.best\/category\/technology"/);
 });
