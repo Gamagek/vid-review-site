@@ -1769,7 +1769,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   const baseUrl = getBaseUrl(request, env);
   const playbackOrigin = new URL(request.url).origin;
   const canonical = `${baseUrl}/watch/${encodeURIComponent(video.slug)}`;
-  const title = cleanText(video.seo_title || video.title, 70);
+  const title = cleanText(watchDisplayTitle(video), 70);
   const description = cleanText(video.seo_description || video.description || `Discover ${video.title} on Vid.Best.`, 180);
   const thumbnail = video.thumbnail_url ? absoluteUrl(video.thumbnail_url, baseUrl) : `${baseUrl}/favicon.svg`;
   const tags = Array.isArray(video.seo_tags) ? video.seo_tags.slice(0, 20) : [];
@@ -1777,7 +1777,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   const videoSchema = {
     "@type": "VideoObject",
     "@id": `${canonical}#video`,
-    name: video.title,
+    name: watchDisplayTitle(video),
     description,
     thumbnailUrl: [thumbnail],
     uploadDate,
@@ -1894,7 +1894,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     </section>
     <article class="watch-copy glass-panel">
       <div class="tile-badges"><span class="badge">${escapeHtml(video.primary_category)}</span><span class="badge secondary">${escapeHtml(video.subcategory)}</span></div>
-      <h1>${escapeHtml(video.title)}</h1>
+      <h1>${escapeHtml(watchDisplayTitle(video))}</h1>
       <p class="lead">${escapeHtml(video.description)}</p>
       <div class="watch-reactions" data-reactions='${escapeHtml(JSON.stringify(video.reactions))}'>
         <button type="button" data-reaction="like">👍 <span>${video.reactions.like}</span></button>
@@ -1939,14 +1939,68 @@ function renderWatchHtml(video, request, env, scriptNonce) {
 </html>`;
 }
 
-function renderMedia(video, playbackOrigin) {
-  if (video.embed_url) {
-    const embedUrl = preparePlaybackEmbed(video.embed_url, playbackOrigin);
-    const isTikTok = /(^|\\.)tiktok\\.com$/i.test(new URL(embedUrl, playbackOrigin).hostname);
-    const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
-    return `<iframe id="watch-media-frame" src="${escapeHtml(embedUrl)}" title="${escapeHtml(video.title)}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"${sandbox}></iframe>`;
+function extractTikTokId(value) {
+  if (!value) return "";
+  try {
+    const url = new URL(value);
+    return url.pathname.match(/\\/video\\/(\\d+)/)?.[1]
+      || url.pathname.match(/\\/player\\/v1\\/(\\d+)/)?.[1]
+      || url.searchParams.get("item_id")
+      || "";
+  } catch {
+    return "";
   }
-  const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}"` : "";
+}
+
+function buildTikTokEmbedUrl(value) {
+  const id = extractTikTokId(value);
+  if (!/^\\d+$/.test(id)) return "";
+  const params = new URLSearchParams({
+    controls: "1",
+    progress_bar: "1",
+    play_button: "1",
+    volume_control: "1",
+    fullscreen_button: "1",
+    timestamp: "1",
+    native_context_menu: "1",
+    closed_caption: "1",
+    loop: "1",
+    rel: "0",
+    autoplay: "0",
+    muted: "0",
+    music_info: "0",
+    description: "0",
+  });
+  return `https://www.tiktok.com/player/v1/${id}?${params.toString()}`;
+}
+
+function watchDisplayTitle(video) {
+  return /saiyaara/i.test(String(video.slug || "")) || /saiyaara/i.test(String(video.title || ""))
+    ? "Saiyaara; A Cinematic Romance"
+    : video.title;
+}
+
+function renderMedia(video, playbackOrigin) {
+  const provider = String(video.provider || "").toLowerCase();
+  let source = video.embed_url || video.source_url || "";
+  if (provider === "tiktok" || /(^|\\.)tiktok\\.com$/i.test(new URL(source, playbackOrigin).hostname)) {
+    source = buildTikTokEmbedUrl(source) || source;
+  }
+  if (source) {
+    const embedUrl = preparePlaybackEmbed(source, playbackOrigin);
+    let isTikTok = false;
+    try { isTikTok = /(^|\\.)tiktok\\.com$/i.test(new URL(embedUrl, playbackOrigin).hostname); } catch {}
+    if (isTikTok) {
+      const repaired = buildTikTokEmbedUrl(embedUrl);
+      if (repaired) {
+        const finalUrl = preparePlaybackEmbed(repaired, playbackOrigin);
+        return `<iframe id="watch-media-frame" src="${escapeHtml(finalUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+      }
+    }
+    const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
+    return `<iframe id="watch-media-frame" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"${sandbox}></iframe>`;
+  }
+  const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}` : "";
   const captions = video.has_captions
     ? `<track kind="captions" src="/captions/${encodeURIComponent(video.slug)}.vtt" srclang="${escapeHtml(video.transcript_language || "en")}" label="Generated captions">`
     : "";
