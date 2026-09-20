@@ -4,7 +4,19 @@ import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 import seoWorker from "../src/seo-edge.js";
 
-const migrations = [\n  "0001_initial.sql",\n  "0002_discovery_requests.sql",\n  "0003_security_rate_limits.sql",\n  "0004_maintenance_indexes.sql",\n  "0005_source_video_metadata.sql",\n  "0006_test_player_and_comment_images.sql",\n  "0007_universal_video_experience.sql",\n  "0008_verified_demo_metadata.sql",\n  "0009_app_settings.sql",\n  "0010_video_analysis.sql",\n  "0011_spirituality_buddhism.sql",\n];
+const migrations = [
+  "0001_initial.sql",
+  "0002_discovery_requests.sql",
+  "0003_security_rate_limits.sql",
+  "0004_maintenance_indexes.sql",
+  "0005_source_video_metadata.sql",
+  "0006_test_player_and_comment_images.sql",
+  "0007_universal_video_experience.sql",
+  "0008_verified_demo_metadata.sql",
+  "0009_app_settings.sql",
+  "0010_video_analysis.sql",
+  "0011_spirituality_buddhism.sql",
+];
 
 class TestD1Statement {
   constructor(database, sql, bindings = []) {
