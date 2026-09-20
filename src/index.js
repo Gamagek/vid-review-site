@@ -615,6 +615,7 @@ function detectMediaProvider(video) {
     if (host === "player.vimeo.com" || host === "vimeo.com") return "vimeo";
     if (host === "dailymotion.com" || host === "dai.ly") return "dailymotion";
     if (host === "player.twitch.tv" || host === "clips.twitch.tv" || host === "twitch.tv") return "twitch";
+    if (host === "tiktok.com" || host.endsWith(".tiktok.com")) return "tiktok";
     if (host === "instagram.com" || host.endsWith(".instagram.com")) return "instagram";
   } catch {
     // Relative and malformed values are handled by their existing media type.
@@ -1982,29 +1983,30 @@ function watchDisplayTitle(video) {
 
 function renderMedia(video, playbackOrigin) {
   const provider = String(video.provider || "").toLowerCase();
-  let source = video.embed_url || video.source_url || "";
-  if (provider === "tiktok") {
-    source = buildTikTokEmbedUrl(source) || source;
-  }
-  if (source) {
-    const embedUrl = preparePlaybackEmbed(source, playbackOrigin);
-    let isTikTok = false;
-    try { isTikTok = provider === "tiktok" || /(^|\.)tiktok\.com$/i.test(new URL(embedUrl, playbackOrigin).hostname); } catch { isTikTok = provider === "tiktok"; }
-    if (isTikTok) {
-      const repaired = buildTikTokEmbedUrl(embedUrl);
-      if (repaired) {
-        const finalUrl = preparePlaybackEmbed(repaired, playbackOrigin);
-        return `<iframe id="watch-media-frame" src="${escapeHtml(finalUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
-      }
+  if (video.embed_url || provider === "tiktok") {
+    let source = video.embed_url || "";
+    if (provider === "tiktok") {
+      source = buildTikTokEmbedUrl(source || video.source_url);
     }
-    const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
-    return `<iframe id="watch-media-frame" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"${sandbox}></iframe>`;
+    if (source) {
+      const embedUrl = preparePlaybackEmbed(source, playbackOrigin);
+      const isTikTok = provider === "tiktok";
+      if (isTikTok) {
+        const repaired = buildTikTokEmbedUrl(embedUrl);
+        if (repaired) {
+          const finalUrl = preparePlaybackEmbed(repaired, playbackOrigin);
+          return \`<iframe id="watch-media-frame" src="\${escapeHtml(finalUrl)}" title="\${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>\`;
+        }
+      }
+      const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
+      return \`<iframe id="watch-media-frame" src="\${escapeHtml(embedUrl)}" title="\${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"\${sandbox}></iframe>\`;
+    }
   }
-  const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}"` : "";
+  const poster = video.thumbnail_url ? \` poster="\${escapeHtml(video.thumbnail_url)}"\` : "";
   const captions = video.has_captions
-    ? `<track kind="captions" src="/captions/${encodeURIComponent(video.slug)}.vtt" srclang="${escapeHtml(video.transcript_language || "en")}" label="Generated captions">`
+    ? \`<track kind="captions" src="/captions/\${encodeURIComponent(video.slug)}.vtt" srclang="\${escapeHtml(video.transcript_language || "en")}" label="Generated captions">\`
     : "";
-  return `<video id="watch-media-video" controls playsinline preload="metadata"${poster}><source src="${escapeHtml(video.source_url)}">${captions}Your browser does not support this video.</video>`;
+  return \`<video id="watch-media-video" controls playsinline preload="metadata"\${poster}><source src="\${escapeHtml(video.source_url)}">\${captions}Your browser does not support this video.</video>\`;
 }
 
 function preparePlaybackEmbed(value, playbackOrigin) {
