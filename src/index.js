@@ -1983,13 +1983,13 @@ function watchDisplayTitle(video) {
 function renderMedia(video, playbackOrigin) {
   const provider = String(video.provider || "").toLowerCase();
   let source = video.embed_url || video.source_url || "";
-  if (provider === "tiktok" || /(^|\\.)tiktok\\.com$/i.test(new URL(source, playbackOrigin).hostname)) {
+  if (provider === "tiktok") {
     source = buildTikTokEmbedUrl(source) || source;
   }
   if (source) {
     const embedUrl = preparePlaybackEmbed(source, playbackOrigin);
     let isTikTok = false;
-    try { isTikTok = /(^|\\.)tiktok\\.com$/i.test(new URL(embedUrl, playbackOrigin).hostname); } catch {}
+    try { isTikTok = provider === "tiktok" || /(^|\.)tiktok\.com$/i.test(new URL(embedUrl, playbackOrigin).hostname); } catch { isTikTok = provider === "tiktok"; }
     if (isTikTok) {
       const repaired = buildTikTokEmbedUrl(embedUrl);
       if (repaired) {
