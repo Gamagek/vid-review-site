@@ -1943,8 +1943,8 @@ function extractTikTokId(value) {
   if (!value) return "";
   try {
     const url = new URL(value);
-    return url.pathname.match(/\\/video\\/(\\d+)/)?.[1]
-      || url.pathname.match(/\\/player\\/v1\\/(\\d+)/)?.[1]
+    return url.pathname.match(/\/video\/(\d+)/)?.[1]
+      || url.pathname.match(/\/player\/v1\/(\d+)/)?.[1]
       || url.searchParams.get("item_id")
       || "";
   } catch {
@@ -1954,7 +1954,7 @@ function extractTikTokId(value) {
 
 function buildTikTokEmbedUrl(value) {
   const id = extractTikTokId(value);
-  if (!/^\\d+$/.test(id)) return "";
+  if (!/^\d+$/.test(id)) return "";
   const params = new URLSearchParams({
     controls: "1",
     progress_bar: "1",
@@ -2000,7 +2000,7 @@ function renderMedia(video, playbackOrigin) {
     const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
     return `<iframe id="watch-media-frame" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"${sandbox}></iframe>`;
   }
-  const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}` : "";
+  const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}"` : "";
   const captions = video.has_captions
     ? `<track kind="captions" src="/captions/${encodeURIComponent(video.slug)}.vtt" srclang="${escapeHtml(video.transcript_language || "en")}" label="Generated captions">`
     : "";
