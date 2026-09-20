@@ -636,3 +636,42 @@ test("homepage previews wait three seconds and respect reduced-data preferences"
   assert.match(appSource, /\/comments`/);
   assert.match(appSource, /\/reactions`/);
 });
+
+test("renders TikTok embeds for clean controls, reliable replay, and provider messaging", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+       slug, title, source_url, embed_url, media_type, primary_category, subcategory, description, published
+     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+  ).run(
+    "tiktok-player-test",
+    "TikTok player test",
+    "https://www.tiktok.com/@example/video/6718335390845095173",
+    "https://www.tiktok.com/player/v1/6718335390845095173?controls=1&rel=1&description=1&music_info=1",
+    "tiktok",
+    "Social Media & Trending",
+    "TikTok Trending",
+    "Official TikTok embed playback test",
+  );
+
+  const page = await send(context, "/watch/tiktok-player-test");
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.match(html, /tiktok\.com\\/player\\/v1\\/6718335390845095173/);
+  assert.match(html, /loop=1/);
+  assert.match(html, /rel=0/);
+  assert.match(html, /autoplay=0/);
+  assert.match(html, /muted=0/);
+  assert.match(html, /description=0/);
+  assert.match(html, /music_info=0/);
+  assert.doesNotMatch(html, /rel=1/);
+  assert.doesNotMatch(html, /description=1/);
+  assert.doesNotMatch(html, /music_info=1/);
+  assert.match(html, /data-video-provider="tiktok"/);
+
+  const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
+  assert.match(watchSource, /provider === "tiktok"/);
+  assert.match(watchSource, /"x-tiktok-player": true/);
+  assert.match(watchSource, /type,/);
+  assert.match(watchSource, /vidbestTikTokNativeControls/);
+});
