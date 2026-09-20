@@ -657,7 +657,7 @@ test("renders TikTok embeds for clean controls, reliable replay, and provider me
   const page = await send(context, "/watch/tiktok-player-test");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /tiktok\.com\\/player\\/v1\\/6718335390845095173/);
+  assert.ok(html.includes("https://www.tiktok.com/player/v1/6718335390845095173"));
   assert.match(html, /loop=1/);
   assert.match(html, /rel=0/);
   assert.match(html, /autoplay=0/);
