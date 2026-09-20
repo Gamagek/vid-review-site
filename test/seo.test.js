@@ -149,3 +149,20 @@ test("only substantive category hubs enter the category sitemap", async () => {
   assert.match(categoryXml, /https:\/\/vid\.best\/category\/technology/);
   assert.doesNotMatch(categoryXml, /https:\/\/vid\.best\/category\/music/);
 });
+
+
+test("video pages expose a crawlable category breadcrumb", async () => {
+  const context = createContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+      slug, title, source_url, media_type, primary_category, subcategory, description, published
+    ) VALUES ('breadcrumb-video', 'Breadcrumb video', 'https://example.com/breadcrumb.mp4', 'raw', 'Technology', 'Web Development', 'A crawlable breadcrumb test video', 1)`,
+  ).run();
+
+  const response = await request(context, "https://vid.best/watch/breadcrumb-video");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /class="vidbest-seo-breadcrumb"/);
+  assert.match(html, /href="https:\/\/vid\.best\/category\/technology"/);
+  assert.match(html, /"item":"https:\/\/vid\.best\/category\/technology"/);
+});
