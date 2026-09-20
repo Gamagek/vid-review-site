@@ -675,3 +675,31 @@ test("renders TikTok embeds for clean controls, reliable replay, and provider me
   assert.match(watchSource, /type,/);
   assert.match(watchSource, /vidbestTikTokNativeControls/);
 });
+
+test("repairs a legacy TikTok record with only its source URL and uses the Saiyaara title", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+       slug, title, source_url, media_type, primary_category, subcategory, description, published
+     ) VALUES (?, ?, ?, 'raw', 'Social Media & Trending', 'TikTok Trending', ?, 1)`,
+  ).run(
+    "saiyaara-tiktok",
+    "Saiyaara movie TikTok",
+    "https://www.tiktok.com/@example/video/6718335390845095173",
+    "Legacy TikTok source without an embed URL",
+  );
+
+  const page = await send(context, "/watch/saiyaara-tiktok");
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.ok(html.includes("<title>Saiyaara; A Cinematic Romance | Vid.Best</title>"));
+  assert.ok(html.includes("<h1>Saiyaara; A Cinematic Romance</h1>"));
+  assert.ok(html.includes("https://www.tiktok.com/player/v1/6718335390845095173"));
+  assert.ok(html.includes("loop=1"));
+  assert.ok(html.includes("rel=0"));
+  assert.ok(html.includes("autoplay=0"));
+  assert.ok(html.includes("muted=0"));
+  assert.ok(html.includes("description=0"));
+  assert.ok(html.includes("music_info=0"));
+  assert.ok(html.includes('data-video-provider="tiktok"'));
+});
