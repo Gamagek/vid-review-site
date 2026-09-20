@@ -366,7 +366,33 @@ function enrichHomepageHtml(html) {
   return output;
 }
 
-async function passThroughHome(request, env, ctx) {
+async 
+function enrichWatchHtml(html) {
+  let output = String(html);
+  const categoryRegex = /"item":"https:\/\/vid\.best\/\?category=([^"]+)"/g;
+  output = output.replace(categoryRegex, (match, encodedCategory) => {
+    let category;
+    try {
+      category = decodeURIComponent(encodedCategory);
+    } catch {
+      return match;
+    }
+    if (!CATEGORY_ORDER.includes(category)) return match;
+    return `"item":"${escapeHtml(categoryUrl(category))}"`;
+  });
+
+  const categoryMatch = output.match(/"item":"https:\/\/vid\.best\/category\/([^"]+)"/);
+  const breadcrumbCategorySlug = categoryMatch?.[1] || "";
+  const breadcrumbCategory = CATEGORY_BY_SLUG.get(decodeURIComponent(breadcrumbCategorySlug)) || "";
+  if (breadcrumbCategory && !output.includes("vidbest-seo-breadcrumb")) {
+    const nav = `<nav class="vidbest-seo-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true"> / </span><a href="${escapeHtml(categoryUrl(breadcrumbCategory))}">${escapeHtml(breadcrumbCategory)}</a></nav>`;
+    output = output.replace('<article class="watch-copy glass-panel">', `${nav}<article class="watch-copy glass-panel">`);
+    output = output.replace("</head>", '<style id="vidbest-seo-breadcrumb-style">.vidbest-seo-breadcrumb{max-width:1200px;margin:12px auto 0;padding:0 24px;font-size:13px;opacity:.82}.vidbest-seo-breadcrumb a{text-decoration:none}.vidbest-seo-breadcrumb a:hover{text-decoration:underline}</style></head>');
+  }
+  return output;
+}
+
+function passThroughHome(request, env, ctx) {
   const response = await edgeWorker.fetch(request, env, ctx);
   const url = new URL(request.url);
   const headers = new Headers(response.headers);
@@ -384,7 +410,7 @@ async function passThroughHome(request, env, ctx) {
     });
   }
 
-  const html = enrichHomepageHtml(await response.text());
+  const rawHtml = await response.text();\n  const watchHtml = url.pathname.startsWith("/watch/") ? enrichWatchHtml(rawHtml) : rawHtml;\n  const html = url.pathname === "/" ? enrichHomepageHtml(watchHtml) : watchHtml;
   headers.delete("Content-Length");
   return new Response(html, {
     status: response.status,
