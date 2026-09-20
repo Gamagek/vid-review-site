@@ -1162,7 +1162,7 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
     if (!id) throw new AppError(400, "Use a full TikTok video URL containing the video ID");
     return {
       source_url: url.toString(),
-      embed_url: `https://www.tiktok.com/player/v1/${id}?description=1&music_info=1`,
+      embed_url: `https://www.tiktok.com/player/v1/${id}?controls=1&progress_bar=1&play_button=1&volume_control=1&fullscreen_button=1&timestamp=1&music_info=1&description=1&native_context_menu=1&rel=1`,
       media_type: "tiktok",
       provider: "tiktok",
       r2_key: null,
@@ -1942,7 +1942,9 @@ function renderWatchHtml(video, request, env, scriptNonce) {
 function renderMedia(video, playbackOrigin) {
   if (video.embed_url) {
     const embedUrl = preparePlaybackEmbed(video.embed_url, playbackOrigin);
-    return `<iframe id="watch-media-frame" src="${escapeHtml(embedUrl)}" title="${escapeHtml(video.title)}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"></iframe>`;
+    const isTikTok = /(^|\\.)tiktok\\.com$/i.test(new URL(embedUrl, playbackOrigin).hostname);
+    const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
+    return `<iframe id="watch-media-frame" src="${escapeHtml(embedUrl)}" title="${escapeHtml(video.title)}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"${sandbox}></iframe>`;
   }
   const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}"` : "";
   const captions = video.has_captions
@@ -1955,6 +1957,7 @@ function preparePlaybackEmbed(value, playbackOrigin) {
   try {
     const url = new URL(value);
     const pageUrl = new URL(playbackOrigin);
+    const hostname = url.hostname.toLowerCase().replace(/^www\\./, "");
     if (url.hostname === "www.youtube-nocookie.com" || url.hostname.endsWith(".youtube.com")) {
       url.searchParams.set("enablejsapi", "1");
       url.searchParams.set("playsinline", "1");
@@ -1962,6 +1965,19 @@ function preparePlaybackEmbed(value, playbackOrigin) {
     }
     if (url.hostname === "player.twitch.tv" || url.hostname === "clips.twitch.tv") {
       url.searchParams.set("parent", pageUrl.hostname);
+    }
+    if (hostname === "tiktok.com" || hostname.endsWith(".tiktok.com")) {
+      // Use TikTok's documented player controls rather than trying to replace its player.
+      url.searchParams.set("controls", "1");
+      url.searchParams.set("progress_bar", "1");
+      url.searchParams.set("play_button", "1");
+      url.searchParams.set("volume_control", "1");
+      url.searchParams.set("fullscreen_button", "1");
+      url.searchParams.set("timestamp", "1");
+      url.searchParams.set("music_info", "1");
+      url.searchParams.set("description", "1");
+      url.searchParams.set("native_context_menu", "1");
+      url.searchParams.set("rel", "1");
     }
     return url.toString();
   } catch {
