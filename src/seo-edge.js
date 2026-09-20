@@ -103,7 +103,7 @@ function redirectToCanonical(request) {
 }
 
 function resolveCategory(pathname) {
-  const match = pathname.match(/^\\/category\\/([^/]+)\\/?$/);
+  const match = pathname.match(/^\/category\/([^/]+)\/?$/);
   if (!match) return null;
   try {
     return CATEGORY_BY_SLUG.get(decodeURIComponent(match[1])) || null;
