@@ -1784,7 +1784,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     url: canonical,
     mainEntityOfPage: canonical,
     ...(video.source_duration ? { duration: video.source_duration } : {}),
-    ...(video.embed_url ? { embedUrl: video.embed_url } : {}),
+    ...(video.embed_url ? { embedUrl: preparePlaybackEmbed(video.embed_url, playbackOrigin) } : {}),
     ...(!video.embed_url ? { contentUrl: video.source_url } : {}),
     ...(tags.length ? { keywords: tags.join(", ") } : {}),
     ...(video.primary_category ? { genre: [video.primary_category, video.subcategory].filter(Boolean) } : {}),
