@@ -392,7 +392,7 @@ function enrichWatchHtml(html) {
   return output;
 }
 
-function passThroughHome(request, env, ctx) {
+async function passThroughHome(request, env, ctx) {
   const response = await edgeWorker.fetch(request, env, ctx);
   const url = new URL(request.url);
   const headers = new Headers(response.headers);
