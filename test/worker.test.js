@@ -703,3 +703,11 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   assert.ok(html.includes("music_info=0"));
   assert.ok(html.includes('data-video-provider="tiktok"'));
 });
+
+
+test("redirects the legacy Saiyaara slug to the permanent SEO slug", async () => {
+  const context = createTestContext();
+  const response = await send(context, "/watch/fyppppppppppppppppppppppp-fyp-ahaanpanday-aneetpadda-saiyaara");
+  assert.equal(response.status, 301);
+  assert.equal(response.headers.get("location"), "https://example.com/watch/saiyaara-a-cinematic-romance");
+});

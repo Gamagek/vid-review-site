@@ -649,6 +649,7 @@ function initializeEmbeddedMediaTools() {
     frame.style.width = "100%";
     frame.style.height = "100%";
     frame.style.border = "0";
+    initializeTikTokReliability(player, stage, frame);
     return;
   }
 
@@ -839,6 +840,157 @@ function initializeEmbeddedMediaTools() {
       if (Number.isFinite(time)) state.currentTime = time;
     } catch {}
   });
+}
+
+function initializeTikTokReliability(player, stage, frame) {
+  if (!player || !stage || !frame || frame.dataset.vidbestTikTokReliability === "1") return;
+  frame.dataset.vidbestTikTokReliability = "1";
+
+  const sourceUrl = document.querySelector(".source-link")?.href || "";
+  const sourceText = sourceUrl ? "Open on TikTok" : "Open original source";
+  const status = document.createElement("div");
+  status.className = "vidbest-tiktok-status";
+  status.hidden = true;
+
+  const message = document.createElement("span");
+  message.className = "vidbest-tiktok-status-message";
+
+  const retry = document.createElement("button");
+  retry.type = "button";
+  retry.className = "button ghost";
+  retry.textContent = "Retry player";
+
+  const open = document.createElement("a");
+  open.className = "button ghost";
+  open.textContent = sourceText;
+  open.target = "_blank";
+  open.rel = "noopener noreferrer nofollow";
+  if (sourceUrl) open.href = sourceUrl;
+
+  status.append(message, retry, open);
+  stage.insertAdjacentElement("afterend", status);
+
+  let ready = false;
+  let attempts = 0;
+  let watchdog = null;
+  let retryTimer = null;
+
+  function clearWatchdog() {
+    if (watchdog) {
+      clearTimeout(watchdog);
+      watchdog = null;
+    }
+  }
+
+  function showStatus(text) {
+    message.textContent = text;
+    status.hidden = false;
+  }
+
+  function hideStatus() {
+    status.hidden = true;
+    message.textContent = "";
+  }
+
+  function addCacheBust() {
+    try {
+      const url = new URL(frame.src);
+      url.searchParams.set("_vidbest_retry", String(Date.now()));
+      frame.src = url.toString();
+    } catch {
+      frame.src = frame.src;
+    }
+  }
+
+  function beginWatchdog() {
+    clearWatchdog();
+    watchdog = setTimeout(() => {
+      if (!ready) handleFailure("TikTok did not finish loading the player.");
+    }, 10000);
+  }
+
+  function restartPlayer() {
+    clearWatchdog();
+    ready = false;
+    hideStatus();
+    addCacheBust();
+    beginWatchdog();
+  }
+
+  function handleFailure(reason) {
+    clearWatchdog();
+    if (attempts < 1) {
+      attempts += 1;
+      showStatus("TikTok could not start on the first attempt. Retrying once…");
+      retryTimer = setTimeout(restartPlayer, 500);
+      return;
+    }
+    showStatus(reason + " It may be a temporary TikTok/CDN restriction.");
+    retry.disabled = false;
+  }
+
+  retry.addEventListener("click", () => {
+    if (retryTimer) {
+      clearTimeout(retryTimer);
+      retryTimer = null;
+    }
+    attempts = 0;
+    retry.disabled = true;
+    restartPlayer();
+  });
+
+  frame.addEventListener("load", () => {
+    if (!ready) beginWatchdog();
+  });
+
+  window.addEventListener("message", (event) => {
+    if (event.source !== frame.contentWindow) return;
+    if (event.origin !== "https://www.tiktok.com") return;
+
+    try {
+      const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+      const type = data?.type || "";
+      const value = data?.value;
+
+      if (type === "onPlayerReady") {
+        ready = true;
+        attempts = 0;
+        clearWatchdog();
+        retry.disabled = false;
+        hideStatus();
+        return;
+      }
+
+      if (type === "onStateChange") {
+        const state = Number(value);
+        if (state === 1 || state === 3) {
+          ready = true;
+          clearWatchdog();
+          hideStatus();
+        }
+        return;
+      }
+
+      if (type === "onPlayerError") {
+        const code = Number(value?.errorCode ?? value);
+        if (code === 1001) {
+          handleFailure("TikTok reports this video is unavailable.");
+        } else if (code === 2001) {
+          handleFailure("TikTok's server could not serve this video.");
+        } else if (code === 3001) {
+          handleFailure("TikTok reported a playback error.");
+        } else if (code === 3002) {
+          showStatus("Browser autoplay was blocked. Tap TikTok's Play button.");
+        } else {
+          handleFailure("The TikTok player returned an error.");
+        }
+      }
+    } catch {
+      // Ignore unrelated cross-origin messages.
+    }
+  });
+
+  beginWatchdog();
 }
 
 function initializeBackgroundPlayback() {

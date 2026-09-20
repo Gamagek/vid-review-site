@@ -1750,6 +1750,13 @@ function secureStoredContentType(headers) {
 
 async function watchPage(request, env, ctx, slugInput) {
   const slug = safeDecode(slugInput).split("/")[0];
+  const legacySlugRedirects = new Map([
+    ["fyppppppppppppppppppppppp-fyp-ahaanpanday-aneetpadda-saiyaara", "saiyaara-a-cinematic-romance"],
+  ]);
+  const redirectSlug = legacySlugRedirects.get(slug);
+  if (redirectSlug) {
+    return Response.redirect(new URL(`/watch/${redirectSlug}`, request.url), 301);
+  }
   const row = await env.DB.prepare(
     `SELECT v.*, a.transcript, a.language AS transcript_language,
             CASE WHEN length(a.captions_vtt) > 0 THEN 1 ELSE 0 END AS has_captions,
@@ -1995,7 +2002,7 @@ function renderMedia(video, playbackOrigin) {
         const repaired = buildTikTokEmbedUrl(embedUrl);
         if (repaired) {
           const finalUrl = preparePlaybackEmbed(repaired, playbackOrigin);
-          return `<iframe id="watch-media-frame" src="${escapeHtml(finalUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+          return `<iframe id="watch-media-frame" src="${escapeHtml(finalUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe>`;
         }
       }
       const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
