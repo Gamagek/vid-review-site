@@ -186,7 +186,7 @@ async function startMutedPlayback() {
   }
   const frame = persistentPlayer?.querySelector("iframe");
   const provider = String(document.body.dataset.videoProvider || "").toLowerCase();
-  if (frame && ["youtube", "vimeo"].includes(provider)) {
+  if (frame && ["youtube", "vimeo", "tiktok"].includes(provider)) {
     playerProviderCommand("mute");
     playerProviderCommand("playVideo");
     return true;
@@ -208,6 +208,23 @@ function playerProviderCommand(method, args = []) {
     if (provider === "youtube") {
       const targetOrigin = new URL(frame.src).origin;
       frame.contentWindow?.postMessage(JSON.stringify({ event: "command", func: method, args }), targetOrigin);
+      return;
+    }
+    if (provider === "tiktok") {
+      const targetOrigin = new URL(frame.src).origin;
+      const type = method === "playVideo" ? "play"
+        : method === "pauseVideo" ? "pause"
+          : method === "mute" ? "mute"
+            : method === "unMute" ? "unMute"
+              : method === "seekTo" ? "seekTo"
+                : "";
+      if (!type) return;
+      const message = {
+        "x-tiktok-player": true,
+        type,
+        ...(type === "seekTo" ? { value: Number(args[0]) } : {}),
+      };
+      frame.contentWindow?.postMessage(message, targetOrigin);
       return;
     }
     if (provider === "vimeo") {
@@ -622,6 +639,19 @@ function initializeEmbeddedMediaTools() {
   player.dataset.vidbestEmbeddedTools = "1";
 
   const provider = String(document.body.dataset.videoProvider || inferProvider(frame)).toLowerCase();
+
+  // TikTok supplies its own responsive touch controls inside the official
+  // iframe. Do not place the Vid.Best overlay on top of them.
+  if (provider === "tiktok") {
+    player.dataset.vidbestTikTokNativeControls = "1";
+    frame.setAttribute("allow", "fullscreen; autoplay; encrypted-media; picture-in-picture; web-share");
+    frame.setAttribute("allowfullscreen", "");
+    frame.style.width = "100%";
+    frame.style.height = "100%";
+    frame.style.border = "0";
+    return;
+  }
+
   const remote = provider === "youtube" || provider === "vimeo";
   const state = { playing: false, muted: false, rate: 1, currentTime: 0 };
 
@@ -1102,6 +1132,13 @@ function initializeEmbeddedAudioLab() {
   style.id = "vidbest-player-polish-v4-css";
   style.textContent = [
     ".watch-player-stage{position:relative}",
+    ".watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:min(100%,540px);height:min(78vh,760px);min-height:0;aspect-ratio:9/16;margin-inline:auto;background:#000}",
+    ".watch-player[data-provider=\"tiktok\"] .watch-player-stage iframe{width:100%;height:100%;min-height:0;display:block;border:0;object-fit:contain;background:#000}",
+    ".watch-player.is-mini[data-provider=\"tiktok\"]{width:min(430px,calc(100vw - 36px))}",
+    ".watch-player.is-mini[data-provider=\"tiktok\"] .watch-player-stage{width:100%;height:min(70vh,calc((100vw - 36px) * 1.7778));min-height:0;aspect-ratio:9/16}",
+    ".watch-player.is-mini[data-provider=\"tiktok\"] .watch-player-stage iframe{min-height:0}",
+    ".watch-player.is-theater[data-provider=\"tiktok\"] .watch-player-stage{width:100%;max-width:none;height:calc(100vh - 90px);min-height:0;aspect-ratio:auto}",
+    "@media(max-width:760px){.watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:100%;height:min(78vh,calc((100vw - 40px) * 1.7778));max-height:78vh}.watch-player[data-provider=\"tiktok\"] .watch-player-stage iframe{min-height:0}}",
     ".watch-player-stage .player-tools.vidbest-stage-tools{position:absolute!important;left:8px;right:8px;bottom:42px;z-index:30;margin:0!important;width:auto!important;max-width:none!important;display:flex!important;align-items:center;gap:5px;flex-wrap:wrap;padding:7px 8px!important;border-radius:12px;background:linear-gradient(180deg,rgba(4,7,16,.08),rgba(4,7,16,.94));box-sizing:border-box;pointer-events:none}",
     ".watch-player-stage .player-tools.vidbest-stage-tools>*{pointer-events:auto}",
     ".watch-player-stage .player-tools.vidbest-stage-tools button{min-height:30px;white-space:nowrap}",

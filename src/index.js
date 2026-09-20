@@ -1162,7 +1162,7 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
     if (!id) throw new AppError(400, "Use a full TikTok video URL containing the video ID");
     return {
       source_url: url.toString(),
-      embed_url: `https://www.tiktok.com/player/v1/${id}?controls=1&progress_bar=1&play_button=1&volume_control=1&fullscreen_button=1&timestamp=1&music_info=1&description=1&native_context_menu=1&rel=1`,
+      embed_url: `https://www.tiktok.com/player/v1/${id}?controls=1&progress_bar=1&play_button=1&volume_control=1&fullscreen_button=1&timestamp=1&native_context_menu=1&closed_caption=1&loop=1&rel=0&autoplay=0&muted=0&music_info=0&description=0`,
       media_type: "tiktok",
       provider: "tiktok",
       r2_key: null,
@@ -1784,7 +1784,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     url: canonical,
     mainEntityOfPage: canonical,
     ...(video.source_duration ? { duration: video.source_duration } : {}),
-    ...(video.embed_url ? { embedUrl: video.embed_url } : {}),
+    ...(video.embed_url ? { embedUrl: preparePlaybackEmbed(video.embed_url, playbackOrigin) } : {}),
     ...(!video.embed_url ? { contentUrl: video.source_url } : {}),
     ...(tags.length ? { keywords: tags.join(", ") } : {}),
     ...(video.primary_category ? { genre: [video.primary_category, video.subcategory].filter(Boolean) } : {}),
@@ -1968,16 +1968,22 @@ function preparePlaybackEmbed(value, playbackOrigin) {
     }
     if (hostname === "tiktok.com" || hostname.endsWith(".tiktok.com")) {
       // Use TikTok's documented player controls rather than trying to replace its player.
+      // Keep TikTok controls clear, replay the current post, and avoid the
+      // end-of-playback related-video takeover.
       url.searchParams.set("controls", "1");
       url.searchParams.set("progress_bar", "1");
       url.searchParams.set("play_button", "1");
       url.searchParams.set("volume_control", "1");
       url.searchParams.set("fullscreen_button", "1");
       url.searchParams.set("timestamp", "1");
-      url.searchParams.set("music_info", "1");
-      url.searchParams.set("description", "1");
       url.searchParams.set("native_context_menu", "1");
-      url.searchParams.set("rel", "1");
+      url.searchParams.set("closed_caption", "1");
+      url.searchParams.set("loop", "1");
+      url.searchParams.set("rel", "0");
+      url.searchParams.set("autoplay", "0");
+      url.searchParams.set("muted", "0");
+      url.searchParams.set("music_info", "0");
+      url.searchParams.set("description", "0");
     }
     return url.toString();
   } catch {
