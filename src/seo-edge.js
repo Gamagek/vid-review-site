@@ -410,7 +410,9 @@ function passThroughHome(request, env, ctx) {
     });
   }
 
-  const rawHtml = await response.text();\n  const watchHtml = url.pathname.startsWith("/watch/") ? enrichWatchHtml(rawHtml) : rawHtml;\n  const html = url.pathname === "/" ? enrichHomepageHtml(watchHtml) : watchHtml;
+  const rawHtml = await response.text();
+  const watchHtml = url.pathname.startsWith("/watch/") ? enrichWatchHtml(rawHtml) : rawHtml;
+  const html = url.pathname === "/" ? enrichHomepageHtml(watchHtml) : watchHtml;
   headers.delete("Content-Length");
   return new Response(html, {
     status: response.status,
