@@ -15,3 +15,5 @@ console.log("PAGE_TITLE", (pageHtml.match(/<title>([^<]+)<\/title>/i) || [,""])[
 console.log("HAS_TIKTOK_IFRAME", /<iframe[^>]+src="https:\/\/www\.tiktok\.com\/player\/v1\/7669587518156705056/i.test(pageHtml));
 console.log("HAS_TIKTOK_FALLBACK_VIDEO", /<video[^>]+id="watch-media-video"/i.test(pageHtml));
 console.log("PLAYER_SNIPPET", (pageHtml.match(/<div class="watch-player-stage">([\s\S]*?)<\/div>/i) || [,""])[1].slice(0,1800));
+
+console.log("POST_DEPLOY_CHECK", new Date().toISOString());
