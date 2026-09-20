@@ -1,5 +1,5 @@
 name = "vid-review-site"
-main = "src/edge.js"
+main = "src/seo-edge.js"
 compatibility_date = "2026-08-19"
 workers_dev = true
 
