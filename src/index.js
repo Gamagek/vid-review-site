@@ -1995,18 +1995,18 @@ function renderMedia(video, playbackOrigin) {
         const repaired = buildTikTokEmbedUrl(embedUrl);
         if (repaired) {
           const finalUrl = preparePlaybackEmbed(repaired, playbackOrigin);
-          return \`<iframe id="watch-media-frame" src="\${escapeHtml(finalUrl)}" title="\${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>\`;
+          return `<iframe id="watch-media-frame" src="\${escapeHtml(finalUrl)}" title="\${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
         }
       }
       const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
-      return \`<iframe id="watch-media-frame" src="\${escapeHtml(embedUrl)}" title="\${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"\${sandbox}></iframe>\`;
+      return `<iframe id="watch-media-frame" src="\${escapeHtml(embedUrl)}" title="\${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"\${sandbox}></iframe>`;
     }
   }
-  const poster = video.thumbnail_url ? \` poster="\${escapeHtml(video.thumbnail_url)}"\` : "";
+  const poster = video.thumbnail_url ? ` poster="\${escapeHtml(video.thumbnail_url)}"` : "";
   const captions = video.has_captions
-    ? \`<track kind="captions" src="/captions/\${encodeURIComponent(video.slug)}.vtt" srclang="\${escapeHtml(video.transcript_language || "en")}" label="Generated captions">\`
+    ? `<track kind="captions" src="/captions/\${encodeURIComponent(video.slug)}.vtt" srclang="\${escapeHtml(video.transcript_language || "en")}" label="Generated captions">`
     : "";
-  return \`<video id="watch-media-video" controls playsinline preload="metadata"\${poster}><source src="\${escapeHtml(video.source_url)}">\${captions}Your browser does not support this video.</video>\`;
+  return `<video id="watch-media-video" controls playsinline preload="metadata"\${poster}><source src="\${escapeHtml(video.source_url)}">\${captions}Your browser does not support this video.</video>`;
 }
 
 function preparePlaybackEmbed(value, playbackOrigin) {
