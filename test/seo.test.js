@@ -36,6 +36,11 @@ class TestD1Statement {
   async all() {
     return { success: true, results: this.database.prepare(this.sql).all(...this.bindings) };
   }
+
+  async run() {
+    this.database.prepare(this.sql).run(...this.bindings);
+    return { success: true };
+  }
 }
 
 class TestD1Database {
