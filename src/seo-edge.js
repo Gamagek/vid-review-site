@@ -366,7 +366,6 @@ function enrichHomepageHtml(html) {
   return output;
 }
 
-async 
 function enrichWatchHtml(html) {
   let output = String(html);
   const categoryRegex = /"item":"https:\/\/vid\.best\/\?category=([^"]+)"/g;
