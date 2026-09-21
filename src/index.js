@@ -1960,6 +1960,15 @@ function extractTikTokId(value) {
   }
 }
 
+function extractTikTokUsername(value) {
+  try {
+    const match = new URL(value).pathname.match(/^\\/@([^/]+)/);
+    return match?.[1] ? decodeURIComponent(match[1]) : "";
+  } catch {
+    return "";
+  }
+}
+
 function buildTikTokPostUrl(value, id) {
   try {
     const url = new URL(value);
@@ -2011,14 +2020,16 @@ function renderMedia(video, playbackOrigin) {
         const tiktokId = extractTikTokId(source || video.source_url);
         if (tiktokId) {
           const cite = buildTikTokPostUrl(source || video.source_url, tiktokId);
-          return `<div class="tiktok-embed-wrap">
+          const username = extractTikTokUsername(cite);
+          const authorHref = username ? `https://www.tiktok.com/@${encodeURIComponent(username)}?refer=embed` : cite;
+          const authorLabel = username ? `@${username}` : "View this TikTok";
+          return `<div class="tiktok-embed-wrap" data-tiktok-embed>
             <blockquote class="tiktok-embed" cite="${escapeHtml(cite)}" data-video-id="${escapeHtml(tiktokId)}" data-embed-from="oembed">
               <section aria-label="TikTok video">
-                <a target="_blank" title="Open this video on TikTok" href="${escapeHtml(cite)}">Open this video on TikTok</a>
+                <a target="_blank" rel="noopener noreferrer nofollow" title="${escapeHtml(authorLabel)}" href="${escapeHtml(authorHref)}">${escapeHtml(authorLabel)}</a>
               </section>
             </blockquote>
-          </div>
-          <script src="https://www.tiktok.com/embed.js" defer></script>`;
+          </div>`;
         }
       }
       const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
