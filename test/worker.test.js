@@ -666,6 +666,7 @@ test("renders TikTok embeds for clean controls, reliable replay, and provider me
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
   assert.match(watchSource, /provider === "tiktok"/);
+  assert.match(watchSource, /Play TikTok in popup/);
   assert.match(watchSource, /"x-tiktok-player": true/);
   assert.match(watchSource, /type,/);
   assert.match(watchSource, /vidbestTikTokNativeControls/);
@@ -693,6 +694,7 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   assert.ok(html.includes('data-video-id="6718335390845095173"'));
   assert.ok(html.includes('@example'));
   assert.ok(html.includes('data-tiktok-embed'));
+  assert.ok(html.includes('https://www.tiktok.com/embed.js'));
   assert.ok(html.includes('data-video-provider="tiktok"'));
 });
 
