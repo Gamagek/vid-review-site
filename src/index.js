@@ -2109,7 +2109,7 @@ function renderMedia(video, playbackOrigin) {
     }
   }
 
-  const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}` : "";
+  const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}"` : "";
   const captions = video.has_captions
     ? `<track kind="captions" src="/captions/${encodeURIComponent(video.slug)}.vtt" srclang="${escapeHtml(video.transcript_language || "en")}" label="Generated captions">`
     : "";
