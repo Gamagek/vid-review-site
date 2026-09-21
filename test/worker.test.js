@@ -662,7 +662,10 @@ test("renders TikTok embeds for clean controls, reliable replay, and provider me
   assert.match(html, /@example/);
   assert.match(html, /cite="https:\/\/www\.tiktok\.com\/@example\/video\/6718335390845095173"/);
   assert.doesNotMatch(html, /<blockquote[^>]+cite="[^"]*player\/v1\/6718335390845095173/);
-  assert.match(html, /data-video-provider="tiktok"/);
+  assert.match(html, /data-video-provider="tiktok"/); 
+  assert.match(html, /https:\/\/widgets\.sociablekit\.com\/tiktok-feed\/iframe\/25715575/);
+  assert.match(html, /data-sociablekit-fallback/);
+  assert.match(html, /widgets\.sociablekit\.com/);
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
   assert.match(watchSource, /provider === "tiktok"/);
