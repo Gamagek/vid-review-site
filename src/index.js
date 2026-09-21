@@ -2031,7 +2031,7 @@ function renderMedia(video, playbackOrigin) {
                 <a target="_blank" rel="noopener noreferrer nofollow" title="${escapeHtml(authorLabel)}" href="${escapeHtml(authorHref)}">${escapeHtml(authorLabel)}</a>
               </section>
             </blockquote>
-          </div>
+           </div>`;
         }
       }
       const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
