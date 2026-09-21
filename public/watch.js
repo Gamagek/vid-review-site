@@ -27,6 +27,7 @@ function initializeWatchPage() {
   initializePersistentPlayer();
   initializeEmbeddedMediaTools();
   initializeTikTokEmbedScript();
+  initializeTikTokPopupFallback();
   initializeAudioLab();
   initializeEmbeddedAudioLab();
   repairNativePlayerControls();
@@ -843,6 +844,53 @@ function initializeEmbeddedMediaTools() {
   });
 }
 
+function initializeTikTokPopupFallback() {
+  const wrap = document.querySelector("[data-tiktok-embed]");
+  if (!wrap || wrap.dataset.vidbestPopupFallback === "1") return;
+  wrap.dataset.vidbestPopupFallback = "1";
+
+  const source = wrap.dataset.tiktokSource || "";
+  if (!source) return;
+
+  const fallback = document.createElement("div");
+  fallback.className = "vidbest-tiktok-fallback";
+  fallback.innerHTML = "<span>TikTok's embedded player can be restricted by the browser or TikTok CDN.</span>";
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "button ghost";
+  button.textContent = "Play TikTok in popup";
+  button.setAttribute("aria-label", "Open this TikTok video in a popup");
+  button.addEventListener("click", () => {
+    const popup = window.open(source, "vidbest-tiktok-player", "popup,width=430,height=760,resizable=yes,scrollbars=yes");
+    if (!popup) {
+      window.location.href = source;
+      return;
+    }
+    try { popup.focus(); } catch {}
+  });
+  fallback.append(button);
+  wrap.insertAdjacentElement("afterend", fallback);
+
+  const renderedCheck = () => {
+    if (wrap.querySelector("iframe")) {
+      fallback.hidden = true;
+      return true;
+    }
+    return false;
+  };
+
+  if (renderedCheck()) return;
+  const observer = new MutationObserver(() => {
+    if (renderedCheck()) observer.disconnect();
+  });
+  observer.observe(wrap, { childList: true, subtree: true });
+  setTimeout(() => {
+    observer.disconnect();
+    renderedCheck();
+  }, 5000);
+}
+
 function initializeTikTokEmbedScript() {
   const embeds = [...document.querySelectorAll(".tiktok-embed")];
   if (!embeds.length) return;
@@ -1315,6 +1363,8 @@ function initializeEmbeddedAudioLab() {
     ".tiktok-embed-wrap .tiktok-embed{width:100%!important;max-width:605px!important;min-width:325px!important;margin:0 auto!important}",
     ".tiktok-embed-wrap iframe{width:100%!important;max-width:605px!important;min-width:325px!important;border:0!important}",
     ".vidbest-tiktok-load-status{padding:10px 12px;border-top:1px solid rgba(255,255,255,.08);background:#080a12;color:#9aa3ba;font-size:12px;line-height:1.5}",
+    ".vidbest-tiktok-fallback{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08);background:#080a12;color:#9aa3ba;font-size:12px;line-height:1.45}",
+    ".vidbest-tiktok-fallback[hidden]{display:none!important}",
     ".watch-player[data-provider=\"tiktok\"] .watch-player-stage{height:auto;min-height:0;aspect-ratio:auto}",
     ".watch-player[data-provider=\"tiktok\"] .tiktok-embed-wrap{height:auto;min-height:0}",
 
