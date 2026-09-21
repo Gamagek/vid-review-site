@@ -1161,9 +1161,7 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
     if (!id) throw new AppError(400, "Use a full TikTok video URL containing the video ID");
     return {
       source_url: url.toString(),
-      // TikTok playback is rendered from the official blockquote + embed.js.
-      // Keep embed_url empty so legacy /player/v1/ URLs can never be used.
-      embed_url: null,
+      embed_url: buildTikTokPlayerUrl(id),
       media_type: "tiktok",
       provider: "tiktok",
       r2_key: null,
@@ -1957,6 +1955,26 @@ function extractTikTokId(value) {
   }
 }
 
+function buildTikTokPlayerUrl(id) {
+  const params = new URLSearchParams({
+    controls: "1",
+    progress_bar: "1",
+    play_button: "1",
+    volume_control: "1",
+    fullscreen_button: "1",
+    timestamp: "1",
+    loop: "0",
+    autoplay: "0",
+    music_info: "1",
+    description: "1",
+    rel: "1",
+    native_context_menu: "1",
+    closed_caption: "1",
+    muted: "0",
+  });
+  return `https://www.tiktok.com/player/v1/${encodeURIComponent(id)}?${params.toString()}`;
+}
+
 function extractTikTokUsername(value) {
   try {
     const match = new URL(value).pathname.match(/^\/@([^/]+)/);
@@ -1985,19 +2003,12 @@ function renderMedia(video, playbackOrigin) {
   const provider = String(video.provider || "").toLowerCase();
 
   if (provider === "tiktok") {
-    const tiktokSource = String(video.source_url || "").trim();
-    const tiktokId = extractTikTokId(tiktokSource);
-
-    if (tiktokId) {
-      return `<blockquote class="tiktok-embed" cite="https://www.tiktok.com" data-embed-type="curated" data-video-id-list="${escapeHtml(tiktokId)}" data-embed-from="embed_page" style="max-width: 780px;min-width: 325px;">
-        <section>
-          <a target="_blank" href="https://www.tiktok.com?refer=embed_page">TikTok</a>
-        </section>
-      </blockquote>
-      <script async src="https://www.tiktok.com/embed.js"></script>`;
-    }
-
-    return "";
+    const tiktokId = extractTikTokId(video.source_url);
+    const embedUrl = /^https:\/\/www\.tiktok\.com\/player\/v1\/\d+/.test(String(video.embed_url || ""))
+      ? String(video.embed_url)
+      : (tiktokId ? buildTikTokPlayerUrl(tiktokId) : "");
+    if (!embedUrl) return "";
+    return `<iframe id="watch-media-frame" class="tiktok-official-player" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   }
   if (video.embed_url) {
     const embedUrl = preparePlaybackEmbed(video.embed_url, playbackOrigin);
