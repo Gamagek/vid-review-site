@@ -327,6 +327,34 @@ test("gives AI generation a longer browser timeout than ordinary requests", () =
   assert.match(source, /url\.startsWith\("\/api\/ai\/generate"\) \? 35000 : 15000/);
 });
 
+test("stores new TikTok videos without a legacy player URL", async () => {
+  const context = createTestContext();
+  const response = await send(context, "/api/videos", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "TikTok official embed test",
+      source_url: "https://www.tiktok.com/@example/video/6718335390845095173",
+      primary_category: "Social Media & Trending",
+      subcategory: "TikTok Viral Challenges",
+      published: true,
+    }),
+  });
+  assert.equal(response.status, 201);
+  const result = await response.json();
+  assert.equal(result.video.provider, "tiktok");
+  assert.equal(result.video.media_type, "tiktok");
+  assert.equal(result.video.embed_url, null);
+
+  const page = await send(context, `/watch/${result.video.slug}`);
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.match(html, /class="tiktok-embed"/);
+  assert.match(html, /data-video-id="6718335390845095173"/);
+  assert.doesNotMatch(html, /player\/v1\/6718335390845095173/);
+  assert.doesNotMatch(html, /"embedUrl":s*"https:\/\/www\.tiktok\.com\/player\/v1\//);
+});
+
 test("normalizes trusted provider URLs into provider-owned embeds", async () => {
   const context = createTestContext();
   const cases = [
@@ -736,7 +764,7 @@ test("resolves TikTok availability through the authenticated cloud gateway witho
     const response = await send(
       context,
       "/api/admin/tiktok/resolve?url=" + encodeURIComponent("https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056"),
-      { method: "GET", headers: { Authorization: secret } },
+      { method: "GET", headers: { Authorization: `Bearer ${secret}` } },
     );
     assert.equal(response.status, 200);
     const result = await response.json();

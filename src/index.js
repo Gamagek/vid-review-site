@@ -1164,11 +1164,13 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
   }
 
   if (hostname === "tiktok.com" || hostname.endsWith(".tiktok.com")) {
-    const id = url.pathname.match(/\/video\/(\d+)/)?.[1] || url.pathname.match(/\/player\/v1\/(\d+)/)?.[1];
+    const id = url.pathname.match(/\/video\/(\d+)/)?.[1];
     if (!id) throw new AppError(400, "Use a full TikTok video URL containing the video ID");
     return {
       source_url: url.toString(),
-      embed_url: `https://www.tiktok.com/player/v1/${id}?controls=1&progress_bar=1&play_button=1&volume_control=1&fullscreen_button=1&timestamp=1&native_context_menu=1&closed_caption=1&loop=1&rel=0&autoplay=0&muted=0&music_info=0&description=0`,
+      // TikTok playback is rendered from the official blockquote + embed.js.
+      // Keep embed_url empty so legacy /player/v1/ URLs can never be used.
+      embed_url: null,
       media_type: "tiktok",
       provider: "tiktok",
       r2_key: null,
@@ -1868,8 +1870,8 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     url: canonical,
     mainEntityOfPage: canonical,
     ...(video.source_duration ? { duration: video.source_duration } : {}),
-    ...(video.embed_url ? { embedUrl: preparePlaybackEmbed(video.embed_url, playbackOrigin) } : {}),
-    ...(!video.embed_url ? { contentUrl: video.source_url } : {}),
+    ...(video.embed_url && video.provider !== "tiktok" ? { embedUrl: preparePlaybackEmbed(video.embed_url, playbackOrigin) } : {}),
+    ...(!video.embed_url && video.provider !== "tiktok" ? { contentUrl: video.source_url } : {}),
     ...(tags.length ? { keywords: tags.join(", ") } : {}),
     ...(video.primary_category ? { genre: [video.primary_category, video.subcategory].filter(Boolean) } : {}),
     interactionStatistic: [
@@ -2027,10 +2029,7 @@ function extractTikTokId(value) {
   if (!value) return "";
   try {
     const url = new URL(value);
-    return url.pathname.match(/\/video\/(\d+)/)?.[1]
-      || url.pathname.match(/\/player\/v1\/(\d+)/)?.[1]
-      || url.searchParams.get("item_id")
-      || "";
+    return url.pathname.match(/\/video\/(\d+)/)?.[1] || "";
   } catch {
     return "";
   }
@@ -2051,7 +2050,7 @@ function buildTikTokPostUrl(value, id) {
     const videoMatch = url.pathname.match(/\/video\/(\d+)/);
     if (videoMatch?.[1] === id) return url.toString();
   } catch {}
-  return `https://www.tiktok.com/player/v1/${id}`;
+  return "";
 }
 
 function watchDisplayTitle(video) {
@@ -2064,7 +2063,7 @@ function renderMedia(video, playbackOrigin) {
   const provider = String(video.provider || "").toLowerCase();
 
   if (provider === "tiktok") {
-    const tiktokSource = String(video.source_url || video.embed_url || "").trim();
+    const tiktokSource = String(video.source_url || "").trim();
     const tiktokId = extractTikTokId(tiktokSource);
 
     if (tiktokId) {
@@ -2084,6 +2083,12 @@ function renderMedia(video, playbackOrigin) {
       </div>
       <script async src="https://www.tiktok.com/embed.js"></script>`;
     }
+
+    // Never fall through to a stored legacy TikTok player URL.
+    const source = tiktokSource || "https://www.tiktok.com/";
+    return `<div class="tiktok-embed-wrap" data-tiktok-embed data-tiktok-source="${escapeHtml(source)}">
+      <p class="tiktok-embed-unavailable">This TikTok post cannot be embedded on this browser. <a href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer nofollow">Open it on TikTok</a>.</p>
+    </div>`;
   }
 
   if (video.embed_url) {
