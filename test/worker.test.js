@@ -659,7 +659,8 @@ test("admin uses the official TikTok blockquote preview instead of a raw player 
   assert.match(adminSource, /className = "tiktok-embed"/);
   assert.match(adminSource, /ensureTikTokEmbedScript/);
   assert.doesNotMatch(adminSource, /window\.tiktokEmbed\?\.lib\?\.render/);
-  assert.match(adminSource, /provider: "tiktok"/);
+  assert.doesNotMatch(adminSource, /window\.tiktokEmbed\?\.lib\?\.render/);
+  assert.match(adminSource, /dataset\.embedType = "curated"/);
 });
 
 test("homepage previews wait three seconds and respect reduced-data preferences", () => {
@@ -696,15 +697,15 @@ test("renders the supplied official Saiyaara TikTok embed without fallback UI", 
   const html = await page.text();
   assert.match(html, /class="tiktok-embed"/);
   assert.match(html, /data-video-id="7669587518156705056"/);
-  assert.match(html, /@saiyaara\.4ever/);
-  assert.match(html, /cite="https:\/\/www\.tiktok\.com\/@saiyaara\.4ever\/video\/7669587518156705056"/);
+  assert.doesNotMatch(html, /@saiyaara\.4ever/);
+  assert.match(html, /cite="https:\/\/www\.tiktok\.com"/);
   assert.doesNotMatch(html, /player\/v1\/7669587518156705056/);
   assert.match(html, /data-embed-from="embed_page"/);
-  assert.match(html, /fyppppppppppppppppppppppp/);
-  assert.match(html, /ahaanpanday/);
-  assert.match(html, /aneetpadda/);
-  assert.match(html, /saiyaara/);
-  assert.match(html, /audio-originale-7669587549221178144/);
+  assert.match(html, /data-embed-type="curated"/);
+  assert.match(html, /data-video-id-list="7669587518156705056"/);
+  assert.match(html, /href="https:\/\/www\.tiktok\.com\?refer=embed_page"/);
+  assert.match(html, /<a target="_blank" href="https:\/\/www\.tiktok\.com\?refer=embed_page">TikTok<\/a>/);
+  assert.doesNotMatch(html, /audio-originale-7669587549221178144/);
   assert.match(html, /data-video-provider="tiktok"/);
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
