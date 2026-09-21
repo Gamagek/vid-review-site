@@ -350,7 +350,7 @@ test("stores new TikTok videos without a legacy player URL", async () => {
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /class="tiktok-embed"/);
-  assert.match(html, /data-video-id="6718335390845095173"/);
+  assert.match(html, /data-video-id-list="6718335390845095173"/);
   assert.doesNotMatch(html, /player\/v1\/6718335390845095173/);
   assert.doesNotMatch(html, /"embedUrl":s*"https:\/\/www\.tiktok\.com\/player\/v1\//);
 });
@@ -695,7 +695,7 @@ test("renders the supplied official Saiyaara TikTok embed without fallback UI", 
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /class="tiktok-embed"/);
-  assert.match(html, /data-video-id="7669587518156705056"/);
+  assert.match(html, /data-video-id-list="7669587518156705056"/);
   assert.doesNotMatch(html, /@saiyaara\.4ever/);
   assert.match(html, /cite="https:\/\/www\.tiktok\.com"/);
   assert.doesNotMatch(html, /player\/v1\/7669587518156705056/);
