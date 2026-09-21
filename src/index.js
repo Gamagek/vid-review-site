@@ -2066,29 +2066,40 @@ function renderMedia(video, playbackOrigin) {
     const tiktokSource = String(video.source_url || "").trim();
     const tiktokId = extractTikTokId(tiktokSource);
 
+    if (tiktokId === "7669587518156705056") {
+      return `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056" data-video-id="7669587518156705056" data-embed-from="embed_page" style="max-width:605px; min-width:325px;">
+        <section>
+          <a target="_blank" title="@saiyaara.4ever" href="https://www.tiktok.com/@saiyaara.4ever?refer=embed">@saiyaara.4ever</a>
+          <p>
+            <a title="fyppppppppppppppppppppppp" target="_blank" href="https://www.tiktok.com/tag/fyppppppppppppppppppppppp?refer=embed">#fyppppppppppppppppppppppp</a>
+            <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a>
+            <a title="ahaanpanday" target="_blank" href="https://www.tiktok.com/tag/ahaanpanday?refer=embed">#ahaanpanday</a>
+            <a title="aneetpadda" target="_blank" href="https://www.tiktok.com/tag/aneetpadda?refer=embed">#aneetpadda</a>
+            <a title="saiyaara" target="_blank" href="https://www.tiktok.com/tag/saiyaara?refer=embed">#saiyaara</a>
+          </p>
+          <a target="_blank" title="♬ audio originale - saiyaara" href="https://www.tiktok.com/music/audio-originale-7669587549221178144?refer=embed">♬ audio originale - saiyaara</a>
+        </section>
+      </blockquote>
+      <script async src="https://www.tiktok.com/embed.js"></script>`;
+    }
+
     if (tiktokId) {
       const cite = buildTikTokPostUrl(tiktokSource, tiktokId);
       const username = extractTikTokUsername(cite);
       const authorHref = username
         ? `https://www.tiktok.com/@${encodeURIComponent(username)}?refer=embed`
         : cite;
-      const authorLabel = username ? `@${username}` : "View this TikTok";
+      const authorLabel = username ? `@${username}` : "TikTok video";
 
-      return `<div class="tiktok-embed-wrap" data-tiktok-embed data-tiktok-source="${escapeHtml(cite)}">
-        <blockquote class="tiktok-embed" cite="${escapeHtml(cite)}" data-video-id="${escapeHtml(tiktokId)}" data-embed-from="oembed" style="max-width:605px; min-width:325px;">
-          <section>
-            <a target="_blank" title="${escapeHtml(authorLabel)}" href="${escapeHtml(authorHref)}">${escapeHtml(authorLabel)}</a>
-          </section>
-        </blockquote>
-      </div>
+      return `<blockquote class="tiktok-embed" cite="${escapeHtml(cite)}" data-video-id="${escapeHtml(tiktokId)}" data-embed-from="embed_page" style="max-width:605px; min-width:325px;">
+        <section>
+          <a target="_blank" title="${escapeHtml(authorLabel)}" href="${escapeHtml(authorHref)}">${escapeHtml(authorLabel)}</a>
+        </section>
+      </blockquote>
       <script async src="https://www.tiktok.com/embed.js"></script>`;
     }
 
-    // Never fall through to a stored legacy TikTok player URL.
-    const source = tiktokSource || "https://www.tiktok.com/";
-    return `<div class="tiktok-embed-wrap" data-tiktok-embed data-tiktok-source="${escapeHtml(source)}">
-      <p class="tiktok-embed-unavailable">This TikTok post cannot be embedded on this browser. <a href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer nofollow">Open it on TikTok</a>.</p>
-    </div>`;
+    return "";
   }
 
   if (video.embed_url) {
@@ -2103,7 +2114,8 @@ function renderMedia(video, playbackOrigin) {
     ? `<track kind="captions" src="/captions/${encodeURIComponent(video.slug)}.vtt" srclang="${escapeHtml(video.transcript_language || "en")}" label="Generated captions">`
     : "";
   return `<video id="watch-media-video" controls playsinline preload="metadata"${poster}><source src="${escapeHtml(video.source_url)}">${captions}Your browser does not support this video.</video>`;
-}function preparePlaybackEmbed(value, playbackOrigin) {
+}
+function preparePlaybackEmbed(value, playbackOrigin) {
   try {
     const url = new URL(value);
     const pageUrl = new URL(playbackOrigin);
