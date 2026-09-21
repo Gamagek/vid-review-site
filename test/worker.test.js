@@ -708,6 +708,47 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
 });
 
 
+
+
+test("resolves TikTok availability through the authenticated cloud gateway without proxying media", async () => {
+  const gatewayKey = "gateway-test-secret-that-is-longer-than-thirty-two-characters";
+  const context = createTestContext({
+    TIKTOK_GATEWAY_URL: "https://gateway.example/v1/tiktok",
+    TIKTOK_GATEWAY_TOKEN: gatewayKey,
+  });
+  const originalFetch = globalThis.fetch;
+  let outgoing;
+  globalThis.fetch = async (url, options) => {
+    outgoing = { url: String(url), options };
+    return new Response(JSON.stringify({
+      ok: true,
+      provider: "tiktok",
+      video_id: "7669587518156705056",
+      source_url: "https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056",
+      availability: "metadata_available",
+      title: "Saiyaara; A Cinematic Romance",
+      author_name: "Saiyaara",
+      official_embed: true,
+      playback_note: "Playback still runs from TikTok in the visitor's browser.",
+    }), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  try {
+    const response = await send(
+      context,
+      "/api/admin/tiktok/resolve?url=" + encodeURIComponent("https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056"),
+      { method: "GET", headers: { Authorization: secret } },
+    );
+    assert.equal(response.status, 200);
+    const result = await response.json();
+    assert.equal(result.gateway.video_id, "7669587518156705056");
+    assert.equal(result.gateway.availability, "metadata_available");
+    assert.equal(outgoing.url, "https://gateway.example/v1/tiktok/resolve?url=https%3A%2F%2Fwww.tiktok.com%2F%40saiyaara.4ever%2Fvideo%2F7669587518156705056");
+    assert.equal(outgoing.options.headers.Authorization, "Bearer " + gatewayKey);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("redirects the legacy Saiyaara slug to the permanent SEO slug", async () => {
   const context = createTestContext();
   const response = await send(context, "/watch/fyppppppppppppppppppppppp-fyp-ahaanpanday-aneetpadda-saiyaara");
