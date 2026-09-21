@@ -1284,6 +1284,12 @@ function initializeEmbeddedAudioLab() {
   style.id = "vidbest-player-polish-v4-css";
   style.textContent = [
     ".watch-player-stage{position:relative}",
+    ".tiktok-embed-wrap{width:100%;display:flex;justify-content:center;align-items:flex-start;overflow:hidden;background:#000;min-height:0}",
+    ".tiktok-embed-wrap .tiktok-embed{width:100%!important;max-width:605px!important;min-width:0!important;margin:0 auto!important}",
+    ".tiktok-embed-wrap iframe{width:100%!important;max-width:605px!important;min-width:0!important;border:0!important}",
+    ".watch-player[data-provider=\"tiktok\"] .watch-player-stage{height:auto;min-height:0;aspect-ratio:auto}",
+    ".watch-player[data-provider=\"tiktok\"] .tiktok-embed-wrap{height:auto;min-height:0}",
+
     ".watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:min(100%,540px);height:min(78vh,760px);min-height:0;aspect-ratio:9/16;margin-inline:auto;background:#000}",
     ".watch-player[data-provider=\"tiktok\"] .watch-player-stage iframe{width:100%;height:100%;min-height:0;display:block;border:0;object-fit:contain;background:#000}",
     ".watch-player.is-mini[data-provider=\"tiktok\"]{width:min(430px,calc(100vw - 36px))}",
