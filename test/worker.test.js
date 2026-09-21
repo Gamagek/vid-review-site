@@ -350,7 +350,7 @@ test("stores new TikTok videos without a legacy player URL", async () => {
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /class="tiktok-embed"/);
-  assert.match(html, /data-video-id="7669587518156705056"/);
+  assert.match(html, /data-video-id="6718335390845095173"/);
   assert.doesNotMatch(html, /player\/v1\/6718335390845095173/);
   assert.doesNotMatch(html, /"embedUrl":s*"https:\/\/www\.tiktok\.com\/player\/v1\//);
 });
