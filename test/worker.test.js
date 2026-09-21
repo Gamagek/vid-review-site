@@ -697,7 +697,7 @@ test("renders the supplied official Saiyaara TikTok embed without fallback UI", 
   assert.match(html, /class="tiktok-embed"/);
   assert.match(html, /data-video-id="7669587518156705056"/);
   assert.match(html, /@saiyaara\.4ever/);
-  assert.match(html, /cite="https:\/\/www\.tiktok\.com\/@example\/video\/6718335390845095173"/);
+  assert.match(html, /cite="https:\/\/www\.tiktok\.com\/@saiyaara\.4ever\/video\/7669587518156705056"/);
   assert.doesNotMatch(html, /player\/v1\/7669587518156705056/);
   assert.match(html, /data-embed-from="embed_page"/);
   assert.match(html, /fyppppppppppppppppppppppp/);
