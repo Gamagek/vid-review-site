@@ -462,7 +462,7 @@ function parseEmbed(value) {
       return { embed: `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&playsinline=1&enablejsapi=1&origin=${origin}` };
     }
     if (host === "tiktok.com" || host.endsWith(".tiktok.com")) {
-      const id = url.pathname.match(/\/video\/(\d+)/)?.[1] || url.pathname.match(/\/player\/v1\/(\d+)/)?.[1];
+      const id = url.pathname.match(/\/video\/(\d+)/)?.[1];
       return id ? { provider: "tiktok", id, source: url.toString() } : {};
     }
     if (host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch") {
