@@ -2083,6 +2083,12 @@ function renderMedia(video, playbackOrigin) {
       </div>
       <script async src="https://www.tiktok.com/embed.js"></script>`;
     }
+
+    // Never fall through to a stored legacy TikTok player URL.
+    const source = tiktokSource || "https://www.tiktok.com/";
+    return `<div class="tiktok-embed-wrap" data-tiktok-embed data-tiktok-source="${escapeHtml(source)}">
+      <p class="tiktok-embed-unavailable">This TikTok post cannot be embedded on this browser. <a href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer nofollow">Open it on TikTok</a>.</p>
+    </div>`;
   }
 
   if (video.embed_url) {
