@@ -937,6 +937,7 @@ function initializeTikTokReliability(player, stage, frame) {
 
   const sourceUrl = document.querySelector(".source-link")?.href || "";
   const sourceText = sourceUrl ? "Open on TikTok" : "Open original source";
+  const tiktokWrap = stage.querySelector("[data-tiktok-embed]");
   const status = document.createElement("div");
   status.className = "vidbest-tiktok-status";
   status.hidden = true;
@@ -1016,7 +1017,7 @@ function initializeTikTokReliability(player, stage, frame) {
     }
     showStatus(reason + " Trying the SociableKIT fallback.", true);
     retry.disabled = false;
-    const widget = wrap?.querySelector?.("[data-sociablekit-fallback]");
+    const widget = tiktokWrap?.querySelector?.("[data-sociablekit-fallback]");
     if (widget) widget.hidden = false;
   }
 
