@@ -2054,28 +2054,6 @@ function buildTikTokPostUrl(value, id) {
   return `https://www.tiktok.com/player/v1/${id}`;
 }
 
-function buildTikTokEmbedUrl(value) {
-  const id = extractTikTokId(value);
-  if (!/^\d+$/.test(id)) return "";
-  const params = new URLSearchParams({
-    controls: "1",
-    progress_bar: "1",
-    play_button: "1",
-    volume_control: "1",
-    fullscreen_button: "1",
-    timestamp: "1",
-    native_context_menu: "1",
-    closed_caption: "1",
-    loop: "1",
-    rel: "0",
-    autoplay: "0",
-    muted: "0",
-    music_info: "0",
-    description: "0",
-  });
-  return `https://www.tiktok.com/player/v1/${id}?${params.toString()}`;
-}
-
 function watchDisplayTitle(video) {
   return /saiyaara/i.test(String(video.slug || "")) || /saiyaara/i.test(String(video.title || ""))
     ? "Saiyaara; A Cinematic Romance"
@@ -2084,44 +2062,43 @@ function watchDisplayTitle(video) {
 
 function renderMedia(video, playbackOrigin) {
   const provider = String(video.provider || "").toLowerCase();
-  if (video.embed_url || provider === "tiktok") {
-    let source = video.embed_url || "";
-    if (provider === "tiktok") {
-      source = buildTikTokEmbedUrl(source || video.source_url);
-    }
-    if (source) {
-      const embedUrl = preparePlaybackEmbed(source, playbackOrigin);
-      const isTikTok = provider === "tiktok";
-      if (isTikTok) {
-        const tiktokSource = video.source_url || source;
-        const tiktokId = extractTikTokId(tiktokSource);
-        if (tiktokId) {
-          const cite = buildTikTokPostUrl(tiktokSource, tiktokId);
-          const username = extractTikTokUsername(cite);
-          const authorHref = username ? `https://www.tiktok.com/@${encodeURIComponent(username)}?refer=embed` : cite;
-          const authorLabel = username ? `@${username}` : "View this TikTok";
-          return `<div class="tiktok-embed-wrap" data-tiktok-embed data-tiktok-source="${escapeHtml(cite)}">
-            <blockquote class="tiktok-embed" cite="${escapeHtml(cite)}" data-video-id="${escapeHtml(tiktokId)}" data-embed-from="oembed">
-              <section aria-label="TikTok video">
-                <a target="_blank" rel="noopener noreferrer nofollow" title="${escapeHtml(authorLabel)}" href="${escapeHtml(authorHref)}">${escapeHtml(authorLabel)}</a>
-              </section>
-            </blockquote>
-          </div>
-          <script async src="https://www.tiktok.com/embed.js"></script>`;
-        }
-      }
-      const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
-      return `<iframe id="watch-media-frame" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"${sandbox}></iframe>`;
+
+  if (provider === "tiktok") {
+    const tiktokSource = String(video.source_url || video.embed_url || "").trim();
+    const tiktokId = extractTikTokId(tiktokSource);
+
+    if (tiktokId) {
+      const cite = buildTikTokPostUrl(tiktokSource, tiktokId);
+      const username = extractTikTokUsername(cite);
+      const authorHref = username
+        ? `https://www.tiktok.com/@${encodeURIComponent(username)}?refer=embed`
+        : cite;
+      const authorLabel = username ? `@${username}` : "View this TikTok";
+
+      return `<div class="tiktok-embed-wrap" data-tiktok-embed data-tiktok-source="${escapeHtml(cite)}">
+        <blockquote class="tiktok-embed" cite="${escapeHtml(cite)}" data-video-id="${escapeHtml(tiktokId)}" data-embed-from="oembed" style="max-width:605px; min-width:325px;">
+          <section>
+            <a target="_blank" title="${escapeHtml(authorLabel)}" href="${escapeHtml(authorHref)}">${escapeHtml(authorLabel)}</a>
+          </section>
+        </blockquote>
+      </div>
+      <script async src="https://www.tiktok.com/embed.js"></script>`;
     }
   }
+
+  if (video.embed_url) {
+    const embedUrl = preparePlaybackEmbed(video.embed_url, playbackOrigin);
+    if (embedUrl) {
+      return `<iframe id="watch-media-frame" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"></iframe>`;
+    }
+  }
+
   const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}"` : "";
   const captions = video.has_captions
     ? `<track kind="captions" src="/captions/${encodeURIComponent(video.slug)}.vtt" srclang="${escapeHtml(video.transcript_language || "en")}" label="Generated captions">`
     : "";
   return `<video id="watch-media-video" controls playsinline preload="metadata"${poster}><source src="${escapeHtml(video.source_url)}">${captions}Your browser does not support this video.</video>`;
-}
-
-function preparePlaybackEmbed(value, playbackOrigin) {
+}function preparePlaybackEmbed(value, playbackOrigin) {
   try {
     const url = new URL(value);
     const pageUrl = new URL(playbackOrigin);
@@ -2133,25 +2110,6 @@ function preparePlaybackEmbed(value, playbackOrigin) {
     }
     if (url.hostname === "player.twitch.tv" || url.hostname === "clips.twitch.tv") {
       url.searchParams.set("parent", pageUrl.hostname);
-    }
-    if (hostname === "tiktok.com" || hostname.endsWith(".tiktok.com")) {
-      // Use TikTok's documented player controls rather than trying to replace its player.
-      // Keep TikTok controls clear, replay the current post, and avoid the
-      // end-of-playback related-video takeover.
-      url.searchParams.set("controls", "1");
-      url.searchParams.set("progress_bar", "1");
-      url.searchParams.set("play_button", "1");
-      url.searchParams.set("volume_control", "1");
-      url.searchParams.set("fullscreen_button", "1");
-      url.searchParams.set("timestamp", "1");
-      url.searchParams.set("native_context_menu", "1");
-      url.searchParams.set("closed_caption", "1");
-      url.searchParams.set("loop", "1");
-      url.searchParams.set("rel", "0");
-      url.searchParams.set("autoplay", "0");
-      url.searchParams.set("muted", "0");
-      url.searchParams.set("music_info", "0");
-      url.searchParams.set("description", "0");
     }
     return url.toString();
   } catch {
