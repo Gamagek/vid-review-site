@@ -25,9 +25,9 @@ function initializeWatchPage() {
   enhanceCommentForm();
   enhanceNativePlayer();
   initializePersistentPlayer();
-  initializeEmbeddedMediaTools();
   initializeTikTokEmbedScript();
   initializeTikTokPopupFallback();
+  initializeEmbeddedMediaTools();
   initializeAudioLab();
   initializeEmbeddedAudioLab();
   repairNativePlayerControls();
@@ -854,7 +854,7 @@ function initializeTikTokPopupFallback() {
 
   const fallback = document.createElement("div");
   fallback.className = "vidbest-tiktok-fallback";
-  fallback.innerHTML = "<span>TikTok's embedded player can be restricted by the browser or TikTok CDN.</span>";
+  fallback.innerHTML = "<strong>Alternate TikTok player</strong><span>Using your SociableKIT widget because the official TikTok embed did not become available.</span>";
 
   const button = document.createElement("button");
   button.type = "button";
@@ -869,6 +869,8 @@ function initializeTikTokPopupFallback() {
     }
     try { popup.focus(); } catch {}
   });
+  const widget = wrap.querySelector("[data-sociablekit-fallback]");
+  if (widget) fallback.append(widget);
   fallback.append(button);
   wrap.insertAdjacentElement("afterend", fallback);
 
@@ -895,28 +897,40 @@ function initializeTikTokEmbedScript() {
   const embeds = [...document.querySelectorAll(".tiktok-embed")];
   if (!embeds.length) return;
 
-  let script = document.querySelector('script[data-vidbest-tiktok-embed], script[src="https://www.tiktok.com/embed.js"]');
-  if (!script) {
-    script = document.createElement("script");
-    script.src = "https://www.tiktok.com/embed.js";
-    script.async = true;
-    script.dataset.vidbestTikTokEmbed = "1";
+  const player = document.querySelector("#watch-player");
+  const stage = player?.querySelector(".watch-player-stage");
+  if (!player || !stage) return;
+
+  const attachWhenReady = () => {
+    const iframe = stage.querySelector(".tiktok-embed iframe");
+    if (!iframe) return false;
+    initializeEmbeddedMediaTools();
+    return true;
+  };
+
+  const observer = new MutationObserver(() => {
+    if (attachWhenReady()) observer.disconnect();
+  });
+  observer.observe(stage, { childList: true, subtree: true });
+
+  const script = document.querySelector('script[data-vidbest-tiktok-embed], script[src="https://www.tiktok.com/embed.js"]');
+  if (script) {
+    if (script.dataset.vidbestObserved === "1") return;
+    script.dataset.vidbestObserved = "1";
     script.addEventListener("error", () => {
-      const player = document.querySelector("#watch-player");
-      const stage = player?.querySelector(".watch-player-stage");
-      if (!player || !stage) return;
-      let status = player.querySelector(".vidbest-tiktok-load-status");
-      if (!status) {
-        status = document.createElement("div");
+      const fallback = stage.querySelector("[data-sociablekit-fallback]");
+      if (fallback) fallback.hidden = false;
+      const status = player.querySelector(".vidbest-tiktok-load-status") || document.createElement("div");
+      if (!status.parentNode) {
         status.className = "vidbest-tiktok-load-status";
         stage.insertAdjacentElement("afterend", status);
       }
-      status.textContent = "TikTok's embed service could not load in this browser. Use the TikTok link below to view the original.";
+      status.textContent = "TikTok's official embed service could not load here. Trying the alternate player.";
     }, { once: true });
-    document.head.appendChild(script);
   }
+  if (attachWhenReady()) observer.disconnect();
+  setTimeout(() => observer.disconnect(), 15000);
 }
-
 function initializeTikTokReliability(player, stage, frame) {
   if (!player || !stage || !frame || frame.dataset.vidbestTikTokReliability === "1") return;
   frame.dataset.vidbestTikTokReliability = "1";
@@ -1000,8 +1014,10 @@ function initializeTikTokReliability(player, stage, frame) {
       retryTimer = setTimeout(restartPlayer, 500);
       return;
     }
-    showStatus(reason + " It may be a temporary TikTok/CDN restriction.");
+    showStatus(reason + " Trying the SociableKIT fallback.", true);
     retry.disabled = false;
+    const widget = wrap?.querySelector?.("[data-sociablekit-fallback]");
+    if (widget) widget.hidden = false;
   }
 
   retry.addEventListener("click", () => {
