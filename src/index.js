@@ -355,7 +355,7 @@ function securityHeaders(headers, html = false, scriptNonce = "") {
     const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.tiktok.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self' https://www.tiktok.com https://*.tiktok.com https://*.tiktokcdn.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
     );
   }
   return headers;
@@ -1960,6 +1960,15 @@ function extractTikTokId(value) {
   }
 }
 
+function buildTikTokPostUrl(value, id) {
+  try {
+    const url = new URL(value);
+    const videoMatch = url.pathname.match(/\/video\/(\d+)/);
+    if (videoMatch?.[1] === id) return url.toString();
+  } catch {}
+  return `https://www.tiktok.com/player/v1/${id}`;
+}
+
 function buildTikTokEmbedUrl(value) {
   const id = extractTikTokId(value);
   if (!/^\d+$/.test(id)) return "";
@@ -1999,10 +2008,17 @@ function renderMedia(video, playbackOrigin) {
       const embedUrl = preparePlaybackEmbed(source, playbackOrigin);
       const isTikTok = provider === "tiktok";
       if (isTikTok) {
-        const repaired = buildTikTokEmbedUrl(embedUrl);
-        if (repaired) {
-          const finalUrl = preparePlaybackEmbed(repaired, playbackOrigin);
-          return `<iframe id="watch-media-frame" src="${escapeHtml(finalUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe>`;
+        const tiktokId = extractTikTokId(source || video.source_url);
+        if (tiktokId) {
+          const cite = buildTikTokPostUrl(source || video.source_url, tiktokId);
+          return `<div class="tiktok-embed-wrap">
+            <blockquote class="tiktok-embed" cite="${escapeHtml(cite)}" data-video-id="${escapeHtml(tiktokId)}" data-embed-from="oembed">
+              <section aria-label="TikTok video">
+                <a target="_blank" title="Open this video on TikTok" href="${escapeHtml(cite)}">Open this video on TikTok</a>
+              </section>
+            </blockquote>
+          </div>
+          <script src="https://www.tiktok.com/embed.js" defer></script>`;
         }
       }
       const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
