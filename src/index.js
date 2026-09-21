@@ -2024,13 +2024,14 @@ function renderMedia(video, playbackOrigin) {
           const username = extractTikTokUsername(cite);
           const authorHref = username ? `https://www.tiktok.com/@${encodeURIComponent(username)}?refer=embed` : cite;
           const authorLabel = username ? `@${username}` : "View this TikTok";
-          return `<div class="tiktok-embed-wrap" data-tiktok-embed>
+          return `<div class="tiktok-embed-wrap" data-tiktok-embed data-tiktok-source="${escapeHtml(cite)}">
             <blockquote class="tiktok-embed" cite="${escapeHtml(cite)}" data-video-id="${escapeHtml(tiktokId)}" data-embed-from="oembed">
               <section aria-label="TikTok video">
                 <a target="_blank" rel="noopener noreferrer nofollow" title="${escapeHtml(authorLabel)}" href="${escapeHtml(authorHref)}">${escapeHtml(authorLabel)}</a>
               </section>
             </blockquote>
-          </div>`;
+          </div>
+          <script async src="https://www.tiktok.com/embed.js"></script>`;
         }
       }
       const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
