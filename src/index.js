@@ -2017,9 +2017,10 @@ function renderMedia(video, playbackOrigin) {
       const embedUrl = preparePlaybackEmbed(source, playbackOrigin);
       const isTikTok = provider === "tiktok";
       if (isTikTok) {
-        const tiktokId = extractTikTokId(source || video.source_url);
+        const tiktokSource = video.source_url || source;
+        const tiktokId = extractTikTokId(tiktokSource);
         if (tiktokId) {
-          const cite = buildTikTokPostUrl(source || video.source_url, tiktokId);
+          const cite = buildTikTokPostUrl(tiktokSource, tiktokId);
           const username = extractTikTokUsername(cite);
           const authorHref = username ? `https://www.tiktok.com/@${encodeURIComponent(username)}?refer=embed` : cite;
           const authorLabel = username ? `@${username}` : "View this TikTok";
