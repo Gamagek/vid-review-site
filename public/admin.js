@@ -364,6 +364,7 @@ function renderTikTokPreview(sourceUrl, videoId) {
 
   shell.append(blockquote, status, fallback);
   ui.preview.append(shell);
+  void inspectTikTokFromCloud(shell, status, sourceUrl);
 
   const ready = () => {
     const iframe = shell.querySelector("iframe");
@@ -400,6 +401,32 @@ function renderTikTokPreview(sourceUrl, videoId) {
       fallback.hidden = false;
     }
   }, 8000);
+}
+
+async function inspectTikTokFromCloud(shell, status, sourceUrl) {
+  try {
+    const result = await adminApi(`/api/admin/tiktok/resolve?url=${encodeURIComponent(sourceUrl)}`);
+    const gateway = result.gateway || {};
+    if (gateway.ok) {
+      const title = String(gateway.title || "").trim();
+      const author = String(gateway.author_name || "").trim();
+      if (!ui.title.value.trim() && title) ui.title.value = title;
+      if (!ui.thumbnail.value.trim() && gateway.thumbnail_url) ui.thumbnail.value = gateway.thumbnail_url;
+      status.textContent = [
+        "Cloud metadata verified.",
+        author ? `Creator: ${author}.` : "",
+        "Playback still loads from TikTok in the browser.",
+      ].filter(Boolean).join(" ");
+      status.className = "admin-tiktok-preview-status";
+    } else {
+      status.textContent = gateway.reason || "TikTok did not return metadata from the cloud gateway.";
+      status.className = "admin-tiktok-preview-status error";
+    }
+  } catch (error) {
+    status.textContent = "Cloud check unavailable; trying TikTok official embed directly.";
+    status.className = "admin-tiktok-preview-status";
+    shell.dataset.cloudResolverError = error.message || "unknown";
+  }
 }
 
 let tiktokEmbedScriptPromise = null;
