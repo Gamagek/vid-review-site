@@ -290,12 +290,19 @@ function updatePreview() {
   const r2Source = ui.r2Key.dataset.url || "";
   const target = adminState.sourceMode === "upload" ? r2Source : source;
   if (!target) {
-    const text = document.createElement("span");
-    text.textContent = "Secure media preview appears here";
-    ui.preview.append(text);
+    const empty = document.createElement("span");
+    empty.textContent = "Secure media preview appears here";
+    ui.preview.append(empty);
     return;
   }
+
   const parsed = parseEmbed(target);
+
+  if (parsed.provider === "tiktok") {
+    renderTikTokPreview(target, parsed.id);
+    return;
+  }
+
   if (parsed.embed) {
     const iframe = document.createElement("iframe");
     iframe.src = parsed.embed;
@@ -320,6 +327,127 @@ function updatePreview() {
   }
 }
 
+function renderTikTokPreview(sourceUrl, videoId) {
+  const shell = document.createElement("div");
+  shell.className = "admin-tiktok-preview";
+  shell.dataset.tiktokPreview = "1";
+
+  const status = document.createElement("p");
+  status.className = "admin-tiktok-preview-status";
+  status.textContent = "Loading TikTok's official embed…";
+
+  const blockquote = document.createElement("blockquote");
+  blockquote.className = "tiktok-embed";
+  blockquote.setAttribute("cite", sourceUrl);
+  blockquote.dataset.videoId = videoId;
+  blockquote.dataset.embedFrom = "oembed";
+  blockquote.style.maxWidth = "605px";
+  blockquote.style.minWidth = "325px";
+  blockquote.style.width = "100%";
+
+  const section = document.createElement("section");
+  const link = document.createElement("a");
+  link.href = sourceUrl;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer nofollow";
+  link.textContent = "View this TikTok on TikTok";
+  section.append(link);
+  blockquote.append(section);
+
+  const fallback = document.createElement("a");
+  fallback.className = "admin-tiktok-preview-fallback";
+  fallback.href = sourceUrl;
+  fallback.target = "_blank";
+  fallback.rel = "noopener noreferrer nofollow";
+  fallback.hidden = true;
+  fallback.textContent = "TikTok embed unavailable here — open the original post";
+
+  shell.append(blockquote, status, fallback);
+  ui.preview.append(shell);
+  void inspectTikTokFromCloud(shell, status, sourceUrl);
+
+  const ready = () => {
+    const iframe = shell.querySelector("iframe");
+    if (iframe) {
+      status.textContent = "TikTok official player is ready.";
+      status.className = "admin-tiktok-preview-status success";
+      fallback.hidden = true;
+      return true;
+    }
+    return false;
+  };
+
+  const observer = new MutationObserver(() => {
+    if (ready()) observer.disconnect();
+  });
+  observer.observe(shell, { childList: true, subtree: true });
+
+  ensureTikTokEmbedScript();
+
+  // TikTok's documented embed.js automatically processes blockquotes.
+  // If the current SDK exposes a render helper, use it as progressive
+  // enhancement for dynamically inserted admin previews. It is not required.
+  try {
+    if (window.tiktokEmbed?.lib?.render) {
+      window.tiktokEmbed.lib.render();
+    }
+  } catch {}
+
+  setTimeout(() => {
+    observer.disconnect();
+    if (!ready()) {
+      status.textContent = "TikTok did not provide an embeddable player on this browser or network.";
+      status.className = "admin-tiktok-preview-status error";
+      fallback.hidden = false;
+    }
+  }, 8000);
+}
+
+async function inspectTikTokFromCloud(shell, status, sourceUrl) {
+  try {
+    const result = await adminApi(`/api/admin/tiktok/resolve?url=${encodeURIComponent(sourceUrl)}`);
+    const gateway = result.gateway || {};
+    if (gateway.ok) {
+      const title = String(gateway.title || "").trim();
+      const author = String(gateway.author_name || "").trim();
+      if (!ui.title.value.trim() && title) ui.title.value = title;
+      if (!ui.thumbnail.value.trim() && gateway.thumbnail_url) ui.thumbnail.value = gateway.thumbnail_url;
+      status.textContent = [
+        "Cloud metadata verified.",
+        author ? `Creator: ${author}.` : "",
+        "Playback still loads from TikTok in the browser.",
+      ].filter(Boolean).join(" ");
+      status.className = "admin-tiktok-preview-status";
+    } else {
+      status.textContent = gateway.reason || "TikTok did not return metadata from the cloud gateway.";
+      status.className = "admin-tiktok-preview-status error";
+    }
+  } catch (error) {
+    status.textContent = "Cloud check unavailable; trying TikTok official embed directly.";
+    status.className = "admin-tiktok-preview-status";
+    shell.dataset.cloudResolverError = error.message || "unknown";
+  }
+}
+
+let tiktokEmbedScriptPromise = null;
+
+function ensureTikTokEmbedScript() {
+  const existing = document.querySelector('script[data-vidbest-tiktok-sdk]');
+  if (existing) return tiktokEmbedScriptPromise || Promise.resolve();
+
+  tiktokEmbedScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://www.tiktok.com/embed.js";
+    script.dataset.vidbestTikTokSdk = "1";
+    script.addEventListener("load", resolve, { once: true });
+    script.addEventListener("error", () => reject(new Error("TikTok embed SDK failed to load")), { once: true });
+    document.head.append(script);
+  });
+
+  return tiktokEmbedScriptPromise.catch(() => {});
+}
+
 function parseEmbed(value) {
   try {
     const url = new URL(value, location.origin);
@@ -335,7 +463,7 @@ function parseEmbed(value) {
     }
     if (host === "tiktok.com" || host.endsWith(".tiktok.com")) {
       const id = url.pathname.match(/\/video\/(\d+)/)?.[1] || url.pathname.match(/\/player\/v1\/(\d+)/)?.[1];
-      return id ? { embed: `https://www.tiktok.com/player/v1/${id}?description=1&music_info=1` } : {};
+      return id ? { provider: "tiktok", id, source: url.toString() } : {};
     }
     if (host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch") {
       return { embed: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url.toString())}&show_text=false&width=1280` };

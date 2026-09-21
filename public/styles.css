@@ -752,3 +752,48 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
     max-height: 64vh;
   }
 }
+
+
+/* Admin smart provider preview */
+.admin-tiktok-preview {
+  width: min(100%, 605px);
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #050711;
+}
+.admin-tiktok-preview .tiktok-embed {
+  width: 100% !important;
+  max-width: 605px !important;
+  min-width: 325px !important;
+  margin: 0 auto !important;
+}
+.admin-tiktok-preview iframe {
+  width: 100% !important;
+  max-width: 605px !important;
+  border: 0 !important;
+}
+.admin-tiktok-preview-status {
+  margin: 0;
+  padding: 9px 12px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  color: #9aa3ba;
+  background: #080a12;
+  font-size: .72rem;
+  line-height: 1.45;
+}
+.admin-tiktok-preview-status.success { color: #74e8ad; }
+.admin-tiktok-preview-status.error { color: #ff9cad; }
+.admin-tiktok-preview-fallback {
+  display: block;
+  margin: 10px 12px 12px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  color: #cfd6e8;
+  background: rgba(255,255,255,.06);
+  text-decoration: none;
+  font-size: .74rem;
+}
+.admin-tiktok-preview-fallback:hover {
+  background: rgba(255,255,255,.1);
+}

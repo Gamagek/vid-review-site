@@ -258,6 +258,11 @@ async function route(request, env, ctx) {
     return discoverVideos(request, env);
   }
 
+  if (path === "/api/admin/tiktok/resolve" && request.method === "GET") {
+    await requireAdmin(request, env);
+    return resolveTikTokViaGateway(request, env);
+  }
+
   if (path === "/api/admin/discovery-requests" && request.method === "GET") {
     await requireAdmin(request, env);
     return listDiscoveryRequests(request, env);
@@ -1472,6 +1477,77 @@ async function generateAiCopy(request, env) {
   });
 }
 
+function tiktokGatewayConfiguration(env) {
+  const token = String(env.TIKTOK_GATEWAY_TOKEN || "");
+  if (token.length < 32) throw new AppError(503, "TIKTOK_GATEWAY_TOKEN is not configured");
+
+  let base;
+  try {
+    base = new URL(String(env.TIKTOK_GATEWAY_URL || ""));
+  } catch {
+    throw new AppError(503, "TIKTOK_GATEWAY_URL is not configured");
+  }
+  if (base.protocol !== "https:" || base.username || base.password) {
+    throw new AppError(503, "TIKTOK_GATEWAY_URL must be a credential-free HTTPS URL");
+  }
+  base.pathname = base.pathname.replace(/\/$/, "");
+  base.search = "";
+  base.hash = "";
+  return { base: base.toString().replace(/\/$/, ""), token };
+}
+
+async function resolveTikTokViaGateway(request, env) {
+  const input = cleanText(new URL(request.url).searchParams.get("url"), 2000);
+  if (!input) throw new AppError(400, "TikTok URL is required");
+
+  let source;
+  try {
+    source = new URL(input);
+  } catch {
+    throw new AppError(400, "Enter a valid TikTok video URL");
+  }
+
+  const host = source.hostname.toLowerCase();
+  if (host !== "tiktok.com" && !host.endsWith(".tiktok.com")) {
+    throw new AppError(400, "Only TikTok video URLs are supported");
+  }
+
+  const { base, token } = tiktokGatewayConfiguration(env);
+  let response;
+  try {
+    response = await fetch(base + "/resolve?url=" + encodeURIComponent(source.toString()), {
+      headers: {
+        Accept: "application/json",
+        Authorization: "Bearer " + token,
+      },
+      redirect: "error",
+      signal: AbortSignal.timeout(12000),
+    });
+  } catch (error) {
+    if (error?.name === "TimeoutError" || error?.name === "AbortError") {
+      throw new AppError(504, "TikTok cloud gateway timed out");
+    }
+    throw new AppError(502, "TikTok cloud gateway is unavailable");
+  }
+
+  const text = await response.text();
+  if (encoder.encode(text).byteLength > 300_000) {
+    throw new AppError(502, "TikTok cloud gateway response is too large");
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(text || "{}");
+  } catch {
+    throw new AppError(502, "TikTok cloud gateway returned invalid JSON");
+  }
+
+  if (!response.ok) {
+    throw new AppError(502, payload.error || "TikTok cloud gateway returned HTTP " + response.status);
+  }
+
+  return json({ success: true, gateway: payload });
+}
 function teamworkConfiguration(env) {
   const secret = String(env.TEAMWORK_API_KEY || "");
   let base;
