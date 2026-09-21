@@ -186,7 +186,7 @@ async function startMutedPlayback() {
   }
   const frame = persistentPlayer?.querySelector("iframe");
   const provider = String(document.body.dataset.videoProvider || "").toLowerCase();
-  if (frame && ["youtube", "vimeo", "tiktok"].includes(provider)) {
+  if (frame && ["youtube", "vimeo"].includes(provider)) {
     playerProviderCommand("mute");
     playerProviderCommand("playVideo");
     return true;
@@ -1107,8 +1107,8 @@ function initializeEmbeddedAudioLab() {
   style.textContent = [
     ".watch-player-stage{position:relative}",
     ".tiktok-embed-wrap{width:100%;display:flex;justify-content:center;align-items:flex-start;overflow:hidden;background:#000;min-height:0;border-radius:0 0 14px 14px}",
-    ".tiktok-embed-wrap .tiktok-embed{width:100%!important;max-width:605px!important;min-width:325px!important;margin:0 auto!important}",
-    ".tiktok-embed-wrap iframe{width:100%!important;max-width:605px!important;min-width:325px!important;border:0!important}",
+    ".tiktok-embed-wrap .tiktok-embed{width:100%!important;max-width:780px!important;min-width:325px!important;margin:0 auto!important}",
+    ".tiktok-embed-wrap iframe{width:100%!important;max-width:780px!important;min-width:325px!important;border:0!important}",
     ".vidbest-tiktok-load-status{padding:10px 12px;border-top:1px solid rgba(255,255,255,.08);background:#080a12;color:#9aa3ba;font-size:12px;line-height:1.5}",
     ".vidbest-tiktok-fallback{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08);background:#080a12;color:#9aa3ba;font-size:12px;line-height:1.45}",
     ".vidbest-tiktok-fallback[hidden]{display:none!important}",
