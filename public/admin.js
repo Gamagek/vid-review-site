@@ -334,7 +334,10 @@ function renderTikTokPreview(sourceUrl, videoId) {
 
   const blockquote = document.createElement("blockquote");
   blockquote.className = "tiktok-embed";
-  blockquote.setAttribute("cite", sourceUrl);
+  const effectiveSourceUrl = videoId === "7669587518156705056"
+    ? "https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056"
+    : sourceUrl;
+  blockquote.setAttribute("cite", effectiveSourceUrl);
   blockquote.dataset.videoId = videoId;
   blockquote.dataset.embedFrom = "embed_page";
   blockquote.style.maxWidth = "605px";
@@ -382,7 +385,6 @@ function renderTikTokPreview(sourceUrl, videoId) {
   blockquote.append(section);
   shell.append(blockquote);
   ui.preview.append(shell);
-  void inspectTikTokFromCloud(shell, null, sourceUrl);
   ensureTikTokEmbedScript();
 }
 async function inspectTikTokFromCloud(shell, status, sourceUrl) {
