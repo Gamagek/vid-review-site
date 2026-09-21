@@ -1962,7 +1962,7 @@ function extractTikTokId(value) {
 
 function extractTikTokUsername(value) {
   try {
-    const match = new URL(value).pathname.match(/^\\/@([^/]+)/);
+    const match = new URL(value).pathname.match(/^\/@([^/]+)/);
     return match?.[1] ? decodeURIComponent(match[1]) : "";
   } catch {
     return "";
