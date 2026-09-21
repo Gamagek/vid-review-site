@@ -186,7 +186,7 @@ async function startMutedPlayback() {
   }
   const frame = persistentPlayer?.querySelector("iframe");
   const provider = String(document.body.dataset.videoProvider || "").toLowerCase();
-  if (frame && ["youtube", "vimeo"].includes(provider)) {
+  if (frame && ["youtube", "vimeo", "tiktok"].includes(provider)) {
     playerProviderCommand("mute");
     playerProviderCommand("playVideo");
     return true;
@@ -216,9 +216,25 @@ function playerProviderCommand(method, args = []) {
           : method === "mute" ? { method: "setVolume", value: 0 }
             : method === "unMute" ? { method: "setVolume", value: 1 }
               : method === "setPlaybackRate" ? { method: "setPlaybackRate", value: Number(args[0]) }
-                : method === "seekTo" ? { method: "setCurrentTime", value: Number(args[0]) }
-                  : { method };
+              : method === "seekTo" ? { method: "setCurrentTime", value: Number(args[0]) }
+                : { method };
       frame.contentWindow?.postMessage(JSON.stringify(payload), "https://player.vimeo.com");
+      return;
+    }
+    if (provider === "tiktok") {
+      const type = method === "playVideo" ? "play"
+        : method === "pauseVideo" ? "pause"
+          : method === "mute" ? "mute"
+            : method === "unMute" ? "unMute"
+            : method === "seekTo" ? "seekTo"
+              : "";
+      if (!type) return;
+      const value = type === "seekTo" ? Number(args[0]) : undefined;
+      frame.contentWindow?.postMessage({
+        type,
+        ...(value === undefined ? {} : { value }),
+        "x-tiktok-player": true,
+      }, "https://www.tiktok.com");
     }
   } catch {
     // Provider controls remain the fallback when its API rejects a command.
@@ -623,7 +639,8 @@ function initializeEmbeddedMediaTools() {
 
   const provider = String(document.body.dataset.videoProvider || inferProvider(frame)).toLowerCase();
 
-  const remote = provider === "youtube" || provider === "vimeo";
+  const remote = provider === "youtube" || provider === "vimeo" || provider === "tiktok";
+  const supportsPlaybackRate = provider === "youtube" || provider === "vimeo";
   const state = { playing: false, muted: false, rate: 1, currentTime: 0 };
 
   function inferProvider(element) {
@@ -805,6 +822,21 @@ function initializeEmbeddedMediaTools() {
     if (event.source !== frame.contentWindow) return;
     try {
       const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+      if (provider === "tiktok" && data?.["x-tiktok-player"]) {
+        if (data.type === "onStateChange") state.playing = Number(data.value) === 1;
+        if (data.type === "onMute") state.muted = Boolean(data.value);
+        if (data.type === "onCurrentTime") {
+          const time = Number(data.value?.currentTime);
+          if (Number.isFinite(time)) state.currentTime = time;
+        }
+        if (data.type === "onPlayerError") {
+          const code = Number(data.value?.errorCode);
+          const type = String(data.value?.errorType || "PLAYER_ERROR");
+          message(`TikTok player: ${type}${Number.isFinite(code) ? ` (${code})` : ""}`);
+        }
+        if (data.type === "onPlayerReady") message("TikTok official player ready · provider controls active");
+        return;
+      }
       const info = data && (data.info || data);
       const time = Number(info && (info.currentTime != null ? info.currentTime : data.currentTime));
       if (Number.isFinite(time)) state.currentTime = time;
