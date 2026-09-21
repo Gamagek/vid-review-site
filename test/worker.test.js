@@ -659,7 +659,8 @@ test("renders TikTok embeds for clean controls, reliable replay, and provider me
   const html = await page.text();
   assert.match(html, /class="tiktok-embed"/);
   assert.match(html, /data-video-id="6718335390845095173"/);
-  assert.match(html, /src="https:\/\/www\.tiktok\.com\/embed\.js"/);
+  assert.match(html, /@example/);
+  assert.doesNotMatch(html, /player\/v1\/6718335390845095173/);
   assert.doesNotMatch(html, /rel=1/);
   assert.doesNotMatch(html, /description=1/);
   assert.doesNotMatch(html, /music_info=1/);
@@ -692,7 +693,8 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   assert.ok(html.includes("<h1>Saiyaara; A Cinematic Romance</h1>"));
   assert.ok(html.includes('<blockquote class="tiktok-embed"'));
   assert.ok(html.includes('data-video-id="6718335390845095173"'));
-  assert.ok(html.includes('src="https://www.tiktok.com/embed.js"'));
+  assert.ok(html.includes('@example'));
+  assert.ok(html.includes('data-tiktok-embed'));
   assert.ok(html.includes('data-video-provider="tiktok"'));
 });
 
