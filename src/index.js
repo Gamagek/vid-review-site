@@ -1876,6 +1876,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
+  <script async src="https://www.tiktok.com/embed.js"></script>
   <script src="/watch.js" defer></script>
 </head>
 <body class="watch-page" data-video-id="${Number(video.id)}" data-video-provider="${escapeHtml(video.provider)}">
@@ -2031,7 +2032,6 @@ function renderMedia(video, playbackOrigin) {
               </section>
             </blockquote>
           </div>
-          <script async src="https://www.tiktok.com/embed.js"></script>`;
         }
       }
       const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
