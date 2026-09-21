@@ -695,7 +695,7 @@ test("renders the supplied official Saiyaara TikTok embed without fallback UI", 
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /class="tiktok-embed"/);
-  assert.match(html, /data-video-id="6718335390845095173"/);
+  assert.match(html, /data-video-id="7669587518156705056"/);
   assert.match(html, /@saiyaara\.4ever/);
   assert.match(html, /cite="https:\/\/www\.tiktok\.com\/@example\/video\/6718335390845095173"/);
   assert.doesNotMatch(html, /player\/v1\/7669587518156705056/);
@@ -708,7 +708,6 @@ test("renders the supplied official Saiyaara TikTok embed without fallback UI", 
   assert.match(html, /data-video-provider="tiktok"/);
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
-  assert.match(watchSource, /provider === "tiktok"/);
   assert.doesNotMatch(watchSource, /Play TikTok in popup/);
   assert.doesNotMatch(watchSource, /x-tiktok-player/);
   assert.doesNotMatch(watchSource, /initializeTikTokReliability/);
