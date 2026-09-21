@@ -657,13 +657,9 @@ test("renders TikTok embeds for clean controls, reliable replay, and provider me
   const page = await send(context, "/watch/tiktok-player-test");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.ok(html.includes("https://www.tiktok.com/player/v1/6718335390845095173"));
-  assert.match(html, /loop=1/);
-  assert.match(html, /rel=0/);
-  assert.match(html, /autoplay=0/);
-  assert.match(html, /muted=0/);
-  assert.match(html, /description=0/);
-  assert.match(html, /music_info=0/);
+  assert.match(html, /class="tiktok-embed"/);
+  assert.match(html, /data-video-id="6718335390845095173"/);
+  assert.match(html, /src="https:\/\/www\.tiktok\.com\/embed\.js"/);
   assert.doesNotMatch(html, /rel=1/);
   assert.doesNotMatch(html, /description=1/);
   assert.doesNotMatch(html, /music_info=1/);
@@ -694,13 +690,9 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   const html = await page.text();
   assert.ok(html.includes("<title>Saiyaara; A Cinematic Romance | Vid.Best</title>"));
   assert.ok(html.includes("<h1>Saiyaara; A Cinematic Romance</h1>"));
-  assert.ok(html.includes("https://www.tiktok.com/player/v1/6718335390845095173"));
-  assert.ok(html.includes("loop=1"));
-  assert.ok(html.includes("rel=0"));
-  assert.ok(html.includes("autoplay=0"));
-  assert.ok(html.includes("muted=0"));
-  assert.ok(html.includes("description=0"));
-  assert.ok(html.includes("music_info=0"));
+  assert.ok(html.includes('<blockquote class="tiktok-embed"'));
+  assert.ok(html.includes('data-video-id="6718335390845095173"'));
+  assert.ok(html.includes('src="https://www.tiktok.com/embed.js"'));
   assert.ok(html.includes('data-video-provider="tiktok"'));
 });
 
