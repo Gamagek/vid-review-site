@@ -637,7 +637,7 @@ test("homepage previews wait three seconds and respect reduced-data preferences"
   assert.match(appSource, /\/reactions`/);
 });
 
-test("renders TikTok embeds for clean controls, reliable replay, and provider messaging", async () => {
+test("renders a Microlink TikTok preview card without a provider iframe", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
@@ -647,30 +647,27 @@ test("renders TikTok embeds for clean controls, reliable replay, and provider me
     "tiktok-player-test",
     "TikTok player test",
     "https://www.tiktok.com/@example/video/6718335390845095173",
-    "https://www.tiktok.com/player/v1/6718335390845095173?controls=1&rel=1&description=1&music_info=1",
+    "https://www.tiktok.com/player/v1/6718335390845095173?controls=1",
     "tiktok",
     "Social Media & Trending",
     "TikTok Trending",
-    "Official TikTok embed playback test",
+    "#fyppppppppppppppppppppppp #fyp #saiyaara",
   );
 
   const page = await send(context, "/watch/tiktok-player-test");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /class="tiktok-embed"/);
-  assert.match(html, /data-video-id="6718335390845095173"/);
-  assert.match(html, /@example/);
-  assert.match(html, /cite="https:\/\/www\.tiktok\.com\/@example\/video\/6718335390845095173"/);
-  assert.doesNotMatch(html, /<blockquote[^>]+cite="[^"]*player\/v1\/6718335390845095173/);
-  assert.match(html, /data-video-provider="tiktok"/);
-
-  const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
-  assert.match(watchSource, /provider === "tiktok"/);
-  assert.match(watchSource, /Play TikTok in popup/);
-  assert.match(watchSource, /"x-tiktok-player": true/);
-  assert.match(watchSource, /type,/);
-  assert.match(watchSource, /vidbestTikTokNativeControls/);
+  assert.match(html, /class="tiktok-microlink-card"/);
+  assert.match(html, /data-tiktok-microlink-card/);
+  assert.match(html, /href="https://www\.tiktok\.com/@example/video/6718335390845095173/);
+  assert.match(html, /api\.microlink\.io\/\?url=/);
+  assert.match(html, /embed=image\.url/);
+  assert.doesNotMatch(html, /class="tiktok-embed"/);
+  assert.doesNotMatch(html, /widgets\.sociablekit\.com/);
+  assert.doesNotMatch(html, /<iframe[^>]+tiktok\.com/);
+  assert.match(html, /Open on TikTok/);
 });
+
 
 test("repairs a legacy TikTok record with only its source URL and uses the Saiyaara title", async () => {
   const context = createTestContext();

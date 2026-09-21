@@ -2006,45 +2006,57 @@ function watchDisplayTitle(video) {
     : video.title;
 }
 
+function buildTikTokMicrolinkImageUrl(value) {
+  return `https://api.microlink.io/?url=${encodeURIComponent(value)}&meta=false&embed=image.url`;
+}
+
+function renderTikTokMicrolinkCard(video) {
+  const source = video.source_url || video.embed_url || "";
+  const id = extractTikTokId(source);
+  if (!id) return "";
+
+  const username = extractTikTokUsername(source);
+  const displayName = /saiyaara/i.test(String(video.slug || "")) || /saiyaara/i.test(String(video.title || ""))
+    ? "saiyaara"
+    : (video.title || username || "TikTok video");
+  const accountLabel = username ? `${displayName} (@${username}) on TikTok` : "View this video on TikTok";
+  const description = video.description || (username ? `TikTok video from @${username}` : "Open this TikTok video");
+  const imageUrl = buildTikTokMicrolinkImageUrl(source);
+
+  return `<a class="tiktok-microlink-card" data-tiktok-microlink-card href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer nofollow" aria-label="Open ${escapeHtml(accountLabel)} on TikTok">
+    <span class="tiktok-microlink-media">
+      <img src="${escapeHtml(imageUrl)}" alt="" loading="eager" decoding="async" onerror="this.onerror=null;this.src='https://www.tiktok.com/favicon.ico';this.classList.add('is-fallback')" />
+      <span class="tiktok-microlink-play" aria-hidden="true">▶</span>
+    </span>
+    <span class="tiktok-microlink-body">
+      <span class="tiktok-microlink-brand"><img src="https://www.tiktok.com/favicon.ico" alt="" /> <span>TikTok</span></span>
+      <strong>${escapeHtml(accountLabel)}</strong>
+      <span class="tiktok-microlink-description">${escapeHtml(description)}</span>
+      <span class="tiktok-microlink-cta">Open on TikTok ↗</span>
+    </span>
+  </a>`;
+}
+
 function renderMedia(video, playbackOrigin) {
   const provider = String(video.provider || "").toLowerCase();
-  if (video.embed_url || provider === "tiktok") {
-    let source = video.embed_url || "";
-    if (provider === "tiktok") {
-      source = buildTikTokEmbedUrl(source || video.source_url);
-    }
-    if (source) {
-      const embedUrl = preparePlaybackEmbed(source, playbackOrigin);
-      const isTikTok = provider === "tiktok";
-      if (isTikTok) {
-        const tiktokSource = video.source_url || source;
-        const tiktokId = extractTikTokId(tiktokSource);
-        if (tiktokId) {
-          const cite = buildTikTokPostUrl(tiktokSource, tiktokId);
-          const username = extractTikTokUsername(cite);
-          const authorHref = username ? `https://www.tiktok.com/@${encodeURIComponent(username)}?refer=embed` : cite;
-          const authorLabel = username ? `@${username}` : "View this TikTok";
-          return `<div class="tiktok-embed-wrap" data-tiktok-embed data-tiktok-source="${escapeHtml(cite)}">
-            <blockquote class="tiktok-embed" cite="${escapeHtml(cite)}" data-video-id="${escapeHtml(tiktokId)}" data-embed-from="oembed">
-              <section aria-label="TikTok video">
-                <a target="_blank" rel="noopener noreferrer nofollow" title="${escapeHtml(authorLabel)}" href="${escapeHtml(authorHref)}">${escapeHtml(authorLabel)}</a>
-              </section>
-            </blockquote>
-          </div>
-          <script async src="https://www.tiktok.com/embed.js"></script>`;
-        }
-      }
-      const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
-      return `<iframe id="watch-media-frame" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"${sandbox}></iframe>`;
-    }
+
+  if (provider === "tiktok") {
+    const tiktokCard = renderTikTokMicrolinkCard(video);
+    if (tiktokCard) return tiktokCard;
   }
+
+  if (video.embed_url) {
+    const embedUrl = preparePlaybackEmbed(video.embed_url, playbackOrigin);
+    const sandbox = ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
+    return `<iframe id="watch-media-frame" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"${sandbox}></iframe>`;
+  }
+
   const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}"` : "";
   const captions = video.has_captions
     ? `<track kind="captions" src="/captions/${encodeURIComponent(video.slug)}.vtt" srclang="${escapeHtml(video.transcript_language || "en")}" label="Generated captions">`
     : "";
   return `<video id="watch-media-video" controls playsinline preload="metadata"${poster}><source src="${escapeHtml(video.source_url)}">${captions}Your browser does not support this video.</video>`;
 }
-
 function preparePlaybackEmbed(value, playbackOrigin) {
   try {
     const url = new URL(value);
