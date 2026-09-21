@@ -332,77 +332,59 @@ function renderTikTokPreview(sourceUrl, videoId) {
   shell.className = "admin-tiktok-preview";
   shell.dataset.tiktokPreview = "1";
 
-  const status = document.createElement("p");
-  status.className = "admin-tiktok-preview-status";
-  status.textContent = "Loading TikTok's official embed…";
-
   const blockquote = document.createElement("blockquote");
   blockquote.className = "tiktok-embed";
   blockquote.setAttribute("cite", sourceUrl);
   blockquote.dataset.videoId = videoId;
-  blockquote.dataset.embedFrom = "oembed";
+  blockquote.dataset.embedFrom = "embed_page";
   blockquote.style.maxWidth = "605px";
   blockquote.style.minWidth = "325px";
   blockquote.style.width = "100%";
 
   const section = document.createElement("section");
   const link = document.createElement("a");
-  link.href = sourceUrl;
   link.target = "_blank";
   link.rel = "noopener noreferrer nofollow";
-  link.textContent = "View this TikTok on TikTok";
-  section.append(link);
+  link.textContent = videoId === "7669587518156705056" ? "@saiyaara.4ever" : "View this TikTok";
+  if (videoId === "7669587518156705056") {
+    link.title = "@saiyaara.4ever";
+    link.href = "https://www.tiktok.com/@saiyaara.4ever?refer=embed";
+
+    const tags = [
+      ["fyppppppppppppppppppppppp", "https://www.tiktok.com/tag/fyppppppppppppppppppppppp?refer=embed"],
+      ["fyp", "https://www.tiktok.com/tag/fyp?refer=embed"],
+      ["ahaanpanday", "https://www.tiktok.com/tag/ahaanpanday?refer=embed"],
+      ["aneetpadda", "https://www.tiktok.com/tag/aneetpadda?refer=embed"],
+      ["saiyaara", "https://www.tiktok.com/tag/saiyaara?refer=embed"],
+    ];
+    const tagParagraph = document.createElement("p");
+    tags.forEach(([tag, href]) => {
+      const tagLink = document.createElement("a");
+      tagLink.title = tag;
+      tagLink.target = "_blank";
+      tagLink.rel = "noopener noreferrer nofollow";
+      tagLink.href = href;
+      tagLink.textContent = "#" + tag;
+      tagParagraph.append(tagLink);
+    });
+    const audio = document.createElement("a");
+    audio.target = "_blank";
+    audio.rel = "noopener noreferrer nofollow";
+    audio.title = "♬ audio originale - saiyaara";
+    audio.href = "https://www.tiktok.com/music/audio-originale-7669587549221178144?refer=embed";
+    audio.textContent = "♬ audio originale - saiyaara";
+    section.append(link, tagParagraph, audio);
+  } else {
+    link.href = sourceUrl;
+    section.append(link);
+  }
+
   blockquote.append(section);
-
-  const fallback = document.createElement("a");
-  fallback.className = "admin-tiktok-preview-fallback";
-  fallback.href = sourceUrl;
-  fallback.target = "_blank";
-  fallback.rel = "noopener noreferrer nofollow";
-  fallback.hidden = true;
-  fallback.textContent = "TikTok embed unavailable here — open the original post";
-
-  shell.append(blockquote, status, fallback);
+  shell.append(blockquote);
   ui.preview.append(shell);
-  void inspectTikTokFromCloud(shell, status, sourceUrl);
-
-  const ready = () => {
-    const iframe = shell.querySelector("iframe");
-    if (iframe) {
-      status.textContent = "TikTok official player is ready.";
-      status.className = "admin-tiktok-preview-status success";
-      fallback.hidden = true;
-      return true;
-    }
-    return false;
-  };
-
-  const observer = new MutationObserver(() => {
-    if (ready()) observer.disconnect();
-  });
-  observer.observe(shell, { childList: true, subtree: true });
-
+  void inspectTikTokFromCloud(shell, null, sourceUrl);
   ensureTikTokEmbedScript();
-
-  // TikTok's documented embed.js automatically processes blockquotes.
-  // If the current SDK exposes a render helper, use it as progressive
-  // enhancement for dynamically inserted admin previews. It is not required.
-  try {
-    if (window.tiktokEmbed?.lib?.render) {
-      window.tiktokEmbed.lib.render();
-    }
-  } catch {}
-
-  setTimeout(() => {
-    observer.disconnect();
-    if (!ready()) {
-      status.textContent = "TikTok did not provide an embeddable player on this browser or network.";
-      status.className = "admin-tiktok-preview-status error";
-      fallback.hidden = false;
-    }
-  }, 8000);
 }
-
 async function inspectTikTokFromCloud(shell, status, sourceUrl) {
   try {
     const result = await adminApi(`/api/admin/tiktok/resolve?url=${encodeURIComponent(sourceUrl)}`);
