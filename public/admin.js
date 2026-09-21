@@ -334,13 +334,11 @@ function renderTikTokPreview(sourceUrl, videoId) {
 
   const blockquote = document.createElement("blockquote");
   blockquote.className = "tiktok-embed";
-  const effectiveSourceUrl = videoId === "7669587518156705056"
-    ? "https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056"
-    : sourceUrl;
-  blockquote.setAttribute("cite", effectiveSourceUrl);
-  blockquote.dataset.videoId = videoId;
+  blockquote.setAttribute("cite", "https://www.tiktok.com");
+  blockquote.dataset.embedType = "curated";
+  blockquote.dataset.videoIdList = videoId;
   blockquote.dataset.embedFrom = "embed_page";
-  blockquote.style.maxWidth = "605px";
+  blockquote.style.maxWidth = "780px";
   blockquote.style.minWidth = "325px";
   blockquote.style.width = "100%";
 
@@ -348,71 +346,14 @@ function renderTikTokPreview(sourceUrl, videoId) {
   const link = document.createElement("a");
   link.target = "_blank";
   link.rel = "noopener noreferrer nofollow";
-  link.textContent = videoId === "7669587518156705056" ? "@saiyaara.4ever" : "View this TikTok";
-  if (videoId === "7669587518156705056") {
-    link.title = "@saiyaara.4ever";
-    link.href = "https://www.tiktok.com/@saiyaara.4ever?refer=embed";
-
-    const tags = [
-      ["fyppppppppppppppppppppppp", "https://www.tiktok.com/tag/fyppppppppppppppppppppppp?refer=embed"],
-      ["fyp", "https://www.tiktok.com/tag/fyp?refer=embed"],
-      ["ahaanpanday", "https://www.tiktok.com/tag/ahaanpanday?refer=embed"],
-      ["aneetpadda", "https://www.tiktok.com/tag/aneetpadda?refer=embed"],
-      ["saiyaara", "https://www.tiktok.com/tag/saiyaara?refer=embed"],
-    ];
-    const tagParagraph = document.createElement("p");
-    tags.forEach(([tag, href]) => {
-      const tagLink = document.createElement("a");
-      tagLink.title = tag;
-      tagLink.target = "_blank";
-      tagLink.rel = "noopener noreferrer nofollow";
-      tagLink.href = href;
-      tagLink.textContent = "#" + tag;
-      tagParagraph.append(tagLink);
-    });
-    const audio = document.createElement("a");
-    audio.target = "_blank";
-    audio.rel = "noopener noreferrer nofollow";
-    audio.title = "♬ audio originale - saiyaara";
-    audio.href = "https://www.tiktok.com/music/audio-originale-7669587549221178144?refer=embed";
-    audio.textContent = "♬ audio originale - saiyaara";
-    section.append(link, tagParagraph, audio);
-  } else {
-    link.href = sourceUrl;
-    section.append(link);
-  }
-
+  link.href = "https://www.tiktok.com?refer=embed_page";
+  link.textContent = "TikTok";
+  section.append(link);
   blockquote.append(section);
   shell.append(blockquote);
   ui.preview.append(shell);
   ensureTikTokEmbedScript();
 }
-async function inspectTikTokFromCloud(shell, status, sourceUrl) {
-  try {
-    const result = await adminApi(`/api/admin/tiktok/resolve?url=${encodeURIComponent(sourceUrl)}`);
-    const gateway = result.gateway || {};
-    if (gateway.ok) {
-      const title = String(gateway.title || "").trim();
-      const author = String(gateway.author_name || "").trim();
-      if (!ui.title.value.trim() && title) ui.title.value = title;
-      if (!ui.thumbnail.value.trim() && gateway.thumbnail_url) ui.thumbnail.value = gateway.thumbnail_url;
-      status.textContent = [
-        "Cloud metadata verified.",
-        author ? `Creator: ${author}.` : "",
-        "Playback still loads from TikTok in the browser.",
-      ].filter(Boolean).join(" ");
-      status.className = "admin-tiktok-preview-status";
-    } else {
-      status.textContent = gateway.reason || "TikTok did not return metadata from the cloud gateway.";
-      status.className = "admin-tiktok-preview-status error";
-    }
-  } catch (error) {
-    status.textContent = "Cloud check unavailable; trying TikTok official embed directly.";
-    status.className = "admin-tiktok-preview-status";
-    shell.dataset.cloudResolverError = error.message || "unknown";
-  }
-}
-
 let tiktokEmbedScriptPromise = null;
 
 function ensureTikTokEmbedScript() {

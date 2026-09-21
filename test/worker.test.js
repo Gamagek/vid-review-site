@@ -350,7 +350,7 @@ test("stores new TikTok videos without a legacy player URL", async () => {
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /class="tiktok-embed"/);
-  assert.match(html, /data-video-id="6718335390845095173"/);
+  assert.match(html, /data-video-id-list="6718335390845095173"/);
   assert.doesNotMatch(html, /player\/v1\/6718335390845095173/);
   assert.doesNotMatch(html, /"embedUrl":s*"https:\/\/www\.tiktok\.com\/player\/v1\//);
 });
@@ -659,7 +659,7 @@ test("admin uses the official TikTok blockquote preview instead of a raw player 
   assert.match(adminSource, /className = "tiktok-embed"/);
   assert.match(adminSource, /ensureTikTokEmbedScript/);
   assert.doesNotMatch(adminSource, /window\.tiktokEmbed\?\.lib\?\.render/);
-  assert.match(adminSource, /provider: "tiktok"/);
+  assert.match(adminSource, /dataset\.embedType = "curated"/);
 });
 
 test("homepage previews wait three seconds and respect reduced-data preferences", () => {
@@ -695,16 +695,16 @@ test("renders the supplied official Saiyaara TikTok embed without fallback UI", 
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /class="tiktok-embed"/);
-  assert.match(html, /data-video-id="7669587518156705056"/);
-  assert.match(html, /@saiyaara\.4ever/);
-  assert.match(html, /cite="https:\/\/www\.tiktok\.com\/@saiyaara\.4ever\/video\/7669587518156705056"/);
+  assert.match(html, /data-video-id-list="7669587518156705056"/);
+  assert.doesNotMatch(html, /<blockquote[^>]*cite="https:\/\/www\.tiktok\.com\/@saiyaara\.4ever\/video\/7669587518156705056"/);
+  assert.match(html, /cite="https:\/\/www\.tiktok\.com"/);
   assert.doesNotMatch(html, /player\/v1\/7669587518156705056/);
   assert.match(html, /data-embed-from="embed_page"/);
-  assert.match(html, /fyppppppppppppppppppppppp/);
-  assert.match(html, /ahaanpanday/);
-  assert.match(html, /aneetpadda/);
-  assert.match(html, /saiyaara/);
-  assert.match(html, /audio-originale-7669587549221178144/);
+  assert.match(html, /data-embed-type="curated"/);
+  assert.match(html, /data-video-id-list="7669587518156705056"/);
+  assert.match(html, /href="https:\/\/www\.tiktok\.com\?refer=embed_page"/);
+  assert.match(html, /<a target="_blank" href="https:\/\/www\.tiktok\.com\?refer=embed_page">TikTok<\/a>/);
+  assert.doesNotMatch(html, /audio-originale-7669587549221178144/);
   assert.match(html, /data-video-provider="tiktok"/);
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
@@ -733,9 +733,10 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   assert.ok(html.includes("<title>Saiyaara; A Cinematic Romance | Vid.Best</title>"));
   assert.ok(html.includes("<h1>Saiyaara; A Cinematic Romance</h1>"));
   assert.ok(html.includes('<blockquote class="tiktok-embed"'));
-  assert.ok(html.includes('data-video-id="6718335390845095173"'));
-  assert.ok(html.includes('@example'));
-  assert.ok(html.includes('data-embed-from="embed_page"'));
+  assert.ok(html.includes('data-video-id-list="6718335390845095173"'));
+  assert.ok(html.includes('data-embed-type="curated"'));
+  assert.ok(html.includes('data-video-id-list="6718335390845095173"'));
+  assert.ok(html.includes('cite="https://www.tiktok.com"'));
   assert.ok(html.includes('https://www.tiktok.com/embed.js'));
   assert.doesNotMatch(html, /Play TikTok in popup/);
   assert.ok(html.includes('data-video-provider="tiktok"'));

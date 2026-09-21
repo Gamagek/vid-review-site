@@ -2066,34 +2066,10 @@ function renderMedia(video, playbackOrigin) {
     const tiktokSource = String(video.source_url || "").trim();
     const tiktokId = extractTikTokId(tiktokSource);
 
-    if (tiktokId === "7669587518156705056") {
-      return `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056" data-video-id="7669587518156705056" data-embed-from="embed_page" style="max-width:605px; min-width:325px;">
-        <section>
-          <a target="_blank" title="@saiyaara.4ever" href="https://www.tiktok.com/@saiyaara.4ever?refer=embed">@saiyaara.4ever</a>
-          <p>
-            <a title="fyppppppppppppppppppppppp" target="_blank" href="https://www.tiktok.com/tag/fyppppppppppppppppppppppp?refer=embed">#fyppppppppppppppppppppppp</a>
-            <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a>
-            <a title="ahaanpanday" target="_blank" href="https://www.tiktok.com/tag/ahaanpanday?refer=embed">#ahaanpanday</a>
-            <a title="aneetpadda" target="_blank" href="https://www.tiktok.com/tag/aneetpadda?refer=embed">#aneetpadda</a>
-            <a title="saiyaara" target="_blank" href="https://www.tiktok.com/tag/saiyaara?refer=embed">#saiyaara</a>
-          </p>
-          <a target="_blank" title="♬ audio originale - saiyaara" href="https://www.tiktok.com/music/audio-originale-7669587549221178144?refer=embed">♬ audio originale - saiyaara</a>
-        </section>
-      </blockquote>
-      <script async src="https://www.tiktok.com/embed.js"></script>`;
-    }
-
     if (tiktokId) {
-      const cite = buildTikTokPostUrl(tiktokSource, tiktokId);
-      const username = extractTikTokUsername(cite);
-      const authorHref = username
-        ? `https://www.tiktok.com/@${encodeURIComponent(username)}?refer=embed`
-        : cite;
-      const authorLabel = username ? `@${username}` : "TikTok video";
-
-      return `<blockquote class="tiktok-embed" cite="${escapeHtml(cite)}" data-video-id="${escapeHtml(tiktokId)}" data-embed-from="embed_page" style="max-width:605px; min-width:325px;">
+      return `<blockquote class="tiktok-embed" cite="https://www.tiktok.com" data-embed-type="curated" data-video-id-list="${escapeHtml(tiktokId)}" data-embed-from="embed_page" style="max-width: 780px;min-width: 325px;">
         <section>
-          <a target="_blank" title="${escapeHtml(authorLabel)}" href="${escapeHtml(authorHref)}">${escapeHtml(authorLabel)}</a>
+          <a target="_blank" href="https://www.tiktok.com?refer=embed_page">TikTok</a>
         </section>
       </blockquote>
       <script async src="https://www.tiktok.com/embed.js"></script>`;
@@ -2101,7 +2077,6 @@ function renderMedia(video, playbackOrigin) {
 
     return "";
   }
-
   if (video.embed_url) {
     const embedUrl = preparePlaybackEmbed(video.embed_url, playbackOrigin);
     if (embedUrl) {
