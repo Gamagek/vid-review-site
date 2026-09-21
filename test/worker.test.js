@@ -698,7 +698,7 @@ test("renders the official TikTok Embed Player iframe with responsive options", 
   assert.match(html, /autoplay=0/);
   assert.match(html, /muted=0/);
   assert.doesNotMatch(html, /class="tiktok-embed"/);
-  assert.doesNotMatch(html, /tiktok\.com\\/embed\.js/);
+  assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
   assert.match(html, /allow="autoplay; fullscreen; picture-in-picture"/);
   assert.match(html, /data-video-provider="tiktok"/);
 
