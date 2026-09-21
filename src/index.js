@@ -2004,10 +2004,8 @@ function renderMedia(video, playbackOrigin) {
 
   if (provider === "tiktok") {
     const tiktokId = extractTikTokId(video.source_url);
-    const embedUrl = /^https:\/\/www\.tiktok\.com\/player\/v1\/\d+/.test(String(video.embed_url || ""))
-      ? String(video.embed_url)
-      : (tiktokId ? buildTikTokPlayerUrl(tiktokId) : "");
-    if (!embedUrl) return "";
+    if (!tiktokId) return "";
+    const embedUrl = buildTikTokPlayerUrl(tiktokId);
     return `<iframe id="watch-media-frame" class="tiktok-official-player" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   }
   if (video.embed_url) {
