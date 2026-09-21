@@ -332,47 +332,37 @@ function renderTikTokPreview(sourceUrl, videoId) {
   shell.className = "admin-tiktok-preview";
   shell.dataset.tiktokPreview = "1";
 
-  const blockquote = document.createElement("blockquote");
-  blockquote.className = "tiktok-embed";
-  blockquote.setAttribute("cite", "https://www.tiktok.com");
-  blockquote.dataset.embedType = "curated";
-  blockquote.dataset.videoIdList = videoId;
-  blockquote.dataset.embedFrom = "embed_page";
-  blockquote.style.maxWidth = "780px";
-  blockquote.style.minWidth = "325px";
-  blockquote.style.width = "100%";
-
-  const section = document.createElement("section");
-  const link = document.createElement("a");
-  link.target = "_blank";
-  link.rel = "noopener noreferrer nofollow";
-  link.href = "https://www.tiktok.com?refer=embed_page";
-  link.textContent = "TikTok";
-  section.append(link);
-  blockquote.append(section);
-  shell.append(blockquote);
+  const iframe = document.createElement("iframe");
+  iframe.className = "tiktok-official-player";
+  iframe.src = buildTikTokPlayerUrl(videoId);
+  iframe.title = "TikTok video preview";
+  iframe.loading = "eager";
+  iframe.allow = "autoplay; fullscreen; picture-in-picture";
+  iframe.allowFullscreen = true;
+  iframe.referrerPolicy = "strict-origin-when-cross-origin";
+  shell.append(iframe);
   ui.preview.append(shell);
-  ensureTikTokEmbedScript();
 }
-let tiktokEmbedScriptPromise = null;
 
-function ensureTikTokEmbedScript() {
-  const existing = document.querySelector('script[data-vidbest-tiktok-sdk]');
-  if (existing) return tiktokEmbedScriptPromise || Promise.resolve();
-
-  tiktokEmbedScriptPromise = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.async = true;
-    script.src = "https://www.tiktok.com/embed.js";
-    script.dataset.vidbestTikTokSdk = "1";
-    script.addEventListener("load", resolve, { once: true });
-    script.addEventListener("error", () => reject(new Error("TikTok embed SDK failed to load")), { once: true });
-    document.head.append(script);
+function buildTikTokPlayerUrl(videoId) {
+  const params = new URLSearchParams({
+    controls: "1",
+    progress_bar: "1",
+    play_button: "1",
+    volume_control: "1",
+    fullscreen_button: "1",
+    timestamp: "1",
+    loop: "0",
+    autoplay: "0",
+    music_info: "1",
+    description: "1",
+    rel: "1",
+    native_context_menu: "1",
+    closed_caption: "1",
+    muted: "0",
   });
-
-  return tiktokEmbedScriptPromise.catch(() => {});
+  return `https://www.tiktok.com/player/v1/${encodeURIComponent(videoId)}?${params.toString()}`;
 }
-
 function parseEmbed(value) {
   try {
     const url = new URL(value, location.origin);
