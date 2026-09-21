@@ -658,7 +658,7 @@ test("admin uses the official TikTok blockquote preview instead of a raw player 
   assert.match(adminSource, /renderTikTokPreview/);
   assert.match(adminSource, /className = "tiktok-embed"/);
   assert.match(adminSource, /ensureTikTokEmbedScript/);
-  assert.match(adminSource, /window\.tiktokEmbed\?\.lib\?\.render/);
+  assert.doesNotMatch(adminSource, /window\.tiktokEmbed\?\.lib\?\.render/);
   assert.match(adminSource, /provider: "tiktok"/);
 });
 
@@ -703,10 +703,10 @@ test("renders TikTok embeds for clean controls, reliable replay, and provider me
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
   assert.match(watchSource, /provider === "tiktok"/);
-  assert.match(watchSource, /Play TikTok in popup/);
-  assert.match(watchSource, /"x-tiktok-player": true/);
-  assert.match(watchSource, /type,/);
-  assert.match(watchSource, /vidbestTikTokNativeControls/);
+  assert.doesNotMatch(watchSource, /Play TikTok in popup/);
+  assert.doesNotMatch(watchSource, /x-tiktok-player/);
+  assert.doesNotMatch(watchSource, /initializeTikTokReliability/);
+  assert.doesNotMatch(watchSource, /initializeTikTokPopupFallback/);
 });
 
 test("repairs a legacy TikTok record with only its source URL and uses the Saiyaara title", async () => {
@@ -730,8 +730,9 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   assert.ok(html.includes('<blockquote class="tiktok-embed"'));
   assert.ok(html.includes('data-video-id="6718335390845095173"'));
   assert.ok(html.includes('@example'));
-  assert.ok(html.includes('data-tiktok-embed'));
+  assert.ok(html.includes('data-embed-from="embed_page"'));
   assert.ok(html.includes('https://www.tiktok.com/embed.js'));
+  assert.doesNotMatch(html, /Play TikTok in popup/);
   assert.ok(html.includes('data-video-provider="tiktok"'));
 });
 
