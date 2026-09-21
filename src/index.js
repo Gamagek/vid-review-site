@@ -355,7 +355,7 @@ function securityHeaders(headers, html = false, scriptNonce = "") {
     const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.tiktok.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self' https://www.tiktok.com https://*.tiktok.com https://*.tiktokcdn.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.tiktok.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self' https://www.tiktok.com https://*.tiktok.com https://*.tiktokcdn.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://widgets.sociablekit.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
     );
   }
   return headers;
@@ -2030,8 +2030,18 @@ function renderMedia(video, playbackOrigin) {
                 <a target="_blank" rel="noopener noreferrer nofollow" title="${escapeHtml(authorLabel)}" href="${escapeHtml(authorHref)}">${escapeHtml(authorLabel)}</a>
               </section>
             </blockquote>
-          </div>
-          <script async src="https://www.tiktok.com/embed.js"></script>`;
+            <div class="sociablekit-tiktok-fallback" data-sociablekit-fallback hidden>
+              <iframe
+                src="https://widgets.sociablekit.com/tiktok-feed/iframe/25715575"
+                title="SociableKIT TikTok feed"
+                loading="lazy"
+                frameborder="0"
+                width="100%"
+                height="1000"
+                referrerpolicy="strict-origin-when-cross-origin"
+              ></iframe>
+            </div>
+          </div>`;
         }
       }
       const sandbox = isTikTok ? "" : ' sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"';
