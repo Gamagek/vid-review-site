@@ -25,9 +25,9 @@ function initializeWatchPage() {
   enhanceCommentForm();
   enhanceNativePlayer();
   initializePersistentPlayer();
-  initializeEmbeddedMediaTools();
   initializeTikTokEmbedScript();
   initializeTikTokPopupFallback();
+  initializeEmbeddedMediaTools();
   initializeAudioLab();
   initializeEmbeddedAudioLab();
   repairNativePlayerControls();
@@ -854,7 +854,8 @@ function initializeTikTokPopupFallback() {
 
   const fallback = document.createElement("div");
   fallback.className = "vidbest-tiktok-fallback";
-  fallback.innerHTML = "<span>TikTok's embedded player can be restricted by the browser or TikTok CDN.</span>";
+  fallback.hidden = true;
+  fallback.innerHTML = "<strong>TikTok player is unavailable here.</strong><span>We could not load TikTok's official player on this browser or network.</span>";
 
   const button = document.createElement("button");
   button.type = "button";
@@ -871,29 +872,31 @@ function initializeTikTokPopupFallback() {
   });
   fallback.append(button);
   wrap.insertAdjacentElement("afterend", fallback);
-
-  const renderedCheck = () => {
-    if (wrap.querySelector("iframe")) {
-      fallback.hidden = true;
-      return true;
-    }
-    return false;
-  };
-
-  if (renderedCheck()) return;
-  const observer = new MutationObserver(() => {
-    if (renderedCheck()) observer.disconnect();
-  });
-  observer.observe(wrap, { childList: true, subtree: true });
-  setTimeout(() => {
-    observer.disconnect();
-    renderedCheck();
-  }, 5000);
 }
 
 function initializeTikTokEmbedScript() {
   const embeds = [...document.querySelectorAll(".tiktok-embed")];
   if (!embeds.length) return;
+
+  const player = document.querySelector("#watch-player");
+  const stage = player?.querySelector(".watch-player-stage");
+  if (!player || !stage) return;
+
+  const enhanceAfterIframeRender = () => {
+    const iframe = stage.querySelector("[data-tiktok-embed] iframe, .tiktok-embed iframe");
+    if (!iframe) return false;
+    initializeEmbeddedMediaTools();
+    return true;
+  };
+
+  const observe = () => {
+    if (enhanceAfterIframeRender()) return;
+    const observer = new MutationObserver(() => {
+      if (enhanceAfterIframeRender()) observer.disconnect();
+    });
+    observer.observe(stage, { childList: true, subtree: true });
+    setTimeout(() => observer.disconnect(), 15000);
+  };
 
   let script = document.querySelector('script[data-vidbest-tiktok-embed], script[src="https://www.tiktok.com/embed.js"]');
   if (!script) {
@@ -901,19 +904,20 @@ function initializeTikTokEmbedScript() {
     script.src = "https://www.tiktok.com/embed.js";
     script.async = true;
     script.dataset.vidbestTikTokEmbed = "1";
+    script.addEventListener("load", observe, { once: true });
     script.addEventListener("error", () => {
-      const player = document.querySelector("#watch-player");
-      const stage = player?.querySelector(".watch-player-stage");
-      if (!player || !stage) return;
-      let status = player.querySelector(".vidbest-tiktok-load-status");
-      if (!status) {
-        status = document.createElement("div");
+      const status = player.querySelector(".vidbest-tiktok-load-status") || document.createElement("div");
+      if (!status.parentNode) {
         status.className = "vidbest-tiktok-load-status";
         stage.insertAdjacentElement("afterend", status);
       }
-      status.textContent = "TikTok's embed service could not load in this browser. Use the TikTok link below to view the original.";
+      status.textContent = "TikTok's official embed service could not load in this browser or network.";
+      const fallback = stage.querySelector(".vidbest-tiktok-fallback");
+      if (fallback) fallback.hidden = false;
     }, { once: true });
     document.head.appendChild(script);
+  } else {
+    observe();
   }
 }
 
@@ -925,10 +929,11 @@ function initializeTikTokReliability(player, stage, frame) {
   const sourceText = sourceUrl ? "Open on TikTok" : "Open original source";
   const status = document.createElement("div");
   status.className = "vidbest-tiktok-status";
-  status.hidden = true;
+  status.hidden = false;
 
   const message = document.createElement("span");
   message.className = "vidbest-tiktok-status-message";
+  message.textContent = "Connecting to TikTok's official player…";
 
   const retry = document.createElement("button");
   retry.type = "button";
@@ -950,6 +955,13 @@ function initializeTikTokReliability(player, stage, frame) {
   let watchdog = null;
   let retryTimer = null;
 
+  function setEmbedState(state) {
+    stage.classList.toggle("is-tiktok-pending", state === "pending");
+    stage.classList.toggle("is-tiktok-failed", state === "failed");
+    const fallback = stage.querySelector(".vidbest-tiktok-fallback");
+    if (fallback) fallback.hidden = state !== "failed";
+  }
+
   function clearWatchdog() {
     if (watchdog) {
       clearTimeout(watchdog);
@@ -957,14 +969,16 @@ function initializeTikTokReliability(player, stage, frame) {
     }
   }
 
-  function showStatus(text) {
+  function showStatus(text, failed = false) {
     message.textContent = text;
     status.hidden = false;
+    setEmbedState(failed ? "failed" : "pending");
   }
 
   function hideStatus() {
     status.hidden = true;
     message.textContent = "";
+    setEmbedState("ready");
   }
 
   function addCacheBust() {
@@ -980,14 +994,17 @@ function initializeTikTokReliability(player, stage, frame) {
   function beginWatchdog() {
     clearWatchdog();
     watchdog = setTimeout(() => {
-      if (!ready) handleFailure("TikTok did not finish loading the player.");
-    }, 10000);
+      if (!ready) handleFailure("TikTok did not finish loading the official player.");
+    }, 7000);
   }
 
   function restartPlayer() {
     clearWatchdog();
     ready = false;
-    hideStatus();
+    retry.disabled = true;
+    status.hidden = false;
+    message.textContent = "Retrying TikTok's official player…";
+    setEmbedState("pending");
     addCacheBust();
     beginWatchdog();
   }
@@ -996,11 +1013,13 @@ function initializeTikTokReliability(player, stage, frame) {
     clearWatchdog();
     if (attempts < 1) {
       attempts += 1;
-      showStatus("TikTok could not start on the first attempt. Retrying once…");
-      retryTimer = setTimeout(restartPlayer, 500);
+      message.textContent = "TikTok did not start. Retrying once…";
+      status.hidden = false;
+      setEmbedState("pending");
+      retryTimer = setTimeout(restartPlayer, 600);
       return;
     }
-    showStatus(reason + " It may be a temporary TikTok/CDN restriction.");
+    showStatus(reason + " TikTok or its CDN may be restricting this embed here.", true);
     retry.disabled = false;
   }
 
@@ -1010,7 +1029,6 @@ function initializeTikTokReliability(player, stage, frame) {
       retryTimer = null;
     }
     attempts = 0;
-    retry.disabled = true;
     restartPlayer();
   });
 
@@ -1041,6 +1059,7 @@ function initializeTikTokReliability(player, stage, frame) {
         if (state === 1 || state === 3) {
           ready = true;
           clearWatchdog();
+          retry.disabled = false;
           hideStatus();
         }
         return;
@@ -1065,9 +1084,9 @@ function initializeTikTokReliability(player, stage, frame) {
     }
   });
 
+  setEmbedState("pending");
   beginWatchdog();
 }
-
 function initializeBackgroundPlayback() {
   const player = document.querySelector("#watch-player");
   const video = player && player.querySelector("video");
