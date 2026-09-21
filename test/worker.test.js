@@ -745,40 +745,25 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
 
 
 
-test("resolves TikTok availability through the authenticated cloud gateway without proxying media", async () => {
-  const gatewayKey = "gateway-test-secret-that-is-longer-than-thirty-two-characters";
-  const context = createTestContext({
-    TIKTOK_GATEWAY_URL: "https://gateway.example/v1/tiktok",
-    TIKTOK_GATEWAY_TOKEN: gatewayKey,
-  });
+test("discovers direct TikTok URLs without server-side TikTok requests", async () => {
+  const context = createTestContext();
   const originalFetch = globalThis.fetch;
-  let outgoing;
-  globalThis.fetch = async (url, options) => {
-    outgoing = { url: String(url), options };
-    return new Response(JSON.stringify({
-      ok: true,
-      provider: "tiktok",
-      video_id: "7669587518156705056",
-      source_url: "https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056",
-      availability: "metadata_available",
-      title: "Saiyaara; A Cinematic Romance",
-      author_name: "Saiyaara",
-      official_embed: true,
-      playback_note: "Playback still runs from TikTok in the visitor's browser.",
-    }), { status: 200, headers: { "Content-Type": "application/json" } });
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    throw new Error("Unexpected upstream request");
   };
   try {
     const response = await send(
       context,
-      "/api/admin/tiktok/resolve?url=" + encodeURIComponent("https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056"),
+      "/api/admin/discover?q=" + encodeURIComponent("https://www.tiktok.com/@example/video/6718335390845095173"),
       { method: "GET", headers: { Authorization: `Bearer ${secret}` } },
     );
     assert.equal(response.status, 200);
-    const result = await response.json();
-    assert.equal(result.gateway.video_id, "7669587518156705056");
-    assert.equal(result.gateway.availability, "metadata_available");
-    assert.equal(outgoing.url, "https://gateway.example/v1/tiktok/resolve?url=https%3A%2F%2Fwww.tiktok.com%2F%40saiyaara.4ever%2Fvideo%2F7669587518156705056");
-    assert.equal(outgoing.options.headers.Authorization, "Bearer " + gatewayKey);
+    const payload = await response.json();
+    assert.equal(payload.results[0].provider, "tiktok");
+    assert.equal(payload.results[0].video_id, "6718335390845095173");
+    assert.equal(calls, 0);
   } finally {
     globalThis.fetch = originalFetch;
   }
