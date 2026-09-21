@@ -670,6 +670,10 @@ test("renders TikTok embeds for clean controls, reliable replay, and provider me
   assert.match(watchSource, /"x-tiktok-player": true/);
   assert.match(watchSource, /type,/);
   assert.match(watchSource, /vidbestTikTokNativeControls/);
+  assert.match(watchSource, /initializeTikTokEmbedScript\(\);\s*initializeTikTokPopupFallback\(\);\s*initializeEmbeddedMediaTools\(\);/);
+  assert.match(watchSource, /new MutationObserver\(\(\) => \{/);
+  assert.match(watchSource, /is-tiktok-pending/);
+  assert.match(watchSource, /is-tiktok-failed/);
 });
 
 test("repairs a legacy TikTok record with only its source URL and uses the Saiyaara title", async () => {
