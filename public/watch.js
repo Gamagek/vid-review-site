@@ -186,7 +186,7 @@ async function startMutedPlayback() {
   }
   const frame = persistentPlayer?.querySelector("iframe");
   const provider = String(document.body.dataset.videoProvider || "").toLowerCase();
-  if (frame && ["youtube", "vimeo"].includes(provider)) {
+  if (frame && ["youtube", "vimeo", "tiktok"].includes(provider)) {
     playerProviderCommand("mute");
     playerProviderCommand("playVideo");
     return true;
@@ -216,9 +216,25 @@ function playerProviderCommand(method, args = []) {
           : method === "mute" ? { method: "setVolume", value: 0 }
             : method === "unMute" ? { method: "setVolume", value: 1 }
               : method === "setPlaybackRate" ? { method: "setPlaybackRate", value: Number(args[0]) }
-                : method === "seekTo" ? { method: "setCurrentTime", value: Number(args[0]) }
-                  : { method };
+              : method === "seekTo" ? { method: "setCurrentTime", value: Number(args[0]) }
+                : { method };
       frame.contentWindow?.postMessage(JSON.stringify(payload), "https://player.vimeo.com");
+      return;
+    }
+    if (provider === "tiktok") {
+      const type = method === "playVideo" ? "play"
+        : method === "pauseVideo" ? "pause"
+          : method === "mute" ? "mute"
+            : method === "unMute" ? "unMute"
+            : method === "seekTo" ? "seekTo"
+              : "";
+      if (!type) return;
+      const value = type === "seekTo" ? Number(args[0]) : undefined;
+      frame.contentWindow?.postMessage({
+        type,
+        ...(value === undefined ? {} : { value }),
+        "x-tiktok-player": true,
+      }, "https://www.tiktok.com");
     }
   } catch {
     // Provider controls remain the fallback when its API rejects a command.
@@ -623,7 +639,8 @@ function initializeEmbeddedMediaTools() {
 
   const provider = String(document.body.dataset.videoProvider || inferProvider(frame)).toLowerCase();
 
-  const remote = provider === "youtube" || provider === "vimeo";
+  const remote = provider === "youtube" || provider === "vimeo" || provider === "tiktok";
+  const supportsPlaybackRate = provider === "youtube" || provider === "vimeo";
   const state = { playing: false, muted: false, rate: 1, currentTime: 0 };
 
   function inferProvider(element) {
@@ -805,6 +822,21 @@ function initializeEmbeddedMediaTools() {
     if (event.source !== frame.contentWindow) return;
     try {
       const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+      if (provider === "tiktok" && data?.["x-tiktok-player"]) {
+        if (data.type === "onStateChange") state.playing = Number(data.value) === 1;
+        if (data.type === "onMute") state.muted = Boolean(data.value);
+        if (data.type === "onCurrentTime") {
+          const time = Number(data.value?.currentTime);
+          if (Number.isFinite(time)) state.currentTime = time;
+        }
+        if (data.type === "onPlayerError") {
+          const code = Number(data.value?.errorCode);
+          const type = String(data.value?.errorType || "PLAYER_ERROR");
+          message(`TikTok player: ${type}${Number.isFinite(code) ? ` (${code})` : ""}`);
+        }
+        if (data.type === "onPlayerReady") message("TikTok official player ready · provider controls active");
+        return;
+      }
       const info = data && (data.info || data);
       const time = Number(info && (info.currentTime != null ? info.currentTime : data.currentTime));
       if (Number.isFinite(time)) state.currentTime = time;
@@ -1106,22 +1138,12 @@ function initializeEmbeddedAudioLab() {
   style.id = "vidbest-player-polish-v4-css";
   style.textContent = [
     ".watch-player-stage{position:relative}",
-    ".tiktok-embed-wrap{width:100%;display:flex;justify-content:center;align-items:flex-start;overflow:hidden;background:#000;min-height:0;border-radius:0 0 14px 14px}",
-    ".tiktok-embed-wrap .tiktok-embed{width:100%!important;max-width:780px!important;min-width:325px!important;margin:0 auto!important}",
-    ".tiktok-embed-wrap iframe{width:100%!important;max-width:780px!important;min-width:325px!important;border:0!important}",
-    ".vidbest-tiktok-load-status{padding:10px 12px;border-top:1px solid rgba(255,255,255,.08);background:#080a12;color:#9aa3ba;font-size:12px;line-height:1.5}",
-    ".vidbest-tiktok-fallback{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08);background:#080a12;color:#9aa3ba;font-size:12px;line-height:1.45}",
-    ".vidbest-tiktok-fallback[hidden]{display:none!important}",
-    ".watch-player[data-provider=\"tiktok\"] .watch-player-stage{height:auto;min-height:0;aspect-ratio:auto}",
-    ".watch-player[data-provider=\"tiktok\"] .tiktok-embed-wrap{height:auto;min-height:0}",
-
-    ".watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:min(100%,540px);height:min(78vh,760px);min-height:0;aspect-ratio:9/16;margin-inline:auto;background:#000}",
-    ".watch-player[data-provider=\"tiktok\"] .watch-player-stage iframe{width:100%;height:100%;min-height:0;display:block;border:0;object-fit:contain;background:#000}",
+    ".watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:min(100%,540px);height:min(78vh,760px);min-height:480px;margin-inline:auto;background:#000;overflow:hidden}",
+    ".watch-player[data-provider=\"tiktok\"] .tiktok-official-player{display:block;width:100%;height:100%;min-height:0;border:0;background:#000}",
     ".watch-player.is-mini[data-provider=\"tiktok\"]{width:min(430px,calc(100vw - 36px))}",
-    ".watch-player.is-mini[data-provider=\"tiktok\"] .watch-player-stage{width:100%;height:min(70vh,calc((100vw - 36px) * 1.7778));min-height:0;aspect-ratio:9/16}",
-    ".watch-player.is-mini[data-provider=\"tiktok\"] .watch-player-stage iframe{min-height:0}",
-    ".watch-player.is-theater[data-provider=\"tiktok\"] .watch-player-stage{width:100%;max-width:none;height:calc(100vh - 90px);min-height:0;aspect-ratio:auto}",
-    "@media(max-width:760px){.watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:100%;height:min(78vh,calc((100vw - 40px) * 1.7778));max-height:78vh}.watch-player[data-provider=\"tiktok\"] .watch-player-stage iframe{min-height:0}}",
+    ".watch-player.is-mini[data-provider=\"tiktok\"] .watch-player-stage{width:100%;height:min(70vh,calc((100vw - 36px) * 1.7778));min-height:0}",
+    ".watch-player.is-theater[data-provider=\"tiktok\"] .watch-player-stage{width:min(100%,720px);height:calc(100vh - 90px);min-height:0}",
+    "@media(max-width:640px){.watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:100%;height:min(78vh,calc((100vw - 24px) * 1.7778));min-height:420px}}",
     ".watch-player-stage .player-tools.vidbest-stage-tools{position:absolute!important;left:8px;right:8px;bottom:42px;z-index:30;margin:0!important;width:auto!important;max-width:none!important;display:flex!important;align-items:center;gap:5px;flex-wrap:wrap;padding:7px 8px!important;border-radius:12px;background:linear-gradient(180deg,rgba(4,7,16,.08),rgba(4,7,16,.94));box-sizing:border-box;pointer-events:none}",
     ".watch-player-stage .player-tools.vidbest-stage-tools>*{pointer-events:auto}",
     ".watch-player-stage .player-tools.vidbest-stage-tools button{min-height:30px;white-space:nowrap}",
