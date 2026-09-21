@@ -736,7 +736,7 @@ test("resolves TikTok availability through the authenticated cloud gateway witho
     const response = await send(
       context,
       "/api/admin/tiktok/resolve?url=" + encodeURIComponent("https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056"),
-      { method: "GET", headers: { Authorization: secret } },
+      { method: "GET", headers: { Authorization: "Bearer " + secret } },
     );
     assert.equal(response.status, 200);
     const result = await response.json();
