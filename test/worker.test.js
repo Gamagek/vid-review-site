@@ -625,6 +625,15 @@ test("starts owned R2 analysis through the authenticated Teamwork API", async ()
   }
 });
 
+test("admin uses the official TikTok blockquote preview instead of a raw player iframe", () => {
+  const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
+  assert.match(adminSource, /renderTikTokPreview/);
+  assert.match(adminSource, /className = "tiktok-embed"/);
+  assert.match(adminSource, /ensureTikTokEmbedScript/);
+  assert.match(adminSource, /window\.tiktokEmbed\?\.lib\?\.render/);
+  assert.match(adminSource, /provider: "tiktok"/);
+});
+
 test("homepage previews wait three seconds and respect reduced-data preferences", () => {
   const player = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   const appSource = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
