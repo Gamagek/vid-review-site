@@ -350,7 +350,7 @@ test("stores new TikTok videos without a legacy player URL", async () => {
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /class="tiktok-embed"/);
-  assert.match(html, /data-video-id="6718335390845095173"/);
+  assert.match(html, /data-video-id="7669587518156705056"/);
   assert.doesNotMatch(html, /player\/v1\/6718335390845095173/);
   assert.doesNotMatch(html, /"embedUrl":s*"https:\/\/www\.tiktok\.com\/player\/v1\//);
 });
@@ -674,7 +674,7 @@ test("homepage previews wait three seconds and respect reduced-data preferences"
   assert.match(appSource, /\/reactions`/);
 });
 
-test("renders TikTok embeds for clean controls, reliable replay, and provider messaging", async () => {
+test("renders the supplied official Saiyaara TikTok embed without fallback UI", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
@@ -682,9 +682,9 @@ test("renders TikTok embeds for clean controls, reliable replay, and provider me
      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
   ).run(
     "tiktok-player-test",
-    "TikTok player test",
-    "https://www.tiktok.com/@example/video/6718335390845095173",
-    "https://www.tiktok.com/player/v1/6718335390845095173?controls=1&rel=1&description=1&music_info=1",
+    "Admin data title that must not alter official embed",
+    "https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056?_r=1&_t=ZS-99uc1Q5QfSR",
+    "https://www.tiktok.com/player/v1/7669587518156705056?controls=1",
     "tiktok",
     "Social Media & Trending",
     "TikTok Trending",
@@ -696,9 +696,15 @@ test("renders TikTok embeds for clean controls, reliable replay, and provider me
   const html = await page.text();
   assert.match(html, /class="tiktok-embed"/);
   assert.match(html, /data-video-id="6718335390845095173"/);
-  assert.match(html, /@example/);
+  assert.match(html, /@saiyaara\.4ever/);
   assert.match(html, /cite="https:\/\/www\.tiktok\.com\/@example\/video\/6718335390845095173"/);
-  assert.doesNotMatch(html, /<blockquote[^>]+cite="[^"]*player\/v1\/6718335390845095173/);
+  assert.doesNotMatch(html, /player\/v1\/7669587518156705056/);
+  assert.match(html, /data-embed-from="embed_page"/);
+  assert.match(html, /fyppppppppppppppppppppppp/);
+  assert.match(html, /ahaanpanday/);
+  assert.match(html, /aneetpadda/);
+  assert.match(html, /saiyaara/);
+  assert.match(html, /audio-originale-7669587549221178144/);
   assert.match(html, /data-video-provider="tiktok"/);
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
