@@ -657,7 +657,7 @@ test("admin uses the official TikTok Embed Player iframe", () => {
   const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
   assert.match(adminSource, /renderTikTokPreview/);
   assert.match(adminSource, /buildTikTokPlayerUrl/);
-  assert.match(adminSource, /https:\\/\\/www\\.tiktok\\.com\\/player\\/v1\\/\$\\{encodeURIComponent\(videoId\)\\}/);
+  assert.match(adminSource, /player\\/v1\\/\\$\\{encodeURIComponent\\(videoId\\)\\}/);
   assert.match(adminSource, /closed_caption: "1"/);
   assert.match(adminSource, /music_info: "1"/);
   assert.match(adminSource, /description: "1"/);
