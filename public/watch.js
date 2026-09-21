@@ -912,6 +912,8 @@ function initializeTikTokEmbedScript() {
         stage.insertAdjacentElement("afterend", status);
       }
       status.textContent = "TikTok's official embed service could not load in this browser or network.";
+      stage.classList.remove("is-tiktok-pending");
+      stage.classList.add("is-tiktok-failed");
       const fallback = stage.querySelector(".vidbest-tiktok-fallback");
       if (fallback) fallback.hidden = false;
     }, { once: true });
@@ -969,10 +971,10 @@ function initializeTikTokReliability(player, stage, frame) {
     }
   }
 
-  function showStatus(text, failed = false) {
+  function showStatus(text, state = "pending") {
     message.textContent = text;
     status.hidden = false;
-    setEmbedState(failed ? "failed" : "pending");
+    setEmbedState(state);
   }
 
   function hideStatus() {
@@ -1074,7 +1076,7 @@ function initializeTikTokReliability(player, stage, frame) {
         } else if (code === 3001) {
           handleFailure("TikTok reported a playback error.");
         } else if (code === 3002) {
-          showStatus("Browser autoplay was blocked. Tap TikTok's Play button.");
+          showStatus("Browser autoplay was blocked. Tap TikTok's Play button.", "ready");
         } else {
           handleFailure("The TikTok player returned an error.");
         }
