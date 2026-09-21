@@ -662,6 +662,8 @@ test("renders TikTok embeds for clean controls, reliable replay, and provider me
   assert.match(html, /@example/);
   assert.match(html, /cite="https:\/\/www\.tiktok\.com\/@example\/video\/6718335390845095173"/);
   assert.doesNotMatch(html, /<blockquote[^>]+cite="[^"]*player\/v1\/6718335390845095173/);
+  assert.match(html, /<script async src="https:\/\/www\.tiktok\.com\/embed\.js"><\/script>/);
+  assert.equal((html.match(/https:\/\/www\.tiktok\.com\/embed\.js/g) || []).length, 1);
   assert.match(html, /data-video-provider="tiktok"/);
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
