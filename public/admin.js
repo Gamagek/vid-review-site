@@ -384,15 +384,7 @@ function renderTikTokPreview(sourceUrl, videoId) {
 
   ensureTikTokEmbedScript();
 
-  // TikTok's documented embed.js automatically processes blockquotes.
-  // If the current SDK exposes a render helper, use it as progressive
-  // enhancement for dynamically inserted admin previews. It is not required.
-  try {
-    if (window.tiktokEmbed?.lib?.render) {
-      window.tiktokEmbed.lib.render();
-    }
-  } catch {}
-
+  // TikTok's official embed.js automatically processes the blockquote.
   setTimeout(() => {
     observer.disconnect();
     if (!ready()) {
