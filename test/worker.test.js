@@ -659,7 +659,6 @@ test("admin uses the official TikTok blockquote preview instead of a raw player 
   assert.match(adminSource, /className = "tiktok-embed"/);
   assert.match(adminSource, /ensureTikTokEmbedScript/);
   assert.doesNotMatch(adminSource, /window\.tiktokEmbed\?\.lib\?\.render/);
-  assert.doesNotMatch(adminSource, /window\.tiktokEmbed\?\.lib\?\.render/);
   assert.match(adminSource, /dataset\.embedType = "curated"/);
 });
 
@@ -735,8 +734,9 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   assert.ok(html.includes("<h1>Saiyaara; A Cinematic Romance</h1>"));
   assert.ok(html.includes('<blockquote class="tiktok-embed"'));
   assert.ok(html.includes('data-video-id="6718335390845095173"'));
-  assert.ok(html.includes('@example'));
-  assert.ok(html.includes('data-embed-from="embed_page"'));
+  assert.ok(html.includes('data-embed-type="curated"'));
+  assert.ok(html.includes('data-video-id-list="6718335390845095173"'));
+  assert.ok(html.includes('cite="https://www.tiktok.com"'));
   assert.ok(html.includes('https://www.tiktok.com/embed.js'));
   assert.doesNotMatch(html, /Play TikTok in popup/);
   assert.ok(html.includes('data-video-provider="tiktok"'));
