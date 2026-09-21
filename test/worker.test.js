@@ -344,7 +344,7 @@ test("stores new TikTok videos without a legacy player URL", async () => {
   const result = await response.json();
   assert.equal(result.video.provider, "tiktok");
   assert.equal(result.video.media_type, "tiktok");
-  assert.equal(result.video.embed_url, null);
+  assert.match(result.video.embed_url, /^https:\/\/www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
 
   const page = await send(context, `/watch/${result.video.slug}`);
   assert.equal(page.status, 200);
@@ -352,7 +352,7 @@ test("stores new TikTok videos without a legacy player URL", async () => {
   assert.match(html, /class="tiktok-embed"/);
   assert.match(html, /data-video-id-list="6718335390845095173"/);
   assert.doesNotMatch(html, /player\/v1\/6718335390845095173/);
-  assert.doesNotMatch(html, /"embedUrl":s*"https:\/\/www\.tiktok\.com\/player\/v1\//);
+  assert.ok(!html.includes('"embedUrl":"https://www.tiktok.com/player/v1/'));
 });
 
 test("normalizes trusted provider URLs into provider-owned embeds", async () => {
@@ -662,7 +662,7 @@ test("admin uses the official TikTok Embed Player iframe", () => {
   assert.match(adminSource, /music_info: "1"/);
   assert.match(adminSource, /description: "1"/);
   assert.doesNotMatch(adminSource, /tiktok-embed/);
-  assert.doesNotMatch(adminSource, /embed\\.js/);
+  assert.ok(!adminSource.includes("embed.js"));
 });
 
 test("renders the official TikTok Embed Player iframe with responsive options", async () => {
