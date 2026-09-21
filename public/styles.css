@@ -752,3 +752,51 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
     max-height: 64vh;
   }
 }
+
+/* TikTok official embed loading/failure states. */
+.watch-player[data-provider="tiktok"] .watch-player-stage.is-tiktok-pending {
+  position: relative;
+}
+.watch-player[data-provider="tiktok"] .watch-player-stage.is-tiktok-pending::before {
+  content: "Connecting to TikTok's official player…";
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  color: #aeb6cc;
+  background: #050711;
+}
+.watch-player[data-provider="tiktok"] .watch-player-stage.is-tiktok-pending .tiktok-embed-wrap {
+  visibility: hidden;
+}
+.watch-player[data-provider="tiktok"] .watch-player-stage.is-tiktok-failed .tiktok-embed-wrap {
+  display: none;
+}
+.watch-player[data-provider="tiktok"] .watch-player-stage.is-tiktok-failed {
+  min-height: 260px;
+  height: auto;
+}
+.vidbest-tiktok-fallback {
+  min-height: 260px;
+  padding: 28px 20px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 9px;
+  text-align: center;
+  color: #aeb6cc;
+  background: radial-gradient(circle at 50% 35%, rgba(125,93,240,.16), transparent 55%), #050711;
+}
+.vidbest-tiktok-fallback strong {
+  color: #f1f4ff;
+  font-size: 1rem;
+}
+.vidbest-tiktok-fallback span {
+  max-width: 430px;
+  line-height: 1.55;
+  font-size: .76rem;
+}
+.vidbest-tiktok-fallback .button { margin-top: 6px; }
