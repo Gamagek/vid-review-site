@@ -124,6 +124,7 @@ function chooseVisibleCandidate() {
       previewState.visibility.delete(card);
       continue;
     }
+    if (card.dataset.videoProvider === "tiktok") continue;
     if (ratio >= bestScore && canPreview(card)) {
       bestCard = card;
       bestScore = ratio;
@@ -164,6 +165,10 @@ function startPreview(card) {
   const surface = card.querySelector(".preview-surface");
   const player = createPreviewPlayer(card);
   card.classList.remove("preview-pending");
+  if (card.dataset.videoProvider === "tiktok" && !player) {
+    card.querySelector(".preview-status").textContent = "TikTok preview needs a normal sharing link";
+    return;
+  }
   if (!surface || !player) {
     card.querySelector(".preview-status").textContent = "Open video to play";
     return;
