@@ -86,6 +86,8 @@ function parseTikTokShareUrl(value) {
     if (host !== "tiktok.com") return null;
     const match = url.pathname.match(/^\/@[^/]+\/video\/(\d+)\/?$/);
     if (!match) return null;
+    url.search = "";
+    url.hash = "";
     return { url: url.toString(), id: match[1] };
   } catch {
     return null;
@@ -105,6 +107,17 @@ function ensureTikTokEmbedScript() {
     document.head.append(script);
   });
   return tiktokEmbedScriptPromise;
+}
+
+function renderLoadedTikTokEmbed(blockquote) {
+  const render = window.tiktokEmbed?.lib?.render;
+  if (typeof render !== "function") return false;
+  try {
+    render(blockquote);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function handleVisibility(entries) {
@@ -201,7 +214,12 @@ function createPreviewPlayer(card) {
     blockquote.style.width = "100%";
     const section = document.createElement("section");
     blockquote.append(section);
-    ensureTikTokEmbedScript().catch(() => {
+    const sdkPromise = ensureTikTokEmbedScript();
+    sdkPromise.then(() => {
+      if (!renderLoadedTikTokEmbed(blockquote)) {
+        // TikTok's embed script also processes standard blockquotes as they are added.
+      }
+    }).catch(() => {
       card.querySelector(".preview-status").textContent = "TikTok preview unavailable · open video";
     });
     return blockquote;
