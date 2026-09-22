@@ -18,6 +18,8 @@ const previewState = {
   observer: null,
 };
 
+let tiktokEmbedScriptPromise = null;
+
 document.addEventListener("DOMContentLoaded", initializePreviews);
 document.addEventListener("vidbest:grid-rendered", decorateVideoCards);
 
@@ -63,16 +65,46 @@ function previewsAllowed() {
 
 function previewAvailabilityMessage(card) {
   if (!previewsAllowed()) return "Open video · preview disabled";
+  if (card.dataset.videoProvider === "tiktok" && !parseTikTokShareUrl(card.dataset.videoSource)) {
+    return "TikTok preview needs a normal sharing link";
+  }
   return canPreview(card) ? "Hold for a 3-second preview" : "Open video to play";
 }
 
 function canPreview(card) {
   const provider = card.dataset.videoProvider;
-  // TikTok deliberately has no homepage/mini-tile iframe previews.
-  if (provider === "tiktok") return false;
+  if (provider === "tiktok") return Boolean(parseTikTokShareUrl(card.dataset.videoSource));
   const direct = Boolean(card.dataset.videoSource) && ["direct", "raw", "r2"].includes(provider);
   const embed = Boolean(card.dataset.videoEmbed) && EMBED_PREVIEW_PROVIDERS.has(provider);
   return direct || embed;
+}
+
+function parseTikTokShareUrl(value) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    if (host !== "tiktok.com") return null;
+    const match = url.pathname.match(/^\/@[^/]+\/video\/(\d+)\/?$/);
+    if (!match) return null;
+    return { url: url.toString(), id: match[1] };
+  } catch {
+    return null;
+  }
+}
+
+function ensureTikTokEmbedScript() {
+  const existing = document.querySelector('script[data-vidbest-tiktok-embed]');
+  if (existing) return tiktokEmbedScriptPromise || Promise.resolve();
+  tiktokEmbedScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://www.tiktok.com/embed.js";
+    script.dataset.vidbestTiktokEmbed = "1";
+    script.addEventListener("load", resolve, { once: true });
+    script.addEventListener("error", () => reject(new Error("TikTok preview script failed to load")), { once: true });
+    document.head.append(script);
+  });
+  return tiktokEmbedScriptPromise;
 }
 
 function handleVisibility(entries) {
@@ -151,6 +183,24 @@ function startPreview(card) {
 
 function createPreviewPlayer(card) {
   const provider = card.dataset.videoProvider;
+  if (provider === "tiktok") {
+    const share = parseTikTokShareUrl(card.dataset.videoSource);
+    if (!share) return null;
+    const blockquote = document.createElement("blockquote");
+    blockquote.className = "tiktok-embed";
+    blockquote.setAttribute("cite", share.url);
+    blockquote.dataset.videoId = share.id;
+    blockquote.dataset.embedFrom = "vidbest-hover";
+    blockquote.style.maxWidth = "605px";
+    blockquote.style.minWidth = "0";
+    blockquote.style.width = "100%";
+    const section = document.createElement("section");
+    blockquote.append(section);
+    ensureTikTokEmbedScript().catch(() => {
+      card.querySelector(".preview-status").textContent = "TikTok preview unavailable · open video";
+    });
+    return blockquote;
+  }
   if (["direct", "raw", "r2"].includes(provider)) {
     const source = safeMediaUrl(card.dataset.videoSource);
     if (!source) return null;
