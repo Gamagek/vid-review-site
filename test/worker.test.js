@@ -701,6 +701,10 @@ test("renders the official TikTok Embed Player iframe with responsive options", 
   assert.doesNotMatch(watchSource, /initializeTikTokLazyPlayer/);
   assert.match(watchSource, /"x-tiktok-player": true/);
   assert.match(watchSource, /onPlayerError/);
+  assert.match(watchSource, /className = "vidbest-tiktok-retry"/);
+  assert.match(watchSource, /Remote providers already render their own control bars inside the iframe/);
+  assert.match(watchSource, /if \(remote\) \{/);
+  assert.doesNotMatch(watchSource, /remote = provider === "youtube" \|\| provider === "vimeo" \|\| provider === "tiktok";[\s\S]{0,1200}overlay.append\(play, back, forward/);
   assert.match(watchSource, /Retry TikTok player/);
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /parseTikTokShareUrl/);
