@@ -663,7 +663,7 @@ test("TikTok keeps separate share preview and player paths", () => {
   assert.ok(adminSource.includes("https://www.tiktok.com/player/v1/${encodeURIComponent(videoId)}?${params.toString()}"));
   assert.match(adminSource, /className = "tiktok-embed"/);
   assert.match(adminSource, /ensureTikTokAdminEmbedScript/);
-  assert.match(adminSource, /player link is generated separately/);
+  assert.match(adminSource, /TikTok preview needs the normal full sharing link/);
 });
 
 test("renders the official TikTok Embed Player iframe with responsive options", async () => {
