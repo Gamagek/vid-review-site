@@ -299,7 +299,7 @@ function updatePreview() {
   const parsed = parseEmbed(target);
 
   if (parsed.provider === "tiktok") {
-    renderTikTokPreview(target, parsed.id);
+    renderTikTokPreview(parsed.source);
     return;
   }
 
@@ -327,14 +327,14 @@ function updatePreview() {
   }
 }
 
-function renderTikTokPreview(sourceUrl, videoId) {
+function renderTikTokPreview(sourceUrl) {
   const shell = document.createElement("div");
   shell.className = "admin-tiktok-preview";
   shell.dataset.tiktokPreview = "1";
 
   const iframe = document.createElement("iframe");
   iframe.className = "tiktok-official-player";
-  iframe.src = buildTikTokPlayerUrl(videoId);
+  iframe.src = buildTikTokEmbedUrl(sourceUrl);
   iframe.title = "TikTok video preview";
   iframe.loading = "eager";
   iframe.allow = "autoplay; fullscreen; picture-in-picture";
@@ -344,28 +344,24 @@ function renderTikTokPreview(sourceUrl, videoId) {
   ui.preview.append(shell);
 }
 
-function buildTikTokPlayerUrl(videoId) {
-  const params = new URLSearchParams({
-    controls: "1",
-    progress_bar: "1",
-    play_button: "1",
-    volume_control: "1",
-    fullscreen_button: "1",
-    timestamp: "1",
-    loop: "0",
-    autoplay: "0",
-    music_info: "1",
-    description: "1",
-    rel: "1",
-    native_context_menu: "1",
-    closed_caption: "1",
-    muted: "0",
-  });
-  return `https://www.tiktok.com/player/v1/${encodeURIComponent(videoId)}?${params.toString()}`;
+function buildTikTokEmbedUrl(sourceUrl) {
+  const queryURL = new URL(sourceUrl);
+  queryURL.search = "";
+  queryURL.hash = "";
+  const embedUrl = new URL("https://www.tiktok.com/embed/");
+  embedUrl.searchParams.set("type", "video");
+  embedUrl.searchParams.set("queryURL", queryURL.toString());
+  return embedUrl.toString();
 }
+function extractTikTokShareUrl(value) {
+  const match = String(value || "").match(/https?:\/\/(?:www\.)?tiktok\.com\/@[^\s/]+\/video\/\d+(?:\?[^\s<>"']*)?/i);
+  return match ? match[0].replace(/[),.;!?]+$/, "") : "";
+}
+
 function parseEmbed(value) {
   try {
-    const url = new URL(value, location.origin);
+    const tiktokShareUrl = extractTikTokShareUrl(value);
+    const url = new URL(tiktokShareUrl || value, location.origin);
     const host = url.hostname.toLowerCase().replace(/^www\./, "");
     let youtubeId = null;
     if (host === "youtu.be") youtubeId = url.pathname.split("/").filter(Boolean)[0];
@@ -377,8 +373,11 @@ function parseEmbed(value) {
       return { embed: `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&playsinline=1&enablejsapi=1&origin=${origin}` };
     }
     if (host === "tiktok.com" || host.endsWith(".tiktok.com")) {
-      const id = url.pathname.match(/\/video\/(\d+)/)?.[1];
-      return id ? { provider: "tiktok", id, source: url.toString() } : {};
+      const match = url.pathname.match(/^\/@[^/]+\/video\/(\d+)/);
+      const id = match?.[1];
+      if (!id) return {};
+      const source = `https://www.tiktok.com${url.pathname}`;
+      return { provider: "tiktok", id, source };
     }
     if (host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch") {
       return { embed: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url.toString())}&show_text=false&width=1280` };
