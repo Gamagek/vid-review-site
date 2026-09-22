@@ -68,6 +68,8 @@ function previewAvailabilityMessage(card) {
 
 function canPreview(card) {
   const provider = card.dataset.videoProvider;
+  // TikTok deliberately has no homepage/mini-tile iframe previews.
+  if (provider === "tiktok") return false;
   const direct = Boolean(card.dataset.videoSource) && ["direct", "raw", "r2"].includes(provider);
   const embed = Boolean(card.dataset.videoEmbed) && EMBED_PREVIEW_PROVIDERS.has(provider);
   return direct || embed;
