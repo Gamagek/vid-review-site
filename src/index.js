@@ -159,6 +159,10 @@ async function route(request, env, ctx) {
     return requestDiscovery(request, env);
   }
 
+  if (path === "/api/tiktok/thumbnail" && request.method === "GET") {
+    return tikTokThumbnail(request);
+  }
+
   if (path === "/robots.txt" && request.method === "GET") {
     return robotsResponse(request, env);
   }
@@ -321,6 +325,68 @@ async function route(request, env, ctx) {
 
   const assetResponse = await env.ASSETS.fetch(request);
   return secureAssetResponse(assetResponse, path);
+}
+
+async function tikTokThumbnail(request) {
+  const requested = cleanText(new URL(request.url).searchParams.get("url"), 2000);
+  const share = normalizeTikTokShareUrl(requested);
+  if (!share) throw new AppError(400, "Use a normal TikTok sharing link");
+
+  const requestUrl = new URL(request.url);
+  const cacheKey = new Request(
+    `${requestUrl.origin}/__vidbest-tiktok-thumbnail?url=${encodeURIComponent(share)}`,
+  );
+  const cache = typeof caches !== "undefined" && caches.default ? caches.default : null;
+  if (cache) {
+    const cached = await cache.match(cacheKey);
+    if (cached) return cached;
+  }
+
+  const metadataUrl = new URL("https://www.tiktok.com/oembed");
+  metadataUrl.searchParams.set("url", share);
+  const metadataResponse = await fetch(metadataUrl.toString(), {
+    headers: {
+      Accept: "application/json",
+      "User-Agent": "VidBest/1.0 (+https://vid.best/)",
+    },
+  });
+  if (!metadataResponse.ok) throw new AppError(502, "TikTok preview metadata is unavailable");
+
+  let metadata;
+  try {
+    metadata = await metadataResponse.json();
+  } catch {
+    throw new AppError(502, "TikTok preview metadata is invalid");
+  }
+
+  const thumbnailUrl = String(metadata?.thumbnail_url || "");
+  let thumbnail;
+  try {
+    const parsedThumbnail = new URL(thumbnailUrl);
+    const host = parsedThumbnail.hostname.toLowerCase();
+    const allowed = host === "tiktokcdn.com"
+      || host.endsWith(".tiktokcdn.com")
+      || host === "muscdn.com"
+      || host.endsWith(".muscdn.com");
+    if (!allowed || !["https:"].includes(parsedThumbnail.protocol)) {
+      throw new Error("Unsupported TikTok thumbnail host");
+    }
+    thumbnail = parsedThumbnail;
+  } catch {
+    throw new AppError(502, "TikTok did not provide a usable preview image");
+  }
+
+  const imageResponse = await fetch(thumbnail.toString(), {
+    headers: { Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8" },
+  });
+  if (!imageResponse.ok) throw new AppError(502, "TikTok preview image is unavailable");
+
+  const headers = securityHeaders(new Headers(imageResponse.headers));
+  headers.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
+  if (!headers.has("Content-Type")) headers.set("Content-Type", "image/jpeg");
+  const response = new Response(imageResponse.body, { status: 200, headers });
+  if (cache) await cache.put(cacheKey, response.clone());
+  return response;
 }
 
 function handleError(error) {
@@ -595,9 +661,14 @@ function parseTags(value, fallback = []) {
 
 function serializeVideo(row) {
   if (!row) return null;
+  const provider = detectMediaProvider(row);
+  const fallbackThumbnail = provider === "tiktok" && !row.thumbnail_url
+    ? buildTikTokThumbnailProxyUrl(row.source_url)
+    : null;
   return {
     ...row,
-    provider: detectMediaProvider(row),
+    provider,
+    thumbnail_url: row.thumbnail_url || fallbackThumbnail,
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
     published: Boolean(row.published),
@@ -605,6 +676,24 @@ function serializeVideo(row) {
     seo_tags: parseTags(row.seo_tags),
     reactions: row.reactions || { like: 0, love: 0, useful: 0 },
   };
+}
+
+function buildTikTokThumbnailProxyUrl(sourceUrl) {
+  const share = normalizeTikTokShareUrl(sourceUrl);
+  return share ? `/api/tiktok/thumbnail?url=${encodeURIComponent(share)}` : null;
+}
+
+function normalizeTikTokShareUrl(value) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    if (host !== "tiktok.com") return null;
+    const match = url.pathname.match(/^\/@([^/]+)\/video\/(\d+)\/?$/);
+    if (!match) return null;
+    return `https://www.tiktok.com/@${match[1]}/video/${match[2]}`;
+  } catch {
+    return null;
+  }
 }
 
 function detectMediaProvider(video) {
