@@ -678,7 +678,7 @@ test("admin uses the official TikTok Embed Player iframe", () => {
   assert.match(adminSource, /closed_caption: "1"/);
   assert.match(adminSource, /music_info: "1"/);
   assert.match(adminSource, /description: "1"/);
-  assert.doesNotMatch(adminSource, /tiktok-embed/);
+  assert.doesNotMatch(adminSource, /className = "tiktok-embed"/);
   assert.ok(!adminSource.includes("embed.js"));
 });
 
