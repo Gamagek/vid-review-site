@@ -761,7 +761,7 @@ test("renders the official TikTok Embed Player iframe with responsive options", 
   const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
   assert.match(indexSource, /\/api\/tiktok\/thumbnail/);
   assert.match(indexSource, /www\.tiktok\.com\/oembed/);
-  assert.match(indexSource, /tiktokcdn\(?:-\[a-z0-9-\]\+\)\?\.com/);
+  assert.match(indexSource, /tiktokcdn(?:-[a-z0-9-]+)?\.com/);
 });
 
 test("repairs a legacy TikTok record with only its source URL and uses the Saiyaara title", async () => {
