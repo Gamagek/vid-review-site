@@ -25,7 +25,6 @@ function initializeWatchPage() {
   enhanceCommentForm();
   enhanceNativePlayer();
   initializePersistentPlayer();
-  initializeTikTokLazyPlayer();
   initializeEmbeddedMediaTools();
   initializeAudioLab();
   initializeEmbeddedAudioLab();
@@ -44,68 +43,6 @@ function initializeWatchPage() {
   loadRecommendations();
 }
 
-
-function buildTikTokPlayerUrl(id) {
-  const params = new URLSearchParams({
-    controls: "1",
-    progress_bar: "1",
-    play_button: "1",
-    volume_control: "1",
-    fullscreen_button: "1",
-    timestamp: "1",
-    loop: "0",
-    autoplay: "0",
-    music_info: "1",
-    description: "1",
-    rel: "1",
-    native_context_menu: "1",
-    closed_caption: "1",
-    muted: "0",
-  });
-  return \`https://www.tiktok.com/player/v1/\${encodeURIComponent(id)}?\${params.toString()}\`;
-}
-
-function initializeTikTokLazyPlayer() {
-  const provider = String(document.body.dataset.videoProvider || "").toLowerCase();
-  if (provider !== "tiktok") return;
-  const shell = document.querySelector(".tiktok-lazy-shell");
-  if (!shell || shell.dataset.tiktokLoaded === "1") return;
-
-  const load = () => {
-    if (shell.dataset.tiktokLoaded === "1") return;
-    const id = String(shell.dataset.tiktokId || "");
-    if (!/^\d+$/.test(id)) return;
-    shell.dataset.tiktokLoaded = "1";
-    shell.classList.add("is-loading");
-
-    const iframe = document.createElement("iframe");
-    iframe.className = "tiktok-official-player";
-    iframe.src = buildTikTokPlayerUrl(id);
-    iframe.title = document.querySelector("h1")?.textContent?.trim() || "TikTok video";
-    iframe.loading = "lazy";
-    iframe.allow = "autoplay; fullscreen; picture-in-picture";
-    iframe.allowFullscreen = true;
-    iframe.referrerPolicy = "strict-origin-when-cross-origin";
-    iframe.dataset.tiktokId = id;
-
-    shell.replaceChildren(iframe);
-    shell.classList.remove("is-loading");
-    initializeEmbeddedMediaTools();
-  };
-
-  shell.querySelector("[data-tiktok-load]")?.addEventListener("click", load, { once: true });
-
-  if ("IntersectionObserver" in window) {
-    const observer = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer.disconnect();
-      load();
-    }, { rootMargin: "200px 0px", threshold: 0.01 });
-    observer.observe(shell);
-  } else {
-    window.setTimeout(load, 700);
-  }
-}
 
 function initializePersistentPlayer() {
   if (!persistentPlayer || !playerPlaceholder) return;
@@ -753,111 +690,6 @@ function initializeEmbeddedMediaTools() {
   overlay.className = "vidbest-embed-overlay";
   let tiktokReady = false;
   let tiktokRecoveryTimer = null;
-  let tiktokRecovery = null;
-
-  function copyText(value, button) {
-    const pending = navigator.clipboard?.writeText(value);
-    if (!pending) {
-      button.textContent = `Copy: ${value}`;
-      return;
-    }
-    pending.then(
-      () => {
-        button.textContent = "Copied";
-        window.setTimeout(() => { button.textContent = `Copy ${value}`; }, 1400);
-      },
-      () => { button.textContent = `Copy: ${value}`; },
-    );
-  }
-  function showTikTokRecovery(reason = "TikTok did not respond", includeDns = true) {
-    if (provider !== "tiktok" || !tiktokRecovery) return;
-    const note = tiktokRecovery.querySelector("[data-tiktok-recovery-note]");
-    if (note) note.textContent = reason;
-    const dns = tiktokRecovery.querySelector("[data-tiktok-dns]");
-    if (dns) dns.hidden = !includeDns;
-    tiktokRecovery.hidden = false;
-  }
-
-  function hideTikTokRecovery() {
-    if (tiktokRecovery) tiktokRecovery.hidden = true;
-  }
-
-  function armTikTokRecoveryTimer() {
-    window.clearTimeout(tiktokRecoveryTimer);
-    if (provider !== "tiktok") return;
-    tiktokRecoveryTimer = window.setTimeout(() => {
-      if (!tiktokReady) showTikTokRecovery(
-        "TikTok could not start in this browser or network.",
-        true,
-      );
-    }, 8000);
-  }
-
-  function makeTikTokRecovery() {
-    if (provider !== "tiktok") return null;
-    const source = document.querySelector(".tiktok-lazy-shell")?.dataset.tiktokSource || "";
-    const panel = document.createElement("div");
-    panel.className = "tiktok-recovery";
-    panel.hidden = true;
-
-    const heading = document.createElement("strong");
-    heading.textContent = "TikTok player could not start";
-    const note = document.createElement("p");
-    note.dataset.tiktokRecoveryNote = "1";
-    note.textContent = "TikTok did not respond.";
-    const actions = document.createElement("div");
-    actions.className = "tiktok-recovery-actions";
-
-    const retry = document.createElement("button");
-    retry.type = "button";
-    retry.className = "button primary";
-    retry.textContent = "↻ Retry";
-    retry.addEventListener("click", () => {
-      const id = frame.dataset.tiktokId || document.querySelector(".tiktok-lazy-shell")?.dataset.tiktokId || "";
-      if (!/^\d+$/.test(id)) return;
-      tiktokReady = false;
-      panel.hidden = true;
-
-      frame.src = \`\${buildTikTokPlayerUrl(id)}&retry=\${Date.now()}\`;
-      armTikTokRecoveryTimer();
-    });
-
-    const sourceLink = document.createElement("a");
-    sourceLink.className = "button ghost";
-    sourceLink.textContent = "Open on TikTok";
-    sourceLink.target = "_blank";
-    sourceLink.rel = "noopener noreferrer nofollow";
-    sourceLink.href = source || "https://www.tiktok.com/";
-
-    actions.append(retry, sourceLink);
-
-    const dns = document.createElement("div");
-    dns.dataset.tiktokDns = "1";
-    dns.className = "tiktok-dns-help";
-    dns.innerHTML = \`
-      <span>Network/DNS troubleshooting</span>
-      <p class="tiktok-dns-android"><strong>Android:</strong> Settings → Network & internet → Private DNS → Private DNS provider hostname → <code>dns.google</code> → Save.</p>
-      <button type="button" class="button ghost tiktok-dns-copy tiktok-dns-android">Copy dns.google</button>
-      <p class="tiktok-dns-iphone"><strong>iPhone:</strong> Settings → Wi‑Fi → ⓘ → Configure DNS → Manual → add <code>1.1.1.1</code> → Save.</p>
-      <button type="button" class="button ghost tiktok-dns-copy tiktok-dns-iphone">Copy 1.1.1.1</button>
-    \`;
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isAndroid = userAgent.includes("android");
-    const isIphone = userAgent.includes("iphone") || userAgent.includes("ipad") || userAgent.includes("ipod");
-    if (isAndroid && !isIphone) {
-      dns.querySelectorAll(".tiktok-dns-iphone").forEach((item) => { item.hidden = true; });
-    } else if (isIphone) {
-      dns.querySelectorAll(".tiktok-dns-android").forEach((item) => { item.hidden = true; });
-    }
-    dns.querySelector(".tiktok-dns-copy.tiktok-dns-android")?.addEventListener("click", (event) => copyText("dns.google", event.currentTarget));
-    dns.querySelector(".tiktok-dns-copy.tiktok-dns-iphone")?.addEventListener("click", (event) => copyText("1.1.1.1", event.currentTarget));
-    actions.append(dns);
-
-    panel.append(heading, note, actions);
-    stage.append(panel);
-    return panel;
-  }
-
 
   overlay.setAttribute("aria-label", "Vid.Best embedded player controls");
 
@@ -916,6 +748,33 @@ function initializeEmbeddedMediaTools() {
     message("Caption languages are controlled by the embedded provider.");
     frame.focus();
   });
+
+  const retry = button("↻ Retry", "Retry TikTok player", function() {
+    if (provider !== "tiktok") return;
+    tiktokReady = false;
+    retry.hidden = true;
+    try {
+      const url = new URL(frame.src);
+      url.searchParams.set("retry", String(Date.now()));
+      frame.src = url.toString();
+    } catch {}
+    message("Retrying TikTok player…");
+    armTikTokWatchdog();
+  }, provider !== "tiktok");
+  retry.hidden = provider !== "tiktok";
+
+  function armTikTokWatchdog() {
+    window.clearTimeout(tiktokRecoveryTimer);
+    if (provider !== "tiktok") return;
+    tiktokRecoveryTimer = window.setTimeout(() => {
+      if (!tiktokReady) {
+        retry.hidden = false;
+        message("TikTok did not start. Tap Retry.");
+      }
+    }, 8000);
+  }
+
+  if (provider === "tiktok") armTikTokWatchdog();
 
   async function embeddedPiP() {
     if (!(window.documentPictureInPicture && window.documentPictureInPicture.requestWindow)) {
@@ -990,7 +849,7 @@ function initializeEmbeddedMediaTools() {
   const note = document.createElement("span");
   note.className = "vidbest-embed-note";
   note.textContent = remote ? "Embedded " + provider + " · enhanced controls" : "Embedded " + provider + " · provider controls remain authoritative";
-  overlay.append(play, back, forward, speed, captions, mute, pip, share, pop, full, note);
+  overlay.append(play, back, forward, speed, captions, mute, pip, share, pop, full, retry, note);
   stage.style.position = stage.style.position || "relative";
   stage.append(overlay);
 
@@ -1008,14 +867,13 @@ function initializeEmbeddedMediaTools() {
         if (data.type === "onPlayerError") {
           const code = Number(data.value?.errorCode);
           const type = String(data.value?.errorType || "PLAYER_ERROR");
-          const unavailable = code === 1001;
-          message(`TikTok player: ${type}${Number.isFinite(code) ? ` (${code})` : ""}`);
-          showTikTokRecovery(`TikTok reported ${type}${Number.isFinite(code) ? ` (${code})` : ""}.`, !unavailable);
+          retry.hidden = false;
+          message(`TikTok player: ${type}${Number.isFinite(code) ? ` (${code})` : ""} · Tap Retry`);
         }
         if (data.type === "onPlayerReady") {
           tiktokReady = true;
           window.clearTimeout(tiktokRecoveryTimer);
-          hideTikTokRecovery();
+          retry.hidden = true;
           message("TikTok official player ready · provider controls active");
         }
         return;
