@@ -189,7 +189,7 @@ function createPreviewPlayer(card) {
     if (!share) return null;
     const iframe = document.createElement("iframe");
     iframe.src = buildTikTokPreviewPlayerUrl(share.id);
-    iframe.title = \`${card.dataset.videoTitle} muted TikTok preview\`;
+    iframe.title = `${card.dataset.videoTitle} muted TikTok preview`;
     iframe.loading = "eager";
     iframe.referrerPolicy = "strict-origin-when-cross-origin";
     iframe.allow = "autoplay; fullscreen; picture-in-picture";
@@ -243,7 +243,7 @@ function buildTikTokPreviewPlayerUrl(videoId) {
     closed_caption: "0",
     muted: "1",
   });
-  return \`https://www.tiktok.com/player/v1/\${encodeURIComponent(videoId)}?\${params.toString()}\`;
+  return `https://www.tiktok.com/player/v1/${encodeURIComponent(videoId)}?${params.toString()}`;
 }
 
 function armTikTokPreview(card, iframe) {
