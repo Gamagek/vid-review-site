@@ -6,6 +6,7 @@ const adminState = {
   analysisDraft: null,
   analysisSource: "",
   analysisPollTimer: null,
+  tiktokEmbedPreviewTimer: null,
 };
 
 const ui = {
@@ -32,6 +33,14 @@ const ui = {
   uploadProgress: document.querySelector("#upload-progress"),
   uploadStatus: document.querySelector("#upload-status"),
   preview: document.querySelector("#media-preview"),
+  tiktokEmbedLab: document.querySelector("#tiktok-embed-lab"),
+  tiktokLinkPreview: document.querySelector("#tiktok-link-test-preview"),
+  tiktokEmbedCode: document.querySelector("#tiktok-embed-code"),
+  tiktokGenerateEmbed: document.querySelector("#tiktok-generate-embed"),
+  tiktokPreviewEmbed: document.querySelector("#tiktok-preview-embed"),
+  tiktokCopyEmbed: document.querySelector("#tiktok-copy-embed"),
+  tiktokEmbedStatus: document.querySelector("#tiktok-embed-status"),
+  tiktokEmbedPreview: document.querySelector("#tiktok-embed-preview"),
   category: document.querySelector("#admin-category"),
   subcategory: document.querySelector("#admin-subcategory"),
   otherSubcategory: document.querySelector("#admin-other-subcategory"),
@@ -89,8 +98,21 @@ function bindAdminEvents() {
   ui.otherSubcategory.addEventListener("input", syncOtherSubcategory);
   ui.sourceTabs.forEach((tab) => tab.addEventListener("click", () => setSourceMode(tab.dataset.mode)));
   ui.sourceUrl.addEventListener("change", updatePreview);
-  ui.sourceUrl.addEventListener("input", clearAnalysisIfSourceChanged);
-  ui.sourceUrl.addEventListener("paste", () => setTimeout(updatePreview, 0));
+  ui.sourceUrl.addEventListener("input", () => {
+    clearAnalysisIfSourceChanged();
+    updateTikTokEmbedLab();
+  });
+  ui.sourceUrl.addEventListener("paste", () => setTimeout(() => {
+    updatePreview();
+    updateTikTokEmbedLab();
+  }, 0));
+  ui.tiktokGenerateEmbed.addEventListener("click", generateTikTokEmbedCode);
+  ui.tiktokPreviewEmbed.addEventListener("click", previewTikTokEmbedCode);
+  ui.tiktokCopyEmbed.addEventListener("click", copyTikTokEmbedCode);
+  ui.tiktokEmbedCode.addEventListener("input", () => {
+    clearTimeout(adminState.tiktokEmbedPreviewTimer);
+    adminState.tiktokEmbedPreviewTimer = setTimeout(previewTikTokEmbedCode, 250);
+  });
   ui.videoSearchButton.addEventListener("click", searchPublicVideos);
   ui.videoSearch.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
@@ -300,8 +322,12 @@ function updatePreview() {
 
   if (parsed.provider === "tiktok") {
     renderTikTokPreview(target, parsed.id);
+    updateTikTokEmbedLab(parsed);
     return;
   }
+
+  hideTikTokEmbedLab();
+
 
   if (parsed.embed) {
     const iframe = document.createElement("iframe");
@@ -341,7 +367,13 @@ function renderTikTokPreview(sourceUrl, videoId) {
   iframe.allowFullscreen = true;
   iframe.referrerPolicy = "strict-origin-when-cross-origin";
   shell.append(iframe);
-  ui.preview.append(shell);
+  ui.preview.replaceChildren(shell);
+
+  if (ui.tiktokLinkPreview) {
+    ui.tiktokLinkPreview.replaceChildren(shell.cloneNode(true));
+    const testFrame = ui.tiktokLinkPreview.querySelector("iframe");
+    if (testFrame) testFrame.src = buildTikTokPlayerUrl(videoId);
+  }
 }
 
 function buildTikTokPlayerUrl(videoId) {
@@ -363,9 +395,157 @@ function buildTikTokPlayerUrl(videoId) {
   });
   return `https://www.tiktok.com/player/v1/${encodeURIComponent(videoId)}?${params.toString()}`;
 }
+
+function extractTikTokShareUrl(value) {
+  const match = String(value || "").match(/https?:\/\/(?:www\.)?tiktok\.com\/@[^\s/]+\/video\/\d+(?:\?[^\s<>"']*)?/i);
+  return match ? match[0].replace(/[),.;!?]+$/, "") : "";
+}
+
+function canonicalTikTokUrl(sourceUrl) {
+  try {
+    const url = new URL(sourceUrl);
+    const match = url.pathname.match(/^\/@[^/]+\/video\/(\d+)/);
+    if (!match) return "";
+    return `https://www.tiktok.com${match[0]}`;
+  } catch {
+    return "";
+  }
+}
+
+function buildTikTokOfficialEmbedCode(sourceUrl, videoId) {
+  const canonical = canonicalTikTokUrl(sourceUrl) || `https://www.tiktok.com/@unknown/video/${videoId}`;
+  let author = "";
+  try { author = new URL(canonical).pathname.match(/^\/@([^/]+)/)?.[1] || ""; } catch {}
+  const profile = author ? `https://www.tiktok.com/@${author}?refer=embed` : "https://www.tiktok.com";
+  const authorLink = author
+    ? `<a target="_blank" title="@${author}" href="${profile}">@${author}</a>`
+    : '<a target="_blank" href="https://www.tiktok.com?refer=embed">TikTok</a>';
+  return `<blockquote class="tiktok-embed" cite="${canonical}" data-video-id="${videoId}" data-embed-from="embed_page" style="max-width: 605px;min-width: 325px;"><section>${authorLink}</section></blockquote>\n<script async src="https://www.tiktok.com/embed.js"></script>`;
+}
+
+function readTikTokEmbedCode(code) {
+  const value = String(code || "");
+  const blockquoteMatch = value.match(/<blockquote\b([\s\S]*?)>([\s\S]*?)<\/blockquote>/i);
+  if (!blockquoteMatch || !/class\s*=\s*["'][^"']*tiktok-embed/i.test(blockquoteMatch[1])) return null;
+  const attrs = blockquoteMatch[1];
+  const cite = attrs.match(/\bcite\s*=\s*["']([^"']+)["']/i)?.[1] || "";
+  const dataId = attrs.match(/\bdata-video-id\s*=\s*["'](\d+)["']/i)?.[1] || "";
+  const dataList = attrs.match(/\bdata-video-id-list\s*=\s*["']([^"']+)["']/i)?.[1] || "";
+  const id = dataId || dataList.split(/[,\s]+/).find((item) => /^\d+$/.test(item)) || "";
+  if (!/^\d+$/.test(id)) return null;
+  let source = "";
+  try {
+    const candidate = cite || "";
+    const url = new URL(candidate, location.origin);
+    if (/tiktok\.com$/i.test(url.hostname) || /\.tiktok\.com$/i.test(url.hostname)) {
+      const match = url.pathname.match(/\/video\/(\d+)/);
+      source = match?.[1] === id ? `https://www.tiktok.com${url.pathname}` : "";
+    }
+  } catch {}
+  if (!source) source = `https://www.tiktok.com/video/${id}`;
+  return { id, source, isCurated: /data-embed-type\s*=\s*["']curated["']/i.test(attrs) || /data-video-id-list\s*=/i.test(attrs) };
+}
+
+function sanitizeTikTokEmbedPreview(code) {
+  const parsed = readTikTokEmbedCode(code);
+  if (!parsed) return null;
+  const source = canonicalTikTokUrl(parsed.source) || parsed.source;
+  const attrs = parsed.isCurated
+    ? `cite="${escapeHtml(source)}" data-embed-type="curated" data-video-id-list="${parsed.id}" data-embed-from="embed_page"`
+    : `cite="${escapeHtml(source)}" data-video-id="${parsed.id}" data-embed-from="embed_page"`;
+  return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;background:transparent;display:flex;justify-content:center}blockquote.tiktok-embed{margin:0 auto;max-width:605px;min-width:325px;width:100%;}</style></head><body><blockquote class="tiktok-embed" ${attrs}><section><a target="_blank" href="${escapeHtml(source)}">View on TikTok</a></section></blockquote><script async src="https://www.tiktok.com/embed.js"></script></body></html>`;
+}
+
+function setTikTokEmbedStatus(message, tone = "") {
+  if (!ui.tiktokEmbedStatus) return;
+  setStatus(ui.tiktokEmbedStatus, message, tone);
+}
+
+function hideTikTokEmbedLab() {
+  if (!ui.tiktokEmbedLab) return;
+  ui.tiktokEmbedLab.hidden = true;
+  ui.tiktokLinkPreview?.replaceChildren();
+  ui.tiktokEmbedPreview?.replaceChildren();
+}
+
+function updateTikTokEmbedLab(parsed = null) {
+  if (!ui.tiktokEmbedLab) return;
+  const sourceValue = ui.sourceUrl.value.trim();
+  const sourceMatch = extractTikTokShareUrl(sourceValue);
+  const result = parsed || parseEmbed(sourceMatch || sourceValue);
+  if (result.provider !== "tiktok") {
+    hideTikTokEmbedLab();
+    return;
+  }
+  ui.tiktokEmbedLab.hidden = false;
+  if (!ui.tiktokEmbedCode.value.trim()) {
+    ui.tiktokEmbedCode.value = buildTikTokOfficialEmbedCode(result.source, result.id);
+  }
+  if (!ui.tiktokLinkPreview.querySelector("iframe")) {
+    renderTikTokPreview(result.source, result.id);
+  }
+  previewTikTokEmbedCode();
+}
+
+function generateTikTokEmbedCode() {
+  const parsed = parseEmbed(extractTikTokShareUrl(ui.sourceUrl.value.trim()) || ui.sourceUrl.value.trim());
+  if (parsed.provider !== "tiktok") {
+    setTikTokEmbedStatus("Enter a valid TikTok video link first.", "error");
+    return;
+  }
+  ui.tiktokEmbedCode.value = buildTikTokOfficialEmbedCode(parsed.source, parsed.id);
+  previewTikTokEmbedCode();
+  setTikTokEmbedStatus("Official TikTok embed code generated for testing.", "success");
+}
+
+function previewTikTokEmbedCode() {
+  if (!ui.tiktokEmbedPreview) return;
+  const code = ui.tiktokEmbedCode.value.trim();
+  if (!code) {
+    ui.tiktokEmbedPreview.replaceChildren();
+    ui.tiktokEmbedPreview.append(document.createTextNode("Embedded-code preview appears here."));
+    return;
+  }
+  const srcdoc = sanitizeTikTokEmbedPreview(code);
+  if (!srcdoc) {
+    ui.tiktokEmbedPreview.replaceChildren();
+    ui.tiktokEmbedPreview.append(document.createTextNode("Paste recognized TikTok embed code containing a video ID."));
+    setTikTokEmbedStatus("This tester accepts TikTok's official blockquote embed format only.", "error");
+    return;
+  }
+  const iframe = document.createElement("iframe");
+  iframe.className = "tiktok-embed-code-frame";
+  iframe.title = "TikTok official embed-code live preview";
+  iframe.srcdoc = srcdoc;
+  iframe.loading = "eager";
+  iframe.allow = "autoplay; fullscreen; picture-in-picture";
+  iframe.allowFullscreen = true;
+  iframe.sandbox = "allow-scripts allow-same-origin allow-popups allow-forms allow-presentation";
+  iframe.referrerPolicy = "strict-origin-when-cross-origin";
+  ui.tiktokEmbedPreview.replaceChildren(iframe);
+  setTikTokEmbedStatus("Live preview loaded from the recognized official TikTok embed markup.", "success");
+}
+
+async function copyTikTokEmbedCode() {
+  const code = ui.tiktokEmbedCode.value.trim();
+  if (!code) {
+    setTikTokEmbedStatus("Generate or paste embed code first.", "error");
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(code);
+    setTikTokEmbedStatus("Embed code copied.", "success");
+  } catch {
+    ui.tiktokEmbedCode.focus();
+    ui.tiktokEmbedCode.select();
+    setTikTokEmbedStatus("Clipboard access is unavailable. The code is selected for copying.", "error");
+  }
+}
+
 function parseEmbed(value) {
   try {
-    const url = new URL(value, location.origin);
+    const tiktokShareUrl = extractTikTokShareUrl(value);
+    const url = new URL(tiktokShareUrl || value, location.origin);
     const host = url.hostname.toLowerCase().replace(/^www\./, "");
     let youtubeId = null;
     if (host === "youtu.be") youtubeId = url.pathname.split("/").filter(Boolean)[0];

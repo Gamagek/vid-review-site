@@ -71,6 +71,31 @@
                 <input id="r2-key" name="r2_key" type="hidden">
               </div>
               <div id="media-preview" class="admin-preview"><span>Secure media preview appears here</span></div>
+
+              <details id="tiktok-embed-lab" class="tiktok-embed-lab" hidden>
+                <summary>🎵 TikTok embed-code test lab <small>Admin only · not saved</small></summary>
+                <div class="tiktok-lab-grid">
+                  <section class="tiktok-lab-card">
+                    <div class="tiktok-lab-heading">
+                      <div><strong>1. Normal TikTok link preview</strong><span>Uses the existing PR #26 player preview.</span></div>
+                    </div>
+                    <div id="tiktok-link-test-preview" class="admin-preview tiktok-test-preview"><span>Paste a TikTok link above to test it.</span></div>
+                  </section>
+                  <section class="tiktok-lab-card">
+                    <div class="tiktok-lab-heading">
+                      <div><strong>2. Official embedded-code preview</strong><span>Generate from the link or paste TikTok's official embed code.</span></div>
+                      <button id="tiktok-generate-embed" class="button ghost" type="button">Generate code</button>
+                    </div>
+                    <label><span>Official TikTok embed code</span><textarea id="tiktok-embed-code" rows="8" spellcheck="false" placeholder="Paste TikTok's official <blockquote class=&quot;tiktok-embed&quot;> ... <script async src=&quot;https://www.tiktok.com/embed.js&quot;></script> code here."></textarea></label>
+                    <div class="tiktok-lab-actions">
+                      <button id="tiktok-preview-embed" class="button primary" type="button">Live preview embed</button>
+                      <button id="tiktok-copy-embed" class="button ghost" type="button">Copy code</button>
+                    </div>
+                    <p id="tiktok-embed-status" class="form-status" role="status">Only recognized TikTok embed fields are used in the live preview.</p>
+                    <div id="tiktok-embed-preview" class="admin-preview tiktok-test-preview"><span>Embedded-code preview appears here.</span></div>
+                  </section>
+                </div>
+              </details>
             </div>
 
             <div class="form-section">

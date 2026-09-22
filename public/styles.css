@@ -739,3 +739,88 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
   }
 }
 }
+
+
+/* Admin-only TikTok embed-code test lab. The published player styles remain unchanged. */
+.tiktok-embed-lab {
+  margin-top: 18px;
+  border: 1px solid var(--line, rgba(255,255,255,.12));
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255,255,255,.025);
+}
+.tiktok-embed-lab > summary {
+  cursor: pointer;
+  padding: 14px 16px;
+  font-weight: 700;
+  list-style-position: inside;
+}
+.tiktok-embed-lab > summary small {
+  margin-left: 8px;
+  opacity: .65;
+  font-weight: 500;
+}
+.tiktok-lab-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 0 14px 14px;
+}
+.tiktok-lab-card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line, rgba(255,255,255,.12));
+  border-radius: 14px;
+  background: rgba(0,0,0,.12);
+}
+.tiktok-lab-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.tiktok-lab-heading strong,
+.tiktok-lab-heading span {
+  display: block;
+}
+.tiktok-lab-heading span {
+  margin-top: 4px;
+  opacity: .7;
+  font-size: .88rem;
+}
+.tiktok-lab-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.tiktok-test-preview {
+  min-height: 360px;
+  margin-top: 12px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: #000;
+}
+.tiktok-test-preview iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  border: 0;
+}
+.tiktok-embed-code-frame {
+  width: min(100%, 605px);
+  height: min(78vh, 760px);
+  min-height: 500px;
+  background: #000;
+  border: 0;
+}
+@media (max-width: 900px) {
+  .tiktok-lab-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .tiktok-test-preview { min-height: 420px; }
+  .tiktok-test-preview iframe { min-height: 420px; }
+  .tiktok-embed-code-frame { height: min(78vh, calc((100vw - 42px) * 1.7778)); min-height: 420px; }
+}
