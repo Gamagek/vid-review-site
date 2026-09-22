@@ -663,8 +663,11 @@ test("admin uses the official TikTok Embed Player iframe", () => {
   assert.match(adminSource, /closed_caption: "1"/);
   assert.match(adminSource, /music_info: "1"/);
   assert.match(adminSource, /description: "1"/);
-  assert.doesNotMatch(adminSource, /tiktok-embed/);
-  assert.ok(!adminSource.includes("embed.js"));
+  assert.match(adminSource, /tiktok-embed/);
+  assert.ok(adminSource.includes("https://www.tiktok.com/embed.js"));
+  assert.ok(adminSource.includes("data-video-id-list"));
+  assert.ok(adminSource.includes("tiktok-embed-code-frame"));
+  assert.ok(adminSource.includes("sandbox = "allow-scripts allow-same-origin allow-popups allow-forms allow-presentation""));
 });
 
 test("renders the official TikTok Embed Player iframe with responsive options", async () => {
