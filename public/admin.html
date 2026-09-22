@@ -71,6 +71,15 @@
                 <input id="r2-key" name="r2_key" type="hidden">
               </div>
               <div id="media-preview" class="admin-preview"><span>Secure media preview appears here</span></div>
+              <details id="tiktok-embed-helper" class="tiktok-embed-helper" hidden>
+                <summary>Official TikTok embed code (optional)</summary>
+                <p class="field-help">For TikTok only. You may paste TikTok's official player/embed code here for reference or preview. Vid.Best never injects arbitrary HTML; the saved page uses the verified TikTok post ID and official player.</p>
+                <textarea id="tiktok-embed-code" rows="7" maxlength="12000" spellcheck="false" placeholder="Paste TikTok's official embed code here…"></textarea>
+                <div class="tiktok-embed-helper-actions">
+                  <button id="tiktok-embed-copy" class="button ghost" type="button">Copy embed code</button>
+                  <span id="tiktok-embed-code-status" class="form-status" role="status"></span>
+                </div>
+              </details>
             </div>
 
             <div class="form-section">
