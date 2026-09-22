@@ -682,6 +682,15 @@ function buildTikTokThumbnailProxyUrl(sourceUrl) {
   return share ? `/api/tiktok/thumbnail?url=${encodeURIComponent(share)}` : null;
 }
 
+function isTikTokThumbnailProxy(value) {
+  try {
+    const url = new URL(value, "https://vid.best");
+    return url.pathname === "/api/tiktok/thumbnail" && Boolean(url.searchParams.get("url"));
+  } catch {
+    return false;
+  }
+}
+
 function normalizeTikTokShareUrl(value) {
   try {
     const url = new URL(value);
@@ -1185,7 +1194,11 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
   const suppliedSource = cleanText(body.source_url, 2000, existing?.source_url || "");
   const media = normalizeMedia(suppliedSource, suppliedR2Key, baseUrl);
   const thumbnailCandidate = body.thumbnail_url === undefined ? existing?.thumbnail_url : body.thumbnail_url;
-  const thumbnailUrl = validateOptionalUrl(cleanText(thumbnailCandidate, 2000)) || media.thumbnail_url;
+  const thumbnailText = cleanText(thumbnailCandidate, 2000);
+  const customThumbnail = media.provider === "tiktok" && isTikTokThumbnailProxy(thumbnailText)
+    ? null
+    : validateOptionalUrl(thumbnailText);
+  const thumbnailUrl = customThumbnail || media.thumbnail_url;
 
   return {
     title,
