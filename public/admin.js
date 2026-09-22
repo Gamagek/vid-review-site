@@ -297,10 +297,10 @@ function updatePreview() {
   }
 
   const parsed = parseEmbed(target);
-  if (adminState.sourceMode === "link" && /https?:\/\/((www\.)?tiktok\.com)\/player\/v1\/\d+/i.test(target)) {
+  if (adminState.sourceMode === "link" && /https?:\/\/[^/]*tiktok\.com\//i.test(target) && parsed.provider !== "tiktok") {
     const notice = document.createElement("p");
     notice.className = "form-status error";
-    notice.textContent = "This is a TikTok player link. Use the normal TikTok sharing link for preview; the player link is generated separately for the watch page.";
+    notice.textContent = "TikTok preview needs the normal full sharing link: https://www.tiktok.com/@username/video/VIDEO_ID";
     ui.preview.append(notice);
     return;
   }
