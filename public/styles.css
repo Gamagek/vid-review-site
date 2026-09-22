@@ -705,6 +705,29 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
   border: 0;
   background: #000;
 }
+.watch-player[data-provider="tiktok"] .watch-player-stage {
+  position: relative;
+}
+.vidbest-tiktok-retry {
+  position: absolute;
+  right: 10px;
+  bottom: 58px;
+  z-index: 25;
+  min-width: 58px;
+  min-height: 30px;
+  padding: 5px 9px;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 8px;
+  background: rgba(10,13,22,.9);
+  color: #fff;
+  box-shadow: 0 5px 18px rgba(0,0,0,.35);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  font: 700 12px/1 system-ui,sans-serif;
+}
+.vidbest-tiktok-retry[hidden] { display: none !important; }
+.vidbest-tiktok-retry:hover { background: rgba(20,26,42,.96); }
+
 .watch-player[data-provider="tiktok"].is-mini {
   width: min(430px, calc(100vw - 36px));
 }
