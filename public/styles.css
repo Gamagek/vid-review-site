@@ -687,7 +687,10 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; /* TikTok official Embed Player iframe */
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
+
+/* TikTok official Embed Player iframe */
 .watch-player[data-provider="tiktok"] .watch-player-stage {
   width: min(100%, 540px);
   height: min(78vh, 760px);
@@ -786,6 +789,9 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
 }
 .video-tile[data-video-provider="tiktok"] .preview-surface {
   z-index: 4;
+}
+.video-tile[data-video-provider="tiktok"].preview-playing .preview-surface iframe {
+  pointer-events: none;
 }
 .video-tile[data-video-provider="tiktok"].preview-playing .play-orb,
 .video-tile[data-video-provider="tiktok"].preview-playing .media-fallback,
