@@ -655,6 +655,21 @@ test("starts owned R2 analysis through the authenticated Teamwork API", async ()
   }
 });
 
+test("Admin TikTok embed helper is optional, hidden by default, and safe", () => {
+  const adminHtml = readFileSync(new URL("../public/admin.html", import.meta.url), "utf8");
+  const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
+  assert.match(adminHtml, /id="tiktok-embed-helper"[^>]*hidden/);
+  assert.match(adminHtml, /<summary>Official TikTok embed code \(optional\)<\/summary>/);
+  assert.match(adminHtml, /id="tiktok-embed-code"/);
+  assert.match(adminHtml, /id="tiktok-embed-copy"/);
+  assert.match(adminSource, /extractTikTokIdFromEmbedCode/);
+  assert.match(adminSource, /ui\.tiktokEmbedHelper\.open = false/);
+  assert.match(adminSource, /buildTikTokEmbedCode/);
+  assert.match(adminSource, /navigator\.clipboard\.writeText/);
+  assert.match(adminSource, /ui\.tiktokEmbedCode\.dataset\.generatedFor/);
+  assert.doesNotMatch(adminSource, /innerHTML\s*=\s*ui\.tiktokEmbedCode/);
+});
+
 test("admin uses the official TikTok Embed Player iframe", () => {
   const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
   assert.match(adminSource, /renderTikTokPreview/);
