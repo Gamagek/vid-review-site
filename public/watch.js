@@ -74,7 +74,7 @@ function initializeTikTokLazyPlayer() {
   const load = () => {
     if (shell.dataset.tiktokLoaded === "1") return;
     const id = String(shell.dataset.tiktokId || "");
-    if (!/^\\d+$/.test(id)) return;
+    if (!/^\d+$/.test(id)) return;
     shell.dataset.tiktokLoaded = "1";
     shell.classList.add("is-loading");
 
@@ -756,15 +756,19 @@ function initializeEmbeddedMediaTools() {
   let tiktokRecovery = null;
 
   function copyText(value, button) {
-    navigator.clipboard?.writeText(value).then(
+    const pending = navigator.clipboard?.writeText(value);
+    if (!pending) {
+      button.textContent = `Copy: ${value}`;
+      return;
+    }
+    pending.then(
       () => {
         button.textContent = "Copied";
-        window.setTimeout(() => { button.textContent = \`Copy \${value}\`; }, 1400);
+        window.setTimeout(() => { button.textContent = `Copy ${value}`; }, 1400);
       },
-      () => { button.textContent = \`Copy: \${value}\`; },
+      () => { button.textContent = `Copy: ${value}`; },
     );
   }
-
   function showTikTokRecovery(reason = "TikTok did not respond", includeDns = true) {
     if (provider !== "tiktok" || !tiktokRecovery) return;
     const note = tiktokRecovery.querySelector("[data-tiktok-recovery-note]");
@@ -810,7 +814,7 @@ function initializeEmbeddedMediaTools() {
     retry.textContent = "↻ Retry";
     retry.addEventListener("click", () => {
       const id = frame.dataset.tiktokId || document.querySelector(".tiktok-lazy-shell")?.dataset.tiktokId || "";
-      if (!/^\\d+$/.test(id)) return;
+      if (!/^\d+$/.test(id)) return;
       tiktokReady = false;
       panel.hidden = true;
 
@@ -837,6 +841,14 @@ function initializeEmbeddedMediaTools() {
       <p class="tiktok-dns-iphone"><strong>iPhone:</strong> Settings → Wi‑Fi → ⓘ → Configure DNS → Manual → add <code>1.1.1.1</code> → Save.</p>
       <button type="button" class="button ghost tiktok-dns-copy tiktok-dns-iphone">Copy 1.1.1.1</button>
     \`;
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isAndroid = userAgent.includes("android");
+    const isIphone = userAgent.includes("iphone") || userAgent.includes("ipad") || userAgent.includes("ipod");
+    if (isAndroid && !isIphone) {
+      dns.querySelectorAll(".tiktok-dns-iphone").forEach((item) => { item.hidden = true; });
+    } else if (isIphone) {
+      dns.querySelectorAll(".tiktok-dns-android").forEach((item) => { item.hidden = true; });
+    }
     dns.querySelector(".tiktok-dns-copy.tiktok-dns-android")?.addEventListener("click", (event) => copyText("dns.google", event.currentTarget));
     dns.querySelector(".tiktok-dns-copy.tiktok-dns-iphone")?.addEventListener("click", (event) => copyText("1.1.1.1", event.currentTarget));
     actions.append(dns);
