@@ -32,6 +32,10 @@ const ui = {
   uploadProgress: document.querySelector("#upload-progress"),
   uploadStatus: document.querySelector("#upload-status"),
   preview: document.querySelector("#media-preview"),
+  tiktokEmbedHelper: document.querySelector("#tiktok-embed-helper"),
+  tiktokEmbedCode: document.querySelector("#tiktok-embed-code"),
+  tiktokEmbedCopy: document.querySelector("#tiktok-embed-copy"),
+  tiktokEmbedCodeStatus: document.querySelector("#tiktok-embed-code-status"),
   category: document.querySelector("#admin-category"),
   subcategory: document.querySelector("#admin-subcategory"),
   otherSubcategory: document.querySelector("#admin-other-subcategory"),
@@ -91,6 +95,8 @@ function bindAdminEvents() {
   ui.sourceUrl.addEventListener("change", updatePreview);
   ui.sourceUrl.addEventListener("input", clearAnalysisIfSourceChanged);
   ui.sourceUrl.addEventListener("paste", () => setTimeout(updatePreview, 0));
+  ui.tiktokEmbedCode.addEventListener("input", updateTikTokEmbedCodePreview);
+  ui.tiktokEmbedCopy.addEventListener("click", copyTikTokEmbedCode);
   ui.videoSearchButton.addEventListener("click", searchPublicVideos);
   ui.videoSearch.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
@@ -289,17 +295,26 @@ function updatePreview() {
   const thumbnail = ui.thumbnail.value.trim();
   const r2Source = ui.r2Key.dataset.url || "";
   const target = adminState.sourceMode === "upload" ? r2Source : source;
+  const parsed = target ? parseEmbed(target) : {};
+  const codeId = extractTikTokIdFromEmbedCode(ui.tiktokEmbedCode.value);
+
+  if (parsed.provider === "tiktok" && parsed.id) {
+    syncTikTokEmbedHelper(parsed.id);
+    renderTikTokPreview(target, parsed.id);
+    return;
+  }
+
+  if (!target && codeId) {
+    syncTikTokEmbedHelper(codeId);
+    renderTikTokPreview("", codeId);
+    return;
+  }
+
+  syncTikTokEmbedHelper("");
   if (!target) {
     const empty = document.createElement("span");
     empty.textContent = "Secure media preview appears here";
     ui.preview.append(empty);
-    return;
-  }
-
-  const parsed = parseEmbed(target);
-
-  if (parsed.provider === "tiktok") {
-    renderTikTokPreview(target, parsed.id);
     return;
   }
 
@@ -324,6 +339,68 @@ function updatePreview() {
     video.preload = "metadata";
     if (thumbnail) video.poster = thumbnail;
     ui.preview.append(video);
+  }
+}
+
+function extractTikTokIdFromEmbedCode(value) {
+  const text = String(value || "");
+  return text.match(/tiktok\.com\/player\/v1\/(\d+)/i)?.[1]
+    || text.match(/data-video-id-list\s*=\s*["'](\d+)["']/i)?.[1]
+    || text.match(/data-video-id\s*=\s*["'](\d+)["']/i)?.[1]
+    || text.match(/tiktok\.com\/[^"'<\s]*\/video\/(\d+)/i)?.[1]
+    || "";
+}
+
+function buildTikTokEmbedCode(videoId) {
+  return `<iframe class="tiktok-official-player"
+  src="${buildTikTokPlayerUrl(videoId)}"
+  title="TikTok video"
+  loading="lazy"
+  allow="autoplay; fullscreen; picture-in-picture"
+  allowfullscreen
+  referrerpolicy="strict-origin-when-cross-origin"
+  style="display:block;width:100%;height:min(78vh,760px);min-height:420px;border:0;background:#000;"></iframe>`;
+}
+
+function syncTikTokEmbedHelper(videoId) {
+  if (!ui.tiktokEmbedHelper) return;
+  const isTikTok = Boolean(videoId);
+  ui.tiktokEmbedHelper.hidden = !isTikTok;
+  ui.tiktokEmbedHelper.open = false;
+
+  if (!isTikTok) {
+    ui.tiktokEmbedCode.value = "";
+    setStatus(ui.tiktokEmbedCodeStatus, "");
+    return;
+  }
+
+  if (!ui.tiktokEmbedCode.value.trim()) {
+    ui.tiktokEmbedCode.value = buildTikTokEmbedCode(videoId);
+    setStatus(ui.tiktokEmbedCodeStatus, "Official player code generated. Section remains collapsed.");
+  }
+}
+
+function updateTikTokEmbedCodePreview() {
+  const source = ui.sourceUrl.value.trim();
+  const parsed = source ? parseEmbed(source) : {};
+  if (parsed.provider === "tiktok" && parsed.id) return;
+  const id = extractTikTokIdFromEmbedCode(ui.tiktokEmbedCode.value);
+  if (id) {
+    syncTikTokEmbedHelper(id);
+    renderTikTokPreview("", id);
+  }
+}
+
+async function copyTikTokEmbedCode() {
+  const code = ui.tiktokEmbedCode.value.trim();
+  if (!code) return;
+  try {
+    await navigator.clipboard.writeText(code);
+    setStatus(ui.tiktokEmbedCodeStatus, "Embed code copied.", "success");
+  } catch {
+    ui.tiktokEmbedCode.focus();
+    ui.tiktokEmbedCode.select();
+    setStatus(ui.tiktokEmbedCodeStatus, "Select the code and copy it manually.", "error");
   }
 }
 
@@ -943,6 +1020,13 @@ async function moderateComment(id, status) {
 }
 
 function resetEditor(clearStatus = true) {
+  if (ui.tiktokEmbedHelper) {
+    ui.tiktokEmbedHelper.hidden = true;
+    ui.tiktokEmbedHelper.open = false;
+  }
+  if (ui.tiktokEmbedCode) ui.tiktokEmbedCode.value = "";
+  setStatus(ui.tiktokEmbedCodeStatus, "");
+
   clearAnalysisDraft();
   ui.videoForm.reset();
   ui.editingId.value = "";
