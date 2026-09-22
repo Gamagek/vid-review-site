@@ -2005,13 +2005,8 @@ function renderMedia(video, playbackOrigin) {
   if (provider === "tiktok") {
     const tiktokId = extractTikTokId(video.source_url);
     if (!tiktokId) return "";
-    return `<div id="watch-media-frame" class="tiktok-lazy-shell" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-source="${escapeHtml(video.source_url)}" aria-label="TikTok video player">
-      <div class="tiktok-lazy-placeholder">
-        <span class="tiktok-lazy-icon" aria-hidden="true">▶</span>
-        <strong>TikTok player</strong>
-        <span>Loading starts when this player is visible.</span>
-      </div>
-    </div>`;
+    const embedUrl = buildTikTokPlayerUrl(tiktokId);
+    return `<iframe id="watch-media-frame" class="tiktok-official-player" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   }
   if (video.embed_url) {
     const embedUrl = preparePlaybackEmbed(video.embed_url, playbackOrigin);
