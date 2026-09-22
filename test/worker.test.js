@@ -327,6 +327,47 @@ test("gives AI generation a longer browser timeout than ordinary requests", () =
   assert.match(source, /url\.startsWith\("\/api\/ai\/generate"\) \? 35000 : 15000/);
 });
 
+test("serves TikTok thumbnail cards through the official oEmbed thumbnail", async () => {
+  const context = createTestContext();
+  const originalFetch = globalThis.fetch;
+  const sample = "https://www.tiktok.com/@rorozya/video/7622472784039415061?_r=1&_t=ZS-99wVMKS0Vt3";
+  const thumbnail = "https://p19-common-sign.tiktokcdn-us.com/example/preview.image?x-expires=1790276400&x-signature=test";
+  const calls = [];
+
+  globalThis.fetch = async (url) => {
+    const target = String(url);
+    calls.push(target);
+    if (target.startsWith("https://www.tiktok.com/oembed?")) {
+      return new Response(JSON.stringify({
+        type: "video",
+        title: "ro² (@rorozya) on TikTok",
+        author_name: "ro²",
+        author_url: "https://www.tiktok.com/@rorozya",
+        thumbnail_url: thumbnail,
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    if (target === thumbnail) {
+      return new Response(new Uint8Array([1, 2, 3, 4]), {
+        status: 200,
+        headers: { "Content-Type": "image/jpeg" },
+      });
+    }
+    throw new Error("Unexpected upstream: " + target);
+  };
+
+  try {
+    const response = await send(context, "/api/tiktok/thumbnail?url=" + encodeURIComponent(sample));
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Content-Type"), "image/jpeg");
+    assert.deepEqual([...new Uint8Array(await response.arrayBuffer())], [1, 2, 3, 4]);
+    assert.equal(calls.length, 2);
+    assert.match(calls[0], /\/oembed\?url=/);
+    assert.equal(calls[1], thumbnail);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("stores TikTok source and renders the PR26-style player", async () => {
   const context = createTestContext();
   const response = await send(context, "/api/videos", {
@@ -345,6 +386,7 @@ test("stores TikTok source and renders the PR26-style player", async () => {
   assert.equal(result.video.provider, "tiktok");
   assert.equal(result.video.media_type, "tiktok");
   assert.match(result.video.embed_url, /^https:\/\/www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
+  assert.match(result.video.thumbnail_url, /^\/api\/tiktok\/thumbnail\?url=/);
 
   const page = await send(context, `/watch/${result.video.slug}`);
   assert.equal(page.status, 200);
@@ -708,8 +750,18 @@ test("renders the official TikTok Embed Player iframe with responsive options", 
   assert.match(watchSource, /Retry TikTok player/);
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /parseTikTokShareUrl/);
-  assert.match(homeSource, /ensureTikTokEmbedScript/);
+  assert.match(homeSource, /buildTikTokPreviewPlayerUrl/);
+  assert.match(homeSource, /autoplay: "1"/);
+  assert.match(homeSource, /muted: "1"/);
+  assert.match(homeSource, /PREVIEW_DELAY_MS = 3000/);
+  assert.doesNotMatch(homeSource, /ensureTikTokEmbedScript/);
+  assert.doesNotMatch(homeSource, /className = "tiktok-embed"/);
   assert.match(homeSource, /provider === "tiktok"/);
+
+  const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
+  assert.match(indexSource, /\/api\/tiktok\/thumbnail/);
+  assert.match(indexSource, /www\.tiktok\.com\/oembed/);
+  assert.match(indexSource, /tiktokcdn\(?:-\[a-z0-9-\]\+\)\?\.com/);
 });
 
 test("repairs a legacy TikTok record with only its source URL and uses the Saiyaara title", async () => {
