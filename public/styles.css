@@ -727,9 +727,6 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
   border-radius: 14px;
   background: #050711;
 }
-.watch-player[data-provider="tiktok"] .vidbest-tiktok-retry {
-  display: inline-flex;
-}
 @media (max-width: 640px) {
   .watch-player[data-provider="tiktok"] .watch-player-stage,
   .admin-tiktok-preview {
@@ -741,6 +738,8 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
 
 /* TikTok hover previews from normal sharing URLs only */
 .tile-media .preview-surface {
+  position: absolute;
+  inset: 0;
   display: grid;
   place-items: center;
   width: 100%;
