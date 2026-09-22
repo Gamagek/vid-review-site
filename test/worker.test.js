@@ -327,7 +327,7 @@ test("gives AI generation a longer browser timeout than ordinary requests", () =
   assert.match(source, /url\.startsWith\("\/api\/ai\/generate"\) \? 35000 : 15000/);
 });
 
-test("stores new TikTok videos without a legacy player URL", async () => {
+test("stores TikTok source and renders the PR26-style player", async () => {
   const context = createTestContext();
   const response = await send(context, "/api/videos", {
     method: "POST",
@@ -349,11 +349,11 @@ test("stores new TikTok videos without a legacy player URL", async () => {
   const page = await send(context, `/watch/${result.video.slug}`);
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /class="tiktok-lazy-shell"/);
-  assert.match(html, /data-tiktok-id="6718335390845095173"/);
-  assert.match(html, /data-tiktok-source=/);
-  assert.doesNotMatch(html, /<iframe[^>]+class="tiktok-official-player"/);
-  assert.doesNotMatch(html, /player\/v1\/6718335390845095173/);
+  assert.match(html, /<iframe[^>]+class="tiktok-official-player"/);
+  assert.match(html, /player\/v1\/6718335390845095173/);
+  assert.match(html, /controls=1/);
+  assert.match(html, /closed_caption=1/);
+  assert.match(html, /allow="autoplay; fullscreen; picture-in-picture"/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
   assert.doesNotMatch(html, /"embedUrl":s*"https:\/\/www\.tiktok\.com\/player\/v1\//);
 });
@@ -656,16 +656,14 @@ test("starts owned R2 analysis through the authenticated Teamwork API", async ()
   }
 });
 
-test("admin uses the official TikTok Embed Player iframe", () => {
+test("TikTok keeps separate share preview and player paths", () => {
   const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
   assert.match(adminSource, /renderTikTokPreview/);
   assert.match(adminSource, /buildTikTokPlayerUrl/);
   assert.ok(adminSource.includes("https://www.tiktok.com/player/v1/${encodeURIComponent(videoId)}?${params.toString()}"));
-  assert.match(adminSource, /closed_caption: "1"/);
-  assert.match(adminSource, /music_info: "1"/);
-  assert.match(adminSource, /description: "1"/);
-  assert.doesNotMatch(adminSource, /tiktok-embed/);
-  assert.ok(!adminSource.includes("embed.js"));
+  assert.match(adminSource, /className = "tiktok-embed"/);
+  assert.match(adminSource, /ensureTikTokAdminEmbedScript/);
+  assert.match(adminSource, /player link is generated separately/);
 });
 
 test("renders the official TikTok Embed Player iframe with responsive options", async () => {
@@ -688,25 +686,26 @@ test("renders the official TikTok Embed Player iframe with responsive options", 
   const page = await send(context, "/watch/tiktok-player-test");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /class="tiktok-lazy-shell"/);
-  assert.match(html, /data-tiktok-id="7669587518156705056"/);
-  assert.doesNotMatch(html, /<iframe[^>]+class="tiktok-official-player"/);
-  assert.doesNotMatch(html, /player\/v1\/7669587518156705056/);
+  assert.match(html, /<iframe[^>]+class="tiktok-official-player"/);
+  assert.ok(html.includes("https://www.tiktok.com/player/v1/7669587518156705056?"));
+  assert.match(html, /controls=1/);
+  assert.match(html, /progress_bar=1/);
+  assert.match(html, /volume_control=1/);
+  assert.match(html, /fullscreen_button=1/);
+  assert.match(html, /closed_caption=1/);
   assert.doesNotMatch(html, /class="tiktok-embed"/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
   assert.match(html, /data-video-provider="tiktok"/);
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
-  assert.match(watchSource, /initializeTikTokLazyPlayer/);
-  assert.match(watchSource, /new IntersectionObserver/);
+  assert.doesNotMatch(watchSource, /initializeTikTokLazyPlayer/);
   assert.match(watchSource, /"x-tiktok-player": true/);
   assert.match(watchSource, /onPlayerError/);
-  assert.match(watchSource, /dns\.google/);
-  assert.match(watchSource, /1\.1\.1\.1/);
-  assert.match(watchSource, /Open on TikTok/);
+  assert.match(watchSource, /Retry TikTok player/);
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
+  assert.match(homeSource, /parseTikTokShareUrl/);
+  assert.match(homeSource, /ensureTikTokEmbedScript/);
   assert.match(homeSource, /provider === "tiktok"/);
-  assert.match(homeSource, /TikTok deliberately has no homepage\/mini-tile iframe previews/);
 });
 
 test("repairs a legacy TikTok record with only its source URL and uses the Saiyaara title", async () => {
@@ -727,9 +726,10 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   const html = await page.text();
   assert.ok(html.includes("<title>Saiyaara; A Cinematic Romance | Vid.Best</title>"));
   assert.ok(html.includes("<h1>Saiyaara; A Cinematic Romance</h1>"));
-  assert.ok(html.includes('<div id="watch-media-frame" class="tiktok-lazy-shell"'));
-  assert.ok(html.includes('data-tiktok-id="6718335390845095173"'));
-  assert.ok(!html.includes('https://www.tiktok.com/player/v1/6718335390845095173?'));
+  assert.ok(html.includes('<iframe id="watch-media-frame" class="tiktok-official-player"'));
+  assert.ok(html.includes('https://www.tiktok.com/player/v1/6718335390845095173?'));
+  assert.ok(html.includes("controls=1"));
+  assert.ok(html.includes("closed_caption=1"));
   assert.ok(html.includes('data-video-provider="tiktok"'));
 });
 
