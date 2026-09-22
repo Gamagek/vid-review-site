@@ -639,82 +639,97 @@ function initializeEmbeddedMediaTools() {
   player.dataset.vidbestEmbeddedTools = "1";
 
   const provider = String(document.body.dataset.videoProvider || inferProvider(frame)).toLowerCase();
-
-  const remote = provider === "youtube" || provider === "vimeo" || provider === "tiktok";
-
-  // Remote providers already render their own control bars inside the iframe.
-  // Do not place a second control layer over them; it can block the native seek/volume/fullscreen controls.
-  if (remote) {
-    frame.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; clipboard-write");
-    frame.setAttribute("allowfullscreen", "");
-
-    if (provider === "tiktok") {
-      const retry = document.createElement("button");
-      retry.type = "button";
-      retry.className = "vidbest-tiktok-retry";
-      retry.textContent = "↻ Retry";
-      retry.title = "Retry TikTok player";
-      retry.setAttribute("aria-label", "Retry TikTok player");
-      retry.hidden = true;
-
-      let ready = false;
-      let watchdog = null;
-
-      const armWatchdog = () => {
-        window.clearTimeout(watchdog);
-        watchdog = window.setTimeout(() => {
-          if (!ready) retry.hidden = false;
-        }, 8000);
-      };
-
-      retry.addEventListener("click", () => {
-        ready = false;
-        retry.hidden = true;
-        try {
-          const url = new URL(frame.src);
-          url.searchParams.set("retry", String(Date.now()));
-          frame.src = url.toString();
-        } catch {}
-        armWatchdog();
-      });
-
-      stage.append(retry);
-      armWatchdog();
-
-      addEventListener("message", (event) => {
-        if (event.source !== frame.contentWindow) return;
-        try {
-          const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-          if (!data?.["x-tiktok-player"]) return;
-          if (data.type === "onPlayerReady") {
-            ready = true;
-            window.clearTimeout(watchdog);
-            retry.hidden = true;
-          }
-          if (data.type === "onPlayerError") {
-            ready = false;
-            retry.hidden = false;
-          }
-        } catch {}
-      });
-    }
-    return;
-  }
-
-  // Same-origin/native media keeps the existing enhanced controls below.
+  const remote = ["youtube", "vimeo", "tiktok"].includes(provider);
   const supportsPlaybackRate = provider === "youtube" || provider === "vimeo";
   const state = { playing: false, muted: false, rate: 1, currentTime: 0 };
 
-  const overlay = document.createElement("div");
-  overlay.className = "vidbest-embed-overlay";
-  overlay.setAttribute("aria-label", "Vid.Best embedded player controls");
-
-  function message(text) {
-    const note = overlay.querySelector(".vidbest-embed-note");
-    if (note) note.textContent = text;
+  function inferProvider(element) {
+    try {
+      const host = new URL(element.src || "").hostname.toLowerCase();
+      if (host.includes("youtube")) return "youtube";
+      if (host.includes("vimeo")) return "vimeo";
+      if (host.includes("dailymotion")) return "dailymotion";
+      if (host.includes("tiktok")) return "tiktok";
+      if (host.includes("facebook")) return "facebook";
+      if (host.includes("instagram")) return "instagram";
+      if (host.includes("twitch")) return "twitch";
+    } catch {}
+    return "external";
   }
 
-  function button(label, title, handler, disabled) {
+  frame.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; clipboard-write");
+  frame.setAttribute("allowfullscreen", "");
+
+  if (provider === "tiktok") {
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.className = "vidbest-tiktok-retry";
+    retry.textContent = "↻ Retry";
+    retry.title = "Retry TikTok player";
+    retry.setAttribute("aria-label", "Retry TikTok player");
+    retry.hidden = true;
+
+    let ready = false;
+    let watchdog = null;
+
+    const armWatchdog = () => {
+      window.clearTimeout(watchdog);
+      watchdog = window.setTimeout(() => {
+        if (!ready) retry.hidden = false;
+      }, 8000);
+    };
+
+    retry.addEventListener("click", () => {
+      ready = false;
+      retry.hidden = true;
+      try {
+        const url = new URL(frame.src);
+        url.searchParams.set("retry", String(Date.now()));
+        frame.src = url.toString();
+      } catch {}
+      armWatchdog();
+    });
+
+    stage.append(retry);
+    armWatchdog();
+
+    addEventListener("message", (event) => {
+      if (event.source !== frame.contentWindow) return;
+      try {
+        const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        if (!data?.["x-tiktok-player"]) return;
+        if (data.type === "onPlayerReady") {
+          ready = true;
+          window.clearTimeout(watchdog);
+          retry.hidden = true;
+          note.textContent = "TikTok official player ready · advanced controls active";
+        }
+        if (data.type === "onPlayerError") {
+          ready = false;
+          retry.hidden = false;
+          note.textContent = "TikTok player error · provider controls remain available";
+        }
+        if (data.type === "onStateChange") state.playing = Number(data.value) === 1;
+        if (data.type === "onMute") state.muted = Boolean(data.value);
+        if (data.type === "onCurrentTime") {
+          const time = Number(data.value?.currentTime);
+          if (Number.isFinite(time)) state.currentTime = time;
+        }
+      } catch {}
+    });
+  }
+
+  const overlay = document.createElement("div");
+  overlay.className = "vidbest-embed-overlay";
+  overlay.classList.toggle("vidbest-remote-controls", remote);
+  overlay.setAttribute("aria-label", "Vid.Best advanced playback controls");
+
+  function message(text) {
+    const noteEl = overlay.querySelector(".vidbest-embed-note");
+    if (noteEl) noteEl.textContent = text;
+  }
+
+  function button(label, title, handler, disabled = false) {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "vidbest-embed-button";
@@ -722,7 +737,7 @@ function initializeEmbeddedMediaTools() {
     b.title = title;
     b.setAttribute("aria-label", title);
     b.disabled = Boolean(disabled);
-    b.addEventListener("click", function(event) {
+    b.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
       void handler();
@@ -730,42 +745,89 @@ function initializeEmbeddedMediaTools() {
     return b;
   }
 
-  const play = button("▶", "Play or pause", function() {
-    if (!remote) return message("This provider keeps playback controls inside its own embed.");
+  const play = button("▶", "Play or pause", () => {
     state.playing = !state.playing;
     playerProviderCommand(state.playing ? "playVideo" : "pauseVideo");
     play.textContent = state.playing ? "❚❚" : "▶";
-  }, false);
+  }, !remote);
+
   const back = button("↶10", "Seek back 10 seconds", () => {
     state.currentTime = Math.max(0, state.currentTime - 10);
     playerProviderCommand("seekTo", [state.currentTime, true]);
-  }, false);
+  }, !remote);
+
   const forward = button("10↷", "Seek forward 10 seconds", () => {
     state.currentTime += 10;
     playerProviderCommand("seekTo", [state.currentTime, true]);
-  }, false);
-  const speed = button("1×", "Cycle playback speed", function() {
-    if (!supportsPlaybackRate) return message("Playback speed is controlled by the embedded provider.");
+  }, !remote);
+
+  const speed = button("1×", "Cycle playback speed", () => {
+    if (!supportsPlaybackRate) return message("TikTok does not expose playback-rate control; use its native player controls.");
     const rates = [0.5, 0.75, 1, 1.25, 1.5, 2];
     const next = rates[(rates.indexOf(state.rate) + 1) % rates.length];
     state.rate = next;
     speed.textContent = next + "×";
     playerProviderCommand("setPlaybackRate", [next]);
   }, !supportsPlaybackRate);
-  const mute = button("🔊", "Mute or unmute", function() {
+
+  const mute = button("🔊", "Mute or unmute", () => {
     state.muted = !state.muted;
     playerProviderCommand(state.muted ? "mute" : "unMute");
     mute.textContent = state.muted ? "🔇" : "🔊";
-  }, false);
-  const captions = button("CC", "Caption controls", function() {
+  }, !remote);
+
+  const captions = button("CC", "Caption controls", () => {
     message("Caption languages are controlled by the embedded provider.");
     frame.focus();
-  });
-  const pip = button("▣ PiP", "Picture in Picture", function() {
-    message("Use the provider's own PiP control.");
-  });
-  const share = button("Share", "Share this Vid.Best page", function() { shareWatchPage(); });
-  const pop = button("Pop-out", "Float player while scrolling", function() {
+  }, false);
+
+  async function embeddedPiP() {
+    if (!(window.documentPictureInPicture && window.documentPictureInPicture.requestWindow)) {
+      message("Embedded PiP is not supported here. Use the provider's own PiP control.");
+      return;
+    }
+    if (window.documentPictureInPicture.window) {
+      window.documentPictureInPicture.window.focus();
+      return;
+    }
+    const parent = frame.parentNode;
+    const next = frame.nextSibling;
+    try {
+      const width = Math.max(320, Math.min(720, stage.clientWidth || 480));
+      const height = Math.max(220, Math.min(560, Math.round(width * 0.5625) + 50));
+      const pipWindow = await window.documentPictureInPicture.requestWindow({ width, height });
+      const doc = pipWindow.document;
+      doc.body.style.cssText = "margin:0;background:#05070d;color:#fff;overflow:hidden;font-family:system-ui,sans-serif";
+      const shell = doc.createElement("div");
+      shell.style.cssText = "width:100vw;height:100vh;display:grid;grid-template-rows:36px 1fr";
+      const bar = doc.createElement("div");
+      bar.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:#111827;font:12px system-ui";
+      const label = doc.createElement("span");
+      label.textContent = "Vid.Best · " + provider + " PiP";
+      const close = doc.createElement("button");
+      close.textContent = "Back to page";
+      close.style.cssText = "border:0;border-radius:7px;padding:5px 8px;background:#273449;color:#fff";
+      close.onclick = () => pipWindow.close();
+      bar.append(label, close);
+      const viewport = doc.createElement("div");
+      viewport.style.cssText = "min-height:0;background:#000";
+      frame.style.cssText = "display:block;width:100%;height:100%;border:0";
+      viewport.append(frame);
+      shell.append(bar, viewport);
+      doc.body.append(shell);
+      pipWindow.addEventListener("pagehide", () => {
+        if (parent && !parent.contains(frame)) parent.insertBefore(frame, next || null);
+        frame.style.cssText = "";
+      }, { once: true });
+      message("Embedded video is floating in PiP.");
+    } catch (error) {
+      message(error?.message || "Embedded PiP could not be opened.");
+    }
+  }
+
+  const pip = button("▣ PiP", "Picture in Picture", embeddedPiP);
+  const share = button("Share", "Share this Vid.Best page", () => shareWatchPage());
+  const pop = button("Pop-out", "Float player while scrolling", () => {
     const anchor = document.querySelector("#watch-player-anchor");
     if (!anchor) return;
     const on = !player.classList.contains("is-mini");
@@ -783,18 +845,43 @@ function initializeEmbeddedMediaTools() {
       pop.textContent = "Pop-out";
     }
   });
-  const full = button("⛶", "Fullscreen", async function() {
+  const full = button("⛶", "Fullscreen", async () => {
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
       else if (stage.requestFullscreen) await stage.requestFullscreen();
     } catch { message("Fullscreen is unavailable for this embed."); }
   });
+
   const note = document.createElement("span");
   note.className = "vidbest-embed-note";
-  note.textContent = "Embedded media · enhanced controls";
-  overlay.append(play, back, forward, speed, captions, mute, pip, share, pop, full, note);
-  stage.style.position = stage.style.position || "relative";
-  stage.append(overlay);
+  note.textContent = remote
+    ? "Embedded " + provider + " · Vid.Best advanced controls"
+    : "Embedded media · enhanced controls";
+
+  const controls = [play, back, forward, speed, captions, mute, pip, share, pop, full, note];
+  overlay.append(...controls);
+
+  if (remote) {
+    player.insertAdjacentElement("afterend", overlay);
+  } else {
+    stage.style.position = stage.style.position || "relative";
+    stage.append(overlay);
+  }
+
+  addEventListener("message", (event) => {
+    if (event.source !== frame.contentWindow) return;
+    try {
+      const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+      if (provider === "tiktok" && data?.["x-tiktok-player"]) {
+        if (data.type === "onStateChange") state.playing = Number(data.value) === 1;
+        if (data.type === "onMute") state.muted = Boolean(data.value);
+        if (data.type === "onCurrentTime") {
+          const time = Number(data.value?.currentTime);
+          if (Number.isFinite(time)) state.currentTime = time;
+        }
+      }
+    } catch {}
+  });
 }
 
 
@@ -923,6 +1010,9 @@ function initializeAudioLab() {
   style.id = "vidbest-player-upgrade-styles";
   style.textContent = [
     ".vidbest-embed-overlay{position:absolute;left:8px;right:8px;bottom:8px;z-index:8;display:flex;flex-wrap:wrap;gap:5px;align-items:center;padding:6px;border-radius:11px;background:rgba(5,7,13,.9);backdrop-filter:blur(10px);box-sizing:border-box}",
+    ".vidbest-embed-overlay.vidbest-remote-controls{position:static;left:auto;right:auto;bottom:auto;z-index:auto;width:100%;margin:8px 0 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(5,7,13,.92);box-sizing:border-box}",
+    ".vidbest-embed-overlay.vidbest-remote-controls .vidbest-embed-note{flex-basis:100%;order:20}",
+
     ".vidbest-embed-button{border:0;border-radius:8px;padding:6px 8px;background:#202a3b;color:#fff;cursor:pointer;font:600 12px system-ui}",
     ".vidbest-embed-button:disabled{opacity:.42;cursor:not-allowed}",
     ".vidbest-embed-note{flex:1 1 100%;font:11px system-ui;color:#b9c3d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
