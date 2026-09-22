@@ -641,56 +641,72 @@ function initializeEmbeddedMediaTools() {
   const provider = String(document.body.dataset.videoProvider || inferProvider(frame)).toLowerCase();
 
   const remote = provider === "youtube" || provider === "vimeo" || provider === "tiktok";
+
+  // Remote providers already render their own control bars inside the iframe.
+  // Do not place a second control layer over them; it can block the native seek/volume/fullscreen controls.
+  if (remote) {
+    frame.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; clipboard-write");
+    frame.setAttribute("allowfullscreen", "");
+
+    if (provider === "tiktok") {
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "vidbest-tiktok-retry";
+      retry.textContent = "↻ Retry";
+      retry.title = "Retry TikTok player";
+      retry.setAttribute("aria-label", "Retry TikTok player");
+      retry.hidden = true;
+
+      let ready = false;
+      let watchdog = null;
+
+      const armWatchdog = () => {
+        window.clearTimeout(watchdog);
+        watchdog = window.setTimeout(() => {
+          if (!ready) retry.hidden = false;
+        }, 8000);
+      };
+
+      retry.addEventListener("click", () => {
+        ready = false;
+        retry.hidden = true;
+        try {
+          const url = new URL(frame.src);
+          url.searchParams.set("retry", String(Date.now()));
+          frame.src = url.toString();
+        } catch {}
+        armWatchdog();
+      });
+
+      stage.append(retry);
+      armWatchdog();
+
+      addEventListener("message", (event) => {
+        if (event.source !== frame.contentWindow) return;
+        try {
+          const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+          if (!data?.["x-tiktok-player"]) return;
+          if (data.type === "onPlayerReady") {
+            ready = true;
+            window.clearTimeout(watchdog);
+            retry.hidden = true;
+          }
+          if (data.type === "onPlayerError") {
+            ready = false;
+            retry.hidden = false;
+          }
+        } catch {}
+      });
+    }
+    return;
+  }
+
+  // Same-origin/native media keeps the existing enhanced controls below.
   const supportsPlaybackRate = provider === "youtube" || provider === "vimeo";
   const state = { playing: false, muted: false, rate: 1, currentTime: 0 };
 
-  function inferProvider(element) {
-    try {
-      const host = new URL(element.src || "").hostname.toLowerCase();
-      if (host.includes("youtube")) return "youtube";
-      if (host.includes("vimeo")) return "vimeo";
-      if (host.includes("dailymotion")) return "dailymotion";
-      if (host.includes("tiktok")) return "tiktok";
-      if (host.includes("facebook")) return "facebook";
-      if (host.includes("instagram")) return "instagram";
-      if (host.includes("twitch")) return "twitch";
-    } catch {}
-    return "external";
-  }
-
-  frame.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; clipboard-write");
-  frame.setAttribute("allowfullscreen", "");
-  if (provider === "tiktok") {
-    tiktokRecovery = makeTikTokRecovery();
-    armTikTokRecoveryTimer();
-  }
-
-  function command(method, args) {
-    args = args || [];
-    try {
-      if (typeof playerProviderCommand === "function") {
-        playerProviderCommand(method, args);
-        return;
-      }
-      const origin = provider === "vimeo" ? "https://player.vimeo.com" : new URL(frame.src).origin;
-      const payload = provider === "vimeo"
-        ? (method === "playVideo" ? { method: "play" }
-          : method === "pauseVideo" ? { method: "pause" }
-          : method === "mute" ? { method: "setVolume", value: 0 }
-          : method === "unMute" ? { method: "setVolume", value: 1 }
-          : method === "setPlaybackRate" ? { method: "setPlaybackRate", value: Number(args[0]) }
-          : method === "seekTo" ? { method: "setCurrentTime", value: Number(args[0]) }
-          : { method })
-        : { event: "command", func: method, args: args };
-      frame.contentWindow && frame.contentWindow.postMessage(JSON.stringify(payload), origin);
-    } catch {}
-  }
-
   const overlay = document.createElement("div");
   overlay.className = "vidbest-embed-overlay";
-  let tiktokReady = false;
-  let tiktokRecoveryTimer = null;
-
   overlay.setAttribute("aria-label", "Vid.Best embedded player controls");
 
   function message(text) {
@@ -717,110 +733,37 @@ function initializeEmbeddedMediaTools() {
   const play = button("▶", "Play or pause", function() {
     if (!remote) return message("This provider keeps playback controls inside its own embed.");
     state.playing = !state.playing;
-    command(state.playing ? "playVideo" : "pauseVideo");
+    playerProviderCommand(state.playing ? "playVideo" : "pauseVideo");
     play.textContent = state.playing ? "❚❚" : "▶";
-  }, !remote);
-  const back = button("↶10", "Seek back 10 seconds", function() {
-    if (!remote) return message("Seek is provider-dependent for this embed.");
+  }, false);
+  const back = button("↶10", "Seek back 10 seconds", () => {
     state.currentTime = Math.max(0, state.currentTime - 10);
-    command("seekTo", [state.currentTime, true]);
-  }, !remote);
-  const forward = button("10↷", "Seek forward 10 seconds", function() {
-    if (!remote) return message("Seek is provider-dependent for this embed.");
+    playerProviderCommand("seekTo", [state.currentTime, true]);
+  }, false);
+  const forward = button("10↷", "Seek forward 10 seconds", () => {
     state.currentTime += 10;
-    command("seekTo", [state.currentTime, true]);
-  }, !remote);
+    playerProviderCommand("seekTo", [state.currentTime, true]);
+  }, false);
   const speed = button("1×", "Cycle playback speed", function() {
-    if (!supportsPlaybackRate) return message("Playback speed is controlled by the TikTok player.");
+    if (!supportsPlaybackRate) return message("Playback speed is controlled by the embedded provider.");
     const rates = [0.5, 0.75, 1, 1.25, 1.5, 2];
     const next = rates[(rates.indexOf(state.rate) + 1) % rates.length];
     state.rate = next;
     speed.textContent = next + "×";
-    command("setPlaybackRate", [next]);
+    playerProviderCommand("setPlaybackRate", [next]);
   }, !supportsPlaybackRate);
   const mute = button("🔊", "Mute or unmute", function() {
-    if (!remote) return message("Mute is controlled by the embedded provider.");
     state.muted = !state.muted;
-    command(state.muted ? "mute" : "unMute");
+    playerProviderCommand(state.muted ? "mute" : "unMute");
     mute.textContent = state.muted ? "🔇" : "🔊";
-  }, !remote);
+  }, false);
   const captions = button("CC", "Caption controls", function() {
     message("Caption languages are controlled by the embedded provider.");
     frame.focus();
   });
-
-  const retry = button("↻ Retry", "Retry TikTok player", function() {
-    if (provider !== "tiktok") return;
-    tiktokReady = false;
-    retry.hidden = true;
-    try {
-      const url = new URL(frame.src);
-      url.searchParams.set("retry", String(Date.now()));
-      frame.src = url.toString();
-    } catch {}
-    message("Retrying TikTok player…");
-    armTikTokWatchdog();
-  }, provider !== "tiktok");
-  retry.hidden = provider !== "tiktok";
-
-  function armTikTokWatchdog() {
-    window.clearTimeout(tiktokRecoveryTimer);
-    if (provider !== "tiktok") return;
-    tiktokRecoveryTimer = window.setTimeout(() => {
-      if (!tiktokReady) {
-        retry.hidden = false;
-        message("TikTok did not start. Tap Retry.");
-      }
-    }, 8000);
-  }
-
-  if (provider === "tiktok") armTikTokWatchdog();
-
-  async function embeddedPiP() {
-    if (!(window.documentPictureInPicture && window.documentPictureInPicture.requestWindow)) {
-      message("Embedded PiP is not supported here. Use the provider's own PiP control.");
-      return;
-    }
-    if (window.documentPictureInPicture.window) {
-      window.documentPictureInPicture.window.focus();
-      return;
-    }
-    const parent = frame.parentNode;
-    const next = frame.nextSibling;
-    try {
-      const width = Math.max(320, Math.min(720, stage.clientWidth || 480));
-      const height = Math.max(200, Math.min(520, Math.round(width * 0.5625) + 40));
-      const pip = await window.documentPictureInPicture.requestWindow({ width: width, height: height });
-      const doc = pip.document;
-      doc.body.style.cssText = "margin:0;background:#05070d;color:#fff;overflow:hidden;font-family:system-ui,sans-serif";
-      const shell = doc.createElement("div");
-      shell.style.cssText = "width:100vw;height:100vh;display:grid;grid-template-rows:34px 1fr";
-      const bar = doc.createElement("div");
-      bar.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:0 8px;background:#111827;font:12px system-ui";
-      const label = doc.createElement("span");
-      label.textContent = "Vid.Best · " + provider + " PiP";
-      const close = doc.createElement("button");
-      close.textContent = "Back to page";
-      close.style.cssText = "border:0;border-radius:7px;padding:5px 8px;background:#273449;color:#fff";
-      close.onclick = function() { pip.close(); };
-      bar.append(label, close);
-      const viewport = doc.createElement("div");
-      viewport.style.cssText = "min-height:0;background:#000";
-      frame.style.cssText = "display:block;width:100%;height:100%;border:0";
-      viewport.append(frame);
-      shell.append(bar, viewport);
-      doc.body.append(shell);
-      pip.addEventListener("pagehide", function() {
-        if (parent && !parent.contains(frame)) parent.insertBefore(frame, next || null);
-        frame.style.cssText = "";
-      }, { once: true });
-      message("Embedded video is floating in PiP.");
-    } catch (error) {
-      message(error && error.message ? error.message : "Embedded PiP could not be opened.");
-    }
-  }
-
-  const pip = button("▣ PiP", "Picture in Picture", embeddedPiP);
+  const pip = button("▣ PiP", "Picture in Picture", function() {
+    message("Use the provider's own PiP control.");
+  });
   const share = button("Share", "Share this Vid.Best page", function() { shareWatchPage(); });
   const pop = button("Pop-out", "Float player while scrolling", function() {
     const anchor = document.querySelector("#watch-player-anchor");
@@ -848,44 +791,11 @@ function initializeEmbeddedMediaTools() {
   });
   const note = document.createElement("span");
   note.className = "vidbest-embed-note";
-  note.textContent = remote ? "Embedded " + provider + " · enhanced controls" : "Embedded " + provider + " · provider controls remain authoritative";
-  overlay.append(play, back, forward, speed, captions, mute, pip, share, pop, full, retry, note);
+  note.textContent = "Embedded media · enhanced controls";
+  overlay.append(play, back, forward, speed, captions, mute, pip, share, pop, full, note);
   stage.style.position = stage.style.position || "relative";
   stage.append(overlay);
-
-  addEventListener("message", function(event) {
-    if (event.source !== frame.contentWindow) return;
-    try {
-      const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-      if (provider === "tiktok" && data?.["x-tiktok-player"]) {
-        if (data.type === "onStateChange") state.playing = Number(data.value) === 1;
-        if (data.type === "onMute") state.muted = Boolean(data.value);
-        if (data.type === "onCurrentTime") {
-          const time = Number(data.value?.currentTime);
-          if (Number.isFinite(time)) state.currentTime = time;
-        }
-        if (data.type === "onPlayerError") {
-          const code = Number(data.value?.errorCode);
-          const type = String(data.value?.errorType || "PLAYER_ERROR");
-          retry.hidden = false;
-          message(`TikTok player: ${type}${Number.isFinite(code) ? ` (${code})` : ""} · Tap Retry`);
-        }
-        if (data.type === "onPlayerReady") {
-          tiktokReady = true;
-          window.clearTimeout(tiktokRecoveryTimer);
-          retry.hidden = true;
-          message("TikTok official player ready · provider controls active");
-        }
-        return;
-      }
-      const info = data && (data.info || data);
-      const time = Number(info && (info.currentTime != null ? info.currentTime : data.currentTime));
-      if (Number.isFinite(time)) state.currentTime = time;
-    } catch {}
-  });
 }
-
-
 
 
 function initializeBackgroundPlayback() {
