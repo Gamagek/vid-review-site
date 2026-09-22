@@ -95,7 +95,7 @@ function bindAdminEvents() {
   ui.sourceUrl.addEventListener("change", updatePreview);
   ui.sourceUrl.addEventListener("input", clearAnalysisIfSourceChanged);
   ui.sourceUrl.addEventListener("paste", () => setTimeout(updatePreview, 0));
-  ui.tiktokEmbedCode.addEventListener("input", updateTikTokEmbedCodePreview);
+  ui.tiktokEmbedCode.addEventListener("input", () => { delete ui.tiktokEmbedCode.dataset.generatedFor; updateTikTokEmbedCodePreview(); });
   ui.tiktokEmbedCopy.addEventListener("click", copyTikTokEmbedCode);
   ui.videoSearchButton.addEventListener("click", searchPublicVideos);
   ui.videoSearch.addEventListener("keydown", (event) => {
@@ -370,12 +370,14 @@ function syncTikTokEmbedHelper(videoId) {
 
   if (!isTikTok) {
     ui.tiktokEmbedCode.value = "";
+    delete ui.tiktokEmbedCode.dataset.generatedFor;
     setStatus(ui.tiktokEmbedCodeStatus, "");
     return;
   }
 
-  if (!ui.tiktokEmbedCode.value.trim()) {
+  if (!ui.tiktokEmbedCode.value.trim() || ui.tiktokEmbedCode.dataset.generatedFor) {
     ui.tiktokEmbedCode.value = buildTikTokEmbedCode(videoId);
+    ui.tiktokEmbedCode.dataset.generatedFor = videoId;
     setStatus(ui.tiktokEmbedCodeStatus, "Official player code generated. Section remains collapsed.");
   }
 }
@@ -1024,7 +1026,10 @@ function resetEditor(clearStatus = true) {
     ui.tiktokEmbedHelper.hidden = true;
     ui.tiktokEmbedHelper.open = false;
   }
-  if (ui.tiktokEmbedCode) ui.tiktokEmbedCode.value = "";
+  if (ui.tiktokEmbedCode) {
+    ui.tiktokEmbedCode.value = "";
+    delete ui.tiktokEmbedCode.dataset.generatedFor;
+  }
   setStatus(ui.tiktokEmbedCodeStatus, "");
 
   clearAnalysisDraft();
