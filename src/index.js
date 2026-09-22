@@ -364,8 +364,7 @@ async function tikTokThumbnail(request) {
   try {
     const parsedThumbnail = new URL(thumbnailUrl);
     const host = parsedThumbnail.hostname.toLowerCase();
-    const allowed = host === "tiktokcdn.com"
-      || host.endsWith(".tiktokcdn.com")
+    const allowed = /^([a-z0-9-]+\.)*tiktokcdn(?:-[a-z0-9-]+)?\.com$/.test(host)
       || host === "muscdn.com"
       || host.endsWith(".muscdn.com");
     if (!allowed || !["https:"].includes(parsedThumbnail.protocol)) {
