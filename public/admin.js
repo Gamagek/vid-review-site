@@ -270,7 +270,7 @@ function selectDiscoveredVideo(video) {
   setSourceMode("link");
   ui.sourceUrl.value = video.source_url || "";
   ui.title.value = video.title || "";
-  ui.thumbnail.value = video.thumbnail_url || "";
+  ui.thumbnail.value = isTikTokThumbnailProxy(video.thumbnail_url) ? "" : (video.thumbnail_url || "");
   ui.sourcePublishedAt.value = dateInputValue(video.published_at);
   ui.sourceDurationSeconds.value = "";
   ui.notes.value = [
