@@ -687,8 +687,7 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
-/* TikTok official Embed Player iframe */
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; /* TikTok official Embed Player iframe */
 .watch-player[data-provider="tiktok"] .watch-player-stage {
   width: min(100%, 540px);
   height: min(78vh, 760px);
@@ -696,44 +695,6 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
   margin-inline: auto;
   background: #000;
   overflow: hidden;
-}
-.watch-player[data-provider="tiktok"] .tiktok-lazy-shell {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  display: grid;
-  place-items: center;
-  background: #000;
-}
-.watch-player[data-provider="tiktok"] .tiktok-lazy-placeholder {
-  width: min(86%, 360px);
-  min-height: 150px;
-  display: grid;
-  place-items: center;
-  gap: 8px;
-  padding: 20px;
-  box-sizing: border-box;
-  text-align: center;
-  color: #dce3fa;
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025));
-}
-.watch-player[data-provider="tiktok"] .tiktok-lazy-placeholder strong { font-size: .95rem; }
-.watch-player[data-provider="tiktok"] .tiktok-lazy-placeholder span:not(.tiktok-lazy-icon) {
-  color: #9aa3ba;
-  font-size: .75rem;
-  line-height: 1.45;
-}
-.tiktok-lazy-icon {
-  width: 42px;
-  height: 42px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: rgba(255,255,255,.1);
-  font-size: 18px;
 }
 .watch-player[data-provider="tiktok"] .tiktok-official-player,
 .admin-tiktok-preview .tiktok-official-player {
@@ -766,55 +727,9 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
   border-radius: 14px;
   background: #050711;
 }
-.tiktok-recovery {
-  position: absolute;
-  inset: 14px;
-  z-index: 60;
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  gap: 9px;
-  padding: 20px;
-  box-sizing: border-box;
-  text-align: center;
-  color: #eef2ff;
-  border: 1px solid rgba(255,255,255,.13);
-  border-radius: 16px;
-  background: rgba(6,9,17,.96);
-  box-shadow: 0 20px 70px rgba(0,0,0,.55);
+.watch-player[data-provider="tiktok"] .vidbest-tiktok-retry {
+  display: inline-flex;
 }
-.tiktok-recovery[hidden] { display: none !important; }
-.tiktok-recovery strong { font-size: .95rem; }
-.tiktok-recovery > p { margin: 0; max-width: 520px; color: #aeb7ce; font-size: .76rem; line-height: 1.5; }
-.tiktok-recovery-actions {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-}
-.tiktok-recovery-actions .button { text-decoration: none; }
-.tiktok-dns-help {
-  width: min(100%, 560px);
-  margin-top: 4px;
-  padding: 12px 13px;
-  box-sizing: border-box;
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 12px;
-  background: rgba(255,255,255,.035);
-  color: #aeb7ce;
-  font-size: .72rem;
-  line-height: 1.5;
-}
-.tiktok-dns-help > span { display: block; margin-bottom: 5px; color: #eef2ff; font-weight: 750; }
-.tiktok-dns-help p { margin: 7px 0 5px; }
-.tiktok-dns-help code {
-  padding: 2px 5px;
-  border-radius: 5px;
-  background: rgba(255,255,255,.08);
-  color: #fff;
-}
-.tiktok-dns-help .button { min-height: 32px; margin-bottom: 3px; }
 @media (max-width: 640px) {
   .watch-player[data-provider="tiktok"] .watch-player-stage,
   .admin-tiktok-preview {
@@ -822,5 +737,37 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
     height: min(78vh, calc((100vw - 24px) * 1.7778));
     min-height: 420px;
   }
-  .tiktok-recovery { inset: 8px; padding: 14px; }
+}
+
+/* TikTok hover previews from normal sharing URLs only */
+.tile-media .preview-surface {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+.tile-media .preview-surface iframe {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  border: 0 !important;
+}
+.tile-media .preview-surface .tiktok-embed {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.video-tile[data-video-provider="tiktok"] .preview-surface {
+  z-index: 4;
+}
+.video-tile[data-video-provider="tiktok"].preview-playing .play-orb,
+.video-tile[data-video-provider="tiktok"].preview-playing .media-fallback,
+.video-tile[data-video-provider="tiktok"].preview-playing > .tile-media > img {
+  opacity: 0;
+  pointer-events: none;
 }
