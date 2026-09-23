@@ -799,3 +799,44 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
   opacity: 0;
   pointer-events: none;
 }
+
+
+/* TikTok recovery: keeps fallback actions below the provider frame. */
+.vidbest-tiktok-recovery {
+  position: relative;
+  z-index: 26;
+  width: min(100%, 540px);
+  margin: 8px auto 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  background: rgba(10,13,22,.94);
+  color: #fff;
+  box-sizing: border-box;
+}
+.vidbest-tiktok-recovery[hidden] { display: none !important; }
+.vidbest-tiktok-recovery-text,
+.vidbest-tiktok-connection-note {
+  margin: 0 0 8px;
+  font: 12px/1.45 system-ui,sans-serif;
+  color: rgba(255,255,255,.82);
+}
+.vidbest-tiktok-recovery-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.vidbest-tiktok-standard-fallback {
+  width: 100%;
+  min-height: 420px;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  background: #000;
+}
+.vidbest-tiktok-standard-fallback .tiktok-embed {
+  margin: 0 auto !important;
+  max-width: 605px !important;
+  min-width: 325px !important;
+  width: 100% !important;
+}
