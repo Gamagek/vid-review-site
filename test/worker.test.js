@@ -397,6 +397,7 @@ test("stores TikTok source and renders the PR26-style player", async () => {
   assert.match(html, /closed_caption=1/);
   assert.match(html, /allow="autoplay; fullscreen; picture-in-picture"/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
+  assert.match(html, /data-tiktok-share=/);
   assert.doesNotMatch(html, /"embedUrl":s*"https:\/\/www\.tiktok\.com\/player\/v1\//);
 });
 
@@ -748,6 +749,10 @@ test("renders the official TikTok Embed Player iframe with responsive options", 
   assert.match(watchSource, /if \(remote\) \{/);
   assert.doesNotMatch(watchSource, /remote = provider === "youtube" \|\| provider === "vimeo" \|\| provider === "tiktok";[\s\S]{0,1200}overlay.append\(play, back, forward/);
   assert.match(watchSource, /Retry TikTok player/);
+  assert.match(watchSource, /\/api\/tiktok\/preflight/);
+  assert.match(watchSource, /standard official embed/);
+  assert.match(watchSource, /data-vidbest-tiktok-embed/);
+  assert.match(watchSource, /dns\.google/);
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /parseTikTokShareUrl/);
   assert.match(homeSource, /buildTikTokPreviewPlayerUrl/);
@@ -760,6 +765,7 @@ test("renders the official TikTok Embed Player iframe with responsive options", 
 
   const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
   assert.match(indexSource, /\/api\/tiktok\/thumbnail/);
+  assert.match(indexSource, /\/api\/tiktok\/preflight/);
   assert.match(indexSource, /www\.tiktok\.com\/oembed/);
   assert.match(indexSource, /tiktokcdn(?:-[a-z0-9-]+)?\.com/);
 });
