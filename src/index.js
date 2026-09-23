@@ -383,7 +383,7 @@ async function tikTokPreflight(request) {
     thumbnail_url: buildTikTokThumbnailProxyUrl(share),
     official_player: true,
     standard_embed: true,
-  }, 200, { "Cache-Control": "public, max-age=60, stale-while-revalidate=300" });
+  }, 200, { "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800" });
   if (cache) await cache.put(cacheKey, result.clone());
   return result;
 }
@@ -442,7 +442,7 @@ async function tikTokThumbnail(request) {
   if (!imageResponse.ok) throw new AppError(502, "TikTok preview image is unavailable");
 
   const headers = securityHeaders(new Headers(imageResponse.headers));
-  headers.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
+  headers.set("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800");
   if (!headers.has("Content-Type")) headers.set("Content-Type", "image/jpeg");
   const response = new Response(imageResponse.body, { status: 200, headers });
   if (cache) await cache.put(cacheKey, response.clone());
