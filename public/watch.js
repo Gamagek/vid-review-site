@@ -669,19 +669,156 @@ function initializeEmbeddedMediaTools() {
     retry.setAttribute("aria-label", "Retry TikTok player");
     retry.hidden = true;
 
+    const recovery = document.createElement("div");
+    recovery.className = "vidbest-tiktok-recovery";
+    recovery.hidden = true;
+
+    const recoveryText = document.createElement("p");
+    recoveryText.className = "vidbest-tiktok-recovery-text";
+    recoveryText.textContent = "TikTok could not load in the embedded player. Vid.Best will try its standard official embed once.";
+
+    const recoveryActions = document.createElement("div");
+    recoveryActions.className = "vidbest-tiktok-recovery-actions";
+    const openTikTok = document.createElement("a");
+    openTikTok.className = "button ghost";
+    openTikTok.target = "_blank";
+    openTikTok.rel = "noopener noreferrer";
+    openTikTok.textContent = "Open on TikTok";
+    const connectionHelp = document.createElement("button");
+    connectionHelp.type = "button";
+    connectionHelp.className = "button ghost";
+    connectionHelp.textContent = "Connection help";
+    recoveryActions.append(openTikTok, connectionHelp);
+    recovery.append(recoveryText, recoveryActions);
+
+    const connectionNote = document.createElement("p");
+    connectionNote.className = "vidbest-tiktok-connection-note";
+    connectionNote.hidden = true;
+    connectionNote.textContent = "A DNS change can sometimes fix a resolver/network problem, but it cannot override TikTok content or account restrictions. Android: Settings → Network & internet → Private DNS → Private DNS provider hostname → dns.google.";
+    recovery.append(connectionNote);
+
     let ready = false;
     let watchdog = null;
+    let fallbackTried = false;
+    let fallbackShell = null;
+
+    const getShareUrl = () => frame.dataset.tiktokShare || "";
+
+    const showRecovery = (messageText) => {
+      retry.hidden = false;
+      recovery.hidden = false;
+      if (messageText) recoveryText.textContent = messageText;
+    };
+
+    const hideRecovery = () => {
+      recovery.hidden = true;
+      connectionNote.hidden = true;
+    };
+
+    connectionHelp.addEventListener("click", () => {
+      connectionNote.hidden = !connectionNote.hidden;
+    });
+
+    openTikTok.href = getShareUrl() || "https://www.tiktok.com/";
 
     const armWatchdog = () => {
       window.clearTimeout(watchdog);
       watchdog = window.setTimeout(() => {
-        if (!ready) retry.hidden = false;
+        if (!ready) showRecovery("TikTok did not report a ready player. Vid.Best can try the standard official embed.");
       }, 8000);
     };
 
+    const restoreOfficialPlayer = () => {
+      if (!fallbackShell || !frame.isConnected) return;
+      fallbackShell.replaceWith(frame);
+      fallbackShell = null;
+      frame.removeAttribute("hidden");
+      overlay.hidden = false;
+      ready = false;
+      hideRecovery();
+      const url = new URL(frame.src);
+      url.searchParams.set("retry", String(Date.now()));
+      frame.src = url.toString();
+      armWatchdog();
+    };
+
+    const loadStandardEmbed = async () => {
+      if (fallbackTried) return false;
+      fallbackTried = true;
+      const share = getShareUrl();
+      if (!share) return false;
+      try {
+        const preflight = await api("/api/tiktok/preflight?url=" + encodeURIComponent(share));
+        if (!preflight.ok) return false;
+        const match = share.match(/\/video\/(\d+)\/?$/);
+        if (!match) return false;
+
+        const shell = document.createElement("div");
+        shell.className = "vidbest-tiktok-standard-fallback";
+        const quote = document.createElement("blockquote");
+        quote.className = "tiktok-embed";
+        quote.cite = share;
+        quote.setAttribute("data-video-id", match[1]);
+        quote.setAttribute("data-embed-from", "oembed");
+        quote.style.cssText = "max-width:605px;min-width:325px;width:100%;margin:0 auto";
+        const section = document.createElement("section");
+        const link = document.createElement("a");
+        link.href = share;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "View this video on TikTok";
+        section.append(link);
+        quote.append(section);
+        shell.append(quote);
+        frame.hidden = true;
+        frame.parentNode?.insertBefore(shell, frame);
+        overlay.hidden = true;
+        fallbackShell = shell;
+        openTikTok.href = share;
+        recoveryText.textContent = "Switched to TikTok’s standard official embed.";
+        retry.hidden = false;
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    const ensureTikTokEmbedScript = () => new Promise((resolve) => {
+      if (document.querySelector("script[data-vidbest-tiktok-embed]")) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = "https://www.tiktok.com/embed.js";
+      script.dataset.vidbestTikTokEmbed = "1";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.head.append(script);
+    });
+
+    const recoverTikTok = async (messageText) => {
+      ready = false;
+      showRecovery(messageText);
+      const switched = await loadStandardEmbed();
+      if (switched) {
+        const loaded = await ensureTikTokEmbedScript();
+        if (loaded) {
+          recoveryText.textContent = "TikTok standard official embed loaded. Provider controls are active inside the embed.";
+          return;
+        }
+        recoveryText.textContent = "Standard TikTok embed could not load. Use Open on TikTok or Retry.";
+      }
+    };
+
     retry.addEventListener("click", () => {
+      if (fallbackShell) {
+        restoreOfficialPlayer();
+        return;
+      }
       ready = false;
       retry.hidden = true;
+      hideRecovery();
       try {
         const url = new URL(frame.src);
         url.searchParams.set("retry", String(Date.now()));
@@ -690,7 +827,7 @@ function initializeEmbeddedMediaTools() {
       armWatchdog();
     });
 
-    stage.append(retry);
+    stage.append(retry, recovery);
     armWatchdog();
 
     addEventListener("message", (event) => {
@@ -702,12 +839,12 @@ function initializeEmbeddedMediaTools() {
           ready = true;
           window.clearTimeout(watchdog);
           retry.hidden = true;
+          hideRecovery();
           note.textContent = "TikTok official player ready · advanced controls active";
         }
         if (data.type === "onPlayerError") {
-          ready = false;
-          retry.hidden = false;
-          note.textContent = "TikTok player error · provider controls remain available";
+          void recoverTikTok("TikTok official player reported an error. Trying the standard official embed…");
+          note.textContent = "TikTok is recovering · provider controls remain available when loaded";
         }
         if (data.type === "onStateChange") state.playing = Number(data.value) === 1;
         if (data.type === "onMute") state.muted = Boolean(data.value);
@@ -718,7 +855,6 @@ function initializeEmbeddedMediaTools() {
       } catch {}
     });
   }
-
   const overlay = document.createElement("div");
   overlay.className = "vidbest-embed-overlay";
   overlay.classList.toggle("vidbest-remote-controls", remote);
