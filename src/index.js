@@ -348,6 +348,10 @@ async function tikTokPreflight(request) {
     response = await fetch(metadataUrl.toString(), {
       headers: { Accept: "application/json", "User-Agent": "VidBest/1.0 (+https://vid.best/)" },
       signal: AbortSignal.timeout(7000),
+      cf: {
+        cacheEverything: true,
+        cacheTtlByStatus: { "200-299": 86400, "400-499": 60, "500-599": 10 },
+      },
     });
   } catch (error) {
     console.error("TikTok preflight failed", error?.name || "unknown");
@@ -410,6 +414,11 @@ async function tikTokThumbnail(request) {
       Accept: "application/json",
       "User-Agent": "VidBest/1.0 (+https://vid.best/)",
     },
+    signal: AbortSignal.timeout(7000),
+    cf: {
+      cacheEverything: true,
+      cacheTtlByStatus: { "200-299": 86400, "400-499": 60, "500-599": 10 },
+    },
   });
   if (!metadataResponse.ok) throw new AppError(502, "TikTok preview metadata is unavailable");
 
@@ -438,6 +447,11 @@ async function tikTokThumbnail(request) {
 
   const imageResponse = await fetch(thumbnail.toString(), {
     headers: { Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8" },
+    signal: AbortSignal.timeout(7000),
+    cf: {
+      cacheEverything: true,
+      cacheTtlByStatus: { "200-299": 86400, "400-499": 60, "500-599": 10 },
+    },
   });
   if (!imageResponse.ok) throw new AppError(502, "TikTok preview image is unavailable");
 
