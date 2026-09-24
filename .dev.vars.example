@@ -4,3 +4,4 @@ REACTION_SALT="replace-with-a-different-32-byte-random-value"
 GEMINI_KEY=""
 YOUTUBE_API_KEY=""
 
+TIKTOK_FACADE_API_URL="https://gateway.example.com/tiktok-preview"
