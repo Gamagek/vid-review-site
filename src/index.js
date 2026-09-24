@@ -1242,6 +1242,7 @@ async function listVideos(request, env, includeUnpublished) {
   const countStatement = env.DB.prepare(`SELECT COUNT(*) AS total FROM videos v ${whereSql}`).bind(...bindings);
   const [listResult, countRow] = await env.DB.batch([listStatement, countStatement]);
   const videos = await hydrateVideos(env, listResult.results || []);
+  await attachMediaCacheFields(env, videos, includeUnpublished);
 
   return json({
     videos,
@@ -1560,7 +1561,7 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
     return {
       source_url: `${baseUrl}/media/${encodeR2Key(r2Key)}`,
       embed_url: null,
-      media_type: "r2",
+      media_type: isHlsManifestKey(r2Key) ? "hls" : "r2",
       provider: isHlsManifestKey(r2Key) ? "hls" : "r2",
       r2_key: r2Key,
       thumbnail_url: null,
@@ -2255,6 +2256,7 @@ async function watchPage(request, env, ctx, slugInput) {
   ).bind(slug).first();
   if (!row) return dynamicHtml(notFoundPage(), 404);
   const [video] = await hydrateVideos(env, [row]);
+  await attachMediaCacheFields(env, [video], false);
   ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
   const scriptNonce = createCspNonce();
   return dynamicHtml(renderWatchHtml(video, request, env, scriptNonce), 200, scriptNonce);
