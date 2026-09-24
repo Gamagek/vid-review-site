@@ -163,6 +163,10 @@ async def run_job(job: Job):
                 })
             except Exception:
                 pass
+            try:
+                output_path.unlink(missing_ok=True)
+            except OSError:
+                pass
 
 
 async def callback(job: Job, payload: dict):
