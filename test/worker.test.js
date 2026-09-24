@@ -830,14 +830,17 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(watchSource, /dns\.google/);
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /parseTikTokShareUrl/);
-  assert.match(homeSource, /buildTikTokPreviewPlayerUrl/);
-  assert.match(homeSource, /autoplay: "1"/);
-  assert.match(homeSource, /muted: "1"/);
+  assert.match(homeSource, /loadTikTokFacadePreviews/);
+  assert.match(homeSource, /renderTikTokFacade/);
+  assert.match(homeSource, /\/api\/tiktok\/previews/);
+  assert.doesNotMatch(homeSource, /buildTikTokPreviewPlayerUrl/);
+  assert.doesNotMatch(homeSource, /tiktok\/player\/v1/);
   assert.match(homeSource, /PREVIEW_DELAY_MS = 3000/);
   assert.doesNotMatch(homeSource, /ensureTikTokEmbedScript/);
   assert.doesNotMatch(homeSource, /className = "tiktok-embed"/);
   assert.match(homeSource, /provider === "tiktok"/);
-  assert.doesNotMatch(homeSource, /activateTikTokFacade/);
+  assert.match(homeSource, /tiktok-microlink-preview/);
+  assert.match(homeSource, /TikTok preview · tap to open/);
 
   const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
   assert.match(indexSource, /\/api\/tiktok\/preflight/);
@@ -845,6 +848,40 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(indexSource, /tiktokcdn(?:-[a-z0-9-]+)?\.com/);
 });
 
+test("builds a batch TikTok facade preview from the configured facade endpoint", async () => {
+  const context = createTestContext({ TIKTOK_FACADE_API_URL: "https://gateway.example.com/tiktok-preview" });
+  const share = "https://www.tiktok.com/@rorozya/video/7622472784039415061";
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url) => {
+    calls.push(String(url));
+    return new Response(JSON.stringify({
+      type: "video",
+      title: "Kisah cinta antara pelayan dan majikan",
+      author_name: "ro²",
+      author_url: "https://www.tiktok.com/@rorozya",
+      thumbnail_url: "https://p16-common-sign.tiktokcdn-us.com/example.jpg",
+      description: "Kisah cinta antara pelayan dan majikan #meriaashiqui",
+    }), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  try {
+    const response = await send(context, "/api/tiktok/previews?url=" + encodeURIComponent(share), {
+      headers: { Accept: "application/json" },
+    });
+    assert.equal(response.status, 200);
+    const result = await response.json();
+    assert.equal(result.ok, true);
+    assert.equal(result.previews.length, 1);
+    assert.equal(result.previews[0].url, share);
+    assert.equal(result.previews[0].author_name, "ro²");
+    assert.equal(result.previews[0].description, "Kisah cinta antara pelayan dan majikan #meriaashiqui");
+    assert.equal(result.previews[0].thumbnail_url, "https://p16-common-sign.tiktokcdn-us.com/example.jpg");
+    assert.equal(calls.length, 1);
+    assert.match(calls[0], /^https:\/\/gateway\.example\.com\/tiktok-preview\?url=/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
 test("repairs a legacy TikTok record with only its source URL and uses the Saiyaara title", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
