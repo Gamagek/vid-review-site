@@ -393,33 +393,47 @@ test("gives AI generation a longer browser timeout than ordinary requests", () =
   assert.match(source, /url\.startsWith\("\/api\/ai\/generate"\) \? 35000 : 15000/);
 });
 
-test("uses the optional NGINX TikTok facade for metadata without writing R2 cache files", async () => {
-  const context = createTestContext({ TIKTOK_FACADE_API_URL: "https://gateway.example.com/api/tiktok-oembed" });
+test("serves TikTok thumbnail cards through the official oEmbed thumbnail", async () => {
+  const context = createTestContext();
   const originalFetch = globalThis.fetch;
-  const sample = "https://www.tiktok.com/@rorozya/video/7622472784039415061";
+  const sample = "https://www.tiktok.com/@rorozya/video/7622472784039415061?_r=1&_t=ZS-99wVMKS0Vt3";
+  const thumbnail = "https://p19-common-sign.tiktokcdn-us.com/example/preview.image?x-expires=1790276400&x-signature=test";
   const calls = [];
+
   globalThis.fetch = async (url) => {
-    calls.push(String(url));
-    return new Response(JSON.stringify({
-      type: "video",
-      title: "ro² (@rorozya) on TikTok",
-      author_name: "ro²",
-      thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/example/preview.jpg",
-    }), { status: 200, headers: { "Content-Type": "application/json" } });
+    const target = String(url);
+    calls.push(target);
+    if (target.startsWith("https://www.tiktok.com/oembed?")) {
+      return new Response(JSON.stringify({
+        type: "video",
+        title: "ro² (@rorozya) on TikTok",
+        author_name: "ro²",
+        author_url: "https://www.tiktok.com/@rorozya",
+        thumbnail_url: thumbnail,
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    if (target === thumbnail) {
+      return new Response(new Uint8Array([1, 2, 3, 4]), {
+        status: 200,
+        headers: { "Content-Type": "image/jpeg" },
+      });
+    }
+    throw new Error("Unexpected upstream: " + target);
   };
+
   try {
-    const response = await send(context, "/api/tiktok/preflight?url=" + encodeURIComponent(sample));
+    const response = await send(context, "/api/tiktok/thumbnail?url=" + encodeURIComponent(sample));
     assert.equal(response.status, 200);
-    const payload = await response.json();
-    assert.equal(payload.ok, true);
-    assert.equal(payload.cached, true);
-    assert.equal(payload.video_id, "7622472784039415061");
-    assert.match(calls[0], /^https:\/\/gateway\.example\.com\/api\/tiktok-oembed\?url=/);
-    assert.equal(context.bucket.objects.size, 0);
+    assert.equal(response.headers.get("Content-Type"), "image/jpeg");
+    assert.deepEqual([...new Uint8Array(await response.arrayBuffer())], [1, 2, 3, 4]);
+    assert.equal(calls.length, 2);
+    assert.match(calls[0], /\/oembed\?url=/);
+    assert.equal(calls[1], thumbnail);
   } finally {
     globalThis.fetch = originalFetch;
   }
 });
+
 test("stores TikTok source and renders the PR26-style player", async () => {
   const context = createTestContext();
   const response = await send(context, "/api/videos", {
@@ -438,14 +452,16 @@ test("stores TikTok source and renders the PR26-style player", async () => {
   assert.equal(result.video.provider, "tiktok");
   assert.equal(result.video.media_type, "tiktok");
   assert.match(result.video.embed_url, /^https:\/\/www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
-  assert.equal(result.video.thumbnail_url, null);
+  assert.match(result.video.thumbnail_url, /^\/api\/tiktok\/thumbnail\?url=/);
 
   const page = await send(context, `/watch/${result.video.slug}`);
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /class="tiktok-facade"/);
-  assert.match(html, /data-tiktok-id="6718335390845095173"/);
-  assert.doesNotMatch(html, /<iframe[^>]+class="tiktok-official-player"/);
+  assert.match(html, /<iframe[^>]+class="tiktok-official-player"/);
+  assert.match(html, /player\/v1\/6718335390845095173/);
+  assert.match(html, /controls=1/);
+  assert.match(html, /closed_caption=1/);
+  assert.match(html, /allow="autoplay; fullscreen; picture-in-picture"/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
   assert.match(html, /data-tiktok-share=/);
   assert.doesNotMatch(html, /"embedUrl":s*"https:\/\/www\.tiktok\.com\/player\/v1\//);
@@ -495,8 +511,7 @@ test("renders an R2 HLS media record as a browser HLS player", async () => {
   });
   assert.equal(response.status, 201);
   const result = await response.json();
-  assert.equal(result.video.media_type, "r2");
-  assert.equal(result.video.provider, "hls");
+  assert.equal(result.video.media_type, "hls");
   const page = await send(context, `/watch/${result.video.slug}`);
   const html = await page.text();
   assert.match(html, /data-hls="1"/);
@@ -773,6 +788,145 @@ test("starts owned R2 analysis through the authenticated Teamwork API", async ()
   }
 });
 
+test("persists TikTok metadata and thumbnail in R2 and serves stale thumbnail when upstream fails", async () => {
+  const context = createTestContext();
+  const share = "https://www.tiktok.com/@example/video/6718335390845095173";
+  const originalFetch = globalThis.fetch;
+  let online = true;
+  globalThis.fetch = async (url) => {
+    if (!online) throw new Error("TikTok unavailable");
+    if (String(url).includes("/oembed?")) {
+      return new Response(JSON.stringify({
+        type: "video",
+        title: "Cached TikTok test",
+        author_name: "Example",
+        thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/test.jpg",
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    return new Response("cached-image-bytes", { status: 200, headers: { "Content-Type": "image/jpeg" } });
+  };
+  try {
+    const first = await send(context, "/api/tiktok/thumbnail?url=" + encodeURIComponent(share));
+    assert.equal(first.status, 200);
+    assert.match(first.headers.get("X-VidBest-TikTok-Cache"), /live-r2-snapshot/);
+    assert.equal([...context.bucket.objects.keys()].filter((key) => key.startsWith("uploads/tiktok-cache/")).length, 2);
+
+    online = false;
+    const fallback = await send(context, "/api/tiktok/thumbnail?url=" + encodeURIComponent(share));
+    assert.equal(fallback.status, 200);
+    assert.equal(fallback.headers.get("X-VidBest-TikTok-Cache"), "r2-stale");
+    assert.equal(await fallback.text(), "cached-image-bytes");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("falls back to the persistent TikTok metadata cache during preflight failure", async () => {
+  const context = createTestContext();
+  const share = "https://www.tiktok.com/@example/video/6718335390845095174";
+  const originalFetch = globalThis.fetch;
+  let online = true;
+  globalThis.fetch = async (url) => {
+    if (!online) throw new Error("TikTok unavailable");
+    if (String(url).includes("/oembed?")) {
+      return new Response(JSON.stringify({
+        type: "video",
+        title: "Persistent metadata",
+        author_name: "Example",
+        thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/test.jpg",
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    return new Response("image", { status: 200, headers: { "Content-Type": "image/jpeg" } });
+  };
+  try {
+    const first = await send(context, "/api/tiktok/preflight?url=" + encodeURIComponent(share));
+    assert.equal(first.status, 200);
+    assert.equal((await first.json()).cached, false);
+
+    online = false;
+    const fallback = await send(context, "/api/tiktok/preflight?url=" + encodeURIComponent(share));
+    assert.equal(fallback.status, 200);
+    const result = await fallback.json();
+    assert.equal(result.ok, true);
+    assert.equal(result.cached, true);
+    assert.equal(result.title, "Persistent metadata");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("admin TikTok cache sync persists current TikTok records in R2", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, published)
+     VALUES ('tiktok-cache-one', 'TikTok cache one', 'https://www.tiktok.com/@example/video/6718335390845095175', 'tiktok', 'Social Media & Trending', 'TikTok Trending', 1),
+            ('tiktok-cache-two', 'TikTok cache two', 'https://www.tiktok.com/@example/video/6718335390845095176', 'tiktok', 'Social Media & Trending', 'TikTok Trending', 1)`,
+  ).run();
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    if (String(url).includes("/oembed?")) {
+      const videoId = new URL(url).searchParams.get("url").match(/\/video\/(\d+)/)[1];
+      return new Response(JSON.stringify({
+        type: "video",
+        title: "Cached " + videoId,
+        author_name: "Example",
+        thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/" + videoId + ".jpg",
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    return new Response("image", { status: 200, headers: { "Content-Type": "image/jpeg" } });
+  };
+  try {
+    const response = await send(context, "/api/admin/tiktok/cache?limit=4&offset=0", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${secret}` },
+    });
+    assert.equal(response.status, 200);
+    const result = await response.json();
+    assert.equal(result.total, 2);
+    assert.equal(result.cached, 2);
+    assert.equal(result.complete, true);
+    assert.equal([...context.bucket.objects.keys()].filter((key) => key.startsWith("uploads/tiktok-cache/")).length, 4);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("automatically snapshots a published TikTok preview after saving the video link", async () => {
+  const context = createTestContext();
+  const share = "https://www.tiktok.com/@example/video/6718335390845095199";
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    if (String(url).includes("/oembed?")) {
+      return new Response(JSON.stringify({
+        type: "video",
+        title: "Automatically cached",
+        author_name: "Example",
+        thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/auto.jpg",
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    return new Response("image", { status: 200, headers: { "Content-Type": "image/jpeg" } });
+  };
+  try {
+    const response = await send(context, "/api/videos", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: "Automatic TikTok cache",
+        source_url: share,
+        primary_category: "Social Media & Trending",
+        subcategory: "TikTok Viral Challenges",
+        published: true,
+      }),
+    });
+    assert.equal(response.status, 201);
+    assert.equal(context.pending.length, 1);
+    await Promise.all(context.pending);
+    assert.equal([...context.bucket.objects.keys()].filter((key) => key.startsWith("uploads/tiktok-cache/")).length, 2);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("TikTok keeps separate share preview and player paths", () => {
   const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
   assert.match(adminSource, /renderTikTokPreview/);
@@ -783,7 +937,7 @@ test("TikTok keeps separate share preview and player paths", () => {
   assert.match(adminSource, /TikTok preview needs the normal full sharing link/);
 });
 
-test("renders a click-to-load TikTok facade on the watch page", async () => {
+test("renders the official TikTok Embed Player iframe with responsive options", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
@@ -803,18 +957,20 @@ test("renders a click-to-load TikTok facade on the watch page", async () => {
   const page = await send(context, "/watch/tiktok-player-test");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /class="tiktok-facade"/);
-  assert.match(html, /data-tiktok-id="7669587518156705056"/);
-  assert.doesNotMatch(html, /https:\/\/www\.tiktok\.com\/player\/v1\/7669587518156705056/);
+  assert.match(html, /<iframe[^>]+class="tiktok-official-player"/);
+  assert.ok(html.includes("https://www.tiktok.com/player/v1/7669587518156705056?"));
+  assert.match(html, /controls=1/);
+  assert.match(html, /progress_bar=1/);
+  assert.match(html, /volume_control=1/);
+  assert.match(html, /fullscreen_button=1/);
+  assert.match(html, /closed_caption=1/);
   assert.doesNotMatch(html, /class="tiktok-embed"/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
   assert.match(html, /data-video-provider="tiktok"/);
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
   assert.doesNotMatch(watchSource, /initializeTikTokLazyPlayer/);
-  assert.match(watchSource, /initializeTikTokFacade/);
-  assert.match(watchSource, /buildTikTokOfficialPlayerUrl/);
-  assert.match(watchSource, /tiktok-facade/);
+  assert.match(watchSource, /"x-tiktok-player": true/);
   assert.match(watchSource, /onPlayerError/);
   assert.match(watchSource, /className = "vidbest-tiktok-retry"/);
   assert.match(watchSource, /const remote = \[\"youtube\", \"vimeo\", \"tiktok\"\]\.includes\(provider\)/);
@@ -827,14 +983,16 @@ test("renders a click-to-load TikTok facade on the watch page", async () => {
   assert.match(watchSource, /dns\.google/);
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /parseTikTokShareUrl/);
-  assert.match(homeSource, /activateTikTokFacade/);
-  assert.match(homeSource, /Tap to load the official TikTok player/);
+  assert.match(homeSource, /buildTikTokPreviewPlayerUrl/);
+  assert.match(homeSource, /autoplay: "1"/);
+  assert.match(homeSource, /muted: "1"/);
   assert.match(homeSource, /PREVIEW_DELAY_MS = 3000/);
   assert.doesNotMatch(homeSource, /ensureTikTokEmbedScript/);
   assert.doesNotMatch(homeSource, /className = "tiktok-embed"/);
   assert.match(homeSource, /provider === "tiktok"/);
 
   const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
+  assert.match(indexSource, /\/api\/tiktok\/thumbnail/);
   assert.match(indexSource, /\/api\/tiktok\/preflight/);
   assert.match(indexSource, /www\.tiktok\.com\/oembed/);
   assert.match(indexSource, /tiktokcdn(?:-[a-z0-9-]+)?\.com/);
@@ -858,10 +1016,10 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   const html = await page.text();
   assert.ok(html.includes("<title>Saiyaara; A Cinematic Romance | Vid.Best</title>"));
   assert.ok(html.includes("<h1>Saiyaara; A Cinematic Romance</h1>"));
-  assert.ok(html.includes('class="tiktok-facade"'));
-  assert.ok(html.includes('data-tiktok-id="6718335390845095173"'));
-  assert.doesNotMatch(html, /<iframe id="watch-media-frame" class="tiktok-official-player"/);
-  assert.doesNotMatch(html, /https:\/\/www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
+  assert.ok(html.includes('<iframe id="watch-media-frame" class="tiktok-official-player"'));
+  assert.ok(html.includes('https://www.tiktok.com/player/v1/6718335390845095173?'));
+  assert.ok(html.includes("controls=1"));
+  assert.ok(html.includes("closed_caption=1"));
   assert.ok(html.includes('data-video-provider="tiktok"'));
 });
 
