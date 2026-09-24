@@ -891,6 +891,42 @@ test("admin TikTok cache sync persists current TikTok records in R2", async () =
   }
 });
 
+test("automatically snapshots a published TikTok preview after saving the video link", async () => {
+  const context = createTestContext();
+  const share = "https://www.tiktok.com/@example/video/6718335390845095199";
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    if (String(url).includes("/oembed?")) {
+      return new Response(JSON.stringify({
+        type: "video",
+        title: "Automatically cached",
+        author_name: "Example",
+        thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/auto.jpg",
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    return new Response("image", { status: 200, headers: { "Content-Type": "image/jpeg" } });
+  };
+  try {
+    const response = await send(context, "/api/videos", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: "Automatic TikTok cache",
+        source_url: share,
+        primary_category: "Social Media & Trending",
+        subcategory: "TikTok Viral Challenges",
+        published: true,
+      }),
+    });
+    assert.equal(response.status, 201);
+    assert.equal(context.pending.length, 1);
+    await Promise.all(context.pending);
+    assert.equal([...context.bucket.objects.keys()].filter((key) => key.startsWith("uploads/tiktok-cache/")).length, 2);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("TikTok keeps separate share preview and player paths", () => {
   const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
   assert.match(adminSource, /renderTikTokPreview/);

@@ -201,7 +201,7 @@ async function route(request, env, ctx) {
     if (request.method === "GET") return listVideos(request, env, false);
     if (request.method === "POST") {
       await requireAdmin(request, env);
-      return createVideo(request, env);
+      return createVideo(request, env, ctx);
     }
   }
 
@@ -229,7 +229,7 @@ async function route(request, env, ctx) {
   match = path.match(/^\/api\/videos\/(\d+)$/);
   if (match && ["PATCH", "DELETE"].includes(request.method)) {
     await requireAdmin(request, env);
-    if (request.method === "PATCH") return updateVideo(request, env, Number(match[1]));
+    if (request.method === "PATCH") return updateVideo(request, env, Number(match[1]), ctx);
     if (request.method === "DELETE") return deleteVideo(request, env, Number(match[1]));
   }
 
@@ -541,6 +541,16 @@ async function tikTokPreflightFallback(requestUrl, cache, cacheKey, env, share, 
   });
   if (cache) await cache.put(cacheKey, failed.clone());
   return failed;
+}
+
+async function cacheTikTokPreviewAfterPublish(env, sourceUrl) {
+  const share = normalizeTikTokShareUrl(sourceUrl);
+  if (!share) return;
+  try {
+    await fetchAndStoreTikTokPreview(env, share);
+  } catch (error) {
+    console.error("Automatic TikTok R2 preview cache failed", error?.message || error);
+  }
 }
 
 async function cacheTikTokVideos(request, env) {
@@ -1257,7 +1267,7 @@ async function recordVideoInterest(request, env, videoId) {
   });
 }
 
-async function createVideo(request, env) {
+async function createVideo(request, env, ctx) {
   const body = await readJson(request);
   const baseUrl = getBaseUrl(request, env);
   const data = await validateVideoPayload(body, null, baseUrl, env);
@@ -1291,10 +1301,13 @@ async function createVideo(request, env) {
     Number(data.published),
   ).first();
 
+  if (row && detectMediaProvider(row) === "tiktok" && row.published) {
+    ctx?.waitUntil?.(cacheTikTokPreviewAfterPublish(env, row.source_url));
+  }
   return json({ success: true, video: serializeVideo(row) }, 201);
 }
 
-async function updateVideo(request, env, id) {
+async function updateVideo(request, env, id, ctx) {
   const existing = await env.DB.prepare("SELECT * FROM videos WHERE id = ?").bind(id).first();
   if (!existing) throw new AppError(404, "Video not found");
   const body = await readJson(request);
@@ -1338,6 +1351,9 @@ async function updateVideo(request, env, id) {
     await env.DB.prepare("DELETE FROM video_analysis WHERE video_id = ?").bind(id).run();
   }
   await cleanupUnusedManagedAssets(env, replacedKeys);
+  if (row && detectMediaProvider(row) === "tiktok" && row.published) {
+    ctx?.waitUntil?.(cacheTikTokPreviewAfterPublish(env, row.source_url));
+  }
 
   return json({ success: true, video: serializeVideo(row) });
 }
