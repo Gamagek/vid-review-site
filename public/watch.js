@@ -27,6 +27,7 @@ function initializeWatchPage() {
   enhanceCommentForm();
   enhanceNativePlayer();
   initializeHlsPlayback();
+  initializeTikTokFacade();
   initializePersistentPlayer();
   initializeEmbeddedMediaTools();
   initializeAudioLab();
@@ -46,6 +47,53 @@ function initializeWatchPage() {
   loadRecommendations();
 }
 
+
+function initializeTikTokFacade() {
+  const stage = document.querySelector(".watch-player-stage");
+  const facade = stage?.querySelector(".tiktok-facade");
+  if (!stage || !facade || facade.dataset.activated === "1") return;
+
+  facade.addEventListener("click", () => {
+    if (facade.dataset.activated === "1") return;
+    const videoId = facade.dataset.tiktokId;
+    if (!/^\d+$/.test(videoId || "")) return;
+
+    facade.dataset.activated = "1";
+    const frame = document.createElement("iframe");
+    frame.id = "watch-media-frame";
+    frame.className = "tiktok-official-player";
+    frame.src = buildTikTokOfficialPlayerUrl(videoId);
+    frame.title = facade.getAttribute("aria-label") || "Official TikTok player";
+    frame.loading = "eager";
+    frame.allow = "autoplay; fullscreen; picture-in-picture";
+    frame.allowFullscreen = true;
+    frame.referrerPolicy = "strict-origin-when-cross-origin";
+    stage.replaceChildren(frame);
+
+    initializeEmbeddedMediaTools();
+    initializeEmbeddedAudioLab();
+  });
+}
+
+function buildTikTokOfficialPlayerUrl(videoId) {
+  const params = new URLSearchParams({
+    controls: "1",
+    progress_bar: "1",
+    play_button: "1",
+    volume_control: "1",
+    fullscreen_button: "1",
+    timestamp: "1",
+    loop: "0",
+    autoplay: "0",
+    music_info: "1",
+    description: "1",
+    rel: "1",
+    native_context_menu: "1",
+    closed_caption: "1",
+    muted: "0",
+  });
+  return `https://www.tiktok.com/player/v1/${encodeURIComponent(videoId)}?${params.toString()}`;
+}
 
 function initializeHlsPlayback() {
   const video = document.querySelector("#watch-media-video[data-hls='1']");
@@ -1370,11 +1418,19 @@ function initializeEmbeddedAudioLab() {
   style.textContent = [
     ".watch-player-stage{position:relative}",
     ".watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:min(100%,540px);height:min(78vh,760px);min-height:480px;margin-inline:auto;background:#000;overflow:hidden}",
+    ".watch-player[data-provider=\"tiktok\"] .tiktok-facade{display:block;width:100%;height:100%;padding:0;border:0;background:#000;color:#fff;cursor:pointer}",
+    ".watch-player[data-provider=\"tiktok\"] .tiktok-facade-surface{position:relative;display:grid;place-items:center;width:100%;height:calc(100% - 48px);min-height:0;background:radial-gradient(circle at center,#242424 0,#090909 58%,#000 100%);overflow:hidden}",
+    ".watch-player[data-provider=\"tiktok\"] .tiktok-facade-image{width:100%;height:100%;object-fit:cover}",
+    ".watch-player[data-provider=\"tiktok\"] .tiktok-facade-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.45))}",
+    ".watch-player[data-provider=\"tiktok\"] .tiktok-facade-play{position:absolute;display:grid;place-items:center;width:86px;height:86px;border-radius:50%;background:rgba(255,255,255,.94);color:#111;font-size:32px;box-shadow:0 10px 35px rgba(0,0,0,.4)}",
+    ".watch-player[data-provider=\"tiktok\"] .tiktok-facade:focus-visible .tiktok-facade-play,.watch-player[data-provider=\"tiktok\"] .tiktok-facade:hover .tiktok-facade-play{transform:scale(1.06)}",
+    ".watch-player[data-provider=\"tiktok\"] .tiktok-facade-caption{display:grid;place-items:center;height:48px;padding:0 14px;font-size:14px;letter-spacing:.01em;background:#080808}",
+
     ".watch-player[data-provider=\"tiktok\"] .tiktok-official-player{display:block;width:100%;height:100%;min-height:0;border:0;background:#000}",
     ".watch-player.is-mini[data-provider=\"tiktok\"]{width:min(430px,calc(100vw - 36px))}",
     ".watch-player.is-mini[data-provider=\"tiktok\"] .watch-player-stage{width:100%;height:min(70vh,calc((100vw - 36px) * 1.7778));min-height:0}",
     ".watch-player.is-theater[data-provider=\"tiktok\"] .watch-player-stage{width:min(100%,720px);height:calc(100vh - 90px);min-height:0}",
-    "@media(max-width:640px){.watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:100%;height:min(78vh,calc((100vw - 24px) * 1.7778));min-height:420px}}",
+    "@media(max-width:640px){.watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:100%;height:min(78vh,calc((100vw - 24px) * 1.7778));min-height:420px}.watch-player[data-provider=\"tiktok\"] .tiktok-facade-play{width:72px;height:72px;font-size:27px}}",
     ".watch-player-stage .player-tools.vidbest-stage-tools{position:absolute!important;left:8px;right:8px;bottom:42px;z-index:30;margin:0!important;width:auto!important;max-width:none!important;display:flex!important;align-items:center;gap:5px;flex-wrap:wrap;padding:7px 8px!important;border-radius:12px;background:linear-gradient(180deg,rgba(4,7,16,.08),rgba(4,7,16,.94));box-sizing:border-box;pointer-events:none}",
     ".watch-player-stage .player-tools.vidbest-stage-tools>*{pointer-events:auto}",
     ".watch-player-stage .player-tools.vidbest-stage-tools button{min-height:30px;white-space:nowrap}",

@@ -1,5 +1,3 @@
-import { dispatchMediaCacheJob, getMediaCacheForVideo, handleMediaCacheCallback, cleanupMediaCacheForVideo, queueAuthorizedMediaCache, buildMediaCacheUrl, isMediaCacheTableReady } from "./media-cache.js";
-
 const CATEGORIES = Object.freeze({
   "Entertainment, Movies & Games": [
     "Movie Trailers",
@@ -163,19 +161,8 @@ async function route(request, env, ctx) {
     return requestDiscovery(request, env);
   }
 
-  if (path === "/api/tiktok/thumbnail" && request.method === "GET") {
-    return tikTokThumbnail(request, env, ctx);
-  }
   if (path === "/api/tiktok/preflight" && request.method === "GET") {
     return tikTokPreflight(request, env, ctx);
-  }
-  if (path === "/api/admin/tiktok/cache" && request.method === "POST") {
-    await requireAdmin(request, env);
-    return cacheTikTokVideos(request, env);
-  }
-
-  if (path === "/api/internal/media-cache/callback" && request.method === "POST") {
-    return handleMediaCacheCallback(request, env);
   }
 
   if (path === "/robots.txt" && request.method === "GET") {
@@ -322,12 +309,6 @@ async function route(request, env, ctx) {
     return storeVideoAnalysis(request, env, Number(match[1]));
   }
 
-  match = path.match(/^\/api\/admin\/videos\/(\d+)\/media-cache$/);
-  if (match && ["GET", "POST"].includes(request.method)) {
-    await requireAdmin(request, env);
-    return handleAdminMediaCache(request, env, Number(match[1]), ctx);
-  }
-
   if (path === "/api/assets") {
     await requireAdmin(request, env);
     if (request.method === "GET") return listAssets(request, env);
@@ -348,274 +329,83 @@ async function route(request, env, ctx) {
   return secureAssetResponse(assetResponse, path);
 }
 
-async function tikTokPreflight(request, env, ctx) {
+async function tikTokPreflight(request, env) {
   const requested = cleanText(new URL(request.url).searchParams.get("url"), 2000);
   const share = normalizeTikTokShareUrl(requested);
   if (!share) throw new AppError(400, "Use a normal TikTok sharing link");
-  const requestUrl = new URL(request.url);
-  const cacheKey = new Request(requestUrl.origin + "/__vidbest-tiktok-preflight?url=" + encodeURIComponent(share));
-  const cache = typeof caches !== "undefined" && caches.default ? caches.default : null;
-  if (cache) {
-    const cached = await cache.match(cacheKey);
-    if (cached) return cached;
-  }
 
   try {
-    const preview = await fetchAndStoreTikTokPreview(env, share);
-    const videoId = share.match(/\/video\/(\d+)\/?$/)?.[1] || null;
-    const result = json({
+    const preview = await fetchTikTokPreview(env, share);
+    return json({
       ok: true,
       provider: "tiktok",
-      video_id: videoId,
-      title: preview.metadata.title,
-      author_name: preview.metadata.author_name,
-      thumbnail_url: buildTikTokThumbnailProxyUrl(share),
+      video_id: preview.video_id,
+      title: preview.title,
+      author_name: preview.author_name,
+      thumbnail_url: preview.thumbnail_url,
       official_player: true,
       standard_embed: true,
-      cached: false,
-    }, 200, { "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800" });
-    if (cache) await cache.put(cacheKey, result.clone());
-    return result;
+      cached: Boolean(env.TIKTOK_FACADE_API_URL),
+    }, 200, {
+      "Cache-Control": "public, max-age=300, stale-while-revalidate=1800",
+    });
   } catch (error) {
-    return tikTokPreflightFallback(requestUrl, cache, cacheKey, env, share, error);
+    const reason = error instanceof AppError
+      ? error.message.replace(/^TikTok preview /i, "").slice(0, 120)
+      : "upstream-timeout-or-network";
+    return json({ ok: false, provider: "tiktok", reason }, 200, {
+      "Cache-Control": "public, max-age=10, stale-while-revalidate=30",
+    });
   }
 }
 
-async function tikTokThumbnail(request, env, ctx) {
-  const requested = cleanText(new URL(request.url).searchParams.get("url"), 2000);
-  const share = normalizeTikTokShareUrl(requested);
-  if (!share) throw new AppError(400, "Use a normal TikTok sharing link");
-
-  const requestUrl = new URL(request.url);
-  const cacheKey = new Request(
-    `${requestUrl.origin}/__vidbest-tiktok-thumbnail?url=${encodeURIComponent(share)}`,
-  );
-  const cache = typeof caches !== "undefined" && caches.default ? caches.default : null;
-  if (cache) {
-    const cached = await cache.match(cacheKey);
-    if (cached) return cached;
-  }
-
-  try {
-    const preview = await fetchAndStoreTikTokPreview(env, share);
-    const headers = securityHeaders(new Headers(preview.imageResponse.headers));
-    headers.set("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800");
-    headers.set("X-VidBest-TikTok-Cache", "live-r2-snapshot");
-    if (!headers.has("Content-Type")) headers.set("Content-Type", "image/jpeg");
-    const response = new Response(preview.imageResponse.body, { status: 200, headers });
-    if (cache) await cache.put(cacheKey, response.clone());
-    return response;
-  } catch (error) {
-    const fallback = await getTikTokPersistentThumbnail(env, share);
-    if (fallback) {
-      const headers = new Headers();
-      fallback.writeHttpMetadata(headers);
-      headers.set("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800");
-      headers.set("X-VidBest-TikTok-Cache", "r2-stale");
-      headers.set("X-Content-Type-Options", "nosniff");
-      const response = new Response(fallback.body, { status: 200, headers });
-      if (cache) await cache.put(cacheKey, response.clone());
-      return response;
+async function fetchTikTokPreview(env, share) {
+  const facadeBase = String(env.TIKTOK_FACADE_API_URL || "").trim();
+  let metadataUrl;
+  if (facadeBase) {
+    try {
+      metadataUrl = new URL(facadeBase);
+      if (metadataUrl.protocol !== "https:" || metadataUrl.username || metadataUrl.password) {
+        throw new Error("TIKTOK_FACADE_API_URL must be HTTPS without credentials");
+      }
+      metadataUrl.searchParams.set("url", share);
+    } catch {
+      throw new AppError(503, "TIKTOK_FACADE_API_URL is invalid");
     }
-    throw error;
+  } else {
+    metadataUrl = new URL("https://www.tiktok.com/oembed");
+    metadataUrl.searchParams.set("url", share);
   }
-}
 
-async function fetchAndStoreTikTokPreview(env, share) {
-  if (!env.BUCKET) throw new AppError(503, "TikTok persistent cache is not configured");
-
-  const metadataUrl = new URL("https://www.tiktok.com/oembed");
-  metadataUrl.searchParams.set("url", share);
-  const metadataResponse = await fetch(metadataUrl.toString(), {
-    headers: { Accept: "application/json", "User-Agent": "VidBest/1.0 (+https://vid.best/)" },
+  const response = await fetch(metadataUrl.toString(), {
+    headers: { Accept: "application/json", "User-Agent": "VidBest-TikTok-Facade/1.0" },
     signal: AbortSignal.timeout(7000),
-    cf: {
-      cacheEverything: true,
-      cacheTtlByStatus: { "200-299": 86400, "400-499": 60, "500-599": 10 },
-    },
   });
-  if (!metadataResponse.ok) throw new AppError(502, `TikTok preview metadata returned HTTP ${metadataResponse.status}`);
+  if (!response.ok) throw new AppError(502, `TikTok preview metadata returned HTTP ${response.status}`);
 
   let metadata;
-  try { metadata = await metadataResponse.json(); } catch { metadata = null; }
+  try { metadata = await response.json(); } catch { metadata = null; }
   const videoId = share.match(/\/video\/(\d+)\/?$/)?.[1] || null;
   if (!videoId || String(metadata?.type || "") !== "video") {
     throw new AppError(502, "TikTok did not return an embeddable video preview");
   }
 
-  const thumbnailUrl = String(metadata?.thumbnail_url || "");
-  let thumbnail;
+  let thumbnailUrl = "";
   try {
-    const parsedThumbnail = new URL(thumbnailUrl);
+    const parsedThumbnail = new URL(String(metadata?.thumbnail_url || ""));
     const host = parsedThumbnail.hostname.toLowerCase();
     const allowed = /^([a-z0-9-]+\.)*tiktokcdn(?:-[a-z0-9-]+)?\.com$/.test(host)
       || host === "muscdn.com"
       || host.endsWith(".muscdn.com");
-    if (!allowed || parsedThumbnail.protocol !== "https:") throw new Error("Unsupported TikTok thumbnail host");
-    thumbnail = parsedThumbnail;
-  } catch {
-    throw new AppError(502, "TikTok did not provide a usable preview image");
-  }
+    if (parsedThumbnail.protocol === "https:" && allowed) thumbnailUrl = parsedThumbnail.toString();
+  } catch {}
 
-  const imageResponse = await fetch(thumbnail.toString(), {
-    headers: { Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8" },
-    signal: AbortSignal.timeout(7000),
-    cf: {
-      cacheEverything: true,
-      cacheTtlByStatus: { "200-299": 86400, "400-499": 60, "500-599": 10 },
-    },
-  });
-  if (!imageResponse.ok) throw new AppError(502, `TikTok preview image returned HTTP ${imageResponse.status}`);
-
-  const cachedMetadata = {
+  return {
+    video_id: videoId,
     title: cleanText(metadata?.title, 160, "TikTok video"),
     author_name: cleanText(metadata?.author_name, 120),
-    thumbnail_url: buildTikTokThumbnailProxyUrl(share),
-    video_id: videoId,
-    canonical_url: share,
-    cached_at: new Date().toISOString(),
+    thumbnail_url: thumbnailUrl || null,
   };
-  const { metadataKey, thumbnailKey } = await tikTokCacheKeys(share);
-
-  await Promise.all([
-    env.BUCKET.put(metadataKey, JSON.stringify(cachedMetadata), {
-      httpMetadata: {
-        contentType: "application/json; charset=utf-8",
-        cacheControl: "public, max-age=86400",
-      },
-      customMetadata: { provider: "tiktok", kind: "oembed-cache", canonicalUrl: share },
-    }),
-    env.BUCKET.put(thumbnailKey, imageResponse.clone().body, {
-      httpMetadata: {
-        contentType: imageResponse.headers.get("Content-Type") || "image/jpeg",
-        cacheControl: "public, max-age=31536000, immutable",
-        contentDisposition: "inline",
-      },
-      customMetadata: { provider: "tiktok", kind: "thumbnail-cache", canonicalUrl: share },
-    }),
-  ]);
-
-  return { metadata: cachedMetadata, imageResponse };
-}
-
-async function tikTokCacheKeys(share) {
-  const hash = await sha256Hex(share);
-  return {
-    metadataKey: `uploads/tiktok-cache/${hash}.json`,
-    thumbnailKey: `uploads/tiktok-cache/${hash}.image`,
-  };
-}
-
-async function getTikTokPersistentCache(env, share) {
-  if (!env.BUCKET) return null;
-  const { metadataKey } = await tikTokCacheKeys(share);
-  const object = await env.BUCKET.get(metadataKey);
-  if (!object) return null;
-  try {
-    return JSON.parse(await new Response(object.body).text());
-  } catch {
-    return null;
-  }
-}
-
-async function getTikTokPersistentThumbnail(env, share) {
-  if (!env.BUCKET) return null;
-  const { thumbnailKey } = await tikTokCacheKeys(share);
-  return env.BUCKET.get(thumbnailKey);
-}
-
-async function tikTokPreflightFallback(requestUrl, cache, cacheKey, env, share, error) {
-  const cached = await getTikTokPersistentCache(env, share);
-  if (cached?.video_id) {
-    const result = json({
-      ok: true,
-      provider: "tiktok",
-      video_id: cached.video_id,
-      title: cached.title || "TikTok video",
-      author_name: cached.author_name || "",
-      thumbnail_url: cached.thumbnail_url || buildTikTokThumbnailProxyUrl(share),
-      official_player: true,
-      standard_embed: true,
-      cached: true,
-    }, 200, {
-      "Cache-Control": "public, max-age=300, stale-while-revalidate=3600, stale-if-error=604800",
-      "X-VidBest-TikTok-Cache": "r2-stale",
-    });
-    if (cache) await cache.put(cacheKey, result.clone());
-    return result;
-  }
-
-  const reason = error instanceof AppError
-    ? error.message.replace(/^TikTok preview /i, "").slice(0, 120)
-    : "upstream-timeout-or-network";
-  const failed = json({ ok: false, provider: "tiktok", reason }, 200, {
-    "Cache-Control": "public, max-age=10, stale-while-revalidate=30",
-  });
-  if (cache) await cache.put(cacheKey, failed.clone());
-  return failed;
-}
-
-async function cacheTikTokPreviewAfterPublish(env, sourceUrl) {
-  const share = normalizeTikTokShareUrl(sourceUrl);
-  if (!share) return;
-  try {
-    await fetchAndStoreTikTokPreview(env, share);
-  } catch (error) {
-    console.error("Automatic TikTok R2 preview cache failed", error?.message || error);
-  }
-}
-
-async function cacheTikTokVideos(request, env) {
-  const url = new URL(request.url);
-  const limit = clampInteger(url.searchParams.get("limit"), 1, 2, 2);
-  const offset = clampInteger(url.searchParams.get("offset"), 0, 1000000, 0);
-  const totalRow = await env.DB.prepare(
-    `SELECT COUNT(*) AS total
-     FROM videos
-     WHERE published = 1
-       AND (media_type = 'tiktok'
-         OR lower(source_url) LIKE 'https://www.tiktok.com/@%/video/%')`,
-  ).first();
-  const total = Number(totalRow?.total || 0);
-  const rows = await env.DB.prepare(
-    `SELECT id, source_url
-     FROM videos
-     WHERE published = 1
-       AND (media_type = 'tiktok'
-         OR lower(source_url) LIKE 'https://www.tiktok.com/@%/video/%')
-     ORDER BY id ASC
-     LIMIT ? OFFSET ?`,
-  ).bind(limit, offset).all();
-
-  const failures = [];
-  let cached = 0;
-  const batch = rows.results || [];
-  const outcomes = await Promise.all(batch.map(async (row) => {
-    const share = normalizeTikTokShareUrl(row.source_url);
-    if (!share) return { id: row.id, ok: false, reason: "invalid-tiktok-url" };
-    try {
-      await fetchAndStoreTikTokPreview(env, share);
-      return { id: row.id, ok: true };
-    } catch (error) {
-      return { id: row.id, ok: false, reason: cleanText(error?.message || "cache-failed", 160) };
-    }
-  }));
-  for (const outcome of outcomes) {
-    if (outcome.ok) cached += 1;
-    else failures.push({ id: outcome.id, reason: outcome.reason });
-  }
-
-  const nextOffset = offset + (rows.results || []).length;
-  return json({
-    success: true,
-    total,
-    offset,
-    processed: (rows.results || []).length,
-    cached,
-    failed: failures,
-    next_offset: nextOffset,
-    complete: nextOffset >= total,
-  });
 }
 
 function handleError(error) {
@@ -891,14 +681,10 @@ function parseTags(value, fallback = []) {
 function serializeVideo(row) {
   if (!row) return null;
   const provider = detectMediaProvider(row);
-  const fallbackThumbnail = provider === "tiktok" && !row.thumbnail_url
-    ? buildTikTokThumbnailProxyUrl(row.source_url)
-    : null;
   return {
     ...row,
     provider,
-    media_cache_url: row.cache_r2_key ? buildMediaCacheUrl(row.cache_r2_key) : null,
-    thumbnail_url: row.thumbnail_url || fallbackThumbnail,
+    thumbnail_url: row.thumbnail_url || null,
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
     published: Boolean(row.published),
@@ -908,77 +694,6 @@ function serializeVideo(row) {
   };
 }
 
-async function handleAdminMediaCache(request, env, id, ctx) {
-  const video = await env.DB.prepare("SELECT * FROM videos WHERE id = ?").bind(id).first();
-  if (!video) throw new AppError(404, "Video not found");
-
-  if (request.method === "GET") {
-    const job = await getMediaCacheForVideo(env, id, video.source_url, true);
-    return json({
-      success: true,
-      cache: job ? {
-        ...job,
-        media_url: job.status === "complete" ? buildMediaCacheUrl(job.output_key) : null,
-      } : null,
-    });
-  }
-
-  const body = await readJson(request, 2048);
-  const mediaCache = await queueAuthorizedMediaCache(
-    env,
-    { ...video, provider: detectMediaProvider(video) },
-    { rightsConfirmed: toBoolean(body.media_rights_confirmed) },
-  );
-  if (mediaCache.job?.id && mediaCache.status === "queued") {
-    ctx?.waitUntil?.(dispatchMediaCacheJob(env, mediaCache.job, getBaseUrl(request, env)));
-  }
-  return json({
-    success: true,
-    cache: mediaCache.job ? {
-      ...mediaCache.job,
-      media_url: mediaCache.status === "complete" ? buildMediaCacheUrl(mediaCache.job.output_key) : null,
-    } : { status: mediaCache.status },
-  }, 202);
-}
-
-async function attachMediaCacheFields(env, videos, includeUnpublished) {
-  if (!videos.length || !(await isMediaCacheTableReady(env))) return;
-  const ids = videos.map((video) => Number(video.id)).filter(Number.isSafeInteger);
-  if (!ids.length) return;
-  const placeholders = ids.map(() => "?").join(",");
-  const result = await env.DB.prepare(
-    `SELECT video_id, source_url, output_key, status
-     FROM media_cache_jobs
-     WHERE video_id IN (${placeholders})
-     ORDER BY updated_at DESC`,
-  ).bind(...ids).all();
-  const latest = new Map();
-  for (const job of result.results || []) {
-    const key = Number(job.video_id);
-    if (!latest.has(key)) latest.set(key, job);
-  }
-  for (const video of videos) {
-    const job = latest.get(Number(video.id));
-    video.media_cache_status = includeUnpublished ? (job?.status || null) : undefined;
-    video.media_cache_url = job?.status === "complete" && job.source_url === video.source_url
-      ? buildMediaCacheUrl(job.output_key)
-      : null;
-  }
-}
-
-function buildTikTokThumbnailProxyUrl(sourceUrl) {
-  const share = normalizeTikTokShareUrl(sourceUrl);
-  return share ? `/api/tiktok/thumbnail?url=${encodeURIComponent(share)}` : null;
-}
-
-function isTikTokThumbnailProxy(value) {
-  try {
-    const url = new URL(value, "https://vid.best");
-    return url.pathname === "/api/tiktok/thumbnail" && Boolean(url.searchParams.get("url"));
-  } catch {
-    return false;
-  }
-}
 
 function normalizeTikTokShareUrl(value) {
   try {
@@ -1242,7 +957,6 @@ async function listVideos(request, env, includeUnpublished) {
   const countStatement = env.DB.prepare(`SELECT COUNT(*) AS total FROM videos v ${whereSql}`).bind(...bindings);
   const [listResult, countRow] = await env.DB.batch([listStatement, countStatement]);
   const videos = await hydrateVideos(env, listResult.results || []);
-  await attachMediaCacheFields(env, videos, includeUnpublished);
 
   return json({
     videos,
@@ -1275,7 +989,6 @@ async function getPublicVideo(env, slug) {
   ).bind(slug).first();
   if (!row) throw new AppError(404, "Video not found");
   const [video] = await hydrateVideos(env, [row]);
-  await attachMediaCacheFields(env, [video], false);
   return json({ video });
 }
 
@@ -1376,24 +1089,9 @@ async function createVideo(request, env, ctx) {
     Number(data.published),
   ).first();
 
-  let mediaCache = { status: "not-requested", job: null };
-  if (row && row.published) {
-    mediaCache = await queueAuthorizedMediaCache(
-      env,
-      { ...row, provider: detectMediaProvider(row) },
-      {
-        rightsConfirmed: toBoolean(body.media_rights_confirmed) && body.media_cache_enabled !== false,
-      },
-    );
-    if (mediaCache.job?.id && mediaCache.status === "queued") {
-      ctx?.waitUntil?.(dispatchMediaCacheJob(env, mediaCache.job, getBaseUrl(request, env)));
-    }
-  }
-
   if (row && detectMediaProvider(row) === "tiktok" && row.published) {
-    ctx?.waitUntil?.(cacheTikTokPreviewAfterPublish(env, row.source_url));
   }
-  return json({ success: true, video: serializeVideo({ ...row, media_cache_status: mediaCache.status }) }, 201);
+  return json({ success: true, video: serializeVideo(row) }, 201);
 }
 
 async function updateVideo(request, env, id, ctx) {
@@ -1440,27 +1138,11 @@ async function updateVideo(request, env, id, ctx) {
     await env.DB.prepare("DELETE FROM video_analysis WHERE video_id = ?").bind(id).run();
   }
   await cleanupUnusedManagedAssets(env, replacedKeys);
-  await cleanupMediaCacheForVideo(env, id, row?.source_url || "");
-
-  let mediaCache = { status: "not-requested", job: null };
-  if (row && row.published) {
-    mediaCache = await queueAuthorizedMediaCache(
-      env,
-      { ...row, provider: detectMediaProvider(row) },
-      {
-        rightsConfirmed: toBoolean(body.media_rights_confirmed) && body.media_cache_enabled !== false,
-      },
-    );
-    if (mediaCache.job?.id && mediaCache.status === "queued") {
-      ctx?.waitUntil?.(dispatchMediaCacheJob(env, mediaCache.job, getBaseUrl(request, env)));
-    }
-  }
 
   if (row && detectMediaProvider(row) === "tiktok" && row.published) {
-    ctx?.waitUntil?.(cacheTikTokPreviewAfterPublish(env, row.source_url));
   }
 
-  return json({ success: true, video: serializeVideo({ ...row, media_cache_status: mediaCache.status }) });
+  return json({ success: true, video: serializeVideo(row) });
 }
 
 async function deleteVideo(request, env, id) {
@@ -1468,11 +1150,9 @@ async function deleteVideo(request, env, id) {
     "SELECT id, r2_key, thumbnail_url FROM videos WHERE id = ?",
   ).bind(id).first();
   if (!existing) throw new AppError(404, "Video not found");
-  const cacheJob = await getMediaCacheForVideo(env, id, "", true);
   await env.DB.prepare("DELETE FROM videos WHERE id = ?").bind(id).run();
   await cleanupUnusedManagedAssets(env, [
     existing.r2_key,
-    cacheJob?.output_key,
     managedAssetKeyFromUrl(existing.thumbnail_url, request, env),
   ]);
   return json({ success: true });
@@ -1527,9 +1207,7 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
   const media = normalizeMedia(suppliedSource, suppliedR2Key, baseUrl);
   const thumbnailCandidate = body.thumbnail_url === undefined ? existing?.thumbnail_url : body.thumbnail_url;
   const thumbnailText = cleanText(thumbnailCandidate, 2000);
-  const customThumbnail = media.provider === "tiktok" && isTikTokThumbnailProxy(thumbnailText)
-    ? null
-    : validateOptionalUrl(thumbnailText);
+  const customThumbnail = validateOptionalUrl(thumbnailText);
   const thumbnailUrl = customThumbnail || media.thumbnail_url;
   if (media.provider === "hls" && !toBoolean(body.media_rights_confirmed)) {
     throw new AppError(400, "Confirm that you have permission to store and serve this HLS media before publishing");
@@ -2256,7 +1934,6 @@ async function watchPage(request, env, ctx, slugInput) {
   ).bind(slug).first();
   if (!row) return dynamicHtml(notFoundPage(), 404);
   const [video] = await hydrateVideos(env, [row]);
-  await attachMediaCacheFields(env, [video], false);
   ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
   const scriptNonce = createCspNonce();
   return dynamicHtml(renderWatchHtml(video, request, env, scriptNonce), 200, scriptNonce);
@@ -2493,13 +2170,6 @@ function watchDisplayTitle(video) {
 function renderMedia(video, playbackOrigin) {
   const provider = String(video.provider || "").toLowerCase();
 
-  if (video.media_cache_url && (provider === "direct" || provider === "r2")) {
-    const cacheCaptions = video.has_captions
-      ? `<track kind="captions" src="/captions/${encodeURIComponent(video.slug)}.vtt" srclang="${escapeHtml(video.transcript_language || "en")}" label="Generated captions">`
-      : "";
-    return `<video id="watch-media-video" data-cache-profile="360p" controls playsinline preload="metadata"><source src="${escapeHtml(video.media_cache_url)}" type="video/mp4">${cacheCaptions}Your browser does not support MP4 video.</video>`;
-  }
-
   if (provider === "hls") {
     const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}"` : "";
     const captions = video.has_captions
@@ -2511,8 +2181,15 @@ function renderMedia(video, playbackOrigin) {
   if (provider === "tiktok") {
     const tiktokId = extractTikTokId(video.source_url);
     if (!tiktokId) return "";
-    const embedUrl = buildTikTokPlayerUrl(tiktokId);
-    return `<iframe id="watch-media-frame" class="tiktok-official-player" data-tiktok-share="${escapeHtml(video.source_url)}" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+    const safeTitle = escapeHtml(watchDisplayTitle(video));
+    const safeSource = escapeHtml(video.source_url);
+    const customThumbnail = video.thumbnail_url
+      ? `<img class="tiktok-facade-image" src="${escapeHtml(video.thumbnail_url)}" alt="" loading="eager" decoding="async">`
+      : "";
+    return `<button type="button" class="tiktok-facade" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${safeSource}" aria-label="Load official TikTok player for ${safeTitle}">
+      <span class="tiktok-facade-surface">${customThumbnail}<span class="tiktok-facade-shade" aria-hidden="true"></span><span class="tiktok-facade-play" aria-hidden="true">▶</span></span>
+      <span class="tiktok-facade-caption">Tap to load the official TikTok player</span>
+    </button>`;
   }
   if (video.embed_url) {
     const embedUrl = preparePlaybackEmbed(video.embed_url, playbackOrigin);

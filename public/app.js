@@ -327,7 +327,9 @@ function buildVideoCard(video) {
 
   const image = card.querySelector(".tile-media img");
   const fallback = card.querySelector(".media-fallback");
-  if (video.thumbnail_url) {
+  const lazyTikTokThumbnail = card.dataset.videoProvider === "tiktok"
+    && String(video.thumbnail_url || "").includes("/api/tiktok/thumbnail");
+  if (video.thumbnail_url && !lazyTikTokThumbnail) {
     image.src = video.thumbnail_url;
     image.alt = `${video.title} thumbnail`;
     fallback.hidden = true;
