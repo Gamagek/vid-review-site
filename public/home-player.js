@@ -44,21 +44,18 @@ function decorateVideoCards() {
     const media = card.querySelector(".tile-media");
     if (!media) return;
     card.querySelector(".preview-status").textContent = previewAvailabilityMessage(card);
-    media.addEventListener("pointerenter", () => schedulePreview(card));
-    media.addEventListener("pointerleave", () => {
-      if (previewState.activeCard === card && card.dataset.videoProvider === "tiktok") {
-        stopPreview(card);
-        return;
-      }
-      if (previewState.candidateCard === card && (previewState.visibility.get(card) || 0) < PREVIEW_VISIBILITY) {
-        cancelCandidate(card);
-      }
-    });
-    media.addEventListener("focus", () => schedulePreview(card));
-    media.addEventListener("blur", () => {
-      cancelCandidate(card);
-      if (previewState.activeCard === card && card.dataset.videoProvider === "tiktok") stopPreview(card);
-    });
+    if (card.dataset.videoProvider === "tiktok") {
+      media.addEventListener("click", (event) => activateTikTokFacade(event, card));
+    } else {
+      media.addEventListener("pointerenter", () => schedulePreview(card));
+      media.addEventListener("pointerleave", () => {
+        if (previewState.candidateCard === card && (previewState.visibility.get(card) || 0) < PREVIEW_VISIBILITY) {
+          cancelCandidate(card);
+        }
+      });
+      media.addEventListener("focus", () => schedulePreview(card));
+      media.addEventListener("blur", () => cancelCandidate(card));
+    }
     previewState.observer?.observe(card);
   });
 }
@@ -71,18 +68,38 @@ function previewsAllowed() {
 
 function previewAvailabilityMessage(card) {
   if (!previewsAllowed()) return "Open video · preview disabled";
-  if (card.dataset.videoProvider === "tiktok" && !parseTikTokShareUrl(card.dataset.videoSource)) {
-    return "TikTok preview needs a normal sharing link";
-  }
+  if (card.dataset.videoProvider === "tiktok") return "Tap to load the official TikTok player";
   return canPreview(card) ? "Hold for a 3-second preview" : "Open video to play";
 }
 
 function canPreview(card) {
   const provider = card.dataset.videoProvider;
-  if (provider === "tiktok") return Boolean(parseTikTokShareUrl(card.dataset.videoSource));
+  if (provider === "tiktok") return false;
   const direct = Boolean(card.dataset.videoSource) && ["direct", "raw", "r2"].includes(provider);
   const embed = Boolean(card.dataset.videoEmbed) && EMBED_PREVIEW_PROVIDERS.has(provider);
   return direct || embed;
+}
+
+function activateTikTokFacade(event, card) {
+  const share = parseTikTokShareUrl(card.dataset.videoSource);
+  if (!share) return;
+  event.preventDefault();
+  event.stopPropagation();
+
+  const surface = card.querySelector(".preview-surface");
+  if (!surface || surface.dataset.tiktokActivated === "1") return;
+  surface.dataset.tiktokActivated = "1";
+
+  const iframe = document.createElement("iframe");
+  iframe.src = buildTikTokPlayerUrl(share.id);
+  iframe.title = `${card.dataset.videoTitle} official TikTok player`;
+  iframe.loading = "eager";
+  iframe.referrerPolicy = "strict-origin-when-cross-origin";
+  iframe.allow = "autoplay; fullscreen; picture-in-picture";
+  iframe.allowFullscreen = true;
+  surface.replaceChildren(iframe);
+  card.classList.add("preview-playing");
+  card.querySelector(".preview-status").textContent = "Official TikTok player loaded";
 }
 
 function parseTikTokShareUrl(value) {
@@ -226,22 +243,22 @@ function createPreviewPlayer(card) {
   return iframe;
 }
 
-function buildTikTokPreviewPlayerUrl(videoId) {
+function buildTikTokPlayerUrl(videoId) {
   const params = new URLSearchParams({
-    controls: "0",
-    progress_bar: "0",
-    play_button: "0",
-    volume_control: "0",
-    fullscreen_button: "0",
-    timestamp: "0",
-    loop: "1",
-    autoplay: "1",
-    music_info: "0",
-    description: "0",
+    controls: "1",
+    progress_bar: "1",
+    play_button: "1",
+    volume_control: "1",
+    fullscreen_button: "1",
+    timestamp: "1",
+    loop: "0",
+    autoplay: "0",
+    music_info: "1",
+    description: "1",
     rel: "1",
-    native_context_menu: "0",
-    closed_caption: "0",
-    muted: "1",
+    native_context_menu: "1",
+    closed_caption: "1",
+    muted: "0",
   });
   return `https://www.tiktok.com/player/v1/${encodeURIComponent(videoId)}?${params.toString()}`;
 }
