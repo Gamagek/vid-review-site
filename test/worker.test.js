@@ -100,8 +100,10 @@ function createBucket() {
 }
 
 function createTestContext(overrides = {}) {
+  const { __skipMediaCacheMigration = false, ...envOverrides } = overrides;
   const sqlite = new DatabaseSync(":memory:");
   for (const migration of migrations) {
+    if (__skipMediaCacheMigration && migration === "0013_media_cache_jobs.sql") continue;
     sqlite.exec(readFileSync(new URL(`../migrations/${migration}`, import.meta.url), "utf8"));
   }
   const bucket = createBucket();
@@ -115,7 +117,7 @@ function createTestContext(overrides = {}) {
       APP_NAME: "Test",
       DB: new TestD1Database(sqlite),
       BUCKET: bucket,
-      ...overrides,
+      ...envOverrides,
     },
     ctx: { waitUntil(promise) { pending.push(promise); } },
     pending,
@@ -133,6 +135,41 @@ async function login(context) {
   });
 }
 
+test("legacy databases without the media-cache migration keep existing videos working", async () => {
+  const context = createTestContext({ __skipMediaCacheMigration: true });
+  context.sqlite.prepare(
+    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, description, published)
+     VALUES ('legacy-video', 'Legacy video', 'https://example.com/legacy.mp4', 'raw', 'Technology', 'Web Development', 'Legacy description', 1)`,
+  ).run();
+
+  const list = await send(context, "/api/videos");
+  assert.equal(list.status, 200);
+  assert.equal((await list.json()).videos[0].slug, "legacy-video");
+
+  const api = await send(context, "/api/videos/legacy-video");
+  assert.equal(api.status, 200);
+  assert.equal((await api.json()).video.slug, "legacy-video");
+
+  const page = await send(context, "/watch/legacy-video");
+  assert.equal(page.status, 200);
+  assert.match(await page.text(), /<title>Legacy video | Vid\.Best<\/title>/);
+
+  const publish = await send(context, "/api/videos", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "New legacy-schema video",
+      source_url: "https://example.com/new.mp4",
+      primary_category: "Technology",
+      subcategory: "Web Development",
+      published: true,
+      media_rights_confirmed: true,
+      media_cache_enabled: true,
+    }),
+  });
+  assert.equal(publish.status, 201);
+  assert.equal((await publish.json()).video.media_cache_status, "waiting_migration");
+});
 test("rejects non-object JSON before processing it", async () => {
   const context = createTestContext();
   const response = await send(context, "/api/discovery-requests", {
