@@ -32,7 +32,6 @@ const ui = {
   hlsFolderInput: document.querySelector("#hls-folder-input"),
   uploadHlsButton: document.querySelector("#upload-hls-button"),
   mediaRightsConfirmed: document.querySelector("#media-rights-confirmed"),
-  mediaCacheEnabled: document.querySelector("#media-cache-enabled"),
   uploadProgress: document.querySelector("#upload-progress"),
   uploadStatus: document.querySelector("#upload-status"),
   preview: document.querySelector("#media-preview"),
@@ -848,7 +847,6 @@ async function saveVideo(event) {
     trending: ui.trending.checked,
     published: ui.published.checked,
     media_rights_confirmed: ui.mediaRightsConfirmed?.checked || false,
-    media_cache_enabled: ui.mediaCacheEnabled?.checked !== false,
   };
   setStatus(ui.saveStatus, id ? "Updating record…" : "Saving record…");
   const submit = ui.videoForm.querySelector('button[type="submit"]');
@@ -878,14 +876,7 @@ async function saveVideo(event) {
         queueWarning = ` The discovery queue was not updated: ${error.message}`;
       }
     }
-    const cacheStatus = result.video.media_cache_status === "queued"
-      ? " 360p cache queued."
-      : result.video.media_cache_status === "waiting_transcoder"
-        ? " 360p cache is waiting for the backend transcoder."
-        : result.video.media_cache_status === "unsupported"
-          ? " 360p cache is not used for this provider."
-          : "";
-    setStatus(ui.saveStatus, `Saved: ${result.video.title}.${cacheStatus}${queueWarning}${analysisWarning}`, queueWarning || analysisWarning ? "error" : "success");
+    setStatus(ui.saveStatus, `Saved: \${result.video.title}.\${queueWarning}\${analysisWarning}`, queueWarning || analysisWarning ? "error" : "success");
     resetEditor(false);
     await Promise.all([loadAdminVideos(), loadDiscoveryRequests()]);
   } catch (error) {
@@ -920,8 +911,7 @@ function renderAdminVideo(video) {
   detail.textContent = `${video.primary_category} · ${video.subcategory}`;
   const meta = document.createElement("div");
   meta.className = "admin-list-meta";
-  const cacheLabel = video.media_cache_status ? ` · 360p cache: ${video.media_cache_status}` : "";
-  meta.textContent = `${video.published ? "Published" : "Draft"} · ${formatDate(video.created_at)}${cacheLabel}`;
+  meta.textContent = `\${video.published ? "Published" : "Draft"} · \${formatDate(video.created_at)}`;
   const actions = document.createElement("div");
   actions.className = "admin-item-actions";
   const edit = document.createElement("button");
@@ -964,7 +954,6 @@ async function editVideo(video) {
   ui.trending.checked = Boolean(video.trending);
   ui.published.checked = Boolean(video.published);
   ui.mediaRightsConfirmed.checked = false;
-  ui.mediaCacheEnabled.checked = true;
   setSourceMode(["r2", "hls"].includes(video.media_type) ? "upload" : "link");
   adminState.analysisSource = video.source_url || "";
   adminState.analysisDraft = null;
