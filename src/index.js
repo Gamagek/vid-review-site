@@ -412,8 +412,21 @@ async function tikTokThumbnail(request, env, ctx) {
 async function fetchAndStoreTikTokPreview(env, share) {
   if (!env.BUCKET) throw new AppError(503, "TikTok persistent cache is not configured");
 
-  const metadataUrl = new URL("https://www.tiktok.com/oembed");
-  metadataUrl.searchParams.set("url", share);
+  const facadeBase = String(env.TIKTOK_FACADE_API_URL || "").trim();
+  let metadataUrl;
+  if (facadeBase) {
+    try {
+      metadataUrl = new URL(facadeBase);
+      if (metadataUrl.protocol !== "https:" || metadataUrl.username || metadataUrl.password) throw new Error("TIKTOK_FACADE_API_URL must be HTTPS without credentials");
+      metadataUrl.searchParams.set("url", share);
+    } catch {
+      throw new AppError(503, "TIKTOK_FACADE_API_URL is invalid");
+    }
+  } else {
+    metadataUrl = new URL("https://www.tiktok.com/oembed");
+    metadataUrl.searchParams.set("url", share);
+  }
+
   const metadataResponse = await fetch(metadataUrl.toString(), {
     headers: { Accept: "application/json", "User-Agent": "VidBest/1.0 (+https://vid.best/)" },
     signal: AbortSignal.timeout(7000),
