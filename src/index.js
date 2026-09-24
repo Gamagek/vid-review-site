@@ -911,6 +911,7 @@ function normalizeTikTokShareUrl(value) {
 }
 
 function detectMediaProvider(video) {
+  if (video.media_type === "r2" && isHlsManifestKey(video.r2_key)) return "hls";
   if (video.media_type && video.media_type !== "raw") return video.media_type;
   const value = video.embed_url || video.source_url || "";
   try {
@@ -1405,7 +1406,7 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
     ? null
     : validateOptionalUrl(thumbnailText);
   const thumbnailUrl = customThumbnail || media.thumbnail_url;
-  if (media.media_type === "hls" && !toBoolean(body.media_rights_confirmed)) {
+  if (media.provider === "hls" && !toBoolean(body.media_rights_confirmed)) {
     throw new AppError(400, "Confirm that you have permission to store and serve this HLS media before publishing");
   }
 
@@ -1435,8 +1436,8 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
     return {
       source_url: `${baseUrl}/media/${encodeR2Key(r2Key)}`,
       embed_url: null,
-      media_type: isHlsManifestKey(r2Key) ? "hls" : "r2",
-      provider: "r2",
+      media_type: "r2",
+      provider: isHlsManifestKey(r2Key) ? "hls" : "r2",
       r2_key: r2Key,
       thumbnail_url: null,
     };
