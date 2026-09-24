@@ -1561,7 +1561,7 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
     return {
       source_url: `${baseUrl}/media/${encodeR2Key(r2Key)}`,
       embed_url: null,
-      media_type: isHlsManifestKey(r2Key) ? "hls" : "r2",
+      media_type: "r2",
       provider: isHlsManifestKey(r2Key) ? "hls" : "r2",
       r2_key: r2Key,
       thumbnail_url: null,
