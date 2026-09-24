@@ -15,7 +15,6 @@ const migrations = [
   "0005_source_video_metadata.sql",
   "0009_app_settings.sql",
   "0010_video_analysis.sql",
-  "0013_media_cache_jobs.sql",
 ];
 
 class TestD1Statement {
@@ -133,7 +132,6 @@ async function login(context) {
   });
 }
 
-test("legacy databases without the media-cache migration keep existing videos working", async () => {
   const context = createTestContext();
   const created = await send(context, "/api/videos", {
     method: "POST",
@@ -145,13 +143,11 @@ test("legacy databases without the media-cache migration keep existing videos wo
       subcategory: "Web Development",
       description: "Legacy description",
       published: true,
-      media_cache_enabled: false,
     }),
   });
   assert.equal(created.status, 201);
   const createdVideo = (await created.json()).video;
   assert.ok(createdVideo?.slug);
-  context.sqlite.exec("DROP TABLE media_cache_jobs");
 
   const api = await send(context, `/api/videos/${createdVideo.slug}`);
   assert.equal(api.status, 200);
@@ -171,11 +167,9 @@ test("legacy databases without the media-cache migration keep existing videos wo
       subcategory: "Web Development",
       published: true,
       media_rights_confirmed: true,
-      media_cache_enabled: true,
     }),
   });
   assert.equal(publish.status, 201);
-  assert.equal((await publish.json()).video.media_cache_status, "waiting_migration");
 });
 test("rejects non-object JSON before processing it", async () => {
   const context = createTestContext();
@@ -830,145 +824,6 @@ test("starts owned R2 analysis through the authenticated Teamwork API", async ()
     assert.equal(outgoing.body.media_owned, true);
     assert.equal(outgoing.body.transcribe, true);
     assert.match(outgoing.body.source_url, /\/media\/uploads\/2026-09-13\/test\.mp4$/);
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
-});
-
-test("persists TikTok metadata and thumbnail in R2 and serves stale thumbnail when upstream fails", async () => {
-  const context = createTestContext();
-  const share = "https://www.tiktok.com/@example/video/6718335390845095173";
-  const originalFetch = globalThis.fetch;
-  let online = true;
-  globalThis.fetch = async (url) => {
-    if (!online) throw new Error("TikTok unavailable");
-    if (String(url).includes("/oembed?")) {
-      return new Response(JSON.stringify({
-        type: "video",
-        title: "Cached TikTok test",
-        author_name: "Example",
-        thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/test.jpg",
-      }), { status: 200, headers: { "Content-Type": "application/json" } });
-    }
-    return new Response("cached-image-bytes", { status: 200, headers: { "Content-Type": "image/jpeg" } });
-  };
-  try {
-    const first = await send(context, "/api/tiktok/thumbnail?url=" + encodeURIComponent(share));
-    assert.equal(first.status, 200);
-    assert.match(first.headers.get("X-VidBest-TikTok-Cache"), /live-r2-snapshot/);
-    assert.equal([...context.bucket.objects.keys()].filter((key) => key.startsWith("uploads/tiktok-cache/")).length, 2);
-
-    online = false;
-    const fallback = await send(context, "/api/tiktok/thumbnail?url=" + encodeURIComponent(share));
-    assert.equal(fallback.status, 200);
-    assert.equal(fallback.headers.get("X-VidBest-TikTok-Cache"), "r2-stale");
-    assert.equal(await fallback.text(), "cached-image-bytes");
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
-});
-
-test("falls back to the persistent TikTok metadata cache during preflight failure", async () => {
-  const context = createTestContext();
-  const share = "https://www.tiktok.com/@example/video/6718335390845095174";
-  const originalFetch = globalThis.fetch;
-  let online = true;
-  globalThis.fetch = async (url) => {
-    if (!online) throw new Error("TikTok unavailable");
-    if (String(url).includes("/oembed?")) {
-      return new Response(JSON.stringify({
-        type: "video",
-        title: "Persistent metadata",
-        author_name: "Example",
-        thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/test.jpg",
-      }), { status: 200, headers: { "Content-Type": "application/json" } });
-    }
-    return new Response("image", { status: 200, headers: { "Content-Type": "image/jpeg" } });
-  };
-  try {
-    const first = await send(context, "/api/tiktok/preflight?url=" + encodeURIComponent(share));
-    assert.equal(first.status, 200);
-    assert.equal((await first.json()).cached, false);
-
-    online = false;
-    const fallback = await send(context, "/api/tiktok/preflight?url=" + encodeURIComponent(share));
-    assert.equal(fallback.status, 200);
-    const result = await fallback.json();
-    assert.equal(result.ok, true);
-    assert.equal(result.cached, true);
-    assert.equal(result.title, "Persistent metadata");
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
-});
-
-test("admin TikTok cache sync persists current TikTok records in R2", async () => {
-  const context = createTestContext();
-  context.sqlite.prepare(
-    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, published)
-     VALUES ('tiktok-cache-one', 'TikTok cache one', 'https://www.tiktok.com/@example/video/6718335390845095175', 'tiktok', 'Social Media & Trending', 'TikTok Trending', 1),
-            ('tiktok-cache-two', 'TikTok cache two', 'https://www.tiktok.com/@example/video/6718335390845095176', 'tiktok', 'Social Media & Trending', 'TikTok Trending', 1)`,
-  ).run();
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = async (url) => {
-    if (String(url).includes("/oembed?")) {
-      const videoId = new URL(url).searchParams.get("url").match(/\/video\/(\d+)/)[1];
-      return new Response(JSON.stringify({
-        type: "video",
-        title: "Cached " + videoId,
-        author_name: "Example",
-        thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/" + videoId + ".jpg",
-      }), { status: 200, headers: { "Content-Type": "application/json" } });
-    }
-    return new Response("image", { status: 200, headers: { "Content-Type": "image/jpeg" } });
-  };
-  try {
-    const response = await send(context, "/api/admin/tiktok/cache?limit=4&offset=0", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${secret}` },
-    });
-    assert.equal(response.status, 200);
-    const result = await response.json();
-    assert.equal(result.total, 2);
-    assert.equal(result.cached, 2);
-    assert.equal(result.complete, true);
-    assert.equal([...context.bucket.objects.keys()].filter((key) => key.startsWith("uploads/tiktok-cache/")).length, 4);
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
-});
-
-test("automatically snapshots a published TikTok preview after saving the video link", async () => {
-  const context = createTestContext();
-  const share = "https://www.tiktok.com/@example/video/6718335390845095199";
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = async (url) => {
-    if (String(url).includes("/oembed?")) {
-      return new Response(JSON.stringify({
-        type: "video",
-        title: "Automatically cached",
-        author_name: "Example",
-        thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/auto.jpg",
-      }), { status: 200, headers: { "Content-Type": "application/json" } });
-    }
-    return new Response("image", { status: 200, headers: { "Content-Type": "image/jpeg" } });
-  };
-  try {
-    const response = await send(context, "/api/videos", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: "Automatic TikTok cache",
-        source_url: share,
-        primary_category: "Social Media & Trending",
-        subcategory: "TikTok Viral Challenges",
-        published: true,
-      }),
-    });
-    assert.equal(response.status, 201);
-    assert.equal(context.pending.length, 1);
-    await Promise.all(context.pending);
-    assert.equal([...context.bucket.objects.keys()].filter((key) => key.startsWith("uploads/tiktok-cache/")).length, 2);
   } finally {
     globalThis.fetch = originalFetch;
   }
