@@ -164,6 +164,9 @@ async function route(request, env, ctx) {
   if (path === "/api/tiktok/preflight" && request.method === "GET") {
     return tikTokPreflight(request, env, ctx);
   }
+  if (path === "/api/tiktok/previews" && request.method === "GET") {
+    return tikTokPreviewBatch(request, env);
+  }
 
   if (path === "/robots.txt" && request.method === "GET") {
     return robotsResponse(request, env);
@@ -341,7 +344,10 @@ async function tikTokPreflight(request, env) {
       provider: "tiktok",
       video_id: preview.video_id,
       title: preview.title,
+      caption: preview.caption,
       author_name: preview.author_name,
+      author_url: preview.author_url,
+      description: preview.description,
       thumbnail_url: preview.thumbnail_url,
       official_player: true,
       standard_embed: true,
@@ -403,9 +409,77 @@ async function fetchTikTokPreview(env, share) {
   return {
     video_id: videoId,
     title: cleanText(metadata?.title, 160, "TikTok video"),
+    caption: cleanText(metadata?.title, 220),
     author_name: cleanText(metadata?.author_name, 120),
+    author_url: normalizeTikTokAuthorUrl(metadata?.author_url),
+    description: cleanText(metadata?.description || metadata?.video_description || metadata?.text, 260),
     thumbnail_url: thumbnailUrl || null,
   };
+}
+
+function normalizeTikTokAuthorUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    if (url.protocol !== "https:" || host !== "tiktok.com") return null;
+    if (!/^\/@[^/]+\/?$/.test(url.pathname)) return null;
+    return `https://www.tiktok.com${url.pathname}`;
+  } catch {
+    return null;
+  }
+}
+
+async function tikTokPreviewBatch(request, env) {
+  const requestUrl = new URL(request.url);
+  const requested = requestUrl.searchParams.getAll("url");
+  if (requested.length > 24) throw new AppError(400, "A maximum of 24 TikTok preview URLs is supported");
+
+  const shares = [...new Set(requested.map(normalizeTikTokShareUrl).filter(Boolean))].slice(0, 24);
+  if (!shares.length) throw new AppError(400, "Add at least one TikTok video URL");
+
+  const sorted = [...shares].sort();
+  const cache = typeof caches !== "undefined" && caches.default ? caches.default : null;
+  const cacheKey = new Request(
+    `${requestUrl.origin}/__vidbest-tiktok-previews?urls=${encodeURIComponent(sorted.join("|"))}`,
+  );
+  if (cache) {
+    const cached = await cache.match(cacheKey);
+    if (cached) return cached;
+  }
+
+  const previews = [];
+  for (let index = 0; index < shares.length; index += 4) {
+    const chunk = shares.slice(index, index + 4);
+    const settled = await Promise.allSettled(chunk.map((share) => fetchTikTokPreview(env, share)));
+    settled.forEach((result, offset) => {
+      const share = chunk[offset];
+      if (result.status === "fulfilled") {
+        previews.push({ url: share, ...result.value });
+      } else {
+        previews.push({
+          url: share,
+          video_id: share.match(/\/video\/(\d+)/)?.[1] || null,
+          title: null,
+          caption: null,
+          author_name: null,
+          author_url: null,
+          description: null,
+          thumbnail_url: null,
+          error: result.reason instanceof Error ? result.reason.message.slice(0, 120) : "Preview unavailable",
+        });
+      }
+    });
+  }
+
+  const result = json({
+    ok: true,
+    count: previews.length,
+    previews,
+  }, 200, {
+    "Cache-Control": "public, max-age=300, stale-while-revalidate=1800, stale-if-error=3600",
+  });
+  if (cache) await cache.put(cacheKey, result.clone());
+  return result;
 }
 
 function handleError(error) {
