@@ -2181,15 +2181,8 @@ function renderMedia(video, playbackOrigin) {
   if (provider === "tiktok") {
     const tiktokId = extractTikTokId(video.source_url);
     if (!tiktokId) return "";
-    const safeTitle = escapeHtml(watchDisplayTitle(video));
-    const safeSource = escapeHtml(video.source_url);
-    const customThumbnail = video.thumbnail_url
-      ? `<img class="tiktok-facade-image" src="${escapeHtml(video.thumbnail_url)}" alt="" loading="eager" decoding="async">`
-      : "";
-    return `<button type="button" class="tiktok-facade" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${safeSource}" aria-label="Load official TikTok player for ${safeTitle}">
-      <span class="tiktok-facade-surface">${customThumbnail}<span class="tiktok-facade-shade" aria-hidden="true"></span><span class="tiktok-facade-play" aria-hidden="true">▶</span></span>
-      <span class="tiktok-facade-caption">Tap to load the official TikTok player</span>
-    </button>`;
+    const embedUrl = buildTikTokPlayerUrl(tiktokId);
+    return `<iframe id="watch-media-frame" class="tiktok-official-player" data-tiktok-share="${escapeHtml(video.source_url)}" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   }
   if (video.embed_url) {
     const embedUrl = preparePlaybackEmbed(video.embed_url, playbackOrigin);
