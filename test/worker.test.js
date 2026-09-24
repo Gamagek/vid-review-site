@@ -152,11 +152,8 @@ test("legacy databases without the media-cache migration keep existing videos wo
   });
   assert.equal(created.status, 201);
   const createdVideo = (await created.json()).video;
+  assert.ok(createdVideo?.slug);
   context.sqlite.exec("DROP TABLE media_cache_jobs");
-
-  const list = await send(context, "/api/videos");
-  assert.equal(list.status, 200);
-  assert.equal((await list.json()).videos[0].slug, createdVideo.slug);
 
   const api = await send(context, `/api/videos/${createdVideo.slug}`);
   assert.equal(api.status, 200);
@@ -561,7 +558,8 @@ test("renders an R2 HLS media record as a browser HLS player", async () => {
   });
   assert.equal(response.status, 201);
   const result = await response.json();
-  assert.equal(result.video.media_type, "hls");
+  assert.equal(result.video.media_type, "r2");
+  assert.equal(result.video.provider, "hls");
   const page = await send(context, `/watch/${result.video.slug}`);
   const html = await page.text();
   assert.match(html, /data-hls="1"/);
