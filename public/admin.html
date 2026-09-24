@@ -61,12 +61,19 @@
               </div>
               <div id="upload-source-panel" hidden>
                 <label class="upload-dropzone" id="upload-dropzone">
-                  <input id="asset-file" type="file" accept="image/avif,image/gif,image/jpeg,image/png,image/webp,video/mp4,video/ogg,video/quicktime,video/webm">
+                  <input id="asset-file" type="file" accept="image/avif,image/gif,image/jpeg,image/png,image/webp,video/mp4,video/ogg,video/quicktime,video/webm,.m3u8,.ts,.m4s,.aac,.m4a">
                   <strong>Choose a video or image</strong>
-                  <span>MP4, WebM, Ogg, MOV, PNG, JPEG, WebP, AVIF or GIF. Files stream securely into the bound vid-assets bucket.</span>
+                  <span>MP4, WebM, Ogg, MOV and supported images. Authorized HLS packages can also be uploaded as a folder so the manifest and segments keep their relative paths.</span>
+                </label>
+                <label class="upload-dropzone hls-folder-upload">
+                  <input id="hls-folder-input" type="file" webkitdirectory directory multiple accept=".m3u8,.ts,.m4s,.aac,.m4a,.mp4">
+                  <strong>Or choose an HLS folder</strong>
+                  <span>Select the folder containing one .m3u8 manifest and its media segments. The files are uploaded one by one into a private R2 prefix.</span>
                 </label>
                 <button id="upload-button" class="button ghost" type="button">Upload selected file</button>
+                <button id="upload-hls-button" class="button ghost" type="button">Upload HLS folder</button>
                 <div class="progress-track" aria-hidden="true"><span id="upload-progress"></span></div>
+                <p class="field-help">R2/HLS mode is intended for media you have permission to store and serve. An HLS manifest is a delivery format; it does not change the underlying rights to the media.</p>
                 <p id="upload-status" class="form-status" role="status"></p>
                 <input id="r2-key" name="r2_key" type="hidden">
               </div>
