@@ -550,15 +550,17 @@ async function cacheTikTokVideos(request, env) {
   const totalRow = await env.DB.prepare(
     `SELECT COUNT(*) AS total
      FROM videos
-     WHERE media_type = 'tiktok'
-        OR lower(source_url) LIKE 'https://www.tiktok.com/@%/video/%'`,
+     WHERE published = 1
+       AND (media_type = 'tiktok'
+         OR lower(source_url) LIKE 'https://www.tiktok.com/@%/video/%')`,
   ).first();
   const total = Number(totalRow?.total || 0);
   const rows = await env.DB.prepare(
     `SELECT id, source_url
      FROM videos
-     WHERE media_type = 'tiktok'
-        OR lower(source_url) LIKE 'https://www.tiktok.com/@%/video/%'
+     WHERE published = 1
+       AND (media_type = 'tiktok'
+         OR lower(source_url) LIKE 'https://www.tiktok.com/@%/video/%')
      ORDER BY id ASC
      LIMIT ? OFFSET ?`,
   ).bind(limit, offset).all();
