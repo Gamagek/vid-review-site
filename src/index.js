@@ -1092,7 +1092,6 @@ async function createVideo(request, env, ctx) {
   ).first();
 
   if (row && detectMediaProvider(row) === "tiktok" && row.published) {
-    ctx?.waitUntil?.(cacheTikTokPreviewAfterPublish(env, row.source_url));
   }
   return json({ success: true, video: serializeVideo(row) }, 201);
 }
@@ -1143,7 +1142,6 @@ async function updateVideo(request, env, id, ctx) {
   await cleanupUnusedManagedAssets(env, replacedKeys);
 
   if (row && detectMediaProvider(row) === "tiktok" && row.published) {
-    ctx?.waitUntil?.(cacheTikTokPreviewAfterPublish(env, row.source_url));
   }
 
   return json({ success: true, video: serializeVideo(row) });
@@ -2188,7 +2186,7 @@ function renderMedia(video, playbackOrigin) {
     if (!tiktokId) return "";
     const safeTitle = escapeHtml(watchDisplayTitle(video));
     const safeSource = escapeHtml(video.source_url);
-    const customThumbnail = video.thumbnail_url && !isTikTokThumbnailProxy(video.thumbnail_url)
+    const customThumbnail = video.thumbnail_url
       ? `<img class="tiktok-facade-image" src="${escapeHtml(video.thumbnail_url)}" alt="" loading="eager" decoding="async">`
       : "";
     return `<button type="button" class="tiktok-facade" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${safeSource}" aria-label="Load official TikTok player for ${safeTitle}">
