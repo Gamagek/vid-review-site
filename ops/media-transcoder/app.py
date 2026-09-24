@@ -152,6 +152,7 @@ async def run_job(job: Job):
                 "result_url": result_url,
             })
             JOBS[job.job_id] = {"status": "complete", "error": None, "size": size}
+            output_path.unlink(missing_ok=True)
         except Exception as exc:
             message = str(exc)[:1200]
             JOBS[job.job_id] = {"status": "failed", "error": message}
