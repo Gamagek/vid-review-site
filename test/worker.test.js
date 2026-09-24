@@ -15,6 +15,7 @@ const migrations = [
   "0005_source_video_metadata.sql",
   "0009_app_settings.sql",
   "0010_video_analysis.sql",
+  "0013_media_cache_jobs.sql",
 ];
 
 class TestD1Statement {
@@ -925,6 +926,88 @@ test("automatically snapshots a published TikTok preview after saving the video 
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+test("queues an authorized 360p cache for published direct media when rights are confirmed", async () => {
+  const context = createTestContext();
+  const response = await send(context, "/api/videos", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${secret}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      title: "Authorized direct media",
+      source_url: "https://media.example.com/creator-video.mp4",
+      primary_category: "Technology",
+      subcategory: "Web Development",
+      published: true,
+      media_rights_confirmed: true,
+      media_cache_enabled: true,
+    }),
+  });
+  assert.equal(response.status, 201);
+  const result = await response.json();
+  assert.equal(result.video.media_cache_status, "waiting_transcoder");
+  const job = context.sqlite.prepare("SELECT video_id, profile, status, rights_confirmed FROM media_cache_jobs").get();
+  assert.deepEqual(job, {
+    video_id: 1,
+    profile: "360p",
+    status: "waiting_transcoder",
+    rights_confirmed: 1,
+  });
+});
+
+test("never creates a full-media cache job for TikTok links", async () => {
+  const context = createTestContext();
+  const response = await send(context, "/api/videos", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${secret}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      title: "TikTok source",
+      source_url: "https://www.tiktok.com/@example/video/6718335390845095201",
+      primary_category: "Social Media & Trending",
+      subcategory: "TikTok Viral Challenges",
+      published: true,
+      media_rights_confirmed: true,
+      media_cache_enabled: true,
+    }),
+  });
+  assert.equal(response.status, 201);
+  assert.equal(context.sqlite.prepare("SELECT COUNT(*) AS count FROM media_cache_jobs").get().count, 0);
+});
+
+test("uses the completed authorized 360p R2 cache on the public watch page", async () => {
+  const context = createTestContext();
+  const sourceUrl = "https://example.com/media/uploads/source.mp4";
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+       slug, title, source_url, media_type, r2_key, primary_category, subcategory, description, published
+     ) VALUES (?, ?, ?, 'r2', ?, ?, ?, ?, 1)`,
+  ).run(
+    "cached-direct-video",
+    "Cached direct video",
+    sourceUrl,
+    "uploads/source.mp4",
+    "Technology",
+    "Web Development",
+    "Authorized cache test",
+  );
+  context.sqlite.prepare(
+    `INSERT INTO media_cache_jobs (
+       video_id, source_url, profile, output_key, status, rights_confirmed
+     ) VALUES (1, ?, '360p', 'uploads/media-cache/360p/1-test.mp4', 'complete', 1)`,
+  ).run(sourceUrl);
+
+  const page = await send(context, "/watch/cached-direct-video");
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.match(html, /data-cache-profile="360p"/);
+  assert.ok(html.includes("/media/uploads/media-cache/360p/1-test.mp4"));
+  assert.ok(html.includes('type="video/mp4"'));
 });
 
 test("TikTok keeps separate share preview and player paths", () => {

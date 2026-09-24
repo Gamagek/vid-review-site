@@ -74,12 +74,16 @@
                 <button id="upload-button" class="button ghost" type="button">Upload selected file</button>
                 <button id="upload-hls-button" class="button ghost" type="button">Upload HLS folder</button>
                 <div class="progress-track" aria-hidden="true"><span id="upload-progress"></span></div>
-                <label class="switch-label rights-confirmation"><input id="media-rights-confirmed" type="checkbox"><span></span>I confirm I have permission to store and publicly serve this media</label>
-                <p class="field-help">R2/HLS mode is intended for media you have permission to store and serve. An HLS manifest is a delivery format; it does not change the underlying rights to the media.</p>
                 <p id="upload-status" class="form-status" role="status"></p>
                 <input id="r2-key" name="r2_key" type="hidden">
               </div>
-              <div id="media-preview" class="admin-preview"><span>Secure media preview appears here</span></div>
+              <div id="media-cache-options" class="media-cache-options">
+                <label class="switch-label rights-confirmation"><input id="media-rights-confirmed" type="checkbox"><span></span>I confirm I have permission to store and publicly serve this media</label>
+                <label class="switch-label"><input id="media-cache-enabled" type="checkbox" checked><span></span>Automatically generate a 360p MP4 cache for authorized media</label>
+                <p class="field-help">Only rights-confirmed R2/direct media can use this cache. TikTok, YouTube and other platform embeds stay on their official players and are not copied by this cache.</p>
+                <p class="field-help">The cache targets up to 640 px on the long side and is stored in Vid.Best R2 for faster repeat playback.</p>
+              </div>
+                            <div id="media-preview" class="admin-preview"><span>Secure media preview appears here</span></div>
             </div>
 
             <div class="form-section">
@@ -148,6 +152,7 @@
             <div class="admin-actions">
               <button id="cache-tiktok-button" class="button ghost" type="button">Cache TikTok previews to R2</button>
               <p id="cache-tiktok-status" class="form-status" role="status"></p>
+              <p class="field-help">Automatic 360p cache jobs appear on saved authorized-media records. The backend transcoder must be configured before they can process.</p>
             </div>
           </section>
           <section class="glass-panel queue-panel">
