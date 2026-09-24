@@ -1276,6 +1276,9 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
     ? null
     : validateOptionalUrl(thumbnailText);
   const thumbnailUrl = customThumbnail || media.thumbnail_url;
+  if (media.media_type === "hls" && !toBoolean(body.media_rights_confirmed)) {
+    throw new AppError(400, "Confirm that you have permission to store and serve this HLS media before publishing");
+  }
 
   return {
     title,
@@ -1864,6 +1867,10 @@ async function uploadAsset(request, env) {
   }
 
   const requestedKey = cleanText(request.headers.get("X-Asset-Key"), 700);
+  const isHlsUpload = /\.(m3u8|ts|m4s|aac|m4a)$/i.test(filename) || /\.(m3u8|ts|m4s|aac|m4a)$/i.test(requestedKey);
+  if (isHlsUpload && request.headers.get("X-Media-Rights-Confirmed") !== "1") {
+    throw new AppError(400, "Confirm that you have permission to store and serve this media before uploading HLS files");
+  }
   let key;
   if (requestedKey) {
     key = validateR2Key(requestedKey);
@@ -1877,7 +1884,9 @@ async function uploadAsset(request, env) {
   } else {
     const safeName = filename.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(-100) || "asset";
     const date = new Date().toISOString().slice(0, 10);
-    key = `uploads/${date}/${crypto.randomUUID()}-${safeName}`;
+    key = isHlsUpload
+      ? `uploads/hls/${crypto.randomUUID()}/${safeName}`
+      : `uploads/${date}/${crypto.randomUUID()}-${safeName}`;
   }
   await env.BUCKET.put(key, request.body, {
     httpMetadata: {
