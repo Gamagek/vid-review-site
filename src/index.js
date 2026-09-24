@@ -1,5 +1,3 @@
-import { dispatchMediaCacheJob, getMediaCacheForVideo, handleMediaCacheCallback, cleanupMediaCacheForVideo, queueAuthorizedMediaCache, buildMediaCacheUrl, isMediaCacheTableReady } from "./media-cache.js";
-
 const CATEGORIES = Object.freeze({
   "Entertainment, Movies & Games": [
     "Movie Trailers",
@@ -172,10 +170,6 @@ async function route(request, env, ctx) {
   if (path === "/api/admin/tiktok/cache" && request.method === "POST") {
     await requireAdmin(request, env);
     return cacheTikTokVideos(request, env);
-  }
-
-  if (path === "/api/internal/media-cache/callback" && request.method === "POST") {
-    return handleMediaCacheCallback(request, env);
   }
 
   if (path === "/robots.txt" && request.method === "GET") {
@@ -908,64 +902,6 @@ function serializeVideo(row) {
   };
 }
 
-async function handleAdminMediaCache(request, env, id, ctx) {
-  const video = await env.DB.prepare("SELECT * FROM videos WHERE id = ?").bind(id).first();
-  if (!video) throw new AppError(404, "Video not found");
-
-  if (request.method === "GET") {
-    const job = await getMediaCacheForVideo(env, id, video.source_url, true);
-    return json({
-      success: true,
-      cache: job ? {
-        ...job,
-        media_url: job.status === "complete" ? buildMediaCacheUrl(job.output_key) : null,
-      } : null,
-    });
-  }
-
-  const body = await readJson(request, 2048);
-  const mediaCache = await queueAuthorizedMediaCache(
-    env,
-    { ...video, provider: detectMediaProvider(video) },
-    { rightsConfirmed: toBoolean(body.media_rights_confirmed) },
-  );
-  if (mediaCache.job?.id && mediaCache.status === "queued") {
-    ctx?.waitUntil?.(dispatchMediaCacheJob(env, mediaCache.job, getBaseUrl(request, env)));
-  }
-  return json({
-    success: true,
-    cache: mediaCache.job ? {
-      ...mediaCache.job,
-      media_url: mediaCache.status === "complete" ? buildMediaCacheUrl(mediaCache.job.output_key) : null,
-    } : { status: mediaCache.status },
-  }, 202);
-}
-
-async function attachMediaCacheFields(env, videos, includeUnpublished) {
-  if (!videos.length || !(await isMediaCacheTableReady(env))) return;
-  const ids = videos.map((video) => Number(video.id)).filter(Number.isSafeInteger);
-  if (!ids.length) return;
-  const placeholders = ids.map(() => "?").join(",");
-  const result = await env.DB.prepare(
-    `SELECT video_id, source_url, output_key, status
-     FROM media_cache_jobs
-     WHERE video_id IN (${placeholders})
-     ORDER BY updated_at DESC`,
-  ).bind(...ids).all();
-  const latest = new Map();
-  for (const job of result.results || []) {
-    const key = Number(job.video_id);
-    if (!latest.has(key)) latest.set(key, job);
-  }
-  for (const video of videos) {
-    const job = latest.get(Number(video.id));
-    video.media_cache_status = includeUnpublished ? (job?.status || null) : undefined;
-    video.media_cache_url = job?.status === "complete" && job.source_url === video.source_url
-      ? buildMediaCacheUrl(job.output_key)
-      : null;
-  }
-}
-
 function buildTikTokThumbnailProxyUrl(sourceUrl) {
   const share = normalizeTikTokShareUrl(sourceUrl);
   return share ? `/api/tiktok/thumbnail?url=${encodeURIComponent(share)}` : null;
@@ -1376,24 +1312,10 @@ async function createVideo(request, env, ctx) {
     Number(data.published),
   ).first();
 
-  let mediaCache = { status: "not-requested", job: null };
-  if (row && row.published) {
-    mediaCache = await queueAuthorizedMediaCache(
-      env,
-      { ...row, provider: detectMediaProvider(row) },
-      {
-        rightsConfirmed: toBoolean(body.media_rights_confirmed) && body.media_cache_enabled !== false,
-      },
-    );
-    if (mediaCache.job?.id && mediaCache.status === "queued") {
-      ctx?.waitUntil?.(dispatchMediaCacheJob(env, mediaCache.job, getBaseUrl(request, env)));
-    }
-  }
-
   if (row && detectMediaProvider(row) === "tiktok" && row.published) {
     ctx?.waitUntil?.(cacheTikTokPreviewAfterPublish(env, row.source_url));
   }
-  return json({ success: true, video: serializeVideo({ ...row, media_cache_status: mediaCache.status }) }, 201);
+  return json({ success: true, video: serializeVideo(row) }, 201);
 }
 
 async function updateVideo(request, env, id, ctx) {
@@ -1440,27 +1362,12 @@ async function updateVideo(request, env, id, ctx) {
     await env.DB.prepare("DELETE FROM video_analysis WHERE video_id = ?").bind(id).run();
   }
   await cleanupUnusedManagedAssets(env, replacedKeys);
-  await cleanupMediaCacheForVideo(env, id, row?.source_url || "");
-
-  let mediaCache = { status: "not-requested", job: null };
-  if (row && row.published) {
-    mediaCache = await queueAuthorizedMediaCache(
-      env,
-      { ...row, provider: detectMediaProvider(row) },
-      {
-        rightsConfirmed: toBoolean(body.media_rights_confirmed) && body.media_cache_enabled !== false,
-      },
-    );
-    if (mediaCache.job?.id && mediaCache.status === "queued") {
-      ctx?.waitUntil?.(dispatchMediaCacheJob(env, mediaCache.job, getBaseUrl(request, env)));
-    }
-  }
 
   if (row && detectMediaProvider(row) === "tiktok" && row.published) {
     ctx?.waitUntil?.(cacheTikTokPreviewAfterPublish(env, row.source_url));
   }
 
-  return json({ success: true, video: serializeVideo({ ...row, media_cache_status: mediaCache.status }) });
+  return json({ success: true, video: serializeVideo(row) });
 }
 
 async function deleteVideo(request, env, id) {
@@ -1468,11 +1375,9 @@ async function deleteVideo(request, env, id) {
     "SELECT id, r2_key, thumbnail_url FROM videos WHERE id = ?",
   ).bind(id).first();
   if (!existing) throw new AppError(404, "Video not found");
-  const cacheJob = await getMediaCacheForVideo(env, id, "", true);
   await env.DB.prepare("DELETE FROM videos WHERE id = ?").bind(id).run();
   await cleanupUnusedManagedAssets(env, [
     existing.r2_key,
-    cacheJob?.output_key,
     managedAssetKeyFromUrl(existing.thumbnail_url, request, env),
   ]);
   return json({ success: true });
@@ -2492,13 +2397,6 @@ function watchDisplayTitle(video) {
 
 function renderMedia(video, playbackOrigin) {
   const provider = String(video.provider || "").toLowerCase();
-
-  if (video.media_cache_url && (provider === "direct" || provider === "r2")) {
-    const cacheCaptions = video.has_captions
-      ? `<track kind="captions" src="/captions/${encodeURIComponent(video.slug)}.vtt" srclang="${escapeHtml(video.transcript_language || "en")}" label="Generated captions">`
-      : "";
-    return `<video id="watch-media-video" data-cache-profile="360p" controls playsinline preload="metadata"><source src="${escapeHtml(video.media_cache_url)}" type="video/mp4">${cacheCaptions}Your browser does not support MP4 video.</video>`;
-  }
 
   if (provider === "hls") {
     const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}"` : "";
