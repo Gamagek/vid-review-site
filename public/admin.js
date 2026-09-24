@@ -29,6 +29,8 @@ const ui = {
   sourceTabs: document.querySelectorAll(".source-tab"),
   file: document.querySelector("#asset-file"),
   uploadButton: document.querySelector("#upload-button"),
+  hlsFolderInput: document.querySelector("#hls-folder-input"),
+  uploadHlsButton: document.querySelector("#upload-hls-button"),
   uploadProgress: document.querySelector("#upload-progress"),
   uploadStatus: document.querySelector("#upload-status"),
   preview: document.querySelector("#media-preview"),
@@ -104,7 +106,15 @@ function bindAdminEvents() {
     const file = ui.file.files[0];
     setStatus(ui.uploadStatus, file ? `${file.name} · ${formatBytes(file.size)}` : "");
   });
+  ui.hlsFolderInput.addEventListener("change", () => {
+    const files = [...(ui.hlsFolderInput.files || [])];
+    const manifest = files.find((file) => /\.m3u8$/i.test(file.name));
+    setStatus(ui.uploadStatus, files.length
+      ? `HLS folder: ${files.length} files · ${formatBytes(files.reduce((sum, file) => sum + file.size, 0))}${manifest ? ` · manifest: ${manifest.name}` : " · manifest missing"}`
+      : "");
+  });
   ui.uploadButton.addEventListener("click", uploadFile);
+  ui.uploadHlsButton.addEventListener("click", uploadHlsFolder);
   ui.aiButton.addEventListener("click", generateCopy);
   ui.scanMedia.addEventListener("click", startMediaAnalysis);
   ui.videoForm.addEventListener("submit", saveVideo);
@@ -548,6 +558,78 @@ function uploadThumbnail() {
     setStatus(ui.thumbnailUploadStatus, "Network error during thumbnail upload.", "error");
   });
   request.send(file);
+}
+
+async function uploadHlsFolder() {
+  const files = [...(ui.hlsFolderInput?.files || [])];
+  if (!files.length) {
+    setStatus(ui.uploadStatus, "Choose an HLS folder first.", "error");
+    return;
+  }
+  const manifest = files.find((file) => /\.m3u8$/i.test(file.name));
+  if (!manifest) {
+    setStatus(ui.uploadStatus, "The selected folder must contain an .m3u8 manifest.", "error");
+    return;
+  }
+  const totalBytes = files.reduce((sum, file) => sum + Number(file.size || 0), 0);
+  if (totalBytes > 500 * 1024 * 1024) {
+    setStatus(ui.uploadStatus, "Keep each HLS folder at 500 MB or less for this browser upload flow.", "error");
+    return;
+  }
+  const folder = `uploads/hls/${crypto.randomUUID()}`;
+  ui.uploadHlsButton.disabled = true;
+  ui.uploadButton.disabled = true;
+  ui.uploadProgress.style.width = "0%";
+  let uploadedBytes = 0;
+  try {
+    for (const file of files) {
+      const relative = String(file.webkitRelativePath || file.name).split("/").slice(1).join("/");
+      if (!relative || relative.includes("..")) throw new Error(`Invalid HLS path: ${relative || file.name}`);
+      if (!/\.(m3u8|ts|m4s|aac|m4a|mp4)$/i.test(relative)) throw new Error(`Unsupported HLS file: ${relative}`);
+      const key = `${folder}/${relative.split("/").map((part) => part.replace(/[^A-Za-z0-9._-]+/g, "-")).filter(Boolean).join("/")}`;
+      await uploadAssetFile(file, key, (loaded) => {
+        ui.uploadProgress.style.width = `${Math.round(((uploadedBytes + loaded) / totalBytes) * 100)}%`;
+      });
+      uploadedBytes += file.size;
+    }
+    const manifestRelative = String(manifest.webkitRelativePath || manifest.name).split("/").slice(1).join("/");
+    const manifestKey = `${folder}/${manifestRelative.split("/").map((part) => part.replace(/[^A-Za-z0-9._-]+/g, "-")).filter(Boolean).join("/")}`;
+    ui.r2Key.value = manifestKey;
+    ui.r2Key.dataset.url = `/media/${encodeURIComponent(manifestKey).replace(/%2F/g, "/")}`;
+    ui.sourceUrl.value = ui.r2Key.dataset.url;
+    ui.uploadProgress.style.width = "100%";
+    adminState.sourceMode = "upload";
+    setStatus(ui.uploadStatus, `HLS package uploaded: ${files.length} files. Manifest selected.`, "success");
+    clearAnalysisDraft();
+    updatePreview();
+  } catch (error) {
+    setStatus(ui.uploadStatus, error.message || "HLS upload failed.", "error");
+  } finally {
+    ui.uploadHlsButton.disabled = false;
+    ui.uploadButton.disabled = false;
+  }
+}
+
+function uploadAssetFile(file, key, onProgress) {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("PUT", `/api/assets?filename=${encodeURIComponent(file.name)}`);
+    request.withCredentials = true;
+    request.setRequestHeader("X-File-Name", file.name);
+    request.setRequestHeader("X-Asset-Key", key);
+    request.setRequestHeader("Content-Type", file.type || "");
+    request.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) onProgress?.(event.loaded);
+    });
+    request.addEventListener("load", () => {
+      let result = {};
+      try { result = JSON.parse(request.responseText || "{}"); } catch {}
+      if (request.status >= 200 && request.status < 300) resolve(result);
+      else reject(new Error(result.error || `Upload failed with HTTP ${request.status}`));
+    });
+    request.addEventListener("error", () => reject(new Error("Network error during HLS upload.")));
+    request.send(file);
+  });
 }
 
 async function generateCopy() {
