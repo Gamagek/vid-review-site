@@ -144,11 +144,9 @@ export async function handleMediaCacheCallback(request, env) {
     const statedLength = Number(response.headers.get("Content-Length") || 0);
     if (statedLength > MAX_RESULT_BYTES) throw new Error("360p cache exceeds the 95 MB safety limit");
 
-    const bytes = new Uint8Array(await response.arrayBuffer());
-    if (!bytes.length) throw new Error("Transcoder returned an empty file");
-    if (bytes.byteLength > MAX_RESULT_BYTES) throw new Error("360p cache exceeds the 95 MB safety limit");
+    if (!response.body) throw new Error("Transcoder returned an empty file");
 
-    await env.BUCKET.put(job.output_key, bytes, {
+    await env.BUCKET.put(job.output_key, response.body, {
       httpMetadata: {
         contentType: "video/mp4",
         cacheControl: "public, max-age=31536000, immutable",
