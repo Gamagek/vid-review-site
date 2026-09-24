@@ -31,6 +31,7 @@ const ui = {
   uploadButton: document.querySelector("#upload-button"),
   hlsFolderInput: document.querySelector("#hls-folder-input"),
   uploadHlsButton: document.querySelector("#upload-hls-button"),
+  mediaRightsConfirmed: document.querySelector("#media-rights-confirmed"),
   uploadProgress: document.querySelector("#upload-progress"),
   uploadStatus: document.querySelector("#upload-status"),
   preview: document.querySelector("#media-preview"),
@@ -563,7 +564,15 @@ function uploadThumbnail() {
 async function uploadHlsFolder() {
   const files = [...(ui.hlsFolderInput?.files || [])];
   if (!files.length) {
+    if (!ui.mediaRightsConfirmed.checked) {
+      setStatus(ui.uploadStatus, "Confirm that you have permission to store and serve this media first.", "error");
+      return;
+    }
     setStatus(ui.uploadStatus, "Choose an HLS folder first.", "error");
+    return;
+  }
+  if (!ui.mediaRightsConfirmed.checked) {
+    setStatus(ui.uploadStatus, "Confirm that you have permission to store and serve this media first.", "error");
     return;
   }
   const manifest = files.find((file) => /\.m3u8$/i.test(file.name));
@@ -617,6 +626,7 @@ function uploadAssetFile(file, key, onProgress) {
     request.withCredentials = true;
     request.setRequestHeader("X-File-Name", file.name);
     request.setRequestHeader("X-Asset-Key", key);
+    request.setRequestHeader("X-Media-Rights-Confirmed", "1");
     request.setRequestHeader("Content-Type", file.type || "");
     request.upload.addEventListener("progress", (event) => {
       if (event.lengthComputable) onProgress?.(event.loaded);
@@ -804,6 +814,7 @@ async function saveVideo(event) {
     featured: ui.featured.checked,
     trending: ui.trending.checked,
     published: ui.published.checked,
+    media_rights_confirmed: ui.mediaRightsConfirmed?.checked || false,
   };
   setStatus(ui.saveStatus, id ? "Updating record…" : "Saving record…");
   const submit = ui.videoForm.querySelector('button[type="submit"]');
