@@ -444,7 +444,7 @@ test("stores TikTok source and renders the PR26-style player", async () => {
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /<iframe[^>]+class="tiktok-official-player"/);
-  assert.match(html, /https://www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
+  assert.match(html, /https:\/\/www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
   assert.match(html, /controls=1/);
   assert.match(html, /closed_caption=1/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
