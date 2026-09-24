@@ -281,7 +281,7 @@ function selectDiscoveredVideo(video) {
   setSourceMode("link");
   ui.sourceUrl.value = video.source_url || "";
   ui.title.value = video.title || "";
-  ui.thumbnail.value = isTikTokThumbnailProxy(video.thumbnail_url) ? "" : (video.thumbnail_url || "");
+  ui.thumbnail.value = video.thumbnail_url || "";
   ui.sourcePublishedAt.value = dateInputValue(video.published_at);
   ui.sourceDurationSeconds.value = "";
   ui.notes.value = [
@@ -1096,7 +1096,6 @@ function resetEditor(clearStatus = true) {
   ui.subcategory.disabled = true;
   ui.published.checked = true;
   ui.mediaRightsConfirmed.checked = false;
-  ui.mediaCacheEnabled.checked = true;
   ui.preview.innerHTML = "<span>Secure media preview appears here</span>";
   ui.uploadProgress.style.width = "0%";
   setSourceMode("link");
