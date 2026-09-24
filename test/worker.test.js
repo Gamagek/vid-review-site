@@ -239,6 +239,7 @@ test("accepts HLS manifest and segment uploads under the managed HLS prefix", as
       "Content-Length": "28",
       "X-File-Name": "master.m3u8",
       "X-Asset-Key": "uploads/hls/test/master.m3u8",
+      "X-Media-Rights-Confirmed": "1",
     },
     body: "#EXTM3U\n#EXT-X-VERSION:3\nsegment.ts\n",
   });
@@ -254,6 +255,7 @@ test("accepts HLS manifest and segment uploads under the managed HLS prefix", as
       "Content-Length": "3",
       "X-File-Name": "segment.ts",
       "X-Asset-Key": "uploads/hls/test/segment.ts",
+      "X-Media-Rights-Confirmed": "1",
     },
     body: "ts!",
   });
@@ -261,6 +263,23 @@ test("accepts HLS manifest and segment uploads under the managed HLS prefix", as
   const segmentResponse = await send(context, "/media/uploads/hls/test/segment.ts");
   assert.equal(segmentResponse.status, 200);
   assert.equal(segmentResponse.headers.get("Content-Type"), "video/mp2t");
+});
+
+test("rejects HLS uploads without media rights confirmation", async () => {
+  const context = createTestContext();
+  const response = await send(context, "/api/assets?filename=master.m3u8", {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${secret}`,
+      "Content-Type": "application/vnd.apple.mpegurl",
+      "Content-Length": "8",
+      "X-File-Name": "master.m3u8",
+      "X-Asset-Key": "uploads/hls/test/master.m3u8",
+    },
+    body: "#EXTM3U",
+  });
+  assert.equal(response.status, 400);
+  assert.match((await response.json()).error, /permission to store and serve/i);
 });
 
 test("serves HLS manifests with cacheable HLS headers", async () => {
@@ -487,6 +506,7 @@ test("renders an R2 HLS media record as a browser HLS player", async () => {
       primary_category: "Technology",
       subcategory: "Web Development",
       published: true,
+      media_rights_confirmed: true,
     }),
   });
   assert.equal(response.status, 201);
