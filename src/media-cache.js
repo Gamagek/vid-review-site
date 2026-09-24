@@ -6,6 +6,17 @@ const CACHE_OUTPUT_PREFIX = "uploads/media-cache/360p/";
 const CALLBACK_PATH = "/api/internal/media-cache/callback";
 const MAX_RESULT_BYTES = 95 * 1024 * 1024;
 
+export async function isMediaCacheTableReady(env) {
+  try {
+    const row = await env.DB.prepare(
+      "SELECT 1 AS ready FROM sqlite_master WHERE type = 'table' AND name = 'media_cache_jobs' LIMIT 1",
+    ).first();
+    return Boolean(row?.ready);
+  } catch {
+    return false;
+  }
+}
+
 export function isAuthorizedMediaCacheCandidate(video, rightsConfirmed) {
   if (!rightsConfirmed) return false;
   const provider = String(video?.provider || "").toLowerCase();
@@ -19,6 +30,8 @@ export async function queueAuthorizedMediaCache(env, video, { rightsConfirmed = 
   if (provider === "tiktok") return { status: "unsupported", job: null };
   if (!AUTHORIZED_PROVIDERS.has(provider)) return { status: "unsupported", job: null };
   if (!isAuthorizedMediaCacheCandidate(video, true)) return { status: "unsupported", job: null };
+
+  if (!(await isMediaCacheTableReady(env))) return { status: "waiting_migration", job: null };
 
   const sourceUrl = String(video.source_url);
   const outputKey = CACHE_OUTPUT_PREFIX + Number(video.id) + "-" + await shortHash(sourceUrl) + ".mp4";
@@ -180,6 +193,7 @@ export async function handleMediaCacheCallback(request, env) {
 }
 
 export async function getMediaCacheForVideo(env, videoId, sourceUrl, includeNonComplete = false) {
+  if (!(await isMediaCacheTableReady(env))) return null;
   const sql = includeNonComplete
     ? `SELECT id, video_id, source_url, profile, output_key, status, rights_confirmed, attempts, error, created_at, updated_at
        FROM media_cache_jobs WHERE video_id = ? ORDER BY updated_at DESC LIMIT 1`
@@ -192,6 +206,7 @@ export async function getMediaCacheForVideo(env, videoId, sourceUrl, includeNonC
 }
 
 export async function cleanupMediaCacheForVideo(env, videoId, keepSourceUrl = "") {
+  if (!(await isMediaCacheTableReady(env))) return;
   const result = await env.DB.prepare(
     `SELECT output_key FROM media_cache_jobs
      WHERE video_id = ? AND (? = '' OR source_url <> ?)`,
