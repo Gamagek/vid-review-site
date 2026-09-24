@@ -788,6 +788,109 @@ test("starts owned R2 analysis through the authenticated Teamwork API", async ()
   }
 });
 
+test("persists TikTok metadata and thumbnail in R2 and serves stale thumbnail when upstream fails", async () => {
+  const context = createTestContext();
+  const share = "https://www.tiktok.com/@example/video/6718335390845095173";
+  const originalFetch = globalThis.fetch;
+  let online = true;
+  globalThis.fetch = async (url) => {
+    if (!online) throw new Error("TikTok unavailable");
+    if (String(url).includes("/oembed?")) {
+      return new Response(JSON.stringify({
+        type: "video",
+        title: "Cached TikTok test",
+        author_name: "Example",
+        thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/test.jpg",
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    return new Response("cached-image-bytes", { status: 200, headers: { "Content-Type": "image/jpeg" } });
+  };
+  try {
+    const first = await send(context, "/api/tiktok/thumbnail?url=" + encodeURIComponent(share));
+    assert.equal(first.status, 200);
+    assert.match(first.headers.get("X-VidBest-TikTok-Cache"), /live-r2-snapshot/);
+    assert.equal([...context.bucket.objects.keys()].filter((key) => key.startsWith("uploads/tiktok-cache/")).length, 2);
+
+    online = false;
+    const fallback = await send(context, "/api/tiktok/thumbnail?url=" + encodeURIComponent(share));
+    assert.equal(fallback.status, 200);
+    assert.equal(fallback.headers.get("X-VidBest-TikTok-Cache"), "r2-stale");
+    assert.equal(await fallback.text(), "cached-image-bytes");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("falls back to the persistent TikTok metadata cache during preflight failure", async () => {
+  const context = createTestContext();
+  const share = "https://www.tiktok.com/@example/video/6718335390845095174";
+  const originalFetch = globalThis.fetch;
+  let online = true;
+  globalThis.fetch = async (url) => {
+    if (!online) throw new Error("TikTok unavailable");
+    if (String(url).includes("/oembed?")) {
+      return new Response(JSON.stringify({
+        type: "video",
+        title: "Persistent metadata",
+        author_name: "Example",
+        thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/test.jpg",
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    return new Response("image", { status: 200, headers: { "Content-Type": "image/jpeg" } });
+  };
+  try {
+    const first = await send(context, "/api/tiktok/preflight?url=" + encodeURIComponent(share));
+    assert.equal(first.status, 200);
+    assert.equal((await first.json()).cached, false);
+
+    online = false;
+    const fallback = await send(context, "/api/tiktok/preflight?url=" + encodeURIComponent(share));
+    assert.equal(fallback.status, 200);
+    const result = await fallback.json();
+    assert.equal(result.ok, true);
+    assert.equal(result.cached, true);
+    assert.equal(result.title, "Persistent metadata");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("admin TikTok cache sync persists current TikTok records in R2", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, published)
+     VALUES ('tiktok-cache-one', 'TikTok cache one', 'https://www.tiktok.com/@example/video/6718335390845095175', 'tiktok', 'Social Media & Trending', 'TikTok Trending', 1),
+            ('tiktok-cache-two', 'TikTok cache two', 'https://www.tiktok.com/@example/video/6718335390845095176', 'tiktok', 'Social Media & Trending', 'TikTok Trending', 1)`,
+  ).run();
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    if (String(url).includes("/oembed?")) {
+      const videoId = new URL(url).searchParams.get("url").match(/\/video\/(\d+)/)[1];
+      return new Response(JSON.stringify({
+        type: "video",
+        title: "Cached " + videoId,
+        author_name: "Example",
+        thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/" + videoId + ".jpg",
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    return new Response("image", { status: 200, headers: { "Content-Type": "image/jpeg" } });
+  };
+  try {
+    const response = await send(context, "/api/admin/tiktok/cache?limit=4&offset=0", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${secret}` },
+    });
+    assert.equal(response.status, 200);
+    const result = await response.json();
+    assert.equal(result.total, 2);
+    assert.equal(result.cached, 2);
+    assert.equal(result.complete, true);
+    assert.equal([...context.bucket.objects.keys()].filter((key) => key.startsWith("uploads/tiktok-cache/")).length, 4);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("TikTok keeps separate share preview and player paths", () => {
   const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
   assert.match(adminSource, /renderTikTokPreview/);
@@ -834,7 +937,7 @@ test("renders the official TikTok Embed Player iframe with responsive options", 
   assert.match(watchSource, /"x-tiktok-player": true/);
   assert.match(watchSource, /onPlayerError/);
   assert.match(watchSource, /className = "vidbest-tiktok-retry"/);
-  assert.match(watchSource, /Remote providers already render their own control bars inside the iframe/);
+  assert.match(watchSource, /const remote = \[\"youtube\", \"vimeo\", \"tiktok\"\]\.includes\(provider\)/);
   assert.match(watchSource, /if \(remote\) \{/);
   assert.doesNotMatch(watchSource, /remote = provider === "youtube" \|\| provider === "vimeo" \|\| provider === "tiktok";[\s\S]{0,1200}overlay.append\(play, back, forward/);
   assert.match(watchSource, /Retry TikTok player/);

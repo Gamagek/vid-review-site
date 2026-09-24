@@ -67,6 +67,8 @@ const ui = {
   moderationList: document.querySelector("#moderation-list"),
   discoveryList: document.querySelector("#discovery-request-list"),
   refreshVideos: document.querySelector("#refresh-videos"),
+  cacheTikTokButton: document.querySelector("#cache-tiktok-button"),
+  cacheTikTokStatus: document.querySelector("#cache-tiktok-status"),
   refreshComments: document.querySelector("#refresh-comments"),
   refreshDiscoveries: document.querySelector("#refresh-discoveries"),
 };
@@ -121,8 +123,38 @@ function bindAdminEvents() {
   ui.videoForm.addEventListener("submit", saveVideo);
   ui.reset.addEventListener("click", resetEditor);
   ui.refreshVideos.addEventListener("click", loadAdminVideos);
+  ui.cacheTikTokButton.addEventListener("click", cacheTikTokPreviews);
   ui.refreshComments.addEventListener("click", loadPendingComments);
   ui.refreshDiscoveries.addEventListener("click", loadDiscoveryRequests);
+}
+
+async function cacheTikTokPreviews() {
+  ui.cacheTikTokButton.disabled = true;
+  let offset = 0;
+  let cachedTotal = 0;
+  let processedTotal = 0;
+  let failedTotal = 0;
+  try {
+    while (true) {
+      const result = await adminApi(`/api/admin/tiktok/cache?limit=4&offset=${offset}`, { method: "POST" });
+      cachedTotal += Number(result.cached || 0);
+      processedTotal += Number(result.processed || 0);
+      failedTotal += Array.isArray(result.failed) ? result.failed.length : 0;
+      setStatus(
+        ui.cacheTikTokStatus,
+        result.complete
+          ? `Finished: ${cachedTotal} cached, ${failedTotal} failed, ${processedTotal} processed.`
+          : `Caching TikTok previews… ${processedTotal} processed, ${cachedTotal} saved to R2.`,
+        result.complete && failedTotal ? "error" : result.complete ? "success" : "",
+      );
+      if (result.complete || !Number.isInteger(result.next_offset) || Number(result.next_offset) <= offset) break;
+      offset = Number(result.next_offset);
+    }
+  } catch (error) {
+    setStatus(ui.cacheTikTokStatus, error.message, "error");
+  } finally {
+    ui.cacheTikTokButton.disabled = false;
+  }
 }
 
 async function verifySavedSession() {
