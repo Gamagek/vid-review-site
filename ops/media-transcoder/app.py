@@ -7,6 +7,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from fastapi import FastAPI, Header, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 app = FastAPI(title="Vid.Best Authorized Media Transcoder")
@@ -61,6 +62,16 @@ def allowed_source(url: str) -> bool:
 @app.get("/health")
 def health():
     return {"ok": True, "service": "vidbest-authorized-media-transcoder", "active": len(JOBS)}
+
+
+@app.get("/results/{filename}.mp4")
+def result_file(filename: str):
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", filename):
+        raise HTTPException(status_code=404, detail="Result not found")
+    path = RESULT_DIR / (filename + ".mp4")
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="Result not found")
+    return FileResponse(path, media_type="video/mp4", headers={"Cache-Control": "public, max-age=3600"})
 
 
 @app.post("/v1/jobs", status_code=202)
