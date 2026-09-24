@@ -432,47 +432,33 @@ test("gives AI generation a longer browser timeout than ordinary requests", () =
   assert.match(source, /url\.startsWith\("\/api\/ai\/generate"\) \? 35000 : 15000/);
 });
 
-test("serves TikTok thumbnail cards through the official oEmbed thumbnail", async () => {
-  const context = createTestContext();
+test("uses the optional NGINX TikTok facade for metadata without writing R2 cache files", async () => {
+  const context = createTestContext({ TIKTOK_FACADE_API_URL: "https://gateway.example.com/api/tiktok-oembed" });
   const originalFetch = globalThis.fetch;
-  const sample = "https://www.tiktok.com/@rorozya/video/7622472784039415061?_r=1&_t=ZS-99wVMKS0Vt3";
-  const thumbnail = "https://p19-common-sign.tiktokcdn-us.com/example/preview.image?x-expires=1790276400&x-signature=test";
+  const sample = "https://www.tiktok.com/@rorozya/video/7622472784039415061";
   const calls = [];
-
   globalThis.fetch = async (url) => {
-    const target = String(url);
-    calls.push(target);
-    if (target.startsWith("https://www.tiktok.com/oembed?")) {
-      return new Response(JSON.stringify({
-        type: "video",
-        title: "ro² (@rorozya) on TikTok",
-        author_name: "ro²",
-        author_url: "https://www.tiktok.com/@rorozya",
-        thumbnail_url: thumbnail,
-      }), { status: 200, headers: { "Content-Type": "application/json" } });
-    }
-    if (target === thumbnail) {
-      return new Response(new Uint8Array([1, 2, 3, 4]), {
-        status: 200,
-        headers: { "Content-Type": "image/jpeg" },
-      });
-    }
-    throw new Error("Unexpected upstream: " + target);
+    calls.push(String(url));
+    return new Response(JSON.stringify({
+      type: "video",
+      title: "ro² (@rorozya) on TikTok",
+      author_name: "ro²",
+      thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/example/preview.jpg",
+    }), { status: 200, headers: { "Content-Type": "application/json" } });
   };
-
   try {
-    const response = await send(context, "/api/tiktok/thumbnail?url=" + encodeURIComponent(sample));
+    const response = await send(context, "/api/tiktok/preflight?url=" + encodeURIComponent(sample));
     assert.equal(response.status, 200);
-    assert.equal(response.headers.get("Content-Type"), "image/jpeg");
-    assert.deepEqual([...new Uint8Array(await response.arrayBuffer())], [1, 2, 3, 4]);
-    assert.equal(calls.length, 2);
-    assert.match(calls[0], /\/oembed\?url=/);
-    assert.equal(calls[1], thumbnail);
+    const payload = await response.json();
+    assert.equal(payload.ok, true);
+    assert.equal(payload.cached, true);
+    assert.equal(payload.video_id, "7622472784039415061");
+    assert.match(calls[0], /^https:\/\/gateway\.example\.com\/api\/tiktok-oembed\?url=/);
+    assert.equal(context.bucket.objects.size, 0);
   } finally {
     globalThis.fetch = originalFetch;
   }
 });
-
 test("stores TikTok source and renders the PR26-style player", async () => {
   const context = createTestContext();
   const response = await send(context, "/api/videos", {
