@@ -316,12 +316,6 @@ async function route(request, env, ctx) {
     return storeVideoAnalysis(request, env, Number(match[1]));
   }
 
-  match = path.match(/^\/api\/admin\/videos\/(\d+)\/media-cache$/);
-  if (match && ["GET", "POST"].includes(request.method)) {
-    await requireAdmin(request, env);
-    return handleAdminMediaCache(request, env, Number(match[1]), ctx);
-  }
-
   if (path === "/api/assets") {
     await requireAdmin(request, env);
     if (request.method === "GET") return listAssets(request, env);
@@ -891,7 +885,6 @@ function serializeVideo(row) {
   return {
     ...row,
     provider,
-    media_cache_url: row.cache_r2_key ? buildMediaCacheUrl(row.cache_r2_key) : null,
     thumbnail_url: row.thumbnail_url || fallbackThumbnail,
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
