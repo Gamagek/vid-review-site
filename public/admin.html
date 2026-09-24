@@ -74,14 +74,12 @@
                 <button id="upload-button" class="button ghost" type="button">Upload selected file</button>
                 <button id="upload-hls-button" class="button ghost" type="button">Upload HLS folder</button>
                 <div class="progress-track" aria-hidden="true"><span id="upload-progress"></span></div>
+                <label class="switch-label rights-confirmation"><input id="media-rights-confirmed" type="checkbox"><span></span>I confirm I have permission to store and publicly serve this media</label>
+                <p class="field-help">R2/HLS mode is intended for media you have permission to store and serve. An HLS manifest is a delivery format; it does not change the underlying rights to the media.</p>
                 <p id="upload-status" class="form-status" role="status"></p>
                 <input id="r2-key" name="r2_key" type="hidden">
               </div>
-              <div class="media-rights-options">
-                <label class="switch-label rights-confirmation"><input id="media-rights-confirmed" type="checkbox"><span></span>I confirm I have permission to store and publicly serve this media</label>
-                <p class="field-help">This confirmation is required only when uploading HLS media files to Vid.Best R2.</p>
-              </div>
-                            <div id="media-preview" class="admin-preview"><span>Secure media preview appears here</span></div>
+              <div id="media-preview" class="admin-preview"><span>Secure media preview appears here</span></div>
             </div>
 
             <div class="form-section">
@@ -147,6 +145,10 @@
           <section class="glass-panel queue-panel">
             <div class="side-heading"><div><p class="eyebrow">Library</p><h2>Recent records</h2></div><button id="refresh-videos" type="button" aria-label="Refresh videos">↻</button></div>
             <div id="admin-video-list" class="admin-list"></div>
+            <div class="admin-actions">
+              <button id="cache-tiktok-button" class="button ghost" type="button">Cache TikTok previews to R2</button>
+              <p id="cache-tiktok-status" class="form-status" role="status"></p>
+            </div>
           </section>
           <section class="glass-panel queue-panel">
             <div class="side-heading"><div><p class="eyebrow">Moderation</p><h2>Pending comments</h2></div><button id="refresh-comments" type="button" aria-label="Refresh comments">↻</button></div>
