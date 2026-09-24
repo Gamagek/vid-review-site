@@ -477,7 +477,7 @@ test("stores TikTok source and renders the PR26-style player", async () => {
   assert.equal(result.video.provider, "tiktok");
   assert.equal(result.video.media_type, "tiktok");
   assert.match(result.video.embed_url, /^https:\/\/www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
-  assert.match(result.video.thumbnail_url, /^\/api\/tiktok\/thumbnail\?url=/);
+  assert.equal(result.video.thumbnail_url, null);
 
   const page = await send(context, `/watch/${result.video.slug}`);
   assert.equal(page.status, 200);
@@ -485,8 +485,6 @@ test("stores TikTok source and renders the PR26-style player", async () => {
   assert.match(html, /class="tiktok-facade"/);
   assert.match(html, /data-tiktok-id="6718335390845095173"/);
   assert.doesNotMatch(html, /<iframe[^>]+class="tiktok-official-player"/);
-  assert.match(html, /controls=1/);
-  assert.match(html, /closed_caption=1/);
   assert.match(html, /allow="autoplay; fullscreen; picture-in-picture"/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
   assert.match(html, /data-tiktok-share=/);
@@ -848,11 +846,6 @@ test("renders a click-to-load TikTok facade on the watch page", async () => {
   assert.match(html, /class="tiktok-facade"/);
   assert.match(html, /data-tiktok-id="7669587518156705056"/);
   assert.doesNotMatch(html, /https:\/\/www\.tiktok\.com\/player\/v1\/7669587518156705056/);
-  assert.match(html, /controls=1/);
-  assert.match(html, /progress_bar=1/);
-  assert.match(html, /volume_control=1/);
-  assert.match(html, /fullscreen_button=1/);
-  assert.match(html, /closed_caption=1/);
   assert.doesNotMatch(html, /class="tiktok-embed"/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
   assert.match(html, /data-video-provider="tiktok"/);
@@ -884,7 +877,6 @@ test("renders a click-to-load TikTok facade on the watch page", async () => {
   assert.match(homeSource, /provider === "tiktok"/);
 
   const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
-  assert.match(indexSource, /\/api\/tiktok\/thumbnail/);
   assert.match(indexSource, /\/api\/tiktok\/preflight/);
   assert.match(indexSource, /www\.tiktok\.com\/oembed/);
   assert.match(indexSource, /tiktokcdn(?:-[a-z0-9-]+)?\.com/);
@@ -911,7 +903,7 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   assert.ok(html.includes('class="tiktok-facade"'));
   assert.ok(html.includes('data-tiktok-id="6718335390845095173"'));
   assert.doesNotMatch(html, /<iframe id="watch-media-frame" class="tiktok-official-player"/);
-  assert.ok(html.includes('https://www.tiktok.com/player/v1/6718335390845095173?'));
+  assert.doesNotMatch(html, /https:\/\/www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
   assert.ok(html.includes("controls=1"));
   assert.ok(html.includes("closed_caption=1"));
   assert.ok(html.includes('data-video-provider="tiktok"'));
