@@ -545,7 +545,7 @@ async function tikTokPreflightFallback(requestUrl, cache, cacheKey, env, share, 
 
 async function cacheTikTokVideos(request, env) {
   const url = new URL(request.url);
-  const limit = clampInteger(url.searchParams.get("limit"), 1, 4, 4);
+  const limit = clampInteger(url.searchParams.get("limit"), 1, 2, 2);
   const offset = clampInteger(url.searchParams.get("offset"), 0, 1000000, 0);
   const totalRow = await env.DB.prepare(
     `SELECT COUNT(*) AS total
@@ -565,21 +565,20 @@ async function cacheTikTokVideos(request, env) {
 
   const failures = [];
   let cached = 0;
-  for (const row of rows.results || []) {
+  const batch = rows.results || [];
+  const outcomes = await Promise.all(batch.map(async (row) => {
     const share = normalizeTikTokShareUrl(row.source_url);
-    if (!share) {
-      failures.push({ id: row.id, reason: "invalid-tiktok-url" });
-      continue;
-    }
+    if (!share) return { id: row.id, ok: false, reason: "invalid-tiktok-url" };
     try {
       await fetchAndStoreTikTokPreview(env, share);
-      cached += 1;
+      return { id: row.id, ok: true };
     } catch (error) {
-      failures.push({
-        id: row.id,
-        reason: cleanText(error?.message || "cache-failed", 160),
-      });
+      return { id: row.id, ok: false, reason: cleanText(error?.message || "cache-failed", 160) };
     }
+  }));
+  for (const outcome of outcomes) {
+    if (outcome.ok) cached += 1;
+    else failures.push({ id: outcome.id, reason: outcome.reason });
   }
 
   const nextOffset = offset + (rows.results || []).length;
