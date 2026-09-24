@@ -9,6 +9,8 @@ const relatedFilter = document.querySelector("#related-filter");
 const interestStatus = document.querySelector("#interest-status");
 
 const watchPlayerState = {
+  hls: null,
+  hlsPromise: null,
   rates: [0.5, 0.75, 1, 1.25, 1.5, 2],
   zooms: [1, 1.25, 1.5, 2],
   rateIndex: 2,
@@ -24,6 +26,7 @@ document.addEventListener("DOMContentLoaded", initializeWatchPage);
 function initializeWatchPage() {
   enhanceCommentForm();
   enhanceNativePlayer();
+  initializeHlsPlayback();
   initializePersistentPlayer();
   initializeEmbeddedMediaTools();
   initializeAudioLab();
@@ -43,6 +46,57 @@ function initializeWatchPage() {
   loadRecommendations();
 }
 
+
+function initializeHlsPlayback() {
+  const video = document.querySelector("#watch-media-video[data-hls='1']");
+  if (!video) return;
+  const manifest = video.querySelector("source")?.src || video.currentSrc || "";
+  if (!manifest) return;
+
+  if (video.canPlayType("application/vnd.apple.mpegurl")) {
+    return;
+  }
+
+  const loadHls = () => {
+    if (window.Hls) return Promise.resolve(window.Hls);
+    if (watchPlayerState.hlsPromise) return watchPlayerState.hlsPromise;
+    watchPlayerState.hlsPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/hls.js@1.7.3/dist/hls.min.js";
+      script.async = true;
+      script.dataset.vidbestHls = "1";
+      script.crossOrigin = "anonymous";
+      script.onload = () => resolve(window.Hls);
+      script.onerror = () => reject(new Error("HLS playback library could not load."));
+      document.head.append(script);
+    });
+    return watchPlayerState.hlsPromise;
+  };
+
+  void loadHls().then((Hls) => {
+    if (!Hls || !Hls.isSupported()) throw new Error("This browser does not support HLS playback.");
+    const hls = new Hls({
+      enableWorker: true,
+      lowLatencyMode: false,
+      backBufferLength: 30,
+      maxBufferLength: 30,
+    });
+    watchPlayerState.hls = hls;
+    hls.on(Hls.Events.ERROR, (_event, data) => {
+      if (data?.fatal) {
+        console.warn("Vid.Best HLS fatal error:", data.details || data.type || "unknown");
+        try { hls.destroy(); } catch {}
+      }
+    });
+    hls.loadSource(manifest);
+    hls.attachMedia(video);
+  }).catch((error) => {
+    const note = document.createElement("div");
+    note.className = "vidbest-hls-note";
+    note.textContent = error.message || "HLS playback is unavailable in this browser.";
+    video.insertAdjacentElement("afterend", note);
+  });
+}
 
 function initializePersistentPlayer() {
   if (!persistentPlayer || !playerPlaceholder) return;

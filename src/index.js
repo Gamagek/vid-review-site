@@ -111,6 +111,8 @@ const DISCOVERY_STATUSES = new Set(["pending", "resolved", "rejected"]);
 const SAFE_UPLOAD_TYPES = new Set([
   "image/avif", "image/gif", "image/jpeg", "image/png", "image/webp",
   "video/mp4", "video/ogg", "video/quicktime", "video/webm",
+  "application/vnd.apple.mpegurl", "application/x-mpegurl",
+  "video/mp2t", "video/iso.segment", "audio/aac", "audio/mp4",
 ]);
 const encoder = new TextEncoder();
 const ADMIN_SESSION_COOKIE = "__Host-vidbest_admin";
@@ -495,7 +497,7 @@ function securityHeaders(headers, html = false, scriptNonce = "") {
     const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.tiktok.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self' https://www.tiktok.com https://*.tiktok.com https://*.tiktokcdn.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.tiktok.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self' https://www.tiktok.com https://*.tiktok.com https://*.tiktokcdn.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
     );
   }
   return headers;
@@ -1274,6 +1276,9 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
     ? null
     : validateOptionalUrl(thumbnailText);
   const thumbnailUrl = customThumbnail || media.thumbnail_url;
+  if (media.media_type === "hls" && !toBoolean(body.media_rights_confirmed)) {
+    throw new AppError(400, "Confirm that you have permission to store and serve this HLS media before publishing");
+  }
 
   return {
     title,
@@ -1301,7 +1306,7 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
     return {
       source_url: `${baseUrl}/media/${encodeR2Key(r2Key)}`,
       embed_url: null,
-      media_type: "r2",
+      media_type: isHlsManifestKey(r2Key) ? "hls" : "r2",
       provider: "r2",
       r2_key: r2Key,
       thumbnail_url: null,
@@ -1820,13 +1825,37 @@ async function serveCaptions(env, slug) {
   return new Response(row.captions_vtt, { headers });
 }
 
+function detectUploadContentType(filename, supplied) {
+  const declared = cleanText(supplied, 100).toLowerCase();
+  if (SAFE_UPLOAD_TYPES.has(declared)) return declared;
+  const name = cleanText(filename, 180).toLowerCase();
+  if (name.endsWith(".m3u8")) return "application/vnd.apple.mpegurl";
+  if (name.endsWith(".ts")) return "video/mp2t";
+  if (name.endsWith(".m4s")) return "video/iso.segment";
+  if (name.endsWith(".aac")) return "audio/aac";
+  if (name.endsWith(".m4a")) return "audio/mp4";
+  if (name.endsWith(".mp4")) return "video/mp4";
+  if (name.endsWith(".webm")) return "video/webm";
+  if (name.endsWith(".ogg") || name.endsWith(".ogv")) return "video/ogg";
+  if (name.endsWith(".mov")) return "video/quicktime";
+  if (name.endsWith(".png")) return "image/png";
+  if (name.endsWith(".jpg") || name.endsWith(".jpeg")) return "image/jpeg";
+  if (name.endsWith(".webp")) return "image/webp";
+  if (name.endsWith(".gif")) return "image/gif";
+  if (name.endsWith(".avif")) return "image/avif";
+  return declared;
+}
+
 async function uploadAsset(request, env) {
   const filename = cleanText(request.headers.get("X-File-Name") || new URL(request.url).searchParams.get("filename"), 180);
   if (!filename) throw new AppError(400, "X-File-Name header is required");
   if (!request.body) throw new AppError(400, "Upload body is empty");
-  const contentType = cleanText(request.headers.get("Content-Type"), 100, "application/octet-stream").toLowerCase();
+  const contentType = detectUploadContentType(
+    filename,
+    request.headers.get("Content-Type"),
+  );
   if (!SAFE_UPLOAD_TYPES.has(contentType)) {
-    throw new AppError(415, "Unsupported video or raster image type");
+    throw new AppError(415, "Unsupported media type. Use MP4, WebM, Ogg, MOV, HLS (.m3u8/.ts/.m4s) or a supported image.");
   }
   const maximum = clampInteger(env.MAX_UPLOAD_BYTES, 1_000_000, 500_000_000, 104_857_600);
   const contentLength = Number(request.headers.get("Content-Length"));
@@ -1837,9 +1866,28 @@ async function uploadAsset(request, env) {
     throw new AppError(413, `File exceeds the ${Math.floor(maximum / 1_048_576)} MB upload limit`);
   }
 
-  const safeName = filename.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(-100) || "asset";
-  const date = new Date().toISOString().slice(0, 10);
-  const key = `uploads/${date}/${crypto.randomUUID()}-${safeName}`;
+  const requestedKey = cleanText(request.headers.get("X-Asset-Key"), 700);
+  const isHlsUpload = /\.(m3u8|ts|m4s|aac|m4a)$/i.test(filename) || /\.(m3u8|ts|m4s|aac|m4a)$/i.test(requestedKey);
+  if (isHlsUpload && request.headers.get("X-Media-Rights-Confirmed") !== "1") {
+    throw new AppError(400, "Confirm that you have permission to store and serve this media before uploading HLS files");
+  }
+  let key;
+  if (requestedKey) {
+    key = validateR2Key(requestedKey);
+    if (!key || !key.startsWith("uploads/hls/")) {
+      throw new AppError(400, "Custom asset keys are only allowed under uploads/hls/");
+    }
+    const extension = key.split(".").pop()?.toLowerCase() || "";
+    if (!["m3u8", "ts", "m4s", "mp4", "aac", "m4a"].includes(extension)) {
+      throw new AppError(415, "HLS package contains an unsupported file type");
+    }
+  } else {
+    const safeName = filename.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(-100) || "asset";
+    const date = new Date().toISOString().slice(0, 10);
+    key = isHlsUpload
+      ? `uploads/hls/${crypto.randomUUID()}/${safeName}`
+      : `uploads/${date}/${crypto.randomUUID()}-${safeName}`;
+  }
   await env.BUCKET.put(key, request.body, {
     httpMetadata: {
       contentType,
@@ -1900,7 +1948,12 @@ async function serveR2Object(request, env, keyInput) {
   headers.set("ETag", object.httpEtag);
   headers.set("Accept-Ranges", "bytes");
   headers.set("X-Content-Type-Options", "nosniff");
-  headers.set("Cache-Control", headers.get("Cache-Control") || "public, max-age=31536000, immutable");
+  if (isHlsManifestKey(key)) {
+    headers.set("Access-Control-Allow-Origin", "*");
+    headers.set("Cache-Control", "public, max-age=300, stale-while-revalidate=3600");
+  } else {
+    headers.set("Cache-Control", headers.get("Cache-Control") || "public, max-age=31536000, immutable");
+  }
   let status = 200;
   if (object.range) {
     const offset = object.range.offset ?? Math.max(0, object.size - (object.range.suffix || object.range.length || 0));
@@ -1914,9 +1967,15 @@ async function serveR2Object(request, env, keyInput) {
   return new Response(object.body, { status, headers });
 }
 
+function isHlsManifestKey(key) {
+  return /\.m3u8$/i.test(String(key || ""));
+}
+
 function secureStoredContentType(headers) {
   const contentType = (headers.get("Content-Type") || "").split(";", 1)[0].trim().toLowerCase();
-  if (!SAFE_UPLOAD_TYPES.has(contentType)) {
+  if (contentType === "application/x-mpegurl") headers.set("Content-Type", "application/vnd.apple.mpegurl");
+  const normalized = (headers.get("Content-Type") || "").split(";", 1)[0].trim().toLowerCase();
+  if (!SAFE_UPLOAD_TYPES.has(normalized)) {
     headers.set("Content-Type", "application/octet-stream");
     headers.set("Content-Disposition", "attachment");
   }
@@ -2177,6 +2236,14 @@ function watchDisplayTitle(video) {
 
 function renderMedia(video, playbackOrigin) {
   const provider = String(video.provider || "").toLowerCase();
+
+  if (provider === "hls") {
+    const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}"` : "";
+    const captions = video.has_captions
+      ? `<track kind="captions" src="/captions/${encodeURIComponent(video.slug)}.vtt" srclang="${escapeHtml(video.transcript_language || "en")}" label="Generated captions">`
+      : "";
+    return `<video id="watch-media-video" data-hls="1" controls playsinline preload="metadata"${poster}><source src="${escapeHtml(video.source_url)}" type="application/vnd.apple.mpegurl">${captions}Your browser does not support HLS video.</video>`;
+  }
 
   if (provider === "tiktok") {
     const tiktokId = extractTikTokId(video.source_url);

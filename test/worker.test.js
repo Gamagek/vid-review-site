@@ -229,6 +229,72 @@ test("rate limits public comments", async () => {
   assert.equal((await request()).status, 429);
 });
 
+test("accepts HLS manifest and segment uploads under the managed HLS prefix", async () => {
+  const context = createTestContext();
+  const manifest = await send(context, "/api/assets?filename=master.m3u8", {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${secret}`,
+      "Content-Type": "application/vnd.apple.mpegurl",
+      "Content-Length": "28",
+      "X-File-Name": "master.m3u8",
+      "X-Asset-Key": "uploads/hls/test/master.m3u8",
+      "X-Media-Rights-Confirmed": "1",
+    },
+    body: "#EXTM3U\n#EXT-X-VERSION:3\nsegment.ts\n",
+  });
+  assert.equal(manifest.status, 201);
+  const uploaded = await manifest.json();
+  assert.equal(uploaded.key, "uploads/hls/test/master.m3u8");
+
+  const segment = await send(context, "/api/assets?filename=segment.ts", {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${secret}`,
+      "Content-Type": "video/mp2t",
+      "Content-Length": "3",
+      "X-File-Name": "segment.ts",
+      "X-Asset-Key": "uploads/hls/test/segment.ts",
+      "X-Media-Rights-Confirmed": "1",
+    },
+    body: "ts!",
+  });
+  assert.equal(segment.status, 201);
+  const segmentResponse = await send(context, "/media/uploads/hls/test/segment.ts");
+  assert.equal(segmentResponse.status, 200);
+  assert.equal(segmentResponse.headers.get("Content-Type"), "video/mp2t");
+});
+
+test("rejects HLS uploads without media rights confirmation", async () => {
+  const context = createTestContext();
+  const response = await send(context, "/api/assets?filename=master.m3u8", {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${secret}`,
+      "Content-Type": "application/vnd.apple.mpegurl",
+      "Content-Length": "8",
+      "X-File-Name": "master.m3u8",
+      "X-Asset-Key": "uploads/hls/test/master.m3u8",
+    },
+    body: "#EXTM3U",
+  });
+  assert.equal(response.status, 400);
+  assert.match((await response.json()).error, /permission to store and serve/i);
+});
+
+test("serves HLS manifests with cacheable HLS headers", async () => {
+  const context = createTestContext();
+  context.bucket.objects.set("uploads/hls/demo/master.m3u8", {
+    bytes: new TextEncoder().encode("#EXTM3U\nsegment.ts\n"),
+    options: { httpMetadata: { contentType: "application/vnd.apple.mpegurl" } },
+  });
+  const response = await send(context, "/media/uploads/hls/demo/master.m3u8");
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("Content-Type"), "application/vnd.apple.mpegurl");
+  assert.match(response.headers.get("Access-Control-Allow-Origin"), /\*/);
+  assert.match(response.headers.get("Cache-Control"), /max-age=300/);
+});
+
 test("accepts a valid raster upload and rejects an oversized upload", async () => {
   const context = createTestContext({ MAX_UPLOAD_BYTES: "1000000" });
   const valid = await send(context, "/api/assets?filename=preview.png", {
@@ -427,6 +493,29 @@ test("normalizes trusted provider URLs into provider-owned embeds", async () => 
     assert.equal(result.video.provider, provider);
     assert.match(result.video.embed_url, embedPattern);
   }
+});
+
+test("renders an R2 HLS media record as a browser HLS player", async () => {
+  const context = createTestContext();
+  const response = await send(context, "/api/videos", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "Authorized HLS test",
+      r2_key: "uploads/hls/demo/master.m3u8",
+      primary_category: "Technology",
+      subcategory: "Web Development",
+      published: true,
+      media_rights_confirmed: true,
+    }),
+  });
+  assert.equal(response.status, 201);
+  const result = await response.json();
+  assert.equal(result.video.media_type, "hls");
+  const page = await send(context, `/watch/${result.video.slug}`);
+  const html = await page.text();
+  assert.match(html, /data-hls="1"/);
+  assert.match(html, /application\/vnd\.apple\.mpegurl/);
 });
 
 test("uses the current request hostname for Twitch playback", async () => {
