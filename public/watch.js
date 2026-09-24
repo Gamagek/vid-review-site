@@ -62,9 +62,10 @@ function initializeHlsPlayback() {
     if (watchPlayerState.hlsPromise) return watchPlayerState.hlsPromise;
     watchPlayerState.hlsPromise = new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = "/hls.min.js";
+      script.src = "https://cdn.jsdelivr.net/npm/hls.js@1.7.3/dist/hls.min.js";
       script.async = true;
       script.dataset.vidbestHls = "1";
+      script.crossOrigin = "anonymous";
       script.onload = () => resolve(window.Hls);
       script.onerror = () => reject(new Error("HLS playback library could not load."));
       document.head.append(script);
