@@ -1,4 +1,4 @@
-import { dispatchMediaCacheJob, getMediaCacheForVideo, handleMediaCacheCallback, cleanupMediaCacheForVideo, queueAuthorizedMediaCache, buildMediaCacheUrl } from "./media-cache.js";
+import { dispatchMediaCacheJob, getMediaCacheForVideo, handleMediaCacheCallback, cleanupMediaCacheForVideo, queueAuthorizedMediaCache, buildMediaCacheUrl, isMediaCacheTableReady } from "./media-cache.js";
 
 const CATEGORIES = Object.freeze({
   "Entertainment, Movies & Games": [
@@ -941,6 +941,31 @@ async function handleAdminMediaCache(request, env, id, ctx) {
   }, 202);
 }
 
+async function attachMediaCacheFields(env, videos, includeUnpublished) {
+  if (!videos.length || !(await isMediaCacheTableReady(env))) return;
+  const ids = videos.map((video) => Number(video.id)).filter(Number.isSafeInteger);
+  if (!ids.length) return;
+  const placeholders = ids.map(() => "?").join(",");
+  const result = await env.DB.prepare(
+    `SELECT video_id, source_url, output_key, status
+     FROM media_cache_jobs
+     WHERE video_id IN (${placeholders})
+     ORDER BY updated_at DESC`,
+  ).bind(...ids).all();
+  const latest = new Map();
+  for (const job of result.results || []) {
+    const key = Number(job.video_id);
+    if (!latest.has(key)) latest.set(key, job);
+  }
+  for (const video of videos) {
+    const job = latest.get(Number(video.id));
+    video.media_cache_status = includeUnpublished ? (job?.status || null) : undefined;
+    video.media_cache_url = job?.status === "complete" && job.source_url === video.source_url
+      ? buildMediaCacheUrl(job.output_key)
+      : null;
+  }
+}
+
 function buildTikTokThumbnailProxyUrl(sourceUrl) {
   const share = normalizeTikTokShareUrl(sourceUrl);
   return share ? `/api/tiktok/thumbnail?url=${encodeURIComponent(share)}` : null;
@@ -1207,18 +1232,11 @@ async function listVideos(request, env, includeUnpublished) {
 
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
   const selectSql = includeUnpublished
-    ? `SELECT v.*,
-          (SELECT mc.status FROM media_cache_jobs mc
-           WHERE mc.video_id = v.id
-           ORDER BY mc.updated_at DESC LIMIT 1) AS media_cache_status,
-          m.source_published_at, m.source_duration
+    ? `SELECT v.*, m.source_published_at, m.source_duration
        FROM videos v
        LEFT JOIN video_source_metadata m ON m.video_id = v.id
        ${whereSql} ORDER BY ${sortSql} LIMIT ? OFFSET ?`
-    : `SELECT v.*,
-          (SELECT mc.output_key FROM media_cache_jobs mc
-           WHERE mc.video_id = v.id AND mc.source_url = v.source_url AND mc.status = 'complete'
-           ORDER BY mc.updated_at DESC LIMIT 1) AS cache_r2_key
+    : `SELECT v.*
        FROM videos v ${whereSql} ORDER BY ${sortSql} LIMIT ? OFFSET ?`;
   const listStatement = env.DB.prepare(selectSql).bind(...bindings, limit, offset);
   const countStatement = env.DB.prepare(`SELECT COUNT(*) AS total FROM videos v ${whereSql}`).bind(...bindings);
@@ -1248,10 +1266,7 @@ async function hydrateVideos(env, rows) {
 
 async function getPublicVideo(env, slug) {
   const row = await env.DB.prepare(
-    `SELECT v.*,
-            (SELECT mc.output_key FROM media_cache_jobs mc
-             WHERE mc.video_id = v.id AND mc.source_url = v.source_url AND mc.status = 'complete'
-             ORDER BY mc.updated_at DESC LIMIT 1) AS cache_r2_key,
+    `SELECT v.*, 
             a.transcript, a.language AS transcript_language,
             CASE WHEN length(a.captions_vtt) > 0 THEN 1 ELSE 0 END AS has_captions
      FROM videos v LEFT JOIN video_analysis a ON a.video_id = v.id AND a.source_url = v.source_url
@@ -1259,6 +1274,7 @@ async function getPublicVideo(env, slug) {
   ).bind(slug).first();
   if (!row) throw new AppError(404, "Video not found");
   const [video] = await hydrateVideos(env, [row]);
+  await attachMediaCacheFields(env, [video], false);
   return json({ video });
 }
 
@@ -1448,17 +1464,14 @@ async function updateVideo(request, env, id, ctx) {
 
 async function deleteVideo(request, env, id) {
   const existing = await env.DB.prepare(
-    `SELECT id, r2_key, thumbnail_url,
-            (SELECT output_key FROM media_cache_jobs mc
-             WHERE mc.video_id = videos.id AND mc.status = 'complete'
-             ORDER BY mc.updated_at DESC LIMIT 1) AS cache_r2_key
-     FROM videos WHERE id = ?`,
+    "SELECT id, r2_key, thumbnail_url FROM videos WHERE id = ?",
   ).bind(id).first();
   if (!existing) throw new AppError(404, "Video not found");
+  const cacheJob = await getMediaCacheForVideo(env, id, "", true);
   await env.DB.prepare("DELETE FROM videos WHERE id = ?").bind(id).run();
   await cleanupUnusedManagedAssets(env, [
     existing.r2_key,
-    existing.cache_r2_key,
+    cacheJob?.output_key,
     managedAssetKeyFromUrl(existing.thumbnail_url, request, env),
   ]);
   return json({ success: true });
