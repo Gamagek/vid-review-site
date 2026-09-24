@@ -910,7 +910,7 @@ async function editVideo(video) {
   ui.featured.checked = Boolean(video.featured);
   ui.trending.checked = Boolean(video.trending);
   ui.published.checked = Boolean(video.published);
-  setSourceMode(video.media_type === "r2" ? "upload" : "link");
+  setSourceMode(["r2", "hls"].includes(video.media_type) ? "upload" : "link");
   adminState.analysisSource = video.source_url || "";
   adminState.analysisDraft = null;
   ui.analysisTranscript.value = "";
