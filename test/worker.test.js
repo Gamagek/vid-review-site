@@ -100,8 +100,10 @@ function createBucket() {
 }
 
 function createTestContext(overrides = {}) {
+  const { __skipMediaCacheMigration = false, ...envOverrides } = overrides;
   const sqlite = new DatabaseSync(":memory:");
   for (const migration of migrations) {
+    if (__skipMediaCacheMigration && migration === "0013_media_cache_jobs.sql") continue;
     sqlite.exec(readFileSync(new URL(`../migrations/${migration}`, import.meta.url), "utf8"));
   }
   const bucket = createBucket();
@@ -115,7 +117,7 @@ function createTestContext(overrides = {}) {
       APP_NAME: "Test",
       DB: new TestD1Database(sqlite),
       BUCKET: bucket,
-      ...overrides,
+      ...envOverrides,
     },
     ctx: { waitUntil(promise) { pending.push(promise); } },
     pending,
@@ -133,6 +135,50 @@ async function login(context) {
   });
 }
 
+test("legacy databases without the media-cache migration keep existing videos working", async () => {
+  const context = createTestContext();
+  const created = await send(context, "/api/videos", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "Legacy video",
+      source_url: "https://example.com/legacy.mp4",
+      primary_category: "Technology",
+      subcategory: "Web Development",
+      description: "Legacy description",
+      published: true,
+      media_cache_enabled: false,
+    }),
+  });
+  assert.equal(created.status, 201);
+  const createdVideo = (await created.json()).video;
+  assert.ok(createdVideo?.slug);
+  context.sqlite.exec("DROP TABLE media_cache_jobs");
+
+  const api = await send(context, `/api/videos/${createdVideo.slug}`);
+  assert.equal(api.status, 200);
+  assert.equal((await api.json()).video.slug, createdVideo.slug);
+
+  const page = await send(context, `/watch/${createdVideo.slug}`);
+  assert.equal(page.status, 200);
+  assert.match(await page.text(), /<title>Legacy video \| Vid\.Best<\/title>/);
+
+  const publish = await send(context, "/api/videos", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "New legacy-schema video",
+      source_url: "https://example.com/new.mp4",
+      primary_category: "Technology",
+      subcategory: "Web Development",
+      published: true,
+      media_rights_confirmed: true,
+      media_cache_enabled: true,
+    }),
+  });
+  assert.equal(publish.status, 201);
+  assert.equal((await publish.json()).video.media_cache_status, "waiting_migration");
+});
 test("rejects non-object JSON before processing it", async () => {
   const context = createTestContext();
   const response = await send(context, "/api/discovery-requests", {
@@ -512,7 +558,8 @@ test("renders an R2 HLS media record as a browser HLS player", async () => {
   });
   assert.equal(response.status, 201);
   const result = await response.json();
-  assert.equal(result.video.media_type, "hls");
+  assert.equal(result.video.media_type, "r2");
+  assert.equal(result.video.provider, "hls");
   const page = await send(context, `/watch/${result.video.slug}`);
   const html = await page.text();
   assert.match(html, /data-hls="1"/);
@@ -950,12 +997,10 @@ test("queues an authorized 360p cache for published direct media when rights are
   const result = await response.json();
   assert.equal(result.video.media_cache_status, "waiting_transcoder");
   const job = context.sqlite.prepare("SELECT video_id, profile, status, rights_confirmed FROM media_cache_jobs").get();
-  assert.deepEqual(job, {
-    video_id: 1,
-    profile: "360p",
-    status: "waiting_transcoder",
-    rights_confirmed: 1,
-  });
+  assert.equal(job.video_id, 1);
+  assert.equal(job.profile, "360p");
+  assert.equal(job.status, "waiting_transcoder");
+  assert.equal(job.rights_confirmed, 1);
 });
 
 test("never creates a full-media cache job for TikTok links", async () => {
