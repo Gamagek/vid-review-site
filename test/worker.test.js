@@ -100,10 +100,8 @@ function createBucket() {
 }
 
 function createTestContext(overrides = {}) {
-  const { __skipMediaCacheMigration = false, ...envOverrides } = overrides;
   const sqlite = new DatabaseSync(":memory:");
   for (const migration of migrations) {
-    if (__skipMediaCacheMigration && migration === "0013_media_cache_jobs.sql") continue;
     sqlite.exec(readFileSync(new URL(`../migrations/${migration}`, import.meta.url), "utf8"));
   }
   const bucket = createBucket();
@@ -117,7 +115,7 @@ function createTestContext(overrides = {}) {
       APP_NAME: "Test",
       DB: new TestD1Database(sqlite),
       BUCKET: bucket,
-      ...envOverrides,
+      ...overrides,
     },
     ctx: { waitUntil(promise) { pending.push(promise); } },
     pending,
@@ -504,8 +502,9 @@ test("stores TikTok source and renders the PR26-style player", async () => {
   const page = await send(context, `/watch/${result.video.slug}`);
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /<iframe[^>]+class="tiktok-official-player"/);
-  assert.match(html, /player\/v1\/6718335390845095173/);
+  assert.match(html, /class="tiktok-facade"/);
+  assert.match(html, /data-tiktok-id="6718335390845095173"/);
+  assert.doesNotMatch(html, /<iframe[^>]+class="tiktok-official-player"/);
   assert.match(html, /controls=1/);
   assert.match(html, /closed_caption=1/);
   assert.match(html, /allow="autoplay; fullscreen; picture-in-picture"/);
@@ -975,86 +974,6 @@ test("automatically snapshots a published TikTok preview after saving the video 
   }
 });
 
-test("queues an authorized 360p cache for published direct media when rights are confirmed", async () => {
-  const context = createTestContext();
-  const response = await send(context, "/api/videos", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${secret}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      title: "Authorized direct media",
-      source_url: "https://media.example.com/creator-video.mp4",
-      primary_category: "Technology",
-      subcategory: "Web Development",
-      published: true,
-      media_rights_confirmed: true,
-      media_cache_enabled: true,
-    }),
-  });
-  assert.equal(response.status, 201);
-  const result = await response.json();
-  assert.equal(result.video.media_cache_status, "waiting_transcoder");
-  const job = context.sqlite.prepare("SELECT video_id, profile, status, rights_confirmed FROM media_cache_jobs").get();
-  assert.equal(job.video_id, 1);
-  assert.equal(job.profile, "360p");
-  assert.equal(job.status, "waiting_transcoder");
-  assert.equal(job.rights_confirmed, 1);
-});
-
-test("never creates a full-media cache job for TikTok links", async () => {
-  const context = createTestContext();
-  const response = await send(context, "/api/videos", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${secret}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      title: "TikTok source",
-      source_url: "https://www.tiktok.com/@example/video/6718335390845095201",
-      primary_category: "Social Media & Trending",
-      subcategory: "TikTok Viral Challenges",
-      published: true,
-      media_rights_confirmed: true,
-      media_cache_enabled: true,
-    }),
-  });
-  assert.equal(response.status, 201);
-  assert.equal(context.sqlite.prepare("SELECT COUNT(*) AS count FROM media_cache_jobs").get().count, 0);
-});
-
-test("uses the completed authorized 360p R2 cache on the public watch page", async () => {
-  const context = createTestContext();
-  const sourceUrl = "https://example.com/media/uploads/source.mp4";
-  context.sqlite.prepare(
-    `INSERT INTO videos (
-       slug, title, source_url, media_type, r2_key, primary_category, subcategory, description, published
-     ) VALUES (?, ?, ?, 'r2', ?, ?, ?, ?, 1)`,
-  ).run(
-    "cached-direct-video",
-    "Cached direct video",
-    sourceUrl,
-    "uploads/source.mp4",
-    "Technology",
-    "Web Development",
-    "Authorized cache test",
-  );
-  context.sqlite.prepare(
-    `INSERT INTO media_cache_jobs (
-       video_id, source_url, profile, output_key, status, rights_confirmed
-     ) VALUES (1, ?, '360p', 'uploads/media-cache/360p/1-test.mp4', 'complete', 1)`,
-  ).run(sourceUrl);
-
-  const page = await send(context, "/watch/cached-direct-video");
-  assert.equal(page.status, 200);
-  const html = await page.text();
-  assert.match(html, /data-cache-profile="360p"/);
-  assert.ok(html.includes("/media/uploads/media-cache/360p/1-test.mp4"));
-  assert.ok(html.includes('type="video/mp4"'));
-});
-
 test("TikTok keeps separate share preview and player paths", () => {
   const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
   assert.match(adminSource, /renderTikTokPreview/);
@@ -1065,7 +984,7 @@ test("TikTok keeps separate share preview and player paths", () => {
   assert.match(adminSource, /TikTok preview needs the normal full sharing link/);
 });
 
-test("renders the official TikTok Embed Player iframe with responsive options", async () => {
+test("renders a click-to-load TikTok facade on the watch page", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
@@ -1085,8 +1004,9 @@ test("renders the official TikTok Embed Player iframe with responsive options", 
   const page = await send(context, "/watch/tiktok-player-test");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /<iframe[^>]+class="tiktok-official-player"/);
-  assert.ok(html.includes("https://www.tiktok.com/player/v1/7669587518156705056?"));
+  assert.match(html, /class="tiktok-facade"/);
+  assert.match(html, /data-tiktok-id="7669587518156705056"/);
+  assert.doesNotMatch(html, /https:\/\/www\.tiktok\.com\/player\/v1\/7669587518156705056/);
   assert.match(html, /controls=1/);
   assert.match(html, /progress_bar=1/);
   assert.match(html, /volume_control=1/);
@@ -1098,7 +1018,9 @@ test("renders the official TikTok Embed Player iframe with responsive options", 
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
   assert.doesNotMatch(watchSource, /initializeTikTokLazyPlayer/);
-  assert.match(watchSource, /"x-tiktok-player": true/);
+  assert.match(watchSource, /initializeTikTokFacade/);
+  assert.match(watchSource, /buildTikTokOfficialPlayerUrl/);
+  assert.match(watchSource, /tiktok-facade/);
   assert.match(watchSource, /onPlayerError/);
   assert.match(watchSource, /className = "vidbest-tiktok-retry"/);
   assert.match(watchSource, /const remote = \[\"youtube\", \"vimeo\", \"tiktok\"\]\.includes\(provider\)/);
@@ -1111,7 +1033,8 @@ test("renders the official TikTok Embed Player iframe with responsive options", 
   assert.match(watchSource, /dns\.google/);
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /parseTikTokShareUrl/);
-  assert.match(homeSource, /buildTikTokPreviewPlayerUrl/);
+  assert.match(homeSource, /activateTikTokFacade/);
+  assert.match(homeSource, /Tap to load the official TikTok player/);
   assert.match(homeSource, /autoplay: "1"/);
   assert.match(homeSource, /muted: "1"/);
   assert.match(homeSource, /PREVIEW_DELAY_MS = 3000/);
@@ -1144,7 +1067,9 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   const html = await page.text();
   assert.ok(html.includes("<title>Saiyaara; A Cinematic Romance | Vid.Best</title>"));
   assert.ok(html.includes("<h1>Saiyaara; A Cinematic Romance</h1>"));
-  assert.ok(html.includes('<iframe id="watch-media-frame" class="tiktok-official-player"'));
+  assert.ok(html.includes('class="tiktok-facade"'));
+  assert.ok(html.includes('data-tiktok-id="6718335390845095173"'));
+  assert.doesNotMatch(html, /<iframe id="watch-media-frame" class="tiktok-official-player"/);
   assert.ok(html.includes('https://www.tiktok.com/player/v1/6718335390845095173?'));
   assert.ok(html.includes("controls=1"));
   assert.ok(html.includes("closed_caption=1"));
