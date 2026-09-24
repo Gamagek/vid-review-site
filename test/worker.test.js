@@ -137,23 +137,34 @@ async function login(context) {
 
 test("legacy databases without the media-cache migration keep existing videos working", async () => {
   const context = createTestContext();
+  const created = await send(context, "/api/videos", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "Legacy video",
+      source_url: "https://example.com/legacy.mp4",
+      primary_category: "Technology",
+      subcategory: "Web Development",
+      description: "Legacy description",
+      published: true,
+      media_cache_enabled: false,
+    }),
+  });
+  assert.equal(created.status, 201);
+  const createdVideo = (await created.json()).video;
   context.sqlite.exec("DROP TABLE media_cache_jobs");
-  context.sqlite.prepare(
-    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, description, published)
-     VALUES ('legacy-video', 'Legacy video', 'https://example.com/legacy.mp4', 'raw', 'Technology', 'Web Development', 'Legacy description', 1)`,
-  ).run();
 
   const list = await send(context, "/api/videos");
   assert.equal(list.status, 200);
-  assert.equal((await list.json()).videos[0].slug, "legacy-video");
+  assert.equal((await list.json()).videos[0].slug, createdVideo.slug);
 
-  const api = await send(context, "/api/videos/legacy-video");
+  const api = await send(context, `/api/videos/${createdVideo.slug}`);
   assert.equal(api.status, 200);
-  assert.equal((await api.json()).video.slug, "legacy-video");
+  assert.equal((await api.json()).video.slug, createdVideo.slug);
 
-  const page = await send(context, "/watch/legacy-video");
+  const page = await send(context, `/watch/${createdVideo.slug}`);
   assert.equal(page.status, 200);
-  assert.match(await page.text(), /<title>Legacy video | Vid\.Best<\/title>/);
+  assert.match(await page.text(), /<title>Legacy video \| Vid\.Best<\/title>/);
 
   const publish = await send(context, "/api/videos", {
     method: "POST",
