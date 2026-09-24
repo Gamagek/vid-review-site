@@ -1089,8 +1089,6 @@ async function createVideo(request, env, ctx) {
     Number(data.published),
   ).first();
 
-  if (row && detectMediaProvider(row) === "tiktok" && row.published) {
-  }
   return json({ success: true, video: serializeVideo(row) }, 201);
 }
 
@@ -1139,8 +1137,6 @@ async function updateVideo(request, env, id, ctx) {
   }
   await cleanupUnusedManagedAssets(env, replacedKeys);
 
-  if (row && detectMediaProvider(row) === "tiktok" && row.published) {
-  }
 
   return json({ success: true, video: serializeVideo(row) });
 }
