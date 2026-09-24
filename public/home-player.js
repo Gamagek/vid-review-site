@@ -86,11 +86,11 @@ function parseTikTokShareUrl(value) {
     const url = new URL(value);
     const host = url.hostname.toLowerCase().replace(/^www\./, "");
     if (host !== "tiktok.com") return null;
-    const match = url.pathname.match(/^\/@[^/]+\/video\/(\d+)\/?$/);
+    const match = url.pathname.match(/^\/@([^/]+)\/video\/(\d+)\/?$/);
     if (!match) return null;
     url.search = "";
     url.hash = "";
-    return { url: url.toString(), id: match[1] };
+    return { url: url.toString(), id: match[2], username: decodeURIComponent(match[1]) };
   } catch {
     return null;
   }
