@@ -957,7 +957,6 @@ async function listVideos(request, env, includeUnpublished) {
   const countStatement = env.DB.prepare(`SELECT COUNT(*) AS total FROM videos v ${whereSql}`).bind(...bindings);
   const [listResult, countRow] = await env.DB.batch([listStatement, countStatement]);
   const videos = await hydrateVideos(env, listResult.results || []);
-  await attachMediaCacheFields(env, videos, includeUnpublished);
 
   return json({
     videos,
@@ -990,7 +989,6 @@ async function getPublicVideo(env, slug) {
   ).bind(slug).first();
   if (!row) throw new AppError(404, "Video not found");
   const [video] = await hydrateVideos(env, [row]);
-  await attachMediaCacheFields(env, [video], false);
   return json({ video });
 }
 
@@ -1936,7 +1934,6 @@ async function watchPage(request, env, ctx, slugInput) {
   ).bind(slug).first();
   if (!row) return dynamicHtml(notFoundPage(), 404);
   const [video] = await hydrateVideos(env, [row]);
-  await attachMediaCacheFields(env, [video], false);
   ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
   const scriptNonce = createCspNonce();
   return dynamicHtml(renderWatchHtml(video, request, env, scriptNonce), 200, scriptNonce);
