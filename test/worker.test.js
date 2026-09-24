@@ -136,7 +136,8 @@ async function login(context) {
 }
 
 test("legacy databases without the media-cache migration keep existing videos working", async () => {
-  const context = createTestContext({ __skipMediaCacheMigration: true });
+  const context = createTestContext();
+  context.sqlite.exec("DROP TABLE media_cache_jobs");
   context.sqlite.prepare(
     `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, description, published)
      VALUES ('legacy-video', 'Legacy video', 'https://example.com/legacy.mp4', 'raw', 'Technology', 'Web Development', 'Legacy description', 1)`,
@@ -987,12 +988,10 @@ test("queues an authorized 360p cache for published direct media when rights are
   const result = await response.json();
   assert.equal(result.video.media_cache_status, "waiting_transcoder");
   const job = context.sqlite.prepare("SELECT video_id, profile, status, rights_confirmed FROM media_cache_jobs").get();
-  assert.deepEqual(job, {
-    video_id: 1,
-    profile: "360p",
-    status: "waiting_transcoder",
-    rights_confirmed: 1,
-  });
+  assert.equal(job.video_id, 1);
+  assert.equal(job.profile, "360p");
+  assert.equal(job.status, "waiting_transcoder");
+  assert.equal(job.rights_confirmed, 1);
 });
 
 test("never creates a full-media cache job for TikTok links", async () => {
