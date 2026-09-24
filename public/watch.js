@@ -43,6 +43,7 @@ function initializeWatchPage() {
   loadRecommendations();
 }
 
+
 function initializePersistentPlayer() {
   if (!persistentPlayer || !playerPlaceholder) return;
   const status = persistentPlayer.querySelector("#persistent-player-status");
@@ -638,8 +639,7 @@ function initializeEmbeddedMediaTools() {
   player.dataset.vidbestEmbeddedTools = "1";
 
   const provider = String(document.body.dataset.videoProvider || inferProvider(frame)).toLowerCase();
-
-  const remote = provider === "youtube" || provider === "vimeo" || provider === "tiktok";
+  const remote = ["youtube", "vimeo", "tiktok"].includes(provider);
   const supportsPlaybackRate = provider === "youtube" || provider === "vimeo";
   const state = { playing: false, muted: false, rate: 1, currentTime: 0 };
 
@@ -660,37 +660,212 @@ function initializeEmbeddedMediaTools() {
   frame.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; clipboard-write");
   frame.setAttribute("allowfullscreen", "");
 
-  function command(method, args) {
-    args = args || [];
-    try {
-      if (typeof playerProviderCommand === "function") {
-        playerProviderCommand(method, args);
+  if (provider === "tiktok") {
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.className = "vidbest-tiktok-retry";
+    retry.textContent = "↻ Retry";
+    retry.title = "Retry TikTok player";
+    retry.setAttribute("aria-label", "Retry TikTok player");
+    retry.hidden = true;
+
+    const recovery = document.createElement("div");
+    recovery.className = "vidbest-tiktok-recovery";
+    recovery.hidden = true;
+
+    const recoveryText = document.createElement("p");
+    recoveryText.className = "vidbest-tiktok-recovery-text";
+    recoveryText.textContent = "TikTok could not load in the embedded player. Vid.Best will try its standard official embed once.";
+
+    const recoveryActions = document.createElement("div");
+    recoveryActions.className = "vidbest-tiktok-recovery-actions";
+    const openTikTok = document.createElement("a");
+    openTikTok.className = "button ghost";
+    openTikTok.target = "_blank";
+    openTikTok.rel = "noopener noreferrer";
+    openTikTok.textContent = "Open on TikTok";
+    const connectionHelp = document.createElement("button");
+    connectionHelp.type = "button";
+    connectionHelp.className = "button ghost";
+    connectionHelp.textContent = "Connection help";
+    recoveryActions.append(openTikTok, connectionHelp);
+    recovery.append(recoveryText, recoveryActions);
+
+    const connectionNote = document.createElement("p");
+    connectionNote.className = "vidbest-tiktok-connection-note";
+    connectionNote.hidden = true;
+    connectionNote.textContent = "A DNS change can sometimes fix a resolver/network problem, but it cannot override TikTok content or account restrictions. Android: Settings → Network & internet → Private DNS → Private DNS provider hostname → dns.google.";
+    recovery.append(connectionNote);
+
+    let ready = false;
+    let watchdog = null;
+    let fallbackTried = false;
+    let fallbackShell = null;
+
+    const getShareUrl = () => frame.dataset.tiktokShare || "";
+
+    const showRecovery = (messageText) => {
+      retry.hidden = false;
+      recovery.hidden = false;
+      if (messageText) recoveryText.textContent = messageText;
+    };
+
+    const hideRecovery = () => {
+      recovery.hidden = true;
+      connectionNote.hidden = true;
+    };
+
+    connectionHelp.addEventListener("click", () => {
+      connectionNote.hidden = !connectionNote.hidden;
+    });
+
+    openTikTok.href = getShareUrl() || "https://www.tiktok.com/";
+
+    const armWatchdog = () => {
+      window.clearTimeout(watchdog);
+      watchdog = window.setTimeout(() => {
+        if (!ready) showRecovery("TikTok did not report a ready player. Vid.Best can try the standard official embed.");
+      }, 8000);
+    };
+
+    const restoreOfficialPlayer = () => {
+      if (!fallbackShell || !frame.isConnected) return;
+      fallbackShell.replaceWith(frame);
+      fallbackShell = null;
+      frame.removeAttribute("hidden");
+      overlay.hidden = false;
+      ready = false;
+      hideRecovery();
+      const url = new URL(frame.src);
+      url.searchParams.set("retry", String(Date.now()));
+      frame.src = url.toString();
+      armWatchdog();
+    };
+
+    const loadStandardEmbed = async () => {
+      if (fallbackTried) return false;
+      fallbackTried = true;
+      const share = getShareUrl();
+      if (!share) return false;
+      try {
+        const preflight = await api("/api/tiktok/preflight?url=" + encodeURIComponent(share));
+        if (!preflight.ok) return false;
+        const match = share.match(/\/video\/(\d+)\/?$/);
+        if (!match) return false;
+
+        const shell = document.createElement("div");
+        shell.className = "vidbest-tiktok-standard-fallback";
+        const quote = document.createElement("blockquote");
+        quote.className = "tiktok-embed";
+        quote.cite = share;
+        quote.setAttribute("data-video-id", match[1]);
+        quote.setAttribute("data-embed-from", "oembed");
+        quote.style.cssText = "max-width:605px;min-width:325px;width:100%;margin:0 auto";
+        const section = document.createElement("section");
+        const link = document.createElement("a");
+        link.href = share;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "View this video on TikTok";
+        section.append(link);
+        quote.append(section);
+        shell.append(quote);
+        frame.hidden = true;
+        frame.parentNode?.insertBefore(shell, frame);
+        overlay.hidden = true;
+        fallbackShell = shell;
+        openTikTok.href = share;
+        recoveryText.textContent = "Switched to TikTok’s standard official embed.";
+        retry.hidden = false;
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    const ensureTikTokEmbedScript = () => new Promise((resolve) => {
+      if (document.querySelector("script[data-vidbest-tiktok-embed]")) {
+        resolve(true);
         return;
       }
-      const origin = provider === "vimeo" ? "https://player.vimeo.com" : new URL(frame.src).origin;
-      const payload = provider === "vimeo"
-        ? (method === "playVideo" ? { method: "play" }
-          : method === "pauseVideo" ? { method: "pause" }
-          : method === "mute" ? { method: "setVolume", value: 0 }
-          : method === "unMute" ? { method: "setVolume", value: 1 }
-          : method === "setPlaybackRate" ? { method: "setPlaybackRate", value: Number(args[0]) }
-          : method === "seekTo" ? { method: "setCurrentTime", value: Number(args[0]) }
-          : { method })
-        : { event: "command", func: method, args: args };
-      frame.contentWindow && frame.contentWindow.postMessage(JSON.stringify(payload), origin);
-    } catch {}
-  }
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = "https://www.tiktok.com/embed.js";
+      script.dataset.vidbestTikTokEmbed = "1";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.head.append(script);
+    });
 
+    const recoverTikTok = async (messageText) => {
+      ready = false;
+      showRecovery(messageText);
+      const switched = await loadStandardEmbed();
+      if (switched) {
+        const loaded = await ensureTikTokEmbedScript();
+        if (loaded) {
+          recoveryText.textContent = "TikTok standard official embed loaded. Provider controls are active inside the embed.";
+          return;
+        }
+        recoveryText.textContent = "Standard TikTok embed could not load. Use Open on TikTok or Retry.";
+      }
+    };
+
+    retry.addEventListener("click", () => {
+      if (fallbackShell) {
+        restoreOfficialPlayer();
+        return;
+      }
+      ready = false;
+      retry.hidden = true;
+      hideRecovery();
+      try {
+        const url = new URL(frame.src);
+        url.searchParams.set("retry", String(Date.now()));
+        frame.src = url.toString();
+      } catch {}
+      armWatchdog();
+    });
+
+    stage.append(retry, recovery);
+    armWatchdog();
+
+    addEventListener("message", (event) => {
+      if (event.source !== frame.contentWindow) return;
+      try {
+        const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        if (!data?.["x-tiktok-player"]) return;
+        if (data.type === "onPlayerReady") {
+          ready = true;
+          window.clearTimeout(watchdog);
+          retry.hidden = true;
+          hideRecovery();
+          note.textContent = "TikTok official player ready · advanced controls active";
+        }
+        if (data.type === "onPlayerError") {
+          void recoverTikTok("TikTok official player reported an error. Trying the standard official embed…");
+          note.textContent = "TikTok is recovering · provider controls remain available when loaded";
+        }
+        if (data.type === "onStateChange") state.playing = Number(data.value) === 1;
+        if (data.type === "onMute") state.muted = Boolean(data.value);
+        if (data.type === "onCurrentTime") {
+          const time = Number(data.value?.currentTime);
+          if (Number.isFinite(time)) state.currentTime = time;
+        }
+      } catch {}
+    });
+  }
   const overlay = document.createElement("div");
   overlay.className = "vidbest-embed-overlay";
-  overlay.setAttribute("aria-label", "Vid.Best embedded player controls");
+  overlay.classList.toggle("vidbest-remote-controls", remote);
+  overlay.setAttribute("aria-label", "Vid.Best advanced playback controls");
 
   function message(text) {
-    const note = overlay.querySelector(".vidbest-embed-note");
-    if (note) note.textContent = text;
+    const noteEl = overlay.querySelector(".vidbest-embed-note");
+    if (noteEl) noteEl.textContent = text;
   }
 
-  function button(label, title, handler, disabled) {
+  function button(label, title, handler, disabled = false) {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "vidbest-embed-button";
@@ -698,7 +873,7 @@ function initializeEmbeddedMediaTools() {
     b.title = title;
     b.setAttribute("aria-label", title);
     b.disabled = Boolean(disabled);
-    b.addEventListener("click", function(event) {
+    b.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
       void handler();
@@ -706,40 +881,41 @@ function initializeEmbeddedMediaTools() {
     return b;
   }
 
-  const play = button("▶", "Play or pause", function() {
-    if (!remote) return message("This provider keeps playback controls inside its own embed.");
+  const play = button("▶", "Play or pause", () => {
     state.playing = !state.playing;
-    command(state.playing ? "playVideo" : "pauseVideo");
+    playerProviderCommand(state.playing ? "playVideo" : "pauseVideo");
     play.textContent = state.playing ? "❚❚" : "▶";
   }, !remote);
-  const back = button("↶10", "Seek back 10 seconds", function() {
-    if (!remote) return message("Seek is provider-dependent for this embed.");
+
+  const back = button("↶10", "Seek back 10 seconds", () => {
     state.currentTime = Math.max(0, state.currentTime - 10);
-    command("seekTo", [state.currentTime, true]);
+    playerProviderCommand("seekTo", [state.currentTime, true]);
   }, !remote);
-  const forward = button("10↷", "Seek forward 10 seconds", function() {
-    if (!remote) return message("Seek is provider-dependent for this embed.");
+
+  const forward = button("10↷", "Seek forward 10 seconds", () => {
     state.currentTime += 10;
-    command("seekTo", [state.currentTime, true]);
+    playerProviderCommand("seekTo", [state.currentTime, true]);
   }, !remote);
-  const speed = button("1×", "Cycle playback speed", function() {
-    if (!remote) return message("Speed is controlled by the embedded provider.");
+
+  const speed = button("1×", "Cycle playback speed", () => {
+    if (!supportsPlaybackRate) return message("TikTok does not expose playback-rate control; use its native player controls.");
     const rates = [0.5, 0.75, 1, 1.25, 1.5, 2];
     const next = rates[(rates.indexOf(state.rate) + 1) % rates.length];
     state.rate = next;
     speed.textContent = next + "×";
-    command("setPlaybackRate", [next]);
-  }, !remote);
-  const mute = button("🔊", "Mute or unmute", function() {
-    if (!remote) return message("Mute is controlled by the embedded provider.");
+    playerProviderCommand("setPlaybackRate", [next]);
+  }, !supportsPlaybackRate);
+
+  const mute = button("🔊", "Mute or unmute", () => {
     state.muted = !state.muted;
-    command(state.muted ? "mute" : "unMute");
+    playerProviderCommand(state.muted ? "mute" : "unMute");
     mute.textContent = state.muted ? "🔇" : "🔊";
   }, !remote);
-  const captions = button("CC", "Caption controls", function() {
+
+  const captions = button("CC", "Caption controls", () => {
     message("Caption languages are controlled by the embedded provider.");
     frame.focus();
-  });
+  }, false);
 
   async function embeddedPiP() {
     if (!(window.documentPictureInPicture && window.documentPictureInPicture.requestWindow)) {
@@ -754,20 +930,20 @@ function initializeEmbeddedMediaTools() {
     const next = frame.nextSibling;
     try {
       const width = Math.max(320, Math.min(720, stage.clientWidth || 480));
-      const height = Math.max(200, Math.min(520, Math.round(width * 0.5625) + 40));
-      const pip = await window.documentPictureInPicture.requestWindow({ width: width, height: height });
-      const doc = pip.document;
+      const height = Math.max(220, Math.min(560, Math.round(width * 0.5625) + 50));
+      const pipWindow = await window.documentPictureInPicture.requestWindow({ width, height });
+      const doc = pipWindow.document;
       doc.body.style.cssText = "margin:0;background:#05070d;color:#fff;overflow:hidden;font-family:system-ui,sans-serif";
       const shell = doc.createElement("div");
-      shell.style.cssText = "width:100vw;height:100vh;display:grid;grid-template-rows:34px 1fr";
+      shell.style.cssText = "width:100vw;height:100vh;display:grid;grid-template-rows:36px 1fr";
       const bar = doc.createElement("div");
-      bar.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:0 8px;background:#111827;font:12px system-ui";
+      bar.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:#111827;font:12px system-ui";
       const label = doc.createElement("span");
       label.textContent = "Vid.Best · " + provider + " PiP";
       const close = doc.createElement("button");
       close.textContent = "Back to page";
       close.style.cssText = "border:0;border-radius:7px;padding:5px 8px;background:#273449;color:#fff";
-      close.onclick = function() { pip.close(); };
+      close.onclick = () => pipWindow.close();
       bar.append(label, close);
       const viewport = doc.createElement("div");
       viewport.style.cssText = "min-height:0;background:#000";
@@ -775,19 +951,19 @@ function initializeEmbeddedMediaTools() {
       viewport.append(frame);
       shell.append(bar, viewport);
       doc.body.append(shell);
-      pip.addEventListener("pagehide", function() {
+      pipWindow.addEventListener("pagehide", () => {
         if (parent && !parent.contains(frame)) parent.insertBefore(frame, next || null);
         frame.style.cssText = "";
       }, { once: true });
       message("Embedded video is floating in PiP.");
     } catch (error) {
-      message(error && error.message ? error.message : "Embedded PiP could not be opened.");
+      message(error?.message || "Embedded PiP could not be opened.");
     }
   }
 
   const pip = button("▣ PiP", "Picture in Picture", embeddedPiP);
-  const share = button("Share", "Share this Vid.Best page", function() { shareWatchPage(); });
-  const pop = button("Pop-out", "Float player while scrolling", function() {
+  const share = button("Share", "Share this Vid.Best page", () => shareWatchPage());
+  const pop = button("Pop-out", "Float player while scrolling", () => {
     const anchor = document.querySelector("#watch-player-anchor");
     if (!anchor) return;
     const on = !player.classList.contains("is-mini");
@@ -805,20 +981,30 @@ function initializeEmbeddedMediaTools() {
       pop.textContent = "Pop-out";
     }
   });
-  const full = button("⛶", "Fullscreen", async function() {
+  const full = button("⛶", "Fullscreen", async () => {
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
       else if (stage.requestFullscreen) await stage.requestFullscreen();
     } catch { message("Fullscreen is unavailable for this embed."); }
   });
+
   const note = document.createElement("span");
   note.className = "vidbest-embed-note";
-  note.textContent = remote ? "Embedded " + provider + " · enhanced controls" : "Embedded " + provider + " · provider controls remain authoritative";
-  overlay.append(play, back, forward, speed, captions, mute, pip, share, pop, full, note);
-  stage.style.position = stage.style.position || "relative";
-  stage.append(overlay);
+  note.textContent = remote
+    ? "Embedded " + provider + " · Vid.Best advanced controls"
+    : "Embedded media · enhanced controls";
 
-  addEventListener("message", function(event) {
+  const controls = [play, back, forward, speed, captions, mute, pip, share, pop, full, note];
+  overlay.append(...controls);
+
+  if (remote) {
+    player.insertAdjacentElement("afterend", overlay);
+  } else {
+    stage.style.position = stage.style.position || "relative";
+    stage.append(overlay);
+  }
+
+  addEventListener("message", (event) => {
     if (event.source !== frame.contentWindow) return;
     try {
       const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
@@ -829,22 +1015,10 @@ function initializeEmbeddedMediaTools() {
           const time = Number(data.value?.currentTime);
           if (Number.isFinite(time)) state.currentTime = time;
         }
-        if (data.type === "onPlayerError") {
-          const code = Number(data.value?.errorCode);
-          const type = String(data.value?.errorType || "PLAYER_ERROR");
-          message(`TikTok player: ${type}${Number.isFinite(code) ? ` (${code})` : ""}`);
-        }
-        if (data.type === "onPlayerReady") message("TikTok official player ready · provider controls active");
-        return;
       }
-      const info = data && (data.info || data);
-      const time = Number(info && (info.currentTime != null ? info.currentTime : data.currentTime));
-      if (Number.isFinite(time)) state.currentTime = time;
     } catch {}
   });
 }
-
-
 
 
 function initializeBackgroundPlayback() {
@@ -972,6 +1146,9 @@ function initializeAudioLab() {
   style.id = "vidbest-player-upgrade-styles";
   style.textContent = [
     ".vidbest-embed-overlay{position:absolute;left:8px;right:8px;bottom:8px;z-index:8;display:flex;flex-wrap:wrap;gap:5px;align-items:center;padding:6px;border-radius:11px;background:rgba(5,7,13,.9);backdrop-filter:blur(10px);box-sizing:border-box}",
+    ".vidbest-embed-overlay.vidbest-remote-controls{position:static;left:auto;right:auto;bottom:auto;z-index:auto;width:100%;margin:8px 0 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(5,7,13,.92);box-sizing:border-box}",
+    ".vidbest-embed-overlay.vidbest-remote-controls .vidbest-embed-note{flex-basis:100%;order:20}",
+
     ".vidbest-embed-button{border:0;border-radius:8px;padding:6px 8px;background:#202a3b;color:#fff;cursor:pointer;font:600 12px system-ui}",
     ".vidbest-embed-button:disabled{opacity:.42;cursor:not-allowed}",
     ".vidbest-embed-note{flex:1 1 100%;font:11px system-ui;color:#b9c3d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",

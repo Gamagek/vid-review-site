@@ -159,6 +159,13 @@ async function route(request, env, ctx) {
     return requestDiscovery(request, env);
   }
 
+  if (path === "/api/tiktok/thumbnail" && request.method === "GET") {
+    return tikTokThumbnail(request);
+  }
+  if (path === "/api/tiktok/preflight" && request.method === "GET") {
+    return tikTokPreflight(request);
+  }
+
   if (path === "/robots.txt" && request.method === "GET") {
     return robotsResponse(request, env);
   }
@@ -321,6 +328,139 @@ async function route(request, env, ctx) {
 
   const assetResponse = await env.ASSETS.fetch(request);
   return secureAssetResponse(assetResponse, path);
+}
+
+async function tikTokPreflight(request) {
+  const requested = cleanText(new URL(request.url).searchParams.get("url"), 2000);
+  const share = normalizeTikTokShareUrl(requested);
+  if (!share) throw new AppError(400, "Use a normal TikTok sharing link");
+  const requestUrl = new URL(request.url);
+  const cacheKey = new Request(requestUrl.origin + "/__vidbest-tiktok-preflight?url=" + encodeURIComponent(share));
+  const cache = typeof caches !== "undefined" && caches.default ? caches.default : null;
+  if (cache) {
+    const cached = await cache.match(cacheKey);
+    if (cached) return cached;
+  }
+  const metadataUrl = new URL("https://www.tiktok.com/oembed");
+  metadataUrl.searchParams.set("url", share);
+  let response;
+  try {
+    response = await fetch(metadataUrl.toString(), {
+      headers: { Accept: "application/json", "User-Agent": "VidBest/1.0 (+https://vid.best/)" },
+      signal: AbortSignal.timeout(7000),
+      cf: {
+        cacheEverything: true,
+        cacheTtlByStatus: { "200-299": 86400, "400-499": 60, "500-599": 10 },
+      },
+    });
+  } catch (error) {
+    console.error("TikTok preflight failed", error?.name || "unknown");
+    const failed = json({ ok: false, provider: "tiktok", reason: "upstream-timeout-or-network" }, 200, {
+      "Cache-Control": "public, max-age=10, stale-while-revalidate=30",
+    });
+    if (cache) await cache.put(cacheKey, failed.clone());
+    return failed;
+  }
+  if (!response.ok) {
+    const failed = json({ ok: false, provider: "tiktok", reason: "upstream-http-" + response.status }, 200, {
+      "Cache-Control": "public, max-age=15, stale-while-revalidate=60",
+    });
+    if (cache) await cache.put(cacheKey, failed.clone());
+    return failed;
+  }
+  let metadata;
+  try { metadata = await response.json(); } catch { metadata = null; }
+  const videoId = share.match(/\/video\/(\d+)\/?$/)?.[1] || null;
+  if (!videoId || String(metadata?.type || "") !== "video") {
+    const failed = json({ ok: false, provider: "tiktok", reason: "not-embeddable-video" }, 200, {
+      "Cache-Control": "public, max-age=30, stale-while-revalidate=120",
+    });
+    if (cache) await cache.put(cacheKey, failed.clone());
+    return failed;
+  }
+  const result = json({
+    ok: true,
+    provider: "tiktok",
+    video_id: videoId,
+    title: cleanText(metadata?.title, 160, "TikTok video"),
+    author_name: cleanText(metadata?.author_name, 120),
+    thumbnail_url: buildTikTokThumbnailProxyUrl(share),
+    official_player: true,
+    standard_embed: true,
+  }, 200, { "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800" });
+  if (cache) await cache.put(cacheKey, result.clone());
+  return result;
+}
+
+async function tikTokThumbnail(request) {
+  const requested = cleanText(new URL(request.url).searchParams.get("url"), 2000);
+  const share = normalizeTikTokShareUrl(requested);
+  if (!share) throw new AppError(400, "Use a normal TikTok sharing link");
+
+  const requestUrl = new URL(request.url);
+  const cacheKey = new Request(
+    `${requestUrl.origin}/__vidbest-tiktok-thumbnail?url=${encodeURIComponent(share)}`,
+  );
+  const cache = typeof caches !== "undefined" && caches.default ? caches.default : null;
+  if (cache) {
+    const cached = await cache.match(cacheKey);
+    if (cached) return cached;
+  }
+
+  const metadataUrl = new URL("https://www.tiktok.com/oembed");
+  metadataUrl.searchParams.set("url", share);
+  const metadataResponse = await fetch(metadataUrl.toString(), {
+    headers: {
+      Accept: "application/json",
+      "User-Agent": "VidBest/1.0 (+https://vid.best/)",
+    },
+    signal: AbortSignal.timeout(7000),
+    cf: {
+      cacheEverything: true,
+      cacheTtlByStatus: { "200-299": 86400, "400-499": 60, "500-599": 10 },
+    },
+  });
+  if (!metadataResponse.ok) throw new AppError(502, "TikTok preview metadata is unavailable");
+
+  let metadata;
+  try {
+    metadata = await metadataResponse.json();
+  } catch {
+    throw new AppError(502, "TikTok preview metadata is invalid");
+  }
+
+  const thumbnailUrl = String(metadata?.thumbnail_url || "");
+  let thumbnail;
+  try {
+    const parsedThumbnail = new URL(thumbnailUrl);
+    const host = parsedThumbnail.hostname.toLowerCase();
+    const allowed = /^([a-z0-9-]+\.)*tiktokcdn(?:-[a-z0-9-]+)?\.com$/.test(host)
+      || host === "muscdn.com"
+      || host.endsWith(".muscdn.com");
+    if (!allowed || !["https:"].includes(parsedThumbnail.protocol)) {
+      throw new Error("Unsupported TikTok thumbnail host");
+    }
+    thumbnail = parsedThumbnail;
+  } catch {
+    throw new AppError(502, "TikTok did not provide a usable preview image");
+  }
+
+  const imageResponse = await fetch(thumbnail.toString(), {
+    headers: { Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8" },
+    signal: AbortSignal.timeout(7000),
+    cf: {
+      cacheEverything: true,
+      cacheTtlByStatus: { "200-299": 86400, "400-499": 60, "500-599": 10 },
+    },
+  });
+  if (!imageResponse.ok) throw new AppError(502, "TikTok preview image is unavailable");
+
+  const headers = securityHeaders(new Headers(imageResponse.headers));
+  headers.set("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800");
+  if (!headers.has("Content-Type")) headers.set("Content-Type", "image/jpeg");
+  const response = new Response(imageResponse.body, { status: 200, headers });
+  if (cache) await cache.put(cacheKey, response.clone());
+  return response;
 }
 
 function handleError(error) {
@@ -595,9 +735,14 @@ function parseTags(value, fallback = []) {
 
 function serializeVideo(row) {
   if (!row) return null;
+  const provider = detectMediaProvider(row);
+  const fallbackThumbnail = provider === "tiktok" && !row.thumbnail_url
+    ? buildTikTokThumbnailProxyUrl(row.source_url)
+    : null;
   return {
     ...row,
-    provider: detectMediaProvider(row),
+    provider,
+    thumbnail_url: row.thumbnail_url || fallbackThumbnail,
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
     published: Boolean(row.published),
@@ -605,6 +750,33 @@ function serializeVideo(row) {
     seo_tags: parseTags(row.seo_tags),
     reactions: row.reactions || { like: 0, love: 0, useful: 0 },
   };
+}
+
+function buildTikTokThumbnailProxyUrl(sourceUrl) {
+  const share = normalizeTikTokShareUrl(sourceUrl);
+  return share ? `/api/tiktok/thumbnail?url=${encodeURIComponent(share)}` : null;
+}
+
+function isTikTokThumbnailProxy(value) {
+  try {
+    const url = new URL(value, "https://vid.best");
+    return url.pathname === "/api/tiktok/thumbnail" && Boolean(url.searchParams.get("url"));
+  } catch {
+    return false;
+  }
+}
+
+function normalizeTikTokShareUrl(value) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    if (host !== "tiktok.com") return null;
+    const match = url.pathname.match(/^\/@([^/]+)\/video\/(\d+)\/?$/);
+    if (!match) return null;
+    return `https://www.tiktok.com/@${match[1]}/video/${match[2]}`;
+  } catch {
+    return null;
+  }
 }
 
 function detectMediaProvider(video) {
@@ -1097,7 +1269,11 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
   const suppliedSource = cleanText(body.source_url, 2000, existing?.source_url || "");
   const media = normalizeMedia(suppliedSource, suppliedR2Key, baseUrl);
   const thumbnailCandidate = body.thumbnail_url === undefined ? existing?.thumbnail_url : body.thumbnail_url;
-  const thumbnailUrl = validateOptionalUrl(cleanText(thumbnailCandidate, 2000)) || media.thumbnail_url;
+  const thumbnailText = cleanText(thumbnailCandidate, 2000);
+  const customThumbnail = media.provider === "tiktok" && isTikTokThumbnailProxy(thumbnailText)
+    ? null
+    : validateOptionalUrl(thumbnailText);
+  const thumbnailUrl = customThumbnail || media.thumbnail_url;
 
   return {
     title,
@@ -2006,7 +2182,7 @@ function renderMedia(video, playbackOrigin) {
     const tiktokId = extractTikTokId(video.source_url);
     if (!tiktokId) return "";
     const embedUrl = buildTikTokPlayerUrl(tiktokId);
-    return `<iframe id="watch-media-frame" class="tiktok-official-player" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+    return `<iframe id="watch-media-frame" class="tiktok-official-player" data-tiktok-share="${escapeHtml(video.source_url)}" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   }
   if (video.embed_url) {
     const embedUrl = preparePlaybackEmbed(video.embed_url, playbackOrigin);

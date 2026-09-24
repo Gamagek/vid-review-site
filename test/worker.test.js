@@ -327,7 +327,48 @@ test("gives AI generation a longer browser timeout than ordinary requests", () =
   assert.match(source, /url\.startsWith\("\/api\/ai\/generate"\) \? 35000 : 15000/);
 });
 
-test("stores new TikTok videos without a legacy player URL", async () => {
+test("serves TikTok thumbnail cards through the official oEmbed thumbnail", async () => {
+  const context = createTestContext();
+  const originalFetch = globalThis.fetch;
+  const sample = "https://www.tiktok.com/@rorozya/video/7622472784039415061?_r=1&_t=ZS-99wVMKS0Vt3";
+  const thumbnail = "https://p19-common-sign.tiktokcdn-us.com/example/preview.image?x-expires=1790276400&x-signature=test";
+  const calls = [];
+
+  globalThis.fetch = async (url) => {
+    const target = String(url);
+    calls.push(target);
+    if (target.startsWith("https://www.tiktok.com/oembed?")) {
+      return new Response(JSON.stringify({
+        type: "video",
+        title: "ro² (@rorozya) on TikTok",
+        author_name: "ro²",
+        author_url: "https://www.tiktok.com/@rorozya",
+        thumbnail_url: thumbnail,
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    if (target === thumbnail) {
+      return new Response(new Uint8Array([1, 2, 3, 4]), {
+        status: 200,
+        headers: { "Content-Type": "image/jpeg" },
+      });
+    }
+    throw new Error("Unexpected upstream: " + target);
+  };
+
+  try {
+    const response = await send(context, "/api/tiktok/thumbnail?url=" + encodeURIComponent(sample));
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Content-Type"), "image/jpeg");
+    assert.deepEqual([...new Uint8Array(await response.arrayBuffer())], [1, 2, 3, 4]);
+    assert.equal(calls.length, 2);
+    assert.match(calls[0], /\/oembed\?url=/);
+    assert.equal(calls[1], thumbnail);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("stores TikTok source and renders the PR26-style player", async () => {
   const context = createTestContext();
   const response = await send(context, "/api/videos", {
     method: "POST",
@@ -345,6 +386,7 @@ test("stores new TikTok videos without a legacy player URL", async () => {
   assert.equal(result.video.provider, "tiktok");
   assert.equal(result.video.media_type, "tiktok");
   assert.match(result.video.embed_url, /^https:\/\/www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
+  assert.match(result.video.thumbnail_url, /^\/api\/tiktok\/thumbnail\?url=/);
 
   const page = await send(context, `/watch/${result.video.slug}`);
   assert.equal(page.status, 200);
@@ -353,7 +395,9 @@ test("stores new TikTok videos without a legacy player URL", async () => {
   assert.match(html, /player\/v1\/6718335390845095173/);
   assert.match(html, /controls=1/);
   assert.match(html, /closed_caption=1/);
+  assert.match(html, /allow="autoplay; fullscreen; picture-in-picture"/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
+  assert.match(html, /data-tiktok-share=/);
   assert.doesNotMatch(html, /"embedUrl":s*"https:\/\/www\.tiktok\.com\/player\/v1\//);
 });
 
@@ -655,16 +699,14 @@ test("starts owned R2 analysis through the authenticated Teamwork API", async ()
   }
 });
 
-test("admin uses the official TikTok Embed Player iframe", () => {
+test("TikTok keeps separate share preview and player paths", () => {
   const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
   assert.match(adminSource, /renderTikTokPreview/);
   assert.match(adminSource, /buildTikTokPlayerUrl/);
   assert.ok(adminSource.includes("https://www.tiktok.com/player/v1/${encodeURIComponent(videoId)}?${params.toString()}"));
-  assert.match(adminSource, /closed_caption: "1"/);
-  assert.match(adminSource, /music_info: "1"/);
-  assert.match(adminSource, /description: "1"/);
-  assert.doesNotMatch(adminSource, /tiktok-embed/);
-  assert.ok(!adminSource.includes("embed.js"));
+  assert.match(adminSource, /className = "tiktok-embed"/);
+  assert.match(adminSource, /ensureTikTokAdminEmbedScript/);
+  assert.match(adminSource, /TikTok preview needs the normal full sharing link/);
 });
 
 test("renders the official TikTok Embed Player iframe with responsive options", async () => {
@@ -693,20 +735,39 @@ test("renders the official TikTok Embed Player iframe with responsive options", 
   assert.match(html, /progress_bar=1/);
   assert.match(html, /volume_control=1/);
   assert.match(html, /fullscreen_button=1/);
-  assert.match(html, /timestamp=1/);
-  assert.match(html, /music_info=1/);
-  assert.match(html, /description=1/);
   assert.match(html, /closed_caption=1/);
-  assert.match(html, /autoplay=0/);
-  assert.match(html, /muted=0/);
   assert.doesNotMatch(html, /class="tiktok-embed"/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
-  assert.match(html, /allow="autoplay; fullscreen; picture-in-picture"/);
   assert.match(html, /data-video-provider="tiktok"/);
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
+  assert.doesNotMatch(watchSource, /initializeTikTokLazyPlayer/);
   assert.match(watchSource, /"x-tiktok-player": true/);
   assert.match(watchSource, /onPlayerError/);
+  assert.match(watchSource, /className = "vidbest-tiktok-retry"/);
+  assert.match(watchSource, /Remote providers already render their own control bars inside the iframe/);
+  assert.match(watchSource, /if \(remote\) \{/);
+  assert.doesNotMatch(watchSource, /remote = provider === "youtube" \|\| provider === "vimeo" \|\| provider === "tiktok";[\s\S]{0,1200}overlay.append\(play, back, forward/);
+  assert.match(watchSource, /Retry TikTok player/);
+  assert.match(watchSource, /\/api\/tiktok\/preflight/);
+  assert.match(watchSource, /standard official embed/);
+  assert.match(watchSource, /data-vidbest-tiktok-embed/);
+  assert.match(watchSource, /dns\.google/);
+  const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
+  assert.match(homeSource, /parseTikTokShareUrl/);
+  assert.match(homeSource, /buildTikTokPreviewPlayerUrl/);
+  assert.match(homeSource, /autoplay: "1"/);
+  assert.match(homeSource, /muted: "1"/);
+  assert.match(homeSource, /PREVIEW_DELAY_MS = 3000/);
+  assert.doesNotMatch(homeSource, /ensureTikTokEmbedScript/);
+  assert.doesNotMatch(homeSource, /className = "tiktok-embed"/);
+  assert.match(homeSource, /provider === "tiktok"/);
+
+  const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
+  assert.match(indexSource, /\/api\/tiktok\/thumbnail/);
+  assert.match(indexSource, /\/api\/tiktok\/preflight/);
+  assert.match(indexSource, /www\.tiktok\.com\/oembed/);
+  assert.match(indexSource, /tiktokcdn(?:-[a-z0-9-]+)?\.com/);
 });
 
 test("repairs a legacy TikTok record with only its source URL and uses the Saiyaara title", async () => {

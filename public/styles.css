@@ -708,6 +708,29 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
   border: 0;
   background: #000;
 }
+.watch-player[data-provider="tiktok"] .watch-player-stage {
+  position: relative;
+}
+.vidbest-tiktok-retry {
+  position: absolute;
+  right: 10px;
+  bottom: 58px;
+  z-index: 25;
+  min-width: 58px;
+  min-height: 30px;
+  padding: 5px 9px;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 8px;
+  background: rgba(10,13,22,.9);
+  color: #fff;
+  box-shadow: 0 5px 18px rgba(0,0,0,.35);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  font: 700 12px/1 system-ui,sans-serif;
+}
+.vidbest-tiktok-retry[hidden] { display: none !important; }
+.vidbest-tiktok-retry:hover { background: rgba(20,26,42,.96); }
+
 .watch-player[data-provider="tiktok"].is-mini {
   width: min(430px, calc(100vw - 36px));
 }
@@ -738,4 +761,82 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
     min-height: 420px;
   }
 }
+
+/* TikTok hover previews from normal sharing URLs only */
+.tile-media .preview-surface {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+.tile-media .preview-surface iframe {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  border: 0 !important;
+}
+.tile-media .preview-surface .tiktok-embed {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.video-tile[data-video-provider="tiktok"] .preview-surface {
+  z-index: 4;
+}
+.video-tile[data-video-provider="tiktok"].preview-playing .preview-surface iframe {
+  pointer-events: none;
+}
+.video-tile[data-video-provider="tiktok"].preview-playing .play-orb,
+.video-tile[data-video-provider="tiktok"].preview-playing .media-fallback,
+.video-tile[data-video-provider="tiktok"].preview-playing > .tile-media > img {
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* TikTok recovery: keeps fallback actions below the provider frame. */
+.vidbest-tiktok-recovery {
+  position: relative;
+  z-index: 26;
+  width: min(100%, 540px);
+  margin: 8px auto 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  background: rgba(10,13,22,.94);
+  color: #fff;
+  box-sizing: border-box;
+}
+.vidbest-tiktok-recovery[hidden] { display: none !important; }
+.vidbest-tiktok-recovery-text,
+.vidbest-tiktok-connection-note {
+  margin: 0 0 8px;
+  font: 12px/1.45 system-ui,sans-serif;
+  color: rgba(255,255,255,.82);
+}
+.vidbest-tiktok-recovery-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.vidbest-tiktok-standard-fallback {
+  width: 100%;
+  min-height: 420px;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  background: #000;
+}
+.vidbest-tiktok-standard-fallback .tiktok-embed {
+  margin: 0 auto !important;
+  max-width: 605px !important;
+  min-width: 325px !important;
+  width: 100% !important;
 }

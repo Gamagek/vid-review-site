@@ -270,7 +270,7 @@ function selectDiscoveredVideo(video) {
   setSourceMode("link");
   ui.sourceUrl.value = video.source_url || "";
   ui.title.value = video.title || "";
-  ui.thumbnail.value = video.thumbnail_url || "";
+  ui.thumbnail.value = isTikTokThumbnailProxy(video.thumbnail_url) ? "" : (video.thumbnail_url || "");
   ui.sourcePublishedAt.value = dateInputValue(video.published_at);
   ui.sourceDurationSeconds.value = "";
   ui.notes.value = [
@@ -297,6 +297,13 @@ function updatePreview() {
   }
 
   const parsed = parseEmbed(target);
+  if (adminState.sourceMode === "link" && /https?:\/\/[^/]*tiktok\.com\//i.test(target) && parsed.provider !== "tiktok") {
+    const notice = document.createElement("p");
+    notice.className = "form-status error";
+    notice.textContent = "TikTok preview needs the normal full sharing link: https://www.tiktok.com/@username/video/VIDEO_ID";
+    ui.preview.append(notice);
+    return;
+  }
 
   if (parsed.provider === "tiktok") {
     renderTikTokPreview(target, parsed.id);
@@ -332,18 +339,59 @@ function renderTikTokPreview(sourceUrl, videoId) {
   shell.className = "admin-tiktok-preview";
   shell.dataset.tiktokPreview = "1";
 
-  const iframe = document.createElement("iframe");
-  iframe.className = "tiktok-official-player";
-  iframe.src = buildTikTokPlayerUrl(videoId);
-  iframe.title = "TikTok video preview";
-  iframe.loading = "eager";
-  iframe.allow = "autoplay; fullscreen; picture-in-picture";
-  iframe.allowFullscreen = true;
-  iframe.referrerPolicy = "strict-origin-when-cross-origin";
-  shell.append(iframe);
+  const parsed = parseTikTokShareUrl(sourceUrl);
+  if (!parsed) {
+    const message = document.createElement("p");
+    message.className = "form-status error";
+    message.textContent = "TikTok preview needs the normal sharing link: https://www.tiktok.com/@username/video/VIDEO_ID";
+    shell.append(message);
+    ui.preview.append(shell);
+    return;
+  }
+
+  const blockquote = document.createElement("blockquote");
+  blockquote.className = "tiktok-embed";
+  blockquote.setAttribute("cite", parsed.url);
+  blockquote.dataset.videoId = parsed.id;
+  blockquote.dataset.embedFrom = "vidbest-admin-preview";
+  blockquote.style.maxWidth = "605px";
+  blockquote.style.minWidth = "0";
+  blockquote.style.width = "100%";
+
+  const section = document.createElement("section");
+  blockquote.append(section);
+  shell.append(blockquote);
   ui.preview.append(shell);
+  ensureTikTokAdminEmbedScript();
 }
 
+function parseTikTokShareUrl(value) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    const match = host === "tiktok.com" ? url.pathname.match(/^\/@[^/]+\/video\/(\d+)\/?$/) : null;
+    return match ? { url: url.toString(), id: match[1] } : null;
+  } catch {
+    return null;
+  }
+}
+
+let tiktokAdminEmbedScriptPromise = null;
+function ensureTikTokAdminEmbedScript() {
+  if (document.querySelector('script[data-vidbest-tiktok-admin-embed]')) {
+    return tiktokAdminEmbedScriptPromise || Promise.resolve();
+  }
+  tiktokAdminEmbedScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://www.tiktok.com/embed.js";
+    script.dataset.vidbestTiktokAdminEmbed = "1";
+    script.addEventListener("load", resolve, { once: true });
+    script.addEventListener("error", () => reject(new Error("TikTok admin preview script failed to load")), { once: true });
+    document.head.append(script);
+  });
+  return tiktokAdminEmbedScriptPromise;
+}
 function buildTikTokPlayerUrl(videoId) {
   const params = new URLSearchParams({
     controls: "1",
