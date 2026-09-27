@@ -304,7 +304,7 @@ function renderFacebookFacade(card) {
   body.className = "facebook-microlink-body";
   const provider = document.createElement("span");
   provider.className = "facebook-microlink-provider";
-  provider.textContent = author || "facebook.com";
+  provider.textContent = "facebook.com";
   const heading = document.createElement("span");
   heading.className = "facebook-microlink-title";
   heading.textContent = title;
