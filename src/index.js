@@ -2476,29 +2476,20 @@ async function fetchFacebookPreview(env, sourceUrl) {
 }
 
 function readMetaTag(html, key) {
-  const escaped = String(key).replace(/[.*+?^$()|[\\]{}]/g, "\\async function enrichFacebookRows(env, rows) {
-  const candidates = rows.filter((row) => isFacebookShareUrl(row?.source_url));
-  if (!candidates.length) return;
-
-  for (let index = 0; index < candidates.length; index += 4) {
-    const chunk = candidates.slice(index, index + 4);
-    const resolved = await Promise.all(chunk.map(async (row) => ({
-      row,
-      url: await resolveFacebookContentUrl(env, row.source_url),
-    })));
-    resolved.forEach(({ row, url }) => {
-      if (url) row.embed_url = buildFacebookPlayerUrl(url);
-    });
+  const escaped = String(key).replace(/[.*+?^$()|[\\]{}]/g, "\\$&");
+  const source = String(html || "");
+  const patterns = [
+    new RegExp("<meta[^>]+(?:property|name)=[\\\"]" + escaped + "[\\\"][^>]+content=[\\\"]([^\\\"]*)[\\\"][^>]*>", "i"),
+    new RegExp("<meta[^>]+content=[\\\"]([^\\\"]*)[\\\"][^>]+(?:property|name)=[\\\"]" + escaped + "[\\\"][^>]*>", "i"),
+    new RegExp("<meta[^>]+(?:property|name)='" + escaped + "'[^>]+content='([^']*)'[^>]*>", "i"),
+    new RegExp("<meta[^>]+content='([^']*)'[^>]+(?:property|name)='" + escaped + "'[^>]*>", "i"),
+  ];
+  for (const pattern of patterns) {
+    const match = source.match(pattern);
+    if (match?.[1]) return match[1];
   }
-}");
-  const first = new RegExp("<meta[^>]+(?:property|name)=[\\\"']" + escaped + "[\\\"'][^>]+content=[\\\"']([^\\\"']*)[\\\"'][^>]*>", "i");
-  const second = new RegExp("<meta[^>]+content=[\\\"']([^\\\"']*)[\\\"'][^>]+(?:property|name)=[\\\"']" + escaped + "[\\\"'][^>]*>", "i");
-  const firstMatch = String(html || "").match(first);
-  if (firstMatch?.[1]) return firstMatch[1];
-  const secondMatch = String(html || "").match(second);
-  return secondMatch?.[1] || "";
+  return "";
 }
-
 function safeFacebookThumbnailUrl(value) {
   try {
     const url = new URL(String(value || ""));
