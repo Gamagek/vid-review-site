@@ -440,7 +440,7 @@ function parseEmbed(value) {
       return id ? { provider: "tiktok", id, source: url.toString() } : {};
     }
     if (host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch") {
-      return { embed: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url.toString())}&show_text=false&width=1280` };
+      return { embed: `https://www.facebook.com/plugins/video.php?height=314&href=${encodeURIComponent(url.toString())}&show_text=false&width=560&t=0` };
     }
     if (host === "vimeo.com" || host.endsWith(".vimeo.com")) {
       const id = url.pathname.match(/\/(?:video\/)?(\d+)/)?.[1];
