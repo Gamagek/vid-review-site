@@ -2408,7 +2408,7 @@ async function videoSitemapResponse(request, env, page) {
         : "";
     const description = cleanText(row.seo_description || row.description || `Discover ${row.title} on Vid.Best.`, 180);
     let videoEntry = "";
-    const canDescribeVideo = thumbnail && (Boolean(row.embed_url) || provider === "tiktok" || provider === "facebook" || !row.source_url.match(/^https:\/\/(www\.)?(youtube|vimeo|dailymotion|twitch|instagram)\./i));
+    const canDescribeVideo = thumbnail && (Boolean(row.embed_url) || Boolean(row.source_published_at) || provider === "tiktok" || provider === "facebook");
     if (canDescribeVideo) {
       const playerUrl = provider === "tiktok"
         ? buildTikTokPlayerUrl(row.source_url.match(/\/video\/(\d+)/)?.[1] || "")
