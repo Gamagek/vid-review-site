@@ -809,6 +809,7 @@ function detectMediaProvider(video) {
     if (host === "dailymotion.com" || host === "dai.ly") return "dailymotion";
     if (host === "player.twitch.tv" || host === "clips.twitch.tv" || host === "twitch.tv") return "twitch";
     if (host === "tiktok.com" || host.endsWith(".tiktok.com")) return "tiktok";
+    if (host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch") return "facebook";
     if (host === "instagram.com" || host.endsWith(".instagram.com")) return "instagram";
   } catch {
     // Relative and malformed values are handled by their existing media type.
