@@ -4,6 +4,7 @@ import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 import worker from "../src/index.js";
 import { refreshSourceMetadata, sanitizeWatchHtml } from "../src/edge.js";
+import seoEdge from "../src/seo-edge.js";
 
 const secret = "correct-horse-battery-staple-admin-secret";
 const reactionSalt = "separate-rate-limit-and-reaction-secret";
@@ -880,6 +881,32 @@ test("serves the seeded YouTube demo and records privacy-hashed interests", asyn
   assert.equal(result.videos[0].slug, "related-web-video");
 });
 
+test("SEO edge exposes a crawlable video index and pages sitemap", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    "INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, description, published) VALUES
+      ('seo-video-one', 'SEO video one', 'https://example.com/video-one.mp4', 'raw', 'Technology', 'Web Development', 'A unique description for search discovery', 1),
+      ('seo-video-two', 'SEO video two', 'https://example.com/video-two.mp4', 'raw', 'Education', 'Tutorials & How-Tos', 'Another unique description for search discovery', 1)",
+  ).run();
+
+  const videosPage = await seoEdge.fetch(new Request('https://example.com/videos'), context.env, context.ctx);
+  assert.equal(videosPage.status, 200);
+  const html = await videosPage.text();
+  assert.match(html, /<link rel="canonical" href="https:\/\/vid\.best\/videos">/);
+  assert.match(html, /https:\/\/vid\.best\/watch\/seo-video-one/);
+  assert.match(html, /https:\/\/vid\.best\/watch\/seo-video-two/);
+  assert.match(html, /"@type":"CollectionPage"/);
+
+  const sitemap = await seoEdge.fetch(new Request('https://example.com/sitemap.xml'), context.env, context.ctx);
+  assert.equal(sitemap.status, 200);
+  const sitemapXml = await sitemap.text();
+  assert.match(sitemapXml, /https:\/\/vid\.best\/sitemaps\/pages\.xml/);
+
+  const pages = await seoEdge.fetch(new Request('https://example.com/sitemaps/pages.xml'), context.env, context.ctx);
+  assert.equal(pages.status, 200);
+  const pagesXml = await pages.text();
+  assert.match(pagesXml, /https:\/\/vid\.best\/videos/);
+});
 test("the theater player has modal keyboard and focus behavior", () => {
   const source = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
   assert.match(source, /setAttribute\("aria-modal", "true"\)/);
