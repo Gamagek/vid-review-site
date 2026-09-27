@@ -217,7 +217,7 @@ test("homepage Facebook tiles stay lightweight link previews", () => {
   assert.match(source, /renderFacebookFacades/);
   assert.match(source, /facebook-microlink-preview/);
   assert.doesNotMatch(source, /provider === "facebook"[\\s\\S]{0,1800}createPreviewPlayer/);
-  assert.doesNotMatch(source, /url.searchParams.set\("autoplay", "true"\)/);
+  assert.doesNotMatch(source, /else if \(provider === "facebook"\)/);
 });
 test("renders Facebook Reel records through the official responsive plugin URL", async () => {
   const context = createTestContext();
