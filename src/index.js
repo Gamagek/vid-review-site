@@ -1072,7 +1072,6 @@ async function listVideos(request, env, includeUnpublished) {
   const countStatement = env.DB.prepare(`SELECT COUNT(*) AS total FROM videos v ${whereSql}`).bind(...bindings);
   const [listResult, countRow] = await env.DB.batch([listStatement, countStatement]);
   const videoRows = listResult.results || [];
-  await enrichFacebookRows(env, videoRows);
   const videos = await hydrateVideos(env, videoRows);
 
   return json({
