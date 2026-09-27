@@ -15,7 +15,7 @@ const migrations = [
   "0005_source_video_metadata.sql",
   "0009_app_settings.sql",
   "0010_video_analysis.sql",
-  "0013_member_notifications.sql",
+  "0014_member_notifications.sql",
 ];
 
 class TestD1Statement {
