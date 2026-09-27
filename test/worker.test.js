@@ -949,7 +949,8 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(homeSource, /PREVIEW_DELAY_MS = 3000/);
   assert.doesNotMatch(homeSource, /ensureTikTokEmbedScript/);
   assert.doesNotMatch(homeSource, /className = "tiktok-embed"/);
-  assert.match(homeSource, /provider === "tiktok"/);\n  assert.match(homeSource, /provider === "facebook"/);
+  assert.match(homeSource, /provider === "tiktok"/);
+  assert.match(homeSource, /provider === "facebook"/);
   assert.match(homeSource, /tiktok-microlink-preview/);
   assert.match(homeSource, /TikTok preview · tap to open/);
 
