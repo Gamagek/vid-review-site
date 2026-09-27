@@ -1045,7 +1045,7 @@ test("enriches Facebook share links with a Microlink-style thumbnail and officia
     assert.equal(result.video.thumbnail_url, "https://scontent.xx.fbcdn.net/test.jpg");
     assert.equal(result.video.facebook_preview_title, "Pause for a moment, Breathe, Observe.");
     assert.match(result.video.facebook_preview_description, /Theravada Vipassana/);
-    assert.match(result.video.embed_url, /facebook\\.com\\/plugins\\/video\\.php/);
+    assert.ok(result.video.embed_url.includes("facebook.com/plugins/video.php"));
     assert.match(result.video.embed_url, /show_text=false/);
     assert.match(result.video.embed_url, /width=560/);
     assert.match(result.video.embed_url, /height=314/);
