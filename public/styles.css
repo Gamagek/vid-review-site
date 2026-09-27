@@ -366,6 +366,72 @@ button { color: inherit; }
 }
 .notification-hub > .form-status[data-state="success"] { color: var(--success); }
 .notification-hub > .form-status[data-state="error"] { color: var(--danger); }
+.notification-feed {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+  max-height: 250px;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+.notification-feed-item {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 56px;
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: rgba(255,255,255,.025);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color .2s, transform .2s, background .2s;
+}
+.notification-feed-item:hover {
+  border-color: rgba(53,220,255,.32);
+  background: rgba(53,220,255,.045);
+  transform: translateY(-1px);
+}
+.notification-feed-item img {
+  width: 70px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: rgba(255,255,255,.05);
+}
+.notification-feed-copy {
+  min-width: 0;
+}
+.notification-feed-copy strong,
+.notification-feed-copy small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.notification-feed-copy strong {
+  white-space: nowrap;
+  font-size: .73rem;
+  line-height: 1.35;
+}
+.notification-feed-copy small {
+  margin-top: 4px;
+  color: var(--muted);
+  white-space: nowrap;
+  font-size: .62rem;
+}
+.notification-feed-empty {
+  margin: 0;
+  padding: 10px 2px;
+  color: var(--muted);
+  font-size: .72rem;
+}
+.notification-email-help {
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: .68rem;
+  line-height: 1.45;
+}
 
 
 
