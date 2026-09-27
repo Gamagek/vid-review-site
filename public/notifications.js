@@ -40,6 +40,8 @@ async function initNotificationHub() {
     await registerServiceWorker();
   } catch {}
 
+  await loadNotificationCategories();
+
   try {
     const params = new URLSearchParams(location.search);
     const loginToken = params.get("login_token");
@@ -57,6 +59,24 @@ async function initNotificationHub() {
   restoreCategory();
   updateBrowserButton();
   startSmartPolling();
+}
+
+async function loadNotificationCategories() {
+  if (!HUB.category) return;
+  try {
+    const response = await fetch("/api/categories", { cache: "no-store" });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) return;
+    const current = HUB.category.value;
+    Object.keys(payload.categories || {}).forEach((category) => {
+      if ([...HUB.category.options].some((option) => option.value === category)) return;
+      const option = document.createElement("option");
+      option.value = category;
+      option.textContent = category;
+      HUB.category.append(option);
+    });
+    if (current) HUB.category.value = current;
+  } catch {}
 }
 
 async function loadMember() {
