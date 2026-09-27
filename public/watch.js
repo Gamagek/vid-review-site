@@ -693,7 +693,7 @@ function initializeEmbeddedMediaTools() {
   player.dataset.vidbestEmbeddedTools = "1";
 
   const provider = String(document.body.dataset.videoProvider || inferProvider(frame)).toLowerCase();
-  const remote = ["youtube", "vimeo", "tiktok"].includes(provider);
+  const remote = ["youtube", "vimeo", "tiktok", "facebook"].includes(provider);
   const supportsPlaybackRate = provider === "youtube" || provider === "vimeo";
   const state = { playing: false, muted: false, rate: 1, currentTime: 0 };
 
