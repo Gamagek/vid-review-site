@@ -55,109 +55,132 @@
   .preview-pending .play-orb { animation: none; }
 }
 
-.tiktok-facade-ready .preview-surface {
+.tiktok-facade-ready .preview-surface,
+.facebook-facade-ready .preview-surface {
   opacity: 1;
-  background: #fff;
+  background: #05070d;
 }
+
 .tiktok-facade-ready .tile-media > img,
-.tiktok-facade-ready .media-fallback {
+.tiktok-facade-ready .media-fallback,
+.facebook-facade-ready .tile-media > img,
+.facebook-facade-ready .media-fallback {
   opacity: 0;
 }
-.tiktok-microlink-preview {
+
+.tiktok-microlink-preview,
+.facebook-microlink-preview {
   position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
+  display: block;
   overflow: hidden;
-  background: #fff;
-  color: #111;
+  background: #111;
+  color: #fff;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
-.tiktok-microlink-image {
-  position: relative;
+
+.tiktok-microlink-image,
+.facebook-microlink-image {
+  position: absolute;
+  inset: 0;
   display: block;
-  flex: 0 0 58%;
-  min-height: 0;
   overflow: hidden;
-  background: #f1f2f4;
+  background: linear-gradient(135deg, #151827, #313654);
 }
-.tiktok-microlink-image img {
+
+.tiktok-microlink-image img,
+.facebook-microlink-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
-.tiktok-microlink-placeholder {
+
+.tiktok-microlink-image::after,
+.facebook-microlink-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.08) 35%, rgba(0,0,0,0.82) 100%);
+}
+
+.tiktok-microlink-placeholder,
+.facebook-microlink-image.is-empty::before {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  color: #666;
-  font-size: .78rem;
+  color: rgba(255,255,255,.78);
+  font-size: .7rem;
   font-weight: 800;
-  letter-spacing: .08em;
+  letter-spacing: .1em;
   text-transform: uppercase;
+  content: "Facebook";
 }
-.tiktok-microlink-body {
+
+.tiktok-microlink-placeholder {
+  z-index: 1;
+}
+
+.tiktok-microlink-body,
+.facebook-microlink-body {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
   flex-direction: column;
-  gap: 4px;
-  padding: 10px 12px;
+  gap: 3px;
+  padding: 9px 11px 10px;
   overflow: hidden;
-  background: #fff;
 }
-.tiktok-microlink-provider {
-  color: #999;
-  font-size: .56rem;
-  font-weight: 700;
-  letter-spacing: .13em;
+
+.tiktok-microlink-provider,
+.facebook-microlink-provider {
+  color: rgba(255,255,255,.72);
+  font-size: .52rem;
+  font-weight: 800;
+  letter-spacing: .12em;
   text-transform: uppercase;
-}
-.tiktok-microlink-author {
-  color: #111;
-  font-size: .75rem;
-  font-weight: 650;
-  line-height: 1.25;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
-.tiktok-microlink-caption {
-  color: #333;
-  font-size: .67rem;
-  line-height: 1.35;
+
+.tiktok-microlink-author,
+.facebook-microlink-title {
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 750;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tiktok-microlink-caption,
+.facebook-microlink-caption {
+  color: rgba(255,255,255,.88);
+  font-size: .61rem;
+  line-height: 1.25;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.tiktok-facade-ready .preview-status {
+
+.tiktok-facade-ready .preview-status,
+.facebook-facade-ready .preview-status {
   z-index: 5;
-}
-
-
-
-/* Facebook mini-tile preview uses the official plugin only when a card becomes active. */
-.facebook-mini-preview-player {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
-  border: 0;
-  background: #05070d;
-  object-fit: cover;
 }
 
 .video-tile[data-video-provider="facebook"] .preview-surface {
   background: #05070d;
 }
 
-.video-tile[data-video-provider="facebook"].preview-playing .play-orb,
-.video-tile[data-video-provider="facebook"].preview-playing .media-type {
-  opacity: 0;
+.video-tile[data-video-provider="facebook"] .play-orb {
+  opacity: .92;
 }
 
 @media (prefers-reduced-motion: reduce) {
