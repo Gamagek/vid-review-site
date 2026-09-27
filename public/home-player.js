@@ -354,11 +354,7 @@ function buildFacebookMicrolinkImageUrl(sourceUrl) {
     const url = new URL(String(sourceUrl || ""));
     const host = url.hostname.toLowerCase().replace(/^www\./, "");
     if (!(host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch")) return "";
-    const api = new URL("https://api.microlink.io/");
-    api.searchParams.set("url", url.toString());
-    api.searchParams.set("meta", "false");
-    api.searchParams.set("embed", "image.url");
-    return api.toString();
+    return "/api/facebook/thumbnail?url=" + encodeURIComponent(url.toString());
   } catch {
     return "";
   }
