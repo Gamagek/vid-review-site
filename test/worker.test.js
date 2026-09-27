@@ -15,6 +15,7 @@ const migrations = [
   "0005_source_video_metadata.sql",
   "0009_app_settings.sql",
   "0010_video_analysis.sql",
+  "0014_member_notifications.sql",
 ];
 
 class TestD1Statement {
@@ -131,6 +132,116 @@ async function login(context) {
     headers: { Authorization: `Bearer ${secret}`, "CF-Connecting-IP": "192.0.2.1" },
   });
 }
+
+test("supports email magic-link account sessions and preferences", async () => {
+  const context = createTestContext({
+    RESEND_API_KEY: "re_test_key",
+    EMAIL_FROM: "Vid.Best <notifications@example.com>",
+  });
+  const originalFetch = globalThis.fetch;
+  let sentEmail;
+  globalThis.fetch = async (url, options) => {
+    if (String(url) !== "https://api.resend.com/emails") return originalFetch(url, options);
+    sentEmail = JSON.parse(options.body);
+    return new Response(JSON.stringify({ id: "email-test-id" }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+  try {
+    const requested = await send(context, "/api/account/login", {
+      method: "POST",
+      headers: { Origin: "https://example.com", "Content-Type": "application/json" },
+      body: JSON.stringify({ email: "Viewer@example.com" }),
+    });
+    assert.equal(requested.status, 200);
+    assert.deepEqual(sentEmail.to, ["viewer@example.com"]);
+    const match = String(sentEmail.html).match(/login_token=([A-Za-z0-9_-]{40,120})/);
+    assert.ok(match?.[1]);
+
+    const verified = await send(context, "/api/account/verify", {
+      method: "POST",
+      headers: { Origin: "https://example.com", "Content-Type": "application/json" },
+      body: JSON.stringify({ token: match[1] }),
+    });
+    assert.equal(verified.status, 200);
+    const cookie = verified.headers.get("Set-Cookie").split(";", 1)[0];
+    assert.match(cookie, /^__Host-vidbest_member=/);
+
+    const me = await send(context, "/api/account/me", { headers: { Cookie: cookie } });
+    assert.equal(me.status, 200);
+    assert.equal((await me.json()).member.email, "viewer@example.com");
+
+    const preferences = await send(context, "/api/account/preferences", {
+      method: "POST",
+      headers: { Origin: "https://example.com", Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ email_notifications: false, category_filter: ["Technology"] }),
+    });
+    assert.equal(preferences.status, 200);
+    const member = (await preferences.json()).member;
+    assert.equal(member.email_notifications, false);
+    assert.deepEqual(member.category_filter, ["Technology"]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("serves the public latest-video notification feed", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+       slug, title, source_url, media_type, primary_category, subcategory, description, published
+     ) VALUES
+       ('notify-one', 'Notification one', 'https://example.com/one.mp4', 'raw', 'Technology', 'Web Development', 'One', 1),
+       ('notify-two', 'Notification two', 'https://example.com/two.mp4', 'raw', 'Education', 'Tutorials & How-Tos', 'Two', 1)`,
+  ).run();
+  const response = await send(context, "/api/notifications/latest");
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(payload.videos.length, 2);
+  assert.equal(payload.videos[0].title, "Notification two");
+});
+
+test("home page contains the account, browser alert and shortcut controls", () => {
+  const source = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
+  const script = readFileSync(new URL("../public/notifications.js", import.meta.url), "utf8");
+  assert.match(source, /id="notification-hub"/);
+  assert.match(source, /id="member-login-form"/);
+  assert.match(source, /id="browser-alert-button"/);
+  assert.match(source, /id="shortcut-button"/);
+  assert.match(source, /manifest\.webmanifest/);
+  assert.match(script, /Notification\.requestPermission/);
+  assert.match(script, /beforeinstallprompt/);
+  assert.match(script, /\/api\/notifications\/latest/);
+});
+
+test("renders Facebook records through the official plugin URL even when stored embed_url is stale", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+       slug, title, source_url, embed_url, media_type, primary_category, subcategory, description, published
+     ) VALUES (?, ?, ?, ?, 'facebook', 'Social Media & Trending', 'Facebook Reels Highlights', ?, 1)`,
+  ).run(
+    "facebook-existing-one",
+    "Facebook existing one",
+    "https://www.facebook.com/watch/?v=123456789",
+    "https://www.facebook.com/broken-old-embed",
+    "Facebook playback compatibility test",
+  );
+
+  const page = await send(context, "/watch/facebook-existing-one");
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.match(html, /facebook-official-player/);
+  assert.match(html, /facebook\.com\/plugins\/video\.php\?href=/);
+  assert.doesNotMatch(html, /broken-old-embed/);
+
+  const api = await send(context, "/api/videos/facebook-existing-one");
+  assert.equal(api.status, 200);
+  const video = (await api.json()).video;
+  assert.equal(video.provider, "facebook");
+  assert.match(video.embed_url, /facebook\.com\/plugins\/video\.php/);
+});
 
 test("rejects non-object JSON before processing it", async () => {
   const context = createTestContext();
@@ -820,9 +931,9 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(watchSource, /"x-tiktok-player": true/);
   assert.match(watchSource, /onPlayerError/);
   assert.match(watchSource, /className = "vidbest-tiktok-retry"/);
-  assert.match(watchSource, /const remote = \[\"youtube\", \"vimeo\", \"tiktok\"\]\.includes\(provider\)/);
+  assert.match(watchSource, /const remote = \[\"youtube\", \"vimeo\", \"tiktok\", \"facebook\"\]\.includes\(provider\)/);
   assert.match(watchSource, /if \(remote\) \{/);
-  assert.doesNotMatch(watchSource, /remote = provider === "youtube" \|\| provider === "vimeo" \|\| provider === "tiktok";[\s\S]{0,1200}overlay.append\(play, back, forward/);
+  assert.doesNotMatch(watchSource, /remote = provider === "youtube" \|\| provider === "vimeo" \|\| provider === "tiktok" \|\| provider === "facebook";[\s\S]{0,1200}overlay.append\(play, back, forward/);
   assert.match(watchSource, /Retry TikTok player/);
   assert.match(watchSource, /\/api\/tiktok\/preflight/);
   assert.match(watchSource, /standard official embed/);
@@ -839,6 +950,7 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.doesNotMatch(homeSource, /ensureTikTokEmbedScript/);
   assert.doesNotMatch(homeSource, /className = "tiktok-embed"/);
   assert.match(homeSource, /provider === "tiktok"/);
+  assert.match(homeSource, /provider === "facebook"/);
   assert.match(homeSource, /tiktok-microlink-preview/);
   assert.match(homeSource, /TikTok preview · tap to open/);
 

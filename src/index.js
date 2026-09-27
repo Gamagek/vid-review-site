@@ -1,3 +1,12 @@
+import {
+  requestMemberLogin,
+  verifyMemberLogin,
+  memberMe,
+  updateMemberPreferences,
+  logoutMember,
+  notifyNewVideoSubscribers,
+} from "./member-auth.js";
+
 const CATEGORIES = Object.freeze({
   "Entertainment, Movies & Games": [
     "Movie Trailers",
@@ -160,6 +169,13 @@ async function route(request, env, ctx) {
   if (path === "/api/discovery-requests" && request.method === "POST") {
     return requestDiscovery(request, env);
   }
+
+  if (path === "/api/account/login" && request.method === "POST") return requestMemberLogin(request, env);
+  if (path === "/api/account/verify" && request.method === "POST") return verifyMemberLogin(request, env);
+  if (path === "/api/account/me" && request.method === "GET") return memberMe(request, env);
+  if (path === "/api/account/preferences" && request.method === "POST") return updateMemberPreferences(request, env);
+  if (path === "/api/account/session" && request.method === "DELETE") return logoutMember(request, env);
+  if (path === "/api/notifications/latest" && request.method === "GET") return latestNotifications(env);
 
   if (path === "/api/tiktok/preflight" && request.method === "GET") {
     return tikTokPreflight(request, env, ctx);
@@ -758,6 +774,7 @@ function serializeVideo(row) {
   return {
     ...row,
     provider,
+    embed_url: provider === "facebook" ? buildFacebookPlayerUrl(row.source_url) || row.embed_url || null : row.embed_url,
     thumbnail_url: row.thumbnail_url || null,
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
@@ -797,6 +814,28 @@ function detectMediaProvider(video) {
     // Relative and malformed values are handled by their existing media type.
   }
   return video.embed_url ? "embed" : "direct";
+}
+
+async function latestNotifications(env) {
+  const result = await env.DB.prepare(
+    `SELECT id, slug, title, primary_category, subcategory, description, thumbnail_url, created_at
+     FROM videos
+     WHERE published = 1
+     ORDER BY id DESC
+     LIMIT 12`,
+  ).all();
+  return json({
+    videos: (result.results || []).map((row) => ({
+      id: Number(row.id),
+      slug: row.slug,
+      title: row.title,
+      primary_category: row.primary_category,
+      subcategory: row.subcategory,
+      description: cleanText(row.description, 220),
+      thumbnail_url: row.thumbnail_url || null,
+      created_at: row.created_at,
+    })),
+  }, 200, { "Cache-Control": "public, max-age=30, stale-while-revalidate=120" });
 }
 
 async function requestDiscovery(request, env) {
@@ -1163,6 +1202,7 @@ async function createVideo(request, env, ctx) {
     Number(data.published),
   ).first();
 
+  if (row?.published) ctx?.waitUntil?.(notifyNewVideoSubscribers(env, row));
   return json({ success: true, video: serializeVideo(row) }, 201);
 }
 
@@ -1212,6 +1252,7 @@ async function updateVideo(request, env, id, ctx) {
   await cleanupUnusedManagedAssets(env, replacedKeys);
 
 
+  if (row?.published && !existing.published) ctx?.waitUntil?.(notifyNewVideoSubscribers(env, row));
   return json({ success: true, video: serializeVideo(row) });
 }
 
@@ -2015,7 +2056,11 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   const canonical = `${baseUrl}/watch/${encodeURIComponent(video.slug)}`;
   const title = cleanText(watchDisplayTitle(video), 70);
   const description = cleanText(video.seo_description || video.description || `Discover ${video.title} on Vid.Best.`, 180);
-  const thumbnail = video.thumbnail_url ? absoluteUrl(video.thumbnail_url, baseUrl) : `${baseUrl}/favicon.svg`;
+  const thumbnail = video.thumbnail_url
+    ? absoluteUrl(video.thumbnail_url, baseUrl)
+    : video.provider === "tiktok"
+      ? `${baseUrl}/api/tiktok/thumbnail?url=${encodeURIComponent(video.source_url)}`
+      : "";
   const tags = Array.isArray(video.seo_tags) ? video.seo_tags.slice(0, 20) : [];
   const uploadDate = video.source_published_at || video.created_at;
   const videoSchema = {
@@ -2023,7 +2068,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     "@id": `${canonical}#video`,
     name: watchDisplayTitle(video),
     description,
-    thumbnailUrl: [thumbnail],
+    ...(thumbnail ? { thumbnailUrl: [thumbnail] } : {}),
     uploadDate,
     url: canonical,
     mainEntityOfPage: canonical,
@@ -2254,6 +2299,13 @@ function renderMedia(video, playbackOrigin) {
     const embedUrl = buildTikTokPlayerUrl(tiktokId);
     return `<iframe id="watch-media-frame" class="tiktok-official-player" data-tiktok-share="${escapeHtml(video.source_url)}" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   }
+  if (provider === "facebook") {
+    const facebookEmbed = buildFacebookPlayerUrl(video.source_url);
+    if (facebookEmbed) {
+      return `<iframe id="watch-media-frame" class="facebook-official-player" src="${escapeHtml(facebookEmbed)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+    }
+  }
+
   if (video.embed_url) {
     const embedUrl = preparePlaybackEmbed(video.embed_url, playbackOrigin);
     if (embedUrl) {
@@ -2267,6 +2319,22 @@ function renderMedia(video, playbackOrigin) {
     : "";
   return `<video id="watch-media-video" controls playsinline preload="metadata"${poster}><source src="${escapeHtml(video.source_url)}">${captions}Your browser does not support this video.</video>`;
 }
+function buildFacebookPlayerUrl(sourceUrl) {
+  try {
+    const url = new URL(String(sourceUrl || ""));
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    if (!(host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch")) return "";
+    const params = new URLSearchParams({
+      href: url.toString(),
+      show_text: "false",
+      width: "1280",
+    });
+    return `https://www.facebook.com/plugins/video.php?${params.toString()}`;
+  } catch {
+    return "";
+  }
+}
+
 function preparePlaybackEmbed(value, playbackOrigin) {
   try {
     const url = new URL(value);
@@ -2332,16 +2400,29 @@ async function videoSitemapResponse(request, env, page) {
   const homepage = page === 1 ? `<url><loc>${escapeXml(`${base}/`)}</loc></url>` : "";
   const entries = rows.map((row) => {
     const canonical = `${base}/watch/${encodeURIComponent(row.slug)}`;
-    const thumbnail = row.thumbnail_url ? absoluteUrl(row.thumbnail_url, base) : "";
+    const provider = detectMediaProvider(row);
+    const thumbnail = row.thumbnail_url
+      ? absoluteUrl(row.thumbnail_url, base)
+      : provider === "tiktok"
+        ? `${base}/api/tiktok/thumbnail?url=${encodeURIComponent(row.source_url)}`
+        : "";
     const description = cleanText(row.seo_description || row.description || `Discover ${row.title} on Vid.Best.`, 180);
     let videoEntry = "";
-    const canDescribeVideo = thumbnail && (!row.embed_url || row.source_published_at);
+    const canDescribeVideo = thumbnail && (Boolean(row.embed_url) || Boolean(row.source_published_at) || provider === "tiktok" || provider === "facebook");
     if (canDescribeVideo) {
-      const location = row.embed_url
-        ? `<video:player_loc allow_embed="yes">${escapeXml(preparePlaybackEmbed(row.embed_url, base))}</video:player_loc>`
+      const playerUrl = provider === "tiktok"
+        ? buildTikTokPlayerUrl(row.source_url.match(/\/video\/(\d+)/)?.[1] || "")
+        : provider === "facebook"
+          ? buildFacebookPlayerUrl(row.source_url)
+          : row.embed_url
+            ? preparePlaybackEmbed(row.embed_url, base)
+            : "";
+      const location = playerUrl
+        ? `<video:player_loc allow_embed="yes">${escapeXml(playerUrl)}</video:player_loc>`
         : `<video:content_loc>${escapeXml(absoluteUrl(row.source_url, base))}</video:content_loc>`;
       const publicationDate = row.source_published_at || row.created_at;
-      videoEntry = `<video:video><video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc><video:title>${escapeXml(row.title)}</video:title><video:description>${escapeXml(description)}</video:description>${location}<video:publication_date>${escapeXml(publicationDate)}</video:publication_date></video:video>`;
+      const duration = parseDurationSeconds(row.source_duration);
+      videoEntry = `<video:video><video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc><video:title>${escapeXml(row.title)}</video:title><video:description>${escapeXml(description)}</video:description>${location}<video:publication_date>${escapeXml(publicationDate)}</video:publication_date>${duration ? `<video:duration>${duration}</video:duration>` : ""}</video:video>`;
     }
     return `<url><loc>${escapeXml(canonical)}</loc><lastmod>${escapeXml(row.updated_at)}</lastmod>${videoEntry}</url>`;
   }).join("");
@@ -2349,6 +2430,14 @@ async function videoSitemapResponse(request, env, page) {
   return new Response(body, {
     headers: securityHeaders(new Headers({ "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=900" })),
   });
+}
+
+function parseDurationSeconds(value) {
+  const numeric = Number(value);
+  if (Number.isFinite(numeric) && numeric > 0 && numeric < 86400) return Math.floor(numeric);
+  const match = String(value || "").match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/i);
+  if (!match) return 0;
+  return Number(match[1] || 0) * 3600 + Number(match[2] || 0) * 60 + Number(match[3] || 0);
 }
 
 function robotsResponse(request, env) {

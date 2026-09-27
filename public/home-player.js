@@ -1,6 +1,6 @@
 const PREVIEW_DELAY_MS = 3000;
 const PREVIEW_VISIBILITY = 0.72;
-const EMBED_PREVIEW_PROVIDERS = new Set(["youtube", "vimeo", "dailymotion", "twitch"]);
+const EMBED_PREVIEW_PROVIDERS = new Set(["youtube", "vimeo", "dailymotion", "twitch", "facebook"]);
 const ALLOWED_EMBED_HOSTS = new Set([
   "www.youtube-nocookie.com",
   "www.youtube.com",
@@ -8,6 +8,7 @@ const ALLOWED_EMBED_HOSTS = new Set([
   "www.dailymotion.com",
   "player.twitch.tv",
   "clips.twitch.tv",
+  "www.facebook.com",
 ]);
 
 const previewState = {
@@ -234,6 +235,9 @@ function safePreviewEmbed(value, provider) {
       url.searchParams.set("autoplay", "true");
       url.searchParams.set("muted", "true");
       url.searchParams.set("parent", location.hostname);
+    } else if (provider === "facebook") {
+      url.searchParams.set("show_text", "false");
+      url.searchParams.set("autoplay", "true");
     }
     return url.href;
   } catch {
