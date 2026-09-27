@@ -291,8 +291,10 @@ function renderFacebookFacade(card) {
   if (imageSource) {
     const image = document.createElement("img");
     image.alt = "";
-    image.loading = "lazy";
+    const nearViewport = card.getBoundingClientRect().top < window.innerHeight * 1.5;
+    image.loading = nearViewport ? "eager" : "lazy";
     image.decoding = "async";
+    if (nearViewport) image.fetchPriority = "high";
     image.src = imageSource;
     image.addEventListener("error", () => imageWrap.classList.add("is-empty"), { once: true });
     imageWrap.append(image);
@@ -308,11 +310,7 @@ function renderFacebookFacade(card) {
   const heading = document.createElement("span");
   heading.className = "facebook-microlink-title";
   heading.textContent = title;
-  const caption = document.createElement("span");
-  caption.className = "facebook-microlink-caption";
-  caption.textContent = description;
   body.append(provider, heading);
-  // Keep the mini-tile compact: the full Facebook post text is shown only on the watch page.\n  void description;
   facade.append(imageWrap, body);
   surface.replaceChildren(facade);
   card.classList.add("facebook-facade-ready");
