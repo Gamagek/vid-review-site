@@ -1,6 +1,6 @@
 const PREVIEW_DELAY_MS = 3000;
 const PREVIEW_VISIBILITY = 0.72;
-const EMBED_PREVIEW_PROVIDERS = new Set(["youtube", "vimeo", "dailymotion", "twitch", "facebook"]);
+const EMBED_PREVIEW_PROVIDERS = new Set(["youtube", "vimeo", "dailymotion", "twitch"]);
 const ALLOWED_EMBED_HOSTS = new Set([
   "www.youtube-nocookie.com",
   "www.youtube.com",
@@ -55,6 +55,7 @@ function decorateVideoCards() {
     media.addEventListener("blur", () => cancelCandidate(card));
     previewState.observer?.observe(card);
   });
+  renderFacebookFacades();
   loadTikTokFacadePreviews();
 }
 
@@ -76,7 +77,7 @@ function previewAvailabilityMessage(card) {
 
 function canPreview(card) {
   const provider = card.dataset.videoProvider;
-  if (provider === "tiktok") return false;
+  if (provider === "tiktok" || provider === "facebook") return false;
   const direct = Boolean(card.dataset.videoSource) && ["direct", "raw", "r2"].includes(provider);
   const embed = Boolean(card.dataset.videoEmbed) && EMBED_PREVIEW_PROVIDERS.has(provider);
   return direct || embed;
@@ -235,11 +236,7 @@ function safePreviewEmbed(value, provider) {
       url.searchParams.set("autoplay", "true");
       url.searchParams.set("muted", "true");
       url.searchParams.set("parent", location.hostname);
-    } else if (provider === "facebook") {
-      url.searchParams.set("show_text", "false");
-      url.searchParams.set("autoplay", "true");
-    }
-    return url.href;
+      return url.href;
   } catch {
     return "";
   }
@@ -255,6 +252,55 @@ function stopPreview(card = null, statusMessage = "") {
   active.classList.remove("preview-playing");
   active.querySelector(".preview-status").textContent = statusMessage || previewAvailabilityMessage(active);
   previewState.activeCard = null;
+}
+
+function renderFacebookFacades() {
+  document.querySelectorAll('.video-tile[data-video-provider="facebook"]:not([data-facebook-facade-ready])').forEach((card) => {
+    const surface = card.querySelector(".preview-surface");
+    if (!surface) return;
+    surface.replaceChildren();
+    const facade = document.createElement("span");
+    facade.className = "facebook-microlink-preview";
+    const imageWrap = document.createElement("span");
+    imageWrap.className = "facebook-microlink-image";
+    const image = document.createElement("img");
+    image.alt = "";
+    image.loading = "lazy";
+    image.decoding = "async";
+    const thumbnail = card.dataset.videoThumbnail || "";
+    if (thumbnail) {
+      image.src = thumbnail;
+      image.addEventListener("error", () => imageWrap.replaceChildren(makeFacebookPlaceholder()), { once: true });
+      imageWrap.append(image);
+    } else {
+      imageWrap.append(makeFacebookPlaceholder());
+    }
+    const body = document.createElement("span");
+    body.className = "facebook-microlink-body";
+    const provider = document.createElement("span");
+    provider.className = "facebook-microlink-provider";
+    provider.textContent = "Facebook";
+    const author = document.createElement("span");
+    author.className = "facebook-microlink-author";
+    author.textContent = "Facebook video · official player on watch page";
+    const caption = document.createElement("span");
+    caption.className = "facebook-microlink-caption";
+    caption.textContent = card.dataset.videoTitle || "View this Facebook video";
+    body.append(provider, author, caption);
+    facade.append(imageWrap, body);
+    surface.append(facade);
+    card.classList.add("facebook-facade-ready");
+    card.dataset.facebookFacadeReady = "1";
+    const status = card.querySelector(".preview-status");
+    if (status) status.textContent = "Facebook preview · tap to open";
+  });
+}
+
+function makeFacebookPlaceholder() {
+  const placeholder = document.createElement("span");
+  placeholder.className = "facebook-microlink-placeholder";
+  placeholder.textContent = "Facebook";
+  return placeholder;
 }
 
 let tiktokFacadeLoading = false;

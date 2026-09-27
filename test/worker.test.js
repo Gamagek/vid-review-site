@@ -133,6 +133,16 @@ async function login(context) {
   });
 }
 
+test("returns a clear configuration error when member email delivery is unavailable", async () => {
+  const context = createTestContext();
+  const response = await send(context, "/api/account/login", {
+    method: "POST",
+    headers: { Origin: "https://example.com", "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "viewer@example.com" }),
+  });
+  assert.equal(response.status, 503);
+  assert.match((await response.json()).error, /Email sign-in is not configured/);
+});
 test("supports email magic-link account sessions and preferences", async () => {
   const context = createTestContext({
     RESEND_API_KEY: "re_test_key",
@@ -186,22 +196,6 @@ test("supports email magic-link account sessions and preferences", async () => {
   }
 });
 
-test("serves the public latest-video notification feed", async () => {
-  const context = createTestContext();
-  context.sqlite.prepare(
-    `INSERT INTO videos (
-       slug, title, source_url, media_type, primary_category, subcategory, description, published
-     ) VALUES
-       ('notify-one', 'Notification one', 'https://example.com/one.mp4', 'raw', 'Technology', 'Web Development', 'One', 1),
-       ('notify-two', 'Notification two', 'https://example.com/two.mp4', 'raw', 'Education', 'Tutorials & How-Tos', 'Two', 1)`,
-  ).run();
-  const response = await send(context, "/api/notifications/latest");
-  assert.equal(response.status, 200);
-  const payload = await response.json();
-  assert.equal(payload.videos.length, 2);
-  assert.equal(payload.videos[0].title, "Notification two");
-});
-
 test("home page contains the account, browser alert and shortcut controls", () => {
   const source = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
   const script = readFileSync(new URL("../public/notifications.js", import.meta.url), "utf8");
@@ -209,14 +203,22 @@ test("home page contains the account, browser alert and shortcut controls", () =
   assert.match(source, /id="member-login-form"/);
   assert.match(source, /id="browser-alert-button"/);
   assert.match(source, /id="shortcut-button"/);
-  assert.match(source, /id="notification-feed"/);
+  assert.doesNotMatch(source, /id="notification-feed"/);
   assert.match(source, /manifest\.webmanifest/);
   assert.match(script, /Notification\.requestPermission/);
   assert.match(script, /beforeinstallprompt/);
   assert.match(script, /\/api\/notifications\/latest/);
-  assert.match(script, /renderNotificationFeed/);
+  assert.doesNotMatch(script, /renderNotificationFeed/);
+  assert.doesNotMatch(script, /notification-feed-item/);
 });
 
+test("homepage Facebook tiles stay lightweight link previews", () => {
+  const source = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
+  assert.match(source, /renderFacebookFacades/);
+  assert.match(source, /facebook-microlink-preview/);
+  assert.doesNotMatch(source, /provider === "facebook"[\\s\\S]{0,1800}createPreviewPlayer/);
+  assert.doesNotMatch(source, /else if \(provider === "facebook"\)/);
+});
 test("renders Facebook Reel records through the official responsive plugin URL", async () => {
   const context = createTestContext();
   context.sqlite.prepare(

@@ -5,6 +5,7 @@ const encoder = new TextEncoder();
 
 export async function requestMemberLogin(request, env) {
   requireSameOrigin(request);
+  await assertMemberSchema(env);
   const body = await readJson(request);
   const email = normalizeEmail(body.email);
   if (!email) throw new AppError(400, "Enter a valid email address.");
@@ -20,10 +21,9 @@ export async function requestMemberLogin(request, env) {
   }
 
   const member = await env.DB.prepare(
-    `INSERT INTO members (email, last_login_requested_at)
-     VALUES (?, strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+    `INSERT INTO members (email)
+     VALUES (?)
      ON CONFLICT(email) DO UPDATE SET
-       last_login_requested_at = excluded.last_login_requested_at,
        updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')
      RETURNING id, email`,
   ).bind(email).first();
@@ -45,11 +45,15 @@ export async function requestMemberLogin(request, env) {
     html: `<p>Sign in to Vid.Best with this one-time link:</p><p><a href="${escapeHtml(new URL("/?login_token=" + encodeURIComponent(token), getBaseUrl(env)).toString())}">Sign in to Vid.Best</a></p><p>This link expires in 20 minutes.</p>`,
   });
 
+  await env.DB.prepare("UPDATE members SET last_login_requested_at = strftime('%Y-%m-%dT%H:%M:%fZ','now'), updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id = ?")
+    .bind(Number(member.id)).run();
+
   return json({ success: true, message: "Check your email for a one-time Vid.Best sign-in link." });
 }
 
 export async function verifyMemberLogin(request, env) {
   requireSameOrigin(request);
+  await assertMemberSchema(env);
   const body = await readJson(request, 4096);
   const token = String(body.token || "").trim();
   if (!/^[A-Za-z0-9_-]{40,120}$/.test(token)) throw new AppError(400, "Invalid sign-in token.");
@@ -87,6 +91,7 @@ export async function verifyMemberLogin(request, env) {
 }
 
 export async function getCurrentMember(request, env) {
+  await assertMemberSchema(env);
   const session = readCookie(request, MEMBER_COOKIE);
   if (!session) return null;
   const hash = await sha256Hex(session);
@@ -113,6 +118,7 @@ export async function memberMe(request, env) {
 
 export async function updateMemberPreferences(request, env) {
   requireSameOrigin(request);
+  await assertMemberSchema(env);
   const member = await getCurrentMember(request, env);
   if (!member) throw new AppError(401, "Please sign in with email first.");
 
@@ -135,6 +141,7 @@ export async function updateMemberPreferences(request, env) {
 
 export async function logoutMember(request, env) {
   requireSameOrigin(request);
+  await assertMemberSchema(env);
   const session = readCookie(request, MEMBER_COOKIE);
   if (session) {
     await env.DB.prepare("DELETE FROM member_sessions WHERE session_hash = ?").bind(await sha256Hex(session)).run();
@@ -145,9 +152,14 @@ export async function logoutMember(request, env) {
 }
 
 export async function notifyNewVideoSubscribers(env, video) {
-  const apiKey = String(env.RESEND_API_KEY || "").trim();
-  const from = String(env.EMAIL_FROM || "").trim();
-  if (!apiKey || !from || !env.DB) return { sent: 0, skipped: true };
+  if (!env.DB) return { sent: 0, skipped: true };
+  try {
+    await assertMemberSchema(env);
+  } catch (error) {
+    console.error("Vid.Best member notification schema unavailable", error?.message || error);
+    return { sent: 0, skipped: true };
+  }
+  if (!hasEmailTransport(env)) return { sent: 0, skipped: true };
 
   const rows = await env.DB.prepare(
     `SELECT id, email, display_name, category_filter, last_email_video_id
@@ -182,9 +194,20 @@ export async function notifyNewVideoSubscribers(env, video) {
 }
 
 async function sendEmail(env, email) {
-  const apiKey = String(env.RESEND_API_KEY || "").trim();
   const from = String(env.EMAIL_FROM || "").trim();
-  if (!apiKey || !from) throw new AppError(503, "Email sign-in is not configured yet. Add RESEND_API_KEY and EMAIL_FROM to Cloudflare.");
+  if (!from) throw new AppError(503, "Email sign-in is not configured. Verify a sender domain, then set EMAIL_FROM.");
+  if (env.EMAIL && typeof env.EMAIL.send === "function") {
+    try {
+      return await env.EMAIL.send({ from, ...email });
+    } catch (error) {
+      throw new AppError(502, "Cloudflare Email Service could not send the message.");
+    }
+  }
+
+  const apiKey = String(env.RESEND_API_KEY || "").trim();
+  if (!apiKey) {
+    throw new AppError(503, "Email sign-in is not configured. Connect Cloudflare Email Service or add RESEND_API_KEY.");
+  }
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -197,11 +220,31 @@ async function sendEmail(env, email) {
     signal: AbortSignal.timeout(8000),
   });
   if (!response.ok) {
-    let detail = "";
-    try { detail = (await response.text()).slice(0, 180); } catch {}
-    throw new AppError(502, "Email provider rejected the message." + (detail ? ` ${detail}` : ""));
+    throw new AppError(502, "Email provider could not send the message.");
   }
   return response.json();
+}
+
+function hasEmailTransport(env) {
+  return Boolean(
+    String(env.EMAIL_FROM || "").trim()
+      && ((env.EMAIL && typeof env.EMAIL.send === "function") || String(env.RESEND_API_KEY || "").trim()),
+  );
+}
+
+async function assertMemberSchema(env) {
+  try {
+    const result = await env.DB.prepare(
+      `SELECT name FROM sqlite_master
+       WHERE type = 'table' AND name IN ('members','member_login_tokens','member_sessions')`,
+    ).all();
+    const names = new Set((result.results || []).map((row) => String(row.name)));
+    if (!['members','member_login_tokens','member_sessions'].every((name) => names.has(name))) {
+      throw new Error("Member account migration is not available.");
+    }
+  } catch (error) {
+    throw new AppError(503, "Member accounts are temporarily unavailable. Please try again after the account database migration is active.");
+  }
 }
 
 function getBaseUrl(env) {
