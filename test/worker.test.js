@@ -216,8 +216,8 @@ test("home page contains the account, browser alert and shortcut controls", () =
 test("home embed previews return the transformed URL for supported providers", () => {
   const source = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(source, /else if \(provider === "twitch"\)[\s\S]*?url\.searchParams\.set\("parent", location\.hostname\);\s*}\s*return url\.href;/);
-  assert.match(source, /const EMBED_PREVIEW_PROVIDERS = new Set\(\["youtube", "vimeo", "dailymotion", "twitch"\]\)/);
-  assert.doesNotMatch(source, /provider === "facebook"\)\s*\{\s*url\.searchParams\.set/);
+  assert.match(source, /const EMBED_PREVIEW_PROVIDERS = new Set\(\["youtube", "vimeo", "dailymotion", "twitch", "facebook"\]\)/);
+  assert.match(source, /function buildFacebookPreviewEmbedUrl/);
 });
 
 test("homepage Facebook tiles use a separate muted official mini-player preview", () => {
