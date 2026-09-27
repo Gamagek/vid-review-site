@@ -775,7 +775,7 @@ function serializeVideo(row) {
   return {
     ...row,
     provider,
-    embed_url: provider === "facebook" ? row.embed_url || buildFacebookPlayerUrl(row.source_url) || null : row.embed_url,
+    embed_url: provider === "facebook" ? getSafeFacebookEmbedUrl(row) : row.embed_url,
     thumbnail_url: row.thumbnail_url || null,
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
@@ -2078,7 +2078,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     url: canonical,
     mainEntityOfPage: canonical,
     ...(video.source_duration ? { duration: video.source_duration } : {}),
-    ...(video.embed_url && video.provider !== "tiktok" ? { embedUrl: preparePlaybackEmbed(video.embed_url, playbackOrigin) } : {}),
+    ...(video.provider === "facebook" && getSafeFacebookEmbedUrl(video) ? { embedUrl: getSafeFacebookEmbedUrl(video) } : video.embed_url && video.provider !== "tiktok" ? { embedUrl: preparePlaybackEmbed(video.embed_url, playbackOrigin) } : {}),
     ...(!video.embed_url && video.provider !== "tiktok" ? { contentUrl: video.source_url } : {}),
     ...(tags.length ? { keywords: tags.join(", ") } : {}),
     ...(video.primary_category ? { genre: [video.primary_category, video.subcategory].filter(Boolean) } : {}),
@@ -2305,7 +2305,7 @@ function renderMedia(video, playbackOrigin) {
     return `<iframe id="watch-media-frame" class="tiktok-official-player" data-tiktok-share="${escapeHtml(video.source_url)}" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   }
   if (provider === "facebook") {
-    const facebookEmbed = video.embed_url || buildFacebookPlayerUrl(video.source_url);
+    const facebookEmbed = getSafeFacebookEmbedUrl(video);
     if (facebookEmbed) {
       return `<iframe id="watch-media-frame" class="facebook-official-player" src="${escapeHtml(facebookEmbed)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
     }
@@ -2440,6 +2440,19 @@ async function resolveFacebookContentUrl(env, sourceUrl) {
   } catch {
     return null;
   }
+}
+
+function getSafeFacebookEmbedUrl(video) {
+  if (!video) return "";
+  const stored = String(video.embed_url || "");
+  try {
+    const embed = new URL(stored);
+    if (embed.protocol === "https:" && embed.hostname === "www.facebook.com" && embed.pathname === "/plugins/video.php") {
+      const href = embed.searchParams.get("href") || "";
+      if (isSupportedFacebookContentUrl(href)) return embed.toString();
+    }
+  } catch {}
+  return buildFacebookPlayerUrl(video.source_url);
 }
 
 function buildFacebookPlayerUrl(sourceUrl) {
