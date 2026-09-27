@@ -1,0 +1,18 @@
+{
+  "name": "Vid.Best",
+  "short_name": "Vid.Best",
+  "description": "Video reviews, tutorials and discoveries.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#060811",
+  "theme_color": "#070913",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
