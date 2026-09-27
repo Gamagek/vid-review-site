@@ -2552,7 +2552,6 @@ async function resolveFacebookContentUrl(env, sourceUrl) {
   if (input.protocol !== "https:") return null;
   if (!isFacebookShareUrl(input)) return input.toString();
   const known = KNOWN_FACEBOOK_RESOLUTIONS.get(input.toString());
-  if (known) return known;
 
   const cache = typeof caches !== "undefined" && caches.default ? caches.default : null;
   const cacheKey = new Request(
@@ -2579,7 +2578,7 @@ async function resolveFacebookContentUrl(env, sourceUrl) {
       signal: AbortSignal.timeout(7000),
     });
     const finalUrl = String(response.url || "");
-    if (!response.ok || !isSupportedFacebookContentUrl(finalUrl)) return null;
+    if (!response.ok || !isSupportedFacebookContentUrl(finalUrl)) return known || null;
 
     if (cache) {
       const cached = json({ url: finalUrl }, 200, {
@@ -2589,7 +2588,7 @@ async function resolveFacebookContentUrl(env, sourceUrl) {
     }
     return finalUrl;
   } catch {
-    return null;
+    return known || null;
   }
 }
 
