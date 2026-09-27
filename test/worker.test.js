@@ -216,17 +216,40 @@ test("home page contains the account, browser alert and shortcut controls", () =
 test("home embed previews return the transformed URL for supported providers", () => {
   const source = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(source, /else if \(provider === "twitch"\)[\s\S]*?url\.searchParams\.set\("parent", location\.hostname\);\s*}\s*return url\.href;/);
-  assert.match(source, /const EMBED_PREVIEW_PROVIDERS = new Set\(\["youtube", "vimeo", "dailymotion", "twitch"\]\)/);
-  assert.doesNotMatch(source, /provider === "facebook"\)\s*\{\s*url\.searchParams\.set/);
+  assert.match(source, /const EMBED_PREVIEW_PROVIDERS = new Set\(\["youtube", "vimeo", "dailymotion", "twitch", "facebook"\]\)/);
+  assert.match(source, /function buildFacebookPreviewEmbedUrl/);
 });
 
-test("homepage Facebook tiles stay lightweight link previews", () => {
+test("homepage Facebook tiles use a separate muted official mini-player preview", () => {
   const source = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
-  assert.match(source, /renderFacebookFacades/);
-  assert.match(source, /facebook-microlink-preview/);
-  assert.doesNotMatch(source, /provider === "facebook"[\\s\\S]{0,1800}createPreviewPlayer/);
-  assert.doesNotMatch(source, /else if \(provider === "facebook"\)/);
+  assert.match(source, /const FACEBOOK_PREVIEW_DELAY_MS = 500/);
+  assert.match(source, /if \(provider === "facebook"\) return createFacebookPreviewPlayer\(card\)/);
+  assert.match(source, /function createFacebookPreviewPlayer/);
+  assert.match(source, /function buildFacebookPreviewEmbedUrl/);
+  assert.match(source, /show_text: "false"/);
+  assert.match(source, /autoplay: "true"/);
+  assert.match(source, /mute: "1"/);
+  assert.match(source, /facebook-mini-preview-player/);
+  assert.doesNotMatch(source, /renderFacebookFacades/);
+  assert.doesNotMatch(source, /facebook-microlink-preview/);
 });
+
+test("Facebook mini preview stays separate from the original-quality watch player", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+       slug, title, source_url, embed_url, media_type, primary_category, subcategory, description, published
+     ) VALUES ('facebook-mini-preview', 'Facebook preview test', 'https://www.facebook.com/reel/1986667352042256', 'https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F1986667352042256&show_text=false&width=560&t=0', 'facebook', 'Social Media & Trending', 'Facebook Reels Highlights', 'Facebook preview test', 1)`,
+  ).run();
+
+  const page = await send(context, "/watch/facebook-mini-preview");
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.match(html, /class="facebook-official-player"/);
+  assert.doesNotMatch(html, /autoplay=true/);
+  assert.doesNotMatch(html, /mute=1/);
+});
+
 test("resolves a Facebook share URL into the official plugin player", async () => {
   const context = createTestContext();
   const share = "https://www.facebook.com/share/v/1EwUUT7MN8/";

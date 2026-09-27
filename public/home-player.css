@@ -138,93 +138,30 @@
 }
 
 
-/* Facebook microlink-style mini-tile facade */
-.facebook-facade-ready .preview-surface {
-  opacity: 1;
-  background: #fff;
-}
-.facebook-facade-ready .tile-media > img,
-.facebook-facade-ready .media-fallback {
-  opacity: 0;
-}
-.facebook-microlink-preview {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-rows: minmax(0, 68%) minmax(0, 32%);
-  overflow: hidden;
-  background: #fff;
-  color: #111;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
-.facebook-microlink-image {
-  position: relative;
-  min-height: 0;
-  overflow: hidden;
-  background: #f1f2f4;
-}
-.facebook-microlink-image img {
+
+/* Facebook mini-tile preview uses the official plugin only when a card becomes active. */
+.facebook-mini-preview-player {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.facebook-microlink-placeholder {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  color: #666;
-  font-size: .8rem;
-  font-weight: 800;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-.facebook-microlink-body {
+  min-width: 0;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 7px 10px;
-  overflow: hidden;
-  background: #fff;
+  border: 0;
+  background: #05070d;
+  object-fit: cover;
 }
-.facebook-microlink-provider {
-  color: #999;
-  font-size: .52rem;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
+
+.video-tile[data-video-provider="facebook"] .preview-surface {
+  background: #05070d;
 }
-.facebook-microlink-title {
-  color: #111;
-  font-size: .66rem;
-  font-weight: 650;
-  line-height: 1.22;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+
+.video-tile[data-video-provider="facebook"].preview-playing .play-orb,
+.video-tile[data-video-provider="facebook"].preview-playing .media-type {
+  opacity: 0;
 }
-.facebook-microlink-author {
-  color: #111;
-  font-size: .67rem;
-  font-weight: 650;
-  line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.facebook-microlink-caption {
-  color: #333;
-  font-size: .57rem;
-  line-height: 1.24;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-@media (max-width: 640px) {
-  .facebook-microlink-preview { grid-template-rows: minmax(0, 72%) minmax(0, 28%); }
-  .facebook-microlink-body { padding: 6px 9px; }
-  .facebook-microlink-caption { -webkit-line-clamp: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .video-tile[data-video-provider="facebook"] .preview-surface {
+    display: none;
+  }
 }
