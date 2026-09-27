@@ -774,6 +774,7 @@ function serializeVideo(row) {
   return {
     ...row,
     provider,
+    embed_url: provider === "facebook" ? buildFacebookPlayerUrl(row.source_url) || row.embed_url || null : row.embed_url,
     thumbnail_url: row.thumbnail_url || null,
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
