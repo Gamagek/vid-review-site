@@ -1182,11 +1182,15 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(homeSource, /\/api\/tiktok\/previews/);
   assert.doesNotMatch(homeSource, /buildTikTokPreviewPlayerUrl/);
   assert.doesNotMatch(homeSource, /tiktok\/player\/v1/);
-  assert.match(homeSource, /PREVIEW_DELAY_MS = 3000/);
+  assert.match(homeSource, /PREVIEW_DELAY_MS = 450/);
   assert.doesNotMatch(homeSource, /ensureTikTokEmbedScript/);
   assert.doesNotMatch(homeSource, /className = "tiktok-embed"/);
   assert.match(homeSource, /provider === "tiktok"/);
   assert.match(homeSource, /provider === "facebook"/);
+  assert.match(homeSource, /renderFacebookFacade/);
+  assert.match(homeSource, /facebook-microlink-preview/);
+  assert.doesNotMatch(homeSource, /facebook-mini-preview-player/);
+  assert.doesNotMatch(homeSource, /plugins\/video\.php/);
   assert.match(homeSource, /tiktok-microlink-preview/);
   assert.match(homeSource, /TikTok preview · tap to open/);
 
@@ -1194,6 +1198,18 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(indexSource, /\/api\/tiktok\/preflight/);
   assert.match(indexSource, /www\.tiktok\.com\/oembed/);
   assert.match(indexSource, /tiktokcdn(?:-[a-z0-9-]+)?\.com/);
+});
+
+test("builds a compact Facebook facade without loading the Facebook plugin on the home grid", () => {
+  const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
+  assert.match(homeSource, /renderFacebookFacade/);
+  assert.match(homeSource, /facebook-microlink-preview/);
+  assert.match(homeSource, /facebook-microlink-title/);
+  assert.match(homeSource, /facebook-microlink-caption/);
+  assert.doesNotMatch(homeSource, /createFacebookPreviewPlayer/);
+  assert.doesNotMatch(homeSource, /facebook-mini-preview-player/);
+  assert.doesNotMatch(homeSource, /plugins\\/video\\.php/);
+  assert.match(homeSource, /canPreview\(card\)/);
 });
 
 test("builds a batch TikTok facade preview from the configured facade endpoint", async () => {
