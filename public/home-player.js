@@ -236,7 +236,11 @@ function safePreviewEmbed(value, provider) {
       url.searchParams.set("autoplay", "true");
       url.searchParams.set("muted", "true");
       url.searchParams.set("parent", location.hostname);
-      return url.href;
+    } else if (provider === "facebook") {
+      url.searchParams.set("show_text", "false");
+      url.searchParams.set("autoplay", "true");
+    }
+    return url.href;
   } catch {
     return "";
   }
