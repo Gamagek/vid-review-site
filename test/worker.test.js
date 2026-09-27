@@ -918,6 +918,29 @@ test("starts owned R2 analysis through the authenticated Teamwork API", async ()
   }
 });
 
+test("renders existing Facebook share and Reel URLs with the official video plugin", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+       slug, title, source_url, media_type, primary_category, subcategory, description, published
+     ) VALUES
+       ('facebook-share-video', 'Facebook share video', 'https://www.facebook.com/share/v/1EwUUT7MN8/', 'raw', 'Social Media & Trending', 'Facebook Reels Highlights', 'Facebook share test', 1),
+       ('facebook-reel-video', 'Facebook reel video', 'https://www.facebook.com/reel/1986667352042256', 'raw', 'Social Media & Trending', 'Facebook Reels Highlights', 'Facebook reel test', 1)`,
+  ).run();
+
+  for (const slug of ["facebook-share-video", "facebook-reel-video"]) {
+    const page = await send(context, "/watch/" + slug);
+    assert.equal(page.status, 200);
+    const html = await page.text();
+    assert.match(html, /<iframe id="watch-media-frame" class="facebook-official-player"/);
+    assert.match(html, /https:\/\/www\.facebook\.com\/plugins\/video\.php\?height=314&amp;href=/);
+    assert.match(html, /show_text=false/);
+    assert.match(html, /width=560/);
+    assert.match(html, /t=0/);
+    assert.match(html, /allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share; fullscreen"/);
+  }
+});
+
 test("TikTok keeps separate share preview and player paths", () => {
   const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
   assert.match(adminSource, /renderTikTokPreview/);
