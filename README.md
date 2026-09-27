@@ -159,6 +159,12 @@ Worker runtime secrets such as `GEMINI_KEY`, `ADMIN_SECRET_KEY`, `REACTION_SALT`
 |---|---|---|
 | `GET /api/videos` | Public | Filter published reviews |
 | `GET /api/videos/:slug` | Public | Retrieve one published review |
+| `POST /api/account/login` | Public | Request a passwordless email sign-in link |
+| `POST /api/account/verify` | Public | Consume a one-time sign-in token and create a member session |
+| `GET /api/account/me` | Public | Return the current member session |
+| `POST /api/account/preferences` | Member | Update email notification preferences |
+| `DELETE /api/account/session` | Member | Sign out |
+| `GET /api/notifications/latest` | Public | Return the newest published videos for browser alert checks |
 | `POST /api/discovery-requests` | Public | Request review of a missing video |
 | `POST /api/videos/:id/reactions` | Public | Toggle a privacy-hashed reaction |
 | `GET /api/videos/:id/recommendations` | Public | Retrieve ranked related videos |
