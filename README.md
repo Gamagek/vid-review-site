@@ -1,5 +1,9 @@
 # Vid.Best
 
+## Member notifications
+
+Passwordless member sign-in, optional email alerts, browser alerts and install shortcuts are available from the home-page notification hub.
+
 Vid.Best is a Cloudflare-native video review and discovery platform built with:
 
 - Cloudflare Workers for routing and edge server-side rendering (SSR)
