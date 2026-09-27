@@ -196,6 +196,15 @@
   letter-spacing: .12em;
   text-transform: uppercase;
 }
+.facebook-microlink-title {
+  color: #111;
+  font-size: .66rem;
+  font-weight: 650;
+  line-height: 1.22;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .facebook-microlink-author {
   color: #111;
   font-size: .67rem;
@@ -207,10 +216,10 @@
 }
 .facebook-microlink-caption {
   color: #333;
-  font-size: .6rem;
-  line-height: 1.28;
+  font-size: .57rem;
+  line-height: 1.24;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
