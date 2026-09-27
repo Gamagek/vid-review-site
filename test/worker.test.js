@@ -884,9 +884,9 @@ test("serves the seeded YouTube demo and records privacy-hashed interests", asyn
 test("SEO edge exposes a crawlable video index and pages sitemap", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
-    "INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, description, published) VALUES
+    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, description, published) VALUES
       ('seo-video-one', 'SEO video one', 'https://example.com/video-one.mp4', 'raw', 'Technology', 'Web Development', 'A unique description for search discovery', 1),
-      ('seo-video-two', 'SEO video two', 'https://example.com/video-two.mp4', 'raw', 'Education', 'Tutorials & How-Tos', 'Another unique description for search discovery', 1)",
+      ('seo-video-two', 'SEO video two', 'https://example.com/video-two.mp4', 'raw', 'Education', 'Tutorials & How-Tos', 'Another unique description for search discovery', 1)`,
   ).run();
 
   const videosPage = await seoEdge.fetch(new Request('https://example.com/videos'), context.env, context.ctx);
