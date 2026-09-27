@@ -11,6 +11,7 @@ const HUB = {
   shortcutButton: document.querySelector("#shortcut-button"),
   logoutButton: document.querySelector("#member-logout-button"),
   status: document.querySelector("#notification-status"),
+  feed: document.querySelector("#notification-feed"),
 };
 
 const NOTIFY_KEY = "vidbest-notify-last-id";
@@ -58,6 +59,7 @@ async function initNotificationHub() {
   await loadMember();
   restoreCategory();
   updateBrowserButton();
+  await refreshNotificationFeed();
   startSmartPolling();
 }
 
@@ -232,7 +234,9 @@ function startSmartPolling() {
   void primeLatestNotificationId(false);
   clearInterval(pollTimer);
   pollTimer = setInterval(() => {
-    if (!document.hidden) void checkForNewVideos();
+    if (document.hidden) return;
+    void checkForNewVideos();
+    void refreshNotificationFeed();
   }, 300000);
 }
 
@@ -248,6 +252,7 @@ async function checkForNewVideos() {
   if (!("Notification" in window) || Notification.permission !== "granted") return;
   const videos = await fetchLatestVideos();
   if (!videos.length) return;
+  renderNotificationFeed(videos);
 
   const lastId = Number(localStorage.getItem(NOTIFY_KEY) || 0);
   const eligible = videos
@@ -284,6 +289,57 @@ async function fetchLatestVideos() {
   } catch {
     return [];
   }
+}
+
+function renderNotificationFeed(videos) {
+  if (!HUB.feed) return;
+  const filtered = videos.filter(matchesCategory).slice(0, 5);
+  HUB.feed.replaceChildren();
+  if (!filtered.length) {
+    const empty = document.createElement("p");
+    empty.className = "notification-feed-empty";
+    empty.textContent = "No new videos for this topic yet.";
+    HUB.feed.append(empty);
+    return;
+  }
+  const heading = document.createElement("div");
+  heading.className = "notification-feed-heading";
+  heading.innerHTML = "<span>Latest</span><span>" + filtered.length + " update" + (filtered.length === 1 ? "" : "s") + "</span>";
+  HUB.feed.append(heading);
+  const list = document.createElement("div");
+  list.className = "notification-feed-list";
+  filtered.forEach((video) => {
+    const link = document.createElement("a");
+    link.className = "notification-feed-item";
+    link.href = "/watch/" + encodeURIComponent(video.slug);
+    const thumb = document.createElement("img");
+    thumb.alt = "";
+    thumb.loading = "lazy";
+    thumb.decoding = "async";
+    if (video.thumbnail_url) thumb.src = video.thumbnail_url;
+    const copy = document.createElement("span");
+    copy.className = "notification-feed-copy";
+    const title = document.createElement("strong");
+    title.textContent = video.title;
+    const meta = document.createElement("small");
+    meta.textContent = video.primary_category + " · " + formatNotificationDate(video.created_at);
+    copy.append(title, meta);
+    link.append(thumb, copy);
+    list.append(link);
+  });
+  HUB.feed.append(list);
+}
+
+async function refreshNotificationFeed() {
+  const videos = await fetchLatestVideos();
+  if (videos.length) renderNotificationFeed(videos);
+}
+
+function formatNotificationDate(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? "Recently"
+    : new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(date);
 }
 
 function matchesCategory(video) {

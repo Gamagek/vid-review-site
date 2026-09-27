@@ -209,10 +209,12 @@ test("home page contains the account, browser alert and shortcut controls", () =
   assert.match(source, /id="member-login-form"/);
   assert.match(source, /id="browser-alert-button"/);
   assert.match(source, /id="shortcut-button"/);
+  assert.match(source, /id="notification-feed"/);
   assert.match(source, /manifest\.webmanifest/);
   assert.match(script, /Notification\.requestPermission/);
   assert.match(script, /beforeinstallprompt/);
   assert.match(script, /\/api\/notifications\/latest/);
+  assert.match(script, /renderNotificationFeed/);
 });
 
 test("renders Facebook Reel records through the official responsive plugin URL", async () => {
@@ -253,6 +255,41 @@ test("renders Facebook Reel records through the official responsive plugin URL",
   assert.equal(storedEmbed.searchParams.get("show_text"), "false");
   assert.equal(storedEmbed.searchParams.get("width"), "560");
   assert.equal(storedEmbed.searchParams.get("height"), "314");
+});
+
+test("resolves Facebook share-video links to the official video plugin target", async () => {
+  const context = createTestContext();
+  const originalFetch = globalThis.fetch;
+  let called = 0;
+  globalThis.fetch = async (url) => {
+    called += 1;
+    assert.equal(String(url), "https://www.facebook.com/share/v/1EwUUT7MN8/");
+    return {
+      ok: true,
+      url: "https://www.facebook.com/reel/1986667352042256",
+    };
+  };
+  try {
+    const response = await send(
+      context,
+      "/api/facebook/resolve?url=" + encodeURIComponent("https://www.facebook.com/share/v/1EwUUT7MN8/"),
+    );
+    assert.equal(response.status, 200);
+    const payload = await response.json();
+    assert.equal(called, 1);
+    assert.equal(payload.provider, "facebook");
+    assert.equal(payload.source_url, "https://www.facebook.com/reel/1986667352042256");
+    const embed = new URL(payload.embed_url);
+    assert.equal(embed.hostname, "www.facebook.com");
+    assert.equal(embed.pathname, "/plugins/video.php");
+    assert.equal(embed.searchParams.get("href"), "https://www.facebook.com/reel/1986667352042256");
+    assert.equal(embed.searchParams.get("show_text"), "false");
+    assert.equal(embed.searchParams.get("width"), "560");
+    assert.equal(embed.searchParams.get("height"), "314");
+    assert.equal(embed.searchParams.get("t"), "0");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test("uses the requested Facebook Reel plugin structure for any Facebook video URL", async () => {

@@ -366,6 +366,70 @@ button { color: inherit; }
 }
 .notification-hub > .form-status[data-state="success"] { color: var(--success); }
 .notification-hub > .form-status[data-state="error"] { color: var(--danger); }
+.notification-feed {
+  margin-top: 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.notification-feed-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.notification-feed-list {
+  display: grid;
+  gap: 7px;
+  max-height: 188px;
+  overflow: auto;
+  padding-right: 2px;
+}
+.notification-feed-item {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  padding: 7px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 10px;
+  background: rgba(255,255,255,.025);
+  color: inherit;
+  text-decoration: none;
+}
+.notification-feed-item:hover { border-color: rgba(255,255,255,.14); background: rgba(255,255,255,.045); }
+.notification-feed-item img {
+  width: 58px;
+  height: 38px;
+  border-radius: 7px;
+  object-fit: cover;
+  background: rgba(255,255,255,.06);
+}
+.notification-feed-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+.notification-feed-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: .73rem;
+}
+.notification-feed-copy small {
+  color: var(--muted);
+  font-size: .64rem;
+}
+.notification-feed-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: .7rem;
+}
+
 
 .carousel-controls {
   position: absolute;
