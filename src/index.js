@@ -500,11 +500,11 @@ async function tikTokPreviewBatch(request, env) {
 }
 
 function handleError(error) {
-  if (error instanceof AppError) {
+  if (error instanceof AppError || Number.isInteger(error?.status)) {
     return json(
-      { success: false, error: error.message, ...(error.details ? { details: error.details } : {}) },
-      error.status,
-      error.headers,
+      { success: false, error: error.message || "Request failed", ...(error.details ? { details: error.details } : {}) },
+      Number.isInteger(error?.status) ? error.status : 500,
+      error.headers || {},
     );
   }
   if (error?.name === "AbortError" || error?.name === "TimeoutError") {
