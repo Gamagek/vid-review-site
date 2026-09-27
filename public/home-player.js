@@ -8,6 +8,7 @@ const ALLOWED_EMBED_HOSTS = new Set([
   "www.dailymotion.com",
   "player.twitch.tv",
   "clips.twitch.tv",
+  "www.facebook.com",
 ]);
 
 const previewState = {
