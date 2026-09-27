@@ -177,6 +177,7 @@ async function route(request, env, ctx) {
   if (path === "/api/account/session" && request.method === "DELETE") return logoutMember(request, env);
   if (path === "/api/notifications/latest" && request.method === "GET") return latestNotifications(env);
   if (path === "/api/facebook/resolve" && request.method === "GET") return resolveFacebookEndpoint(request, env);
+  if (path === "/api/facebook/thumbnail" && request.method === "GET") return facebookThumbnailEndpoint(request, env);
 
   if (path === "/api/tiktok/preflight" && request.method === "GET") {
     return tikTokPreflight(request, env, ctx);
@@ -1082,6 +1083,7 @@ async function listVideos(request, env, includeUnpublished) {
 
 async function hydrateVideos(env, rows) {
   if (!rows.length) return [];
+  await enrichFacebookRows(env, rows);
   const ids = rows.map((row) => Number(row.id));
   const placeholders = ids.map(() => "?").join(",");
   const reactionResult = await env.DB.prepare(
@@ -2362,6 +2364,45 @@ async function resolveFacebookEndpoint(request, env) {
   }, 200, { "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400" });
 }
 
+async function facebookThumbnailEndpoint(request, env) {
+  const url = new URL(request.url);
+  const requested = cleanText(url.searchParams.get("url"), 2000);
+  if (!requested || !isFacebookUrl(requested)) throw new AppError(400, "Add a Facebook video URL");
+  let normalized;
+  try {
+    const value = new URL(requested);
+    value.hash = "";
+    normalized = value.toString();
+  } catch {
+    throw new AppError(400, "Invalid Facebook video URL");
+  }
+  const cache = typeof caches !== "undefined" && caches.default ? caches.default : null;
+  const cacheKey = new Request("https://vid.best/__facebook-thumbnail?url=" + encodeURIComponent(normalized));
+  if (cache) {
+    const cached = await cache.match(cacheKey);
+    if (cached) return new Response(cached.body, { status: 200, headers: {
+      "Content-Type": cached.headers.get("Content-Type") || "image/jpeg",
+      "Cache-Control": "public, max-age=604800, stale-while-revalidate=2592000",
+    }});
+  }
+  const preview = await fetchFacebookPreview(env, normalized);
+  const thumbnailUrl = safeFacebookThumbnailUrl(preview?.thumbnail_url);
+  if (!thumbnailUrl) throw new AppError(404, "Facebook thumbnail is unavailable");
+  const response = await fetch(thumbnailUrl, {
+    headers: { Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8", "User-Agent": "VidBest-Facebook-Preview/1.0" },
+    signal: AbortSignal.timeout(7000),
+  });
+  if (!response.ok) throw new AppError(502, "Facebook thumbnail fetch failed");
+  const contentType = response.headers.get("Content-Type") || "";
+  if (!contentType.toLowerCase().startsWith("image/")) throw new AppError(502, "Facebook preview did not return an image");
+  const image = new Response(response.body, { status: 200, headers: {
+    "Content-Type": contentType,
+    "Cache-Control": "public, max-age=604800, stale-while-revalidate=2592000",
+    "X-Content-Type-Options": "nosniff",
+  }});
+  if (cache) { try { await cache.put(cacheKey, image.clone()); } catch {} }
+  return image;
+}
 const KNOWN_FACEBOOK_RESOLUTIONS = new Map([
   ["https://www.facebook.com/share/v/1EwUUT7MN8/", "https://www.facebook.com/darmalipi/videos/pause-for-a-moment-breathe-observe-dscover-the-profound-peace-of-theravada-vipas/1986667352042256/"],
 ]);
