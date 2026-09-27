@@ -1208,7 +1208,7 @@ test("builds a compact Facebook facade without loading the Facebook plugin on th
   assert.match(homeSource, /facebook-microlink-caption/);
   assert.doesNotMatch(homeSource, /createFacebookPreviewPlayer/);
   assert.doesNotMatch(homeSource, /facebook-mini-preview-player/);
-  assert.doesNotMatch(homeSource, /plugins\\/video\\.php/);
+  assert.doesNotMatch(homeSource, /plugins\/video\.php/);
   assert.match(homeSource, /canPreview\(card\)/);
 });
 
