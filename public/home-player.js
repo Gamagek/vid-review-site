@@ -279,7 +279,7 @@ function stopPreview(card = null, statusMessage = "") {
 function renderFacebookFacade(card) {
   const surface = card.querySelector(".preview-surface");
   if (!surface) return;
-  const imageSource = card.dataset.videoThumbnail || card.querySelector(".tile-media img")?.src || "";
+  const imageSource = card.dataset.videoThumbnail || buildFacebookMicrolinkImageUrl(card.dataset.videoSource);
   const title = card.dataset.facebookPreviewTitle || card.dataset.videoTitle || "Facebook video";
   const description = card.dataset.facebookPreviewDescription || "";
   const author = card.dataset.facebookPreviewAuthor || "facebook.com";
@@ -312,7 +312,7 @@ function renderFacebookFacade(card) {
   caption.className = "facebook-microlink-caption";
   caption.textContent = description;
   body.append(provider, heading);
-  if (description) body.append(caption);
+  // Keep the mini-tile compact: the full Facebook post text is shown only on the watch page.\n  void description;
   facade.append(imageWrap, body);
   surface.replaceChildren(facade);
   card.classList.add("facebook-facade-ready");
@@ -343,6 +343,21 @@ async function loadTikTokFacadePreviews() {
     });
   } finally {
     tiktokFacadeLoading = false;
+  }
+}
+
+function buildFacebookMicrolinkImageUrl(sourceUrl) {
+  try {
+    const url = new URL(String(sourceUrl || ""));
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    if (!(host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch")) return "";
+    const api = new URL("https://api.microlink.io/");
+    api.searchParams.set("url", url.toString());
+    api.searchParams.set("meta", "false");
+    api.searchParams.set("embed", "image.url");
+    return api.toString();
+  } catch {
+    return "";
   }
 }
 
