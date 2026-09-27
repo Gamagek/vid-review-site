@@ -236,7 +236,8 @@ function safePreviewEmbed(value, provider) {
       url.searchParams.set("autoplay", "true");
       url.searchParams.set("muted", "true");
       url.searchParams.set("parent", location.hostname);
-      return url.href;
+    }
+    return url.href;
   } catch {
     return "";
   }

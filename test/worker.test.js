@@ -213,6 +213,13 @@ test("home page contains the account, browser alert and shortcut controls", () =
   assert.match(script, /notification-feed-item/);
 });
 
+test("home embed previews return the transformed URL for supported providers", () => {
+  const source = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
+  assert.match(source, /else if \(provider === "twitch"\)[\s\S]*?url\.searchParams\.set\("parent", location\.hostname\);\s*}\s*return url\.href;/);
+  assert.match(source, /const EMBED_PREVIEW_PROVIDERS = new Set\(\["youtube", "vimeo", "dailymotion", "twitch"\]\)/);
+  assert.doesNotMatch(source, /provider === "facebook"\)\s*\{\s*url\.searchParams\.set/);
+});
+
 test("homepage Facebook tiles stay lightweight link previews", () => {
   const source = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(source, /renderFacebookFacades/);
