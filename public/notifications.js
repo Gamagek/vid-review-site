@@ -11,6 +11,7 @@ const HUB = {
   shortcutButton: document.querySelector("#shortcut-button"),
   logoutButton: document.querySelector("#member-logout-button"),
   status: document.querySelector("#notification-status"),
+  feed: document.querySelector("#notification-feed"),
 };
 
 const NOTIFY_KEY = "vidbest-notify-last-id";
@@ -18,6 +19,7 @@ const CATEGORY_KEY = "vidbest-notify-category";
 let installPrompt = null;
 let currentMember = null;
 let pollTimer = null;
+let notificationRegistration = null;
 
 document.addEventListener("DOMContentLoaded", initNotificationHub);
 window.addEventListener("beforeinstallprompt", (event) => {
@@ -37,7 +39,7 @@ async function initNotificationHub() {
   HUB.category?.addEventListener("change", savePreferences);
 
   try {
-    await registerServiceWorker();
+    notificationRegistration = await registerServiceWorker();
   } catch {}
 
   await loadNotificationCategories();
@@ -216,8 +218,10 @@ async function installShortcut() {
 }
 
 async function registerServiceWorker() {
-  if (!("serviceWorker" in navigator)) return;
-  await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+  if (!("serviceWorker" in navigator)) return null;
+  const registration = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+  await navigator.serviceWorker.ready;
+  return registration;
 }
 
 function restoreCategory() {
@@ -236,6 +240,43 @@ function startSmartPolling() {
     void checkForNewVideos();
     void refreshNotificationFeed();
   }, 300000);
+}
+
+async function refreshNotificationFeed() {
+  const videos = await fetchLatestVideos();
+  if (!HUB.feed) return;
+  HUB.feed.replaceChildren();
+  if (!videos.length) {
+    const empty = document.createElement("p");
+    empty.className = "notification-feed-empty";
+    empty.textContent = "No published videos yet.";
+    HUB.feed.append(empty);
+    return;
+  }
+  videos.slice(0, 4).forEach((video) => {
+    const link = document.createElement("a");
+    link.className = "notification-feed-item";
+    link.href = "/watch/" + encodeURIComponent(video.slug);
+    link.setAttribute("aria-label", "Open " + (video.title || "new video"));
+    if (video.thumbnail_url) {
+      const image = document.createElement("img");
+      image.src = video.thumbnail_url;
+      image.alt = "";
+      image.loading = "lazy";
+      image.decoding = "async";
+      image.addEventListener("error", () => image.remove(), { once: true });
+      link.append(image);
+    }
+    const copy = document.createElement("span");
+    copy.className = "notification-feed-copy";
+    const title = document.createElement("strong");
+    title.textContent = video.title || "New Vid.Best video";
+    const meta = document.createElement("small");
+    meta.textContent = [video.primary_category, video.subcategory].filter(Boolean).join(" · ") || "New video";
+    copy.append(title, meta);
+    link.append(copy);
+    HUB.feed.append(link);
+  });
 }
 
 async function primeLatestNotificationId(force) {
@@ -263,14 +304,23 @@ async function checkForNewVideos() {
   }
 
   for (const video of eligible) {
-    const notification = new Notification("New on Vid.Best", {
-      body: video.title,
+    const options = {
+      body: video.title || "A new video is available.",
       icon: "/favicon.svg",
+      badge: "/favicon.svg",
       tag: "vidbest-video-" + video.id,
-    });
+      data: { url: "/watch/" + encodeURIComponent(video.slug) },
+    };
+    try {
+      if (notificationRegistration?.showNotification) {
+        await notificationRegistration.showNotification("New on Vid.Best", options);
+        continue;
+      }
+    } catch {}
+    const notification = new Notification("New on Vid.Best", options);
     notification.onclick = () => {
       window.focus();
-      location.href = "/watch/" + encodeURIComponent(video.slug);
+      location.href = options.data.url;
     };
   }
   localStorage.setItem(NOTIFY_KEY, String(videos[0].id));
@@ -294,6 +344,11 @@ function matchesCategory(video) {
 
 function setStatus(message, type = "") {
   if (!HUB.status) return;
-  HUB.status.textContent = message;
+  const value = message instanceof Element
+    ? (message.textContent || "")
+    : (message && typeof message === "object" && "message" in message
+      ? String(message.message || "")
+      : String(message ?? ""));
+  HUB.status.textContent = value;
   HUB.status.dataset.state = type;
 }
