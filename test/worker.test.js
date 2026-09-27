@@ -220,31 +220,20 @@ test("home embed previews return the transformed URL for supported providers", (
   assert.match(source, /function buildFacebookPreviewEmbedUrl/);
 });
 
-test("homepage Facebook tiles use a separate muted official mini-player preview", () => {
+test("homepage Facebook tiles use a lightweight Microlink thumbnail facade", () => {
   const source = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
-  assert.match(source, /const FACEBOOK_PREVIEW_DELAY_MS = 500/);
-  assert.match(source, /if \(provider === "facebook"\) return createFacebookPreviewPlayer\(card\)/);
-  assert.match(source, /function createFacebookPreviewPlayer/);
-  assert.match(source, /function buildFacebookPreviewEmbedUrl/);
-  assert.match(source, /show_text: "false"/);
-  assert.match(source, /autoplay: "true"/);
-  assert.match(source, /mute: "1"/);
-  assert.match(source, /facebook-mini-preview-player/);
-  assert.doesNotMatch(source, /renderFacebookFacades/);
-  assert.doesNotMatch(source, /facebook-microlink-preview/);
-});
-
-test("Facebook homepage facade uses a Microlink image fallback and not a plugin iframe", () => {
-  const source = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
+  assert.match(source, /function renderFacebookFacade/);
   assert.match(source, /function buildFacebookMicrolinkImageUrl/);
-  assert.match(source, /api\.microlink\.io/);
-  assert.match(source, /meta/,);
-  assert.match(source, /embed/,);
-  assert.match(source, /image\.url/);
+  assert.match(source, /api\\.microlink\\.io/);
+  assert.match(source, /meta/);
+  assert.match(source, /embed/);
+  assert.match(source, /image\\.url/);
+  assert.match(source, /image\\.loading = nearViewport \\? "eager" : "lazy"/);
+  assert.match(source, /facebook-microlink-preview/);
+  assert.match(source, /facebook-microlink-title/);
   assert.doesNotMatch(source, /function createFacebookPreviewPlayer/);
   assert.doesNotMatch(source, /facebook-mini-preview-player/);
   assert.doesNotMatch(source, /plugins\\/video\\.php/);
-  assert.match(source, /image\.loading = nearViewport \? "eager" : "lazy"/);
 });
 
 test("Facebook mini preview stays separate from the original-quality watch player", async () => {
