@@ -134,39 +134,53 @@ async function login(context) {
 }
 
 test("supports email magic-link account sessions and preferences", async () => {
-  const context = createTestContext();
+  const context = createTestContext({
+    RESEND_API_KEY: "re_test_key",
+    EMAIL_FROM: "Vid.Best <notifications@example.com>",
+  });
   const originalFetch = globalThis.fetch;
   let sentEmail;
   globalThis.fetch = async (url, options) => {
     if (String(url) !== "https://api.resend.com/emails") return originalFetch(url, options);
     sentEmail = JSON.parse(options.body);
-    return new Response(JSON.stringify({ id: "email-test-id" }), { status: 200, headers: { "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ id: "email-test-id" }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   };
   try {
-    const login = await send(context, "/api/account/login", {
-      method: "POST",
-      headers: { Origin: "https://example.com", "Content-Type": "application/json" },
-      body: JSON.stringify({ email: "Viewer@example.com" }),
-    });
-    assert.equal(login.status, 503);
-
-    const configured = createTestContext({
-      RESEND_API_KEY: "re_test_key",
-      EMAIL_FROM: "Vid.Best <notifications@example.com>",
-    });
-    const requested = await send(configured, "/api/account/login", {
+    const requested = await send(context, "/api/account/login", {
       method: "POST",
       headers: { Origin: "https://example.com", "Content-Type": "application/json" },
       body: JSON.stringify({ email: "Viewer@example.com" }),
     });
     assert.equal(requested.status, 200);
-    assert.equal(sentEmail, undefined);
+    assert.deepEqual(sentEmail.to, ["viewer@example.com"]);
+    const match = String(sentEmail.html).match(/login_token=([A-Za-z0-9_-]{40,120})/);
+    assert.ok(match?.[1]);
 
-    const tokenRow = configured.sqlite.prepare("SELECT token_hash, expires_at FROM member_login_tokens LIMIT 1").get();
-    assert.ok(tokenRow?.token_hash);
-    assert.ok(sentEmail === undefined || sentEmail.to);
-    const rawToken = [...configured.sqlite.prepare("SELECT token_hash FROM member_login_tokens").all()].length;
-    assert.equal(rawToken, 1);
+    const verified = await send(context, "/api/account/verify", {
+      method: "POST",
+      headers: { Origin: "https://example.com", "Content-Type": "application/json" },
+      body: JSON.stringify({ token: match[1] }),
+    });
+    assert.equal(verified.status, 200);
+    const cookie = verified.headers.get("Set-Cookie").split(";", 1)[0];
+    assert.match(cookie, /^__Host-vidbest_member=/);
+
+    const me = await send(context, "/api/account/me", { headers: { Cookie: cookie } });
+    assert.equal(me.status, 200);
+    assert.equal((await me.json()).member.email, "viewer@example.com");
+
+    const preferences = await send(context, "/api/account/preferences", {
+      method: "POST",
+      headers: { Origin: "https://example.com", Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ email_notifications: false, category_filter: ["Technology"] }),
+    });
+    assert.equal(preferences.status, 200);
+    const member = (await preferences.json()).member;
+    assert.equal(member.email_notifications, false);
+    assert.deepEqual(member.category_filter, ["Technology"]);
   } finally {
     globalThis.fetch = originalFetch;
   }
