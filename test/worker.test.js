@@ -209,10 +209,12 @@ test("home page contains the account, browser alert and shortcut controls", () =
   assert.match(source, /id="member-login-form"/);
   assert.match(source, /id="browser-alert-button"/);
   assert.match(source, /id="shortcut-button"/);
+  assert.match(source, /id="notification-feed"/);
   assert.match(source, /manifest\.webmanifest/);
   assert.match(script, /Notification\.requestPermission/);
   assert.match(script, /beforeinstallprompt/);
   assert.match(script, /\/api\/notifications\/latest/);
+  assert.match(script, /renderNotificationFeed/);
 });
 
 test("renders Facebook Reel records through the official responsive plugin URL", async () => {
