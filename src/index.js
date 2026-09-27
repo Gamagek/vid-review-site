@@ -2421,7 +2421,8 @@ async function videoSitemapResponse(request, env, page) {
         ? `<video:player_loc allow_embed="yes">${escapeXml(playerUrl)}</video:player_loc>`
         : `<video:content_loc>${escapeXml(absoluteUrl(row.source_url, base))}</video:content_loc>`;
       const publicationDate = row.source_published_at || row.created_at;
-      const duration = parseDurationSeconds(row.source_duration);\n      videoEntry = `<video:video><video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc><video:title>${escapeXml(row.title)}</video:title><video:description>${escapeXml(description)}</video:description>${location}<video:publication_date>${escapeXml(publicationDate)}</video:publication_date>${duration ? `<video:duration>${duration}</video:duration>` : ""}</video:video>`;
+      const duration = parseDurationSeconds(row.source_duration);
+      videoEntry = `<video:video><video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc><video:title>${escapeXml(row.title)}</video:title><video:description>${escapeXml(description)}</video:description>${location}<video:publication_date>${escapeXml(publicationDate)}</video:publication_date>${duration ? `<video:duration>${duration}</video:duration>` : ""}</video:video>`;
     }
     return `<url><loc>${escapeXml(canonical)}</loc><lastmod>${escapeXml(row.updated_at)}</lastmod>${videoEntry}</url>`;
   }).join("");
