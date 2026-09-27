@@ -1424,7 +1424,7 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
   if (hostname === "facebook.com" || hostname.endsWith(".facebook.com") || hostname === "fb.watch") {
     return {
       source_url: url.toString(),
-      embed_url: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url.toString())}&show_text=false&width=1280`,
+      embed_url: buildFacebookPlayerUrl(url.toString()),
       media_type: "facebook",
       provider: "facebook",
       r2_key: null,
