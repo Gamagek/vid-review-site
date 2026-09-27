@@ -15,6 +15,7 @@ const migrations = [
   "0005_source_video_metadata.sql",
   "0009_app_settings.sql",
   "0010_video_analysis.sql",
+  "0013_member_notifications.sql",
 ];
 
 class TestD1Statement {
@@ -131,6 +132,73 @@ async function login(context) {
     headers: { Authorization: `Bearer ${secret}`, "CF-Connecting-IP": "192.0.2.1" },
   });
 }
+
+test("supports email magic-link account sessions and preferences", async () => {
+  const context = createTestContext();
+  const originalFetch = globalThis.fetch;
+  let sentEmail;
+  globalThis.fetch = async (url, options) => {
+    if (String(url) !== "https://api.resend.com/emails") return originalFetch(url, options);
+    sentEmail = JSON.parse(options.body);
+    return new Response(JSON.stringify({ id: "email-test-id" }), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  try {
+    const login = await send(context, "/api/account/login", {
+      method: "POST",
+      headers: { Origin: "https://example.com", "Content-Type": "application/json" },
+      body: JSON.stringify({ email: "Viewer@example.com" }),
+    });
+    assert.equal(login.status, 503);
+
+    const configured = createTestContext({
+      RESEND_API_KEY: "re_test_key",
+      EMAIL_FROM: "Vid.Best <notifications@example.com>",
+    });
+    const requested = await send(configured, "/api/account/login", {
+      method: "POST",
+      headers: { Origin: "https://example.com", "Content-Type": "application/json" },
+      body: JSON.stringify({ email: "Viewer@example.com" }),
+    });
+    assert.equal(requested.status, 200);
+    assert.equal(sentEmail, undefined);
+
+    const tokenRow = configured.sqlite.prepare("SELECT token_hash, expires_at FROM member_login_tokens LIMIT 1").get();
+    assert.ok(tokenRow?.token_hash);
+    assert.ok(sentEmail === undefined || sentEmail.to);
+    const rawToken = [...configured.sqlite.prepare("SELECT token_hash FROM member_login_tokens").all()].length;
+    assert.equal(rawToken, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("renders Facebook records through the official plugin URL even when stored embed_url is stale", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+       slug, title, source_url, embed_url, media_type, primary_category, subcategory, description, published
+     ) VALUES (?, ?, ?, ?, 'facebook', 'Social Media & Trending', 'Facebook Reels Highlights', ?, 1)`,
+  ).run(
+    "facebook-existing-one",
+    "Facebook existing one",
+    "https://www.facebook.com/watch/?v=123456789",
+    "https://www.facebook.com/broken-old-embed",
+    "Facebook playback compatibility test",
+  );
+
+  const page = await send(context, "/watch/facebook-existing-one");
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.match(html, /facebook-official-player/);
+  assert.match(html, /facebook\.com\/plugins\/video\.php\?href=/);
+  assert.doesNotMatch(html, /broken-old-embed/);
+
+  const api = await send(context, "/api/videos/facebook-existing-one");
+  assert.equal(api.status, 200);
+  const video = (await api.json()).video;
+  assert.equal(video.provider, "facebook");
+  assert.match(video.embed_url, /facebook\.com\/plugins\/video\.php/);
+});
 
 test("rejects non-object JSON before processing it", async () => {
   const context = createTestContext();
