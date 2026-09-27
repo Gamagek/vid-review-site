@@ -2444,7 +2444,15 @@ function parseDurationSeconds(value) {
 
 function robotsResponse(request, env) {
   const base = getBaseUrl(request, env);
-  const body = `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nSitemap: ${base}/sitemap.xml\n`;
+  const body = [
+    "User-agent: *",
+    "Allow: /",
+    "Disallow: /admin",
+    "Disallow: /api/",
+    "Allow: /api/tiktok/thumbnail",
+    "Allow: /api/tiktok/preflight",
+    `Sitemap: ${base}/sitemap.xml`,
+  ].join("\n") + "\n";
   return new Response(body, {
     headers: securityHeaders(new Headers({ "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=3600" })),
   });
