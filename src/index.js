@@ -176,6 +176,7 @@ async function route(request, env, ctx) {
   if (path === "/api/account/preferences" && request.method === "POST") return updateMemberPreferences(request, env);
   if (path === "/api/account/session" && request.method === "DELETE") return logoutMember(request, env);
   if (path === "/api/notifications/latest" && request.method === "GET") return latestNotifications(env);
+  if (path === "/api/facebook/resolve" && request.method === "GET") return resolveFacebookEndpoint(request, env);
 
   if (path === "/api/tiktok/preflight" && request.method === "GET") {
     return tikTokPreflight(request, env, ctx);
@@ -774,7 +775,7 @@ function serializeVideo(row) {
   return {
     ...row,
     provider,
-    embed_url: provider === "facebook" ? buildFacebookPlayerUrl(row.source_url) || row.embed_url || null : row.embed_url,
+    embed_url: provider === "facebook" ? row.embed_url || buildFacebookPlayerUrl(row.source_url) || null : row.embed_url,
     thumbnail_url: row.thumbnail_url || null,
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
@@ -1069,7 +1070,9 @@ async function listVideos(request, env, includeUnpublished) {
   const listStatement = env.DB.prepare(selectSql).bind(...bindings, limit, offset);
   const countStatement = env.DB.prepare(`SELECT COUNT(*) AS total FROM videos v ${whereSql}`).bind(...bindings);
   const [listResult, countRow] = await env.DB.batch([listStatement, countStatement]);
-  const videos = await hydrateVideos(env, listResult.results || []);
+  const videoRows = listResult.results || [];
+  await enrichFacebookRows(env, videoRows);
+  const videos = await hydrateVideos(env, videoRows);
 
   return json({
     videos,
@@ -1101,6 +1104,7 @@ async function getPublicVideo(env, slug) {
      WHERE v.slug = ? AND v.published = 1`,
   ).bind(slug).first();
   if (!row) throw new AppError(404, "Video not found");
+  await enrichFacebookRows(env, [row]);
   const [video] = await hydrateVideos(env, [row]);
   return json({ video });
 }
@@ -2044,6 +2048,7 @@ async function watchPage(request, env, ctx, slugInput) {
      WHERE v.slug = ? AND v.published = 1`,
   ).bind(slug).first();
   if (!row) return dynamicHtml(notFoundPage(), 404);
+  await enrichFacebookRows(env, [row]);
   const [video] = await hydrateVideos(env, [row]);
   ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
   const scriptNonce = createCspNonce();
@@ -2319,6 +2324,124 @@ function renderMedia(video, playbackOrigin) {
     : "";
   return `<video id="watch-media-video" controls playsinline preload="metadata"${poster}><source src="${escapeHtml(video.source_url)}">${captions}Your browser does not support this video.</video>`;
 }
+async function resolveFacebookEndpoint(request, env) {
+  const url = new URL(request.url);
+  const requested = cleanText(url.searchParams.get("url"), 2000);
+  if (!requested) throw new AppError(400, "Add a Facebook video URL");
+
+  const resolved = await resolveFacebookContentUrl(env, requested);
+  if (!resolved) throw new AppError(422, "Facebook video URL could not be resolved to a supported video page");
+
+  return json({
+    ok: true,
+    provider: "facebook",
+    source_url: resolved,
+    embed_url: buildFacebookPlayerUrl(resolved),
+  }, 200, { "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400" });
+}
+
+async function enrichFacebookRows(env, rows) {
+  const candidates = rows.filter((row) => isFacebookShareUrl(row?.source_url));
+  if (!candidates.length) return;
+
+  for (let index = 0; index < candidates.length; index += 4) {
+    const chunk = candidates.slice(index, index + 4);
+    const resolved = await Promise.all(chunk.map(async (row) => ({
+      row,
+      url: await resolveFacebookContentUrl(env, row.source_url),
+    })));
+    resolved.forEach(({ row, url }) => {
+      if (url) row.embed_url = buildFacebookPlayerUrl(url);
+    });
+  }
+}
+
+function isFacebookUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    return host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch";
+  } catch {
+    return false;
+  }
+}
+
+function isFacebookShareUrl(value) {
+  if (!isFacebookUrl(value)) return false;
+  try {
+    const path = new URL(String(value)).pathname.toLowerCase();
+    return /^\/share\/v\/[^/]+\/?$/.test(path) || /^\/share\/r\/[^/]+\/?$/.test(path);
+  } catch {
+    return false;
+  }
+}
+
+function isSupportedFacebookContentUrl(value) {
+  if (!isFacebookUrl(value)) return false;
+  try {
+    const url = new URL(String(value));
+    if (url.protocol !== "https:") return false;
+    const path = url.pathname.toLowerCase();
+    return /^\/reel\/[^/]+\/?$/.test(path)
+      || /^\/[^/]+\/reels?\/(?:pfbid[\w-]+|[^/]+)\/?$/.test(path)
+      || /^\/[^/]+\/videos\/[^/]+\/?$/.test(path)
+      || /^\/watch\/\?(?:[^#]*&)?v=\d+/.test(url.pathname + url.search)
+      || /^\/video\.php$/.test(path) && url.searchParams.has("v");
+  } catch {
+    return false;
+  }
+}
+
+async function resolveFacebookContentUrl(env, sourceUrl) {
+  if (!isFacebookUrl(sourceUrl)) return null;
+  let input;
+  try {
+    input = new URL(String(sourceUrl));
+  } catch {
+    return null;
+  }
+  if (input.protocol !== "https:") return null;
+  if (!isFacebookShareUrl(input)) return input.toString();
+
+  const cache = typeof caches !== "undefined" && caches.default ? caches.default : null;
+  const cacheKey = new Request(
+    "https://vid.best/__facebook-resolve?url=" + encodeURIComponent(input.toString()),
+  );
+  if (cache) {
+    const cached = await cache.match(cacheKey);
+    if (cached) {
+      try {
+        const payload = await cached.json();
+        if (isSupportedFacebookContentUrl(payload?.url)) return payload.url;
+      } catch {}
+    }
+  }
+
+  try {
+    const response = await fetch(input.toString(), {
+      method: "GET",
+      redirect: "follow",
+      headers: {
+        Accept: "text/html,application/xhtml+xml",
+        "User-Agent": "VidBest-Facebook-Facade/1.0",
+      },
+      signal: AbortSignal.timeout(7000),
+    });
+    const finalUrl = String(response.url || "");
+    if (!response.ok || !isSupportedFacebookContentUrl(finalUrl)) return null;
+
+    if (cache) {
+      const cached = json({ url: finalUrl }, 200, {
+        "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+      });
+      await cache.put(cacheKey, cached.clone());
+    }
+    return finalUrl;
+  } catch {
+    return null;
+  }
+}
+
 function buildFacebookPlayerUrl(sourceUrl) {
   try {
     const url = new URL(String(sourceUrl || ""));
