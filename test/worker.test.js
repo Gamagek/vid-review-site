@@ -884,9 +884,9 @@ test("serves the seeded YouTube demo and records privacy-hashed interests", asyn
 test("SEO edge exposes a crawlable video index and pages sitemap", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
-    "INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, description, published) VALUES
+    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, description, published) VALUES
       ('seo-video-one', 'SEO video one', 'https://example.com/video-one.mp4', 'raw', 'Technology', 'Web Development', 'A unique description for search discovery', 1),
-      ('seo-video-two', 'SEO video two', 'https://example.com/video-two.mp4', 'raw', 'Education', 'Tutorials & How-Tos', 'Another unique description for search discovery', 1)",
+      ('seo-video-two', 'SEO video two', 'https://example.com/video-two.mp4', 'raw', 'Education', 'Tutorials & How-Tos', 'Another unique description for search discovery', 1)`,
   ).run();
 
   const videosPage = await seoEdge.fetch(new Request('https://example.com/videos'), context.env, context.ctx);
@@ -1013,6 +1013,48 @@ test("starts owned R2 analysis through the authenticated Teamwork API", async ()
   }
 });
 
+test("enriches Facebook share links with a Microlink-style thumbnail and official embed metadata", async () => {
+  const context = createTestContext();
+  const share = "https://www.facebook.com/share/v/1EwUUT7MN8/";
+  const canonical = "https://www.facebook.com/darmalipi/videos/pause-for-a-moment-breathe-observe-dscover-the-profound-peace-of-theravada-vipas/1986667352042256/";
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+       slug, title, source_url, media_type, primary_category, subcategory, description, published
+     ) VALUES ('facebook-preview-test', 'Fallback title', ?, 'raw', 'Social Media & Trending', 'Facebook Reels Highlights', 'Fallback description', 1)`,
+  ).run(share);
+
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    const value = String(url);
+    if (value === share) {
+      return { ok: true, url: canonical };
+    }
+    if (value === canonical) {
+      return new Response(
+        `<!doctype html><meta property="og:title" content="Pause for a moment, Breathe, Observe."><meta property="og:description" content="Discover the profound peace of Theravada Vipassana meditation."><meta property="og:image" content="https://scontent.xx.fbcdn.net/test.jpg">`,
+        { status: 200, headers: { "Content-Type": "text/html" } },
+      );
+    }
+    throw new Error("Unexpected Facebook request: " + value);
+  };
+  try {
+    const response = await send(context, "/api/videos/facebook-preview-test");
+    assert.equal(response.status, 200);
+    const result = await response.json();
+    assert.equal(result.video.provider, "facebook");
+    assert.equal(result.video.thumbnail_url, "https://scontent.xx.fbcdn.net/test.jpg");
+    assert.equal(result.video.facebook_preview_title, "Pause for a moment, Breathe, Observe.");
+    assert.match(result.video.facebook_preview_description, /Theravada Vipassana/);
+    assert.ok(result.video.embed_url.includes("facebook.com/plugins/video.php"));
+    assert.match(result.video.embed_url, /show_text=false/);
+    assert.match(result.video.embed_url, /width=560/);
+    assert.match(result.video.embed_url, /height=314/);
+    assert.match(result.video.embed_url, /1986667352042256/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("renders existing Facebook share and Reel URLs with the official video plugin", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
@@ -1034,6 +1076,19 @@ test("renders existing Facebook share and Reel URLs with the official video plug
     assert.match(html, /t=0/);
     assert.match(html, /allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share; fullscreen"/);
   }
+});
+
+test("notification hub hides mail transport details and keeps browser alert controls", () => {
+  const source = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
+  assert.match(source, /id="browser-alert-button"/);
+  assert.match(source, /id="shortcut-button"/);
+  assert.doesNotMatch(source, /Email sign-in and new-video emails use your verified sending setup/);
+  assert.doesNotMatch(source, />New video emails</);
+  assert.match(source, /Account email/);
+  assert.match(source, />Email alerts</);
+  const script = readFileSync(new URL("../public/notifications.js", import.meta.url), "utf8");
+  assert.doesNotMatch(script, /\[object HTMLParagraphElement\]/);
+  assert.match(script, /message\.textContent/);
 });
 
 test("TikTok keeps separate share preview and player paths", () => {

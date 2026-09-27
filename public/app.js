@@ -314,6 +314,10 @@ function buildVideoCard(video) {
   card.dataset.videoSource = video.source_url || "";
   card.dataset.videoEmbed = video.embed_url || "";
   card.dataset.videoThumbnail = video.thumbnail_url || "";
+  card.dataset.facebookPreviewTitle = video.facebook_preview_title || "";
+  card.dataset.facebookPreviewDescription = video.facebook_preview_description || "";
+  card.dataset.facebookPreviewAuthor = video.facebook_preview_author || "";
+  card.dataset.videoThumbnail = video.thumbnail_url || "";
   card.querySelector(".tile-media").href = pageUrl;
   card.querySelector(".tile-title").href = pageUrl;
   card.querySelector(".tile-title").textContent = video.title;

@@ -321,6 +321,11 @@ function updatePreview() {
     return;
   }
 
+  if (parsed.provider === "facebook") {
+    renderFacebookPreview(target, parsed.embed);
+    return;
+  }
+
   if (parsed.embed) {
     const iframe = document.createElement("iframe");
     iframe.src = parsed.embed;
@@ -343,6 +348,42 @@ function updatePreview() {
     if (thumbnail) video.poster = thumbnail;
     ui.preview.append(video);
   }
+}
+
+async function renderFacebookPreview(sourceUrl, fallbackEmbed) {
+  const shell = document.createElement("div");
+  shell.className = "admin-facebook-preview";
+  const note = document.createElement("p");
+  note.className = "form-status";
+  note.textContent = "Loading Facebook player preview…";
+  shell.append(note);
+  ui.preview.append(shell);
+
+  let embedUrl = fallbackEmbed;
+  try {
+    const response = await requestJson("/api/facebook/resolve?url=" + encodeURIComponent(sourceUrl), { headers: { Accept: "application/json" } });
+    embedUrl = response.embed_url || embedUrl;
+  } catch {
+    // Keep the direct official Facebook plugin URL as the fallback preview.
+  }
+
+  shell.replaceChildren();
+  if (!embedUrl) {
+    const message = document.createElement("p");
+    message.className = "form-status error";
+    message.textContent = "Facebook preview could not be resolved. The saved official player will try the original link.";
+    shell.append(message);
+    return;
+  }
+  const iframe = document.createElement("iframe");
+  iframe.src = embedUrl;
+  iframe.title = "Facebook video preview";
+  iframe.loading = "lazy";
+  iframe.allow = "autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share";
+  iframe.allowFullscreen = true;
+  iframe.referrerPolicy = "strict-origin-when-cross-origin";
+  iframe.className = "facebook-official-player";
+  shell.append(iframe);
 }
 
 function renderTikTokPreview(sourceUrl, videoId) {
@@ -440,7 +481,10 @@ function parseEmbed(value) {
       return id ? { provider: "tiktok", id, source: url.toString() } : {};
     }
     if (host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch") {
-      return { embed: `https://www.facebook.com/plugins/video.php?height=314&href=${encodeURIComponent(url.toString())}&show_text=false&width=560&t=0` };
+      return {
+        provider: "facebook",
+        embed: `https://www.facebook.com/plugins/video.php?height=314&href=${encodeURIComponent(url.toString())}&show_text=false&width=560&t=0`,
+      };
     }
     if (host === "vimeo.com" || host.endsWith(".vimeo.com")) {
       const id = url.pathname.match(/\/(?:video\/)?(\d+)/)?.[1];

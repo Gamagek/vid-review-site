@@ -344,11 +344,14 @@ function matchesCategory(video) {
 
 function setStatus(message, type = "") {
   if (!HUB.status) return;
-  const value = message instanceof Element
-    ? (message.textContent || "")
-    : (message && typeof message === "object" && "message" in message
-      ? String(message.message || "")
-      : String(message ?? ""));
+  let value = "";
+  if (message && typeof message === "object") {
+    if (typeof message.textContent === "string") value = message.textContent;
+    else if ("message" in message) value = String(message.message || "");
+    else value = "";
+  } else {
+    value = String(message ?? "");
+  }
   HUB.status.textContent = value;
   HUB.status.dataset.state = type;
 }
