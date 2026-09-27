@@ -931,9 +931,9 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(watchSource, /"x-tiktok-player": true/);
   assert.match(watchSource, /onPlayerError/);
   assert.match(watchSource, /className = "vidbest-tiktok-retry"/);
-  assert.match(watchSource, /const remote = \[\"youtube\", \"vimeo\", \"tiktok\"\]\.includes\(provider\)/);
+  assert.match(watchSource, /const remote = \[\"youtube\", \"vimeo\", \"tiktok\", \"facebook\"\]\.includes\(provider\)/);
   assert.match(watchSource, /if \(remote\) \{/);
-  assert.doesNotMatch(watchSource, /remote = provider === "youtube" \|\| provider === "vimeo" \|\| provider === "tiktok";[\s\S]{0,1200}overlay.append\(play, back, forward/);
+  assert.doesNotMatch(watchSource, /remote = provider === "youtube" \|\| provider === "vimeo" \|\| provider === "tiktok" \|\| provider === "facebook";[\s\S]{0,1200}overlay.append\(play, back, forward/);
   assert.match(watchSource, /Retry TikTok player/);
   assert.match(watchSource, /\/api\/tiktok\/preflight/);
   assert.match(watchSource, /standard official embed/);
