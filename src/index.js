@@ -1072,7 +1072,6 @@ async function listVideos(request, env, includeUnpublished) {
   const countStatement = env.DB.prepare(`SELECT COUNT(*) AS total FROM videos v ${whereSql}`).bind(...bindings);
   const [listResult, countRow] = await env.DB.batch([listStatement, countStatement]);
   const videoRows = listResult.results || [];
-  await enrichFacebookRows(env, videoRows);
   const videos = await hydrateVideos(env, videoRows);
 
   return json({
@@ -2456,6 +2455,15 @@ async function fetchFacebookPreview(env, sourceUrl) {
     author = authorMatch?.[1] ? decodeURIComponent(authorMatch[1]) : "";
   } catch {}
 
+  if (!thumbnailUrl || !title || !description) {
+    const fallback = await fetchMicrolinkFacebookPreview(original);
+    if (fallback) {
+      title = title || fallback.title || "";
+      description = description || fallback.description || "";
+      thumbnailUrl = thumbnailUrl || fallback.thumbnail_url || "";
+    }
+  }
+
   const payload = {
     url: resolvedUrl,
     title,
@@ -2603,6 +2611,32 @@ function getSafeFacebookEmbedUrl(video) {
     }
   } catch {}
   return buildFacebookPlayerUrl(video.source_url);
+}
+
+async function fetchMicrolinkFacebookPreview(sourceUrl) {
+  try {
+    const target = new URL(String(sourceUrl));
+    if (target.protocol !== "https:") return null;
+    const api = new URL("https://api.microlink.io/");
+    api.searchParams.set("url", target.toString());
+    api.searchParams.set("meta", "true");
+    api.searchParams.set("filter", "title,description,image.url,author,url");
+    const response = await fetch(api.toString(), {
+      headers: { Accept: "application/json", "User-Agent": "VidBest-Facebook-Facade/1.0" },
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!response.ok) return null;
+    const payload = await response.json().catch(() => null);
+    const data = payload?.data || {};
+    return {
+      title: decodeHtmlEntities(cleanText(data.title, 180)),
+      description: decodeHtmlEntities(cleanText(data.description, 320)),
+      thumbnail_url: safeFacebookThumbnailUrl(data?.image?.url),
+      author: decodeHtmlEntities(cleanText(data.author, 120)),
+    };
+  } catch {
+    return null;
+  }
 }
 
 function buildFacebookPlayerUrl(sourceUrl) {

@@ -279,10 +279,9 @@ function stopPreview(card = null, statusMessage = "") {
 function renderFacebookFacade(card) {
   const surface = card.querySelector(".preview-surface");
   if (!surface) return;
-  const imageSource = card.dataset.videoThumbnail || card.querySelector(".tile-media img")?.src || "";
+  const fallbackImageSource = buildFacebookMicrolinkImageUrl(card.dataset.videoSource);
+  const imageSource = card.dataset.videoThumbnail || fallbackImageSource;
   const title = card.dataset.facebookPreviewTitle || card.dataset.videoTitle || "Facebook video";
-  const description = card.dataset.facebookPreviewDescription || "";
-  const author = card.dataset.facebookPreviewAuthor || "facebook.com";
   const facade = document.createElement("span");
   facade.className = "facebook-microlink-preview";
 
@@ -291,10 +290,18 @@ function renderFacebookFacade(card) {
   if (imageSource) {
     const image = document.createElement("img");
     image.alt = "";
-    image.loading = "lazy";
+    const nearViewport = card.getBoundingClientRect().top < window.innerHeight * 1.5;
+    image.loading = nearViewport ? "eager" : "lazy";
     image.decoding = "async";
+    if (nearViewport) image.fetchPriority = "high";
     image.src = imageSource;
-    image.addEventListener("error", () => imageWrap.classList.add("is-empty"), { once: true });
+    image.addEventListener("error", () => {
+      if (fallbackImageSource && image.src !== fallbackImageSource) {
+        image.src = fallbackImageSource;
+        return;
+      }
+      imageWrap.classList.add("is-empty");
+    });
     imageWrap.append(image);
   } else {
     imageWrap.classList.add("is-empty");
@@ -308,11 +315,7 @@ function renderFacebookFacade(card) {
   const heading = document.createElement("span");
   heading.className = "facebook-microlink-title";
   heading.textContent = title;
-  const caption = document.createElement("span");
-  caption.className = "facebook-microlink-caption";
-  caption.textContent = description;
   body.append(provider, heading);
-  if (description) body.append(caption);
   facade.append(imageWrap, body);
   surface.replaceChildren(facade);
   card.classList.add("facebook-facade-ready");
@@ -343,6 +346,21 @@ async function loadTikTokFacadePreviews() {
     });
   } finally {
     tiktokFacadeLoading = false;
+  }
+}
+
+function buildFacebookMicrolinkImageUrl(sourceUrl) {
+  try {
+    const url = new URL(String(sourceUrl || ""));
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    if (!(host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch")) return "";
+    const api = new URL("https://api.microlink.io/");
+    api.searchParams.set("url", url.toString());
+    api.searchParams.set("meta", "false");
+    api.searchParams.set("embed", "image.url");
+    return api.toString();
+  } catch {
+    return "";
   }
 }
 
