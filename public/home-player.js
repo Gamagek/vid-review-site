@@ -279,10 +279,9 @@ function stopPreview(card = null, statusMessage = "") {
 function renderFacebookFacade(card) {
   const surface = card.querySelector(".preview-surface");
   if (!surface) return;
-  const imageSource = card.dataset.videoThumbnail || buildFacebookMicrolinkImageUrl(card.dataset.videoSource);
+  const fallbackImageSource = buildFacebookMicrolinkImageUrl(card.dataset.videoSource);
+  const imageSource = card.dataset.videoThumbnail || fallbackImageSource;
   const title = card.dataset.facebookPreviewTitle || card.dataset.videoTitle || "Facebook video";
-  const description = card.dataset.facebookPreviewDescription || "";
-  const author = card.dataset.facebookPreviewAuthor || "facebook.com";
   const facade = document.createElement("span");
   facade.className = "facebook-microlink-preview";
 
@@ -296,7 +295,13 @@ function renderFacebookFacade(card) {
     image.decoding = "async";
     if (nearViewport) image.fetchPriority = "high";
     image.src = imageSource;
-    image.addEventListener("error", () => imageWrap.classList.add("is-empty"), { once: true });
+    image.addEventListener("error", () => {
+      if (fallbackImageSource && image.src !== fallbackImageSource) {
+        image.src = fallbackImageSource;
+        return;
+      }
+      imageWrap.classList.add("is-empty");
+    });
     imageWrap.append(image);
   } else {
     imageWrap.classList.add("is-empty");
