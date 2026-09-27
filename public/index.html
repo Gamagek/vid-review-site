@@ -15,10 +15,12 @@
   <title>Vid.Best — Video Review & Discovery</title>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","@id":"https://vid.best/#website","name":"Vid.Best","url":"https://vid.best/","description":"Video review and discovery across technology, education, culture, travel and more."}</script>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/home-player.css">
   <script src="/app.js" defer></script>
   <script src="/home-player.js" defer></script>
+  <script src="/notifications.js" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -79,15 +81,16 @@
         </dl>
       </div>
 
-      <div class="carousel-shell" aria-label="Featured video reviews">
-        <div class="carousel-glow" aria-hidden="true"></div>
-        <div
-          id="featured-carousel"
-          class="carousel-stage"
-          aria-live="polite"
-        ></div>
+      <div class="hero-visual">
+        <div class="carousel-shell" aria-label="Featured video reviews">
+          <div class="carousel-glow" aria-hidden="true"></div>
+          <div
+            id="featured-carousel"
+            class="carousel-stage"
+            aria-live="polite"
+          ></div>
 
-        <div class="carousel-controls">
+          <div class="carousel-controls">
           <button
             id="carousel-prev"
             type="button"
@@ -109,7 +112,48 @@
           >
             →
           </button>
+          </div>
         </div>
+
+        <aside id="notification-hub" class="notification-hub glass-panel" aria-labelledby="notification-heading">
+          <div class="notification-hub-head">
+            <div>
+              <p class="eyebrow">Stay in the loop</p>
+              <h2 id="notification-heading">Smart video alerts</h2>
+              <p>Get new-video alerts by email or in your browser, with one-click access back to the review.</p>
+            </div>
+            <span class="notification-pulse" aria-hidden="true">●</span>
+          </div>
+
+          <form id="member-login-form" class="notification-login">
+            <label>
+              <span>Email sign-in</span>
+              <input id="member-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" maxlength="320" required>
+            </label>
+            <button id="member-login-button" class="button primary" type="submit">Email me a sign-in link</button>
+          </form>
+
+          <div id="member-account-view" class="notification-account" hidden>
+            <div class="notification-account-line"><strong>Signed in</strong><span id="member-account-email"></span></div>
+            <label>
+              <span>New video emails</span>
+              <input id="email-notifications-enabled" type="checkbox" checked>
+            </label>
+            <label>
+              <span>Topic</span>
+              <select id="notification-category">
+                <option value="">All categories</option>
+              </select>
+            </label>
+            <button id="member-logout-button" class="button text-button" type="button">Sign out</button>
+          </div>
+
+          <div class="notification-actions">
+            <button id="browser-alert-button" class="button ghost" type="button">Enable browser alerts</button>
+            <button id="shortcut-button" class="button ghost" type="button">Add Vid.Best shortcut</button>
+          </div>
+          <p id="notification-status" class="form-status" role="status">Browser alerts work while this page is open. Email alerts use a one-time sign-in link.</p>
+        </aside>
       </div>
     </section>
 
