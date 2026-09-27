@@ -2305,7 +2305,7 @@ function renderMedia(video, playbackOrigin) {
     return `<iframe id="watch-media-frame" class="tiktok-official-player" data-tiktok-share="${escapeHtml(video.source_url)}" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   }
   if (provider === "facebook") {
-    const facebookEmbed = buildFacebookPlayerUrl(video.source_url);
+    const facebookEmbed = video.embed_url || buildFacebookPlayerUrl(video.source_url);
     if (facebookEmbed) {
       return `<iframe id="watch-media-frame" class="facebook-official-player" src="${escapeHtml(facebookEmbed)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
     }
