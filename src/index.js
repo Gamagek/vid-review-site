@@ -2325,9 +2325,11 @@ function buildFacebookPlayerUrl(sourceUrl) {
     const host = url.hostname.toLowerCase().replace(/^www\./, "");
     if (!(host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch")) return "";
     const params = new URLSearchParams({
+      height: "314",
       href: url.toString(),
       show_text: "false",
-      width: "1280",
+      width: "560",
+      t: "0",
     });
     return `https://www.facebook.com/plugins/video.php?${params.toString()}`;
   } catch {
