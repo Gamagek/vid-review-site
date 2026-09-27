@@ -209,7 +209,7 @@ test("home page contains the account, browser alert and shortcut controls", () =
   assert.match(script, /beforeinstallprompt/);
   assert.match(script, /\/api\/notifications\/latest/);
   assert.doesNotMatch(script, /renderNotificationFeed/);
-  assert.doesNotMatch(script, /notification-feed-item/);
+  assert.match(script, /notification-feed-item/);
 });
 
 test("homepage Facebook tiles stay lightweight link previews", () => {
@@ -225,11 +225,10 @@ test("resolves a Facebook share URL into the official plugin player", async () =
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (url, options) => {
     if (String(url) === share) {
-      return new Response("", {
-        status: 200,
+      return {
+        ok: true,
         url: "https://www.facebook.com/reel/1986667352042256/",
-        headers: { "Content-Type": "text/html" },
-      });
+      };
     }
     return originalFetch(url, options);
   };
