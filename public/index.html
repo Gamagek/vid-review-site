@@ -152,7 +152,9 @@
             <button id="browser-alert-button" class="button ghost" type="button">Enable browser alerts</button>
             <button id="shortcut-button" class="button ghost" type="button">Add Vid.Best shortcut</button>
           </div>
-          <p id="notification-status" class="form-status" role="status">Browser alerts can work on this device. Email sign-in requires a verified outbound sender.</p>
+          <div id="notification-feed" class="notification-feed" aria-label="Latest Vid.Best videos" aria-live="polite"></div>
+          <p class="notification-email-help">Email sign-in and new-video emails use your verified sending setup. Cloudflare Email Routing can receive custom-domain mail; outbound sending can use the configured provider.</p>
+          <p id="notification-status" class="form-status" role="status">Browser alerts can work on this device.</p>
         </aside>
       </div>
     </section>
