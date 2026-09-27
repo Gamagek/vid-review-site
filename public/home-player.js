@@ -1,6 +1,7 @@
 const PREVIEW_DELAY_MS = 3000;
+const FACEBOOK_PREVIEW_DELAY_MS = 500;
 const PREVIEW_VISIBILITY = 0.72;
-const EMBED_PREVIEW_PROVIDERS = new Set(["youtube", "vimeo", "dailymotion", "twitch"]);
+const EMBED_PREVIEW_PROVIDERS = new Set(["youtube", "vimeo", "dailymotion", "twitch", "facebook"]);
 const ALLOWED_EMBED_HOSTS = new Set([
   "www.youtube-nocookie.com",
   "www.youtube.com",
@@ -55,7 +56,6 @@ function decorateVideoCards() {
     media.addEventListener("blur", () => cancelCandidate(card));
     previewState.observer?.observe(card);
   });
-  renderFacebookFacades();
   loadTikTokFacadePreviews();
 }
 
@@ -72,12 +72,18 @@ function previewAvailabilityMessage(card) {
       ? "TikTok preview · tap to open"
       : "TikTok preview needs a normal sharing link";
   }
+  if (card.dataset.videoProvider === "facebook") {
+    return canPreview(card) ? "Facebook video preview" : "Open video to play";
+  }
   return canPreview(card) ? "Hold for a 3-second preview" : "Open video to play";
 }
 
 function canPreview(card) {
   const provider = card.dataset.videoProvider;
-  if (provider === "tiktok" || provider === "facebook") return false;
+  if (provider === "tiktok") return false;
+  if (provider === "facebook") {
+    return Boolean(card.dataset.videoEmbed || card.dataset.videoSource);
+  }
   const direct = Boolean(card.dataset.videoSource) && ["direct", "raw", "r2"].includes(provider);
   const embed = Boolean(card.dataset.videoEmbed) && EMBED_PREVIEW_PROVIDERS.has(provider);
   return direct || embed;
@@ -132,8 +138,11 @@ function schedulePreview(card) {
   cancelCandidate();
   previewState.candidateCard = card;
   card.classList.add("preview-pending");
-  card.querySelector(".preview-status").textContent = "Preview starts in 3 seconds";
-  previewState.timer = window.setTimeout(() => startPreview(card), PREVIEW_DELAY_MS);
+  const delay = card.dataset.videoProvider === "facebook" ? FACEBOOK_PREVIEW_DELAY_MS : PREVIEW_DELAY_MS;
+  card.querySelector(".preview-status").textContent = card.dataset.videoProvider === "facebook"
+    ? "Loading Facebook preview…"
+    : "Preview starts in 3 seconds";
+  previewState.timer = window.setTimeout(() => startPreview(card), delay);
 }
 
 function cancelCandidate(card = null) {
@@ -182,6 +191,7 @@ function startPreview(card) {
 
 function createPreviewPlayer(card) {
   const provider = card.dataset.videoProvider;
+  if (provider === "facebook") return createFacebookPreviewPlayer(card);
   if (["direct", "raw", "r2"].includes(provider)) {
     const source = safeMediaUrl(card.dataset.videoSource);
     if (!source) return null;
@@ -243,6 +253,76 @@ function safePreviewEmbed(value, provider) {
   }
 }
 
+function createFacebookPreviewPlayer(card) {
+  const embed = buildFacebookPreviewEmbedUrl(card.dataset.videoEmbed, card.dataset.videoSource);
+  if (!embed) return null;
+
+  const iframe = document.createElement("iframe");
+  iframe.className = "facebook-mini-preview-player";
+  iframe.src = embed;
+  iframe.title = card.dataset.videoTitle + " muted Facebook preview";
+  iframe.loading = "eager";
+  iframe.referrerPolicy = "strict-origin-when-cross-origin";
+  iframe.allow = "autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share";
+  iframe.allowFullscreen = true;
+  iframe.tabIndex = -1;
+  iframe.setAttribute("aria-hidden", "true");
+
+  iframe.addEventListener("load", () => {
+    if (previewState.activeCard === card) {
+      const status = card.querySelector(".preview-status");
+      if (status) status.textContent = "Facebook preview · muted";
+    }
+  }, { once: true });
+
+  return iframe;
+}
+
+function buildFacebookPreviewEmbedUrl(embedValue, sourceValue) {
+  let href = "";
+  try {
+    const embed = new URL(String(embedValue || ""));
+    if (
+      embed.protocol === "https:"
+      && embed.hostname === "www.facebook.com"
+      && embed.pathname === "/plugins/video.php"
+    ) {
+      href = embed.searchParams.get("href") || "";
+    }
+  } catch {}
+
+  if (!href) {
+    try {
+      const source = new URL(String(sourceValue || ""));
+      const host = source.hostname.toLowerCase().replace(/^www\./, "");
+      if (host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch") {
+        href = source.toString();
+      }
+    } catch {}
+  }
+
+  if (!href) return "";
+
+  try {
+    const target = new URL(href);
+    const host = target.hostname.toLowerCase().replace(/^www\./, "");
+    if (!(host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch")) return "";
+
+    const params = new URLSearchParams({
+      height: "180",
+      href: target.toString(),
+      show_text: "false",
+      width: "320",
+      t: "0",
+      autoplay: "true",
+      mute: "1",
+    });
+    return "https://www.facebook.com/plugins/video.php?" + params.toString();
+  } catch {
+    return "";
+  }
+}
+
 function stopPreview(card = null, statusMessage = "") {
   if (card && previewState.activeCard !== card) return;
   const active = previewState.activeCard;
@@ -251,62 +331,9 @@ function stopPreview(card = null, statusMessage = "") {
   active.querySelector(".preview-surface video")?.pause();
   active.querySelector(".preview-surface")?.replaceChildren();
   active.classList.remove("preview-playing");
+  active.classList.remove("facebook-facade-ready");
   active.querySelector(".preview-status").textContent = statusMessage || previewAvailabilityMessage(active);
   previewState.activeCard = null;
-}
-
-function renderFacebookFacades() {
-  document.querySelectorAll('.video-tile[data-video-provider="facebook"]:not([data-facebook-facade-ready])').forEach((card) => {
-    const surface = card.querySelector(".preview-surface");
-    if (!surface) return;
-    surface.replaceChildren();
-    const facade = document.createElement("span");
-    facade.className = "facebook-microlink-preview";
-    const imageWrap = document.createElement("span");
-    imageWrap.className = "facebook-microlink-image";
-    const image = document.createElement("img");
-    image.alt = "";
-    image.loading = "lazy";
-    image.decoding = "async";
-    const thumbnail = card.dataset.videoThumbnail || "";
-    if (thumbnail) {
-      image.src = thumbnail;
-      image.addEventListener("error", () => imageWrap.replaceChildren(makeFacebookPlaceholder()), { once: true });
-      imageWrap.append(image);
-    } else {
-      imageWrap.append(makeFacebookPlaceholder());
-    }
-    const body = document.createElement("span");
-    body.className = "facebook-microlink-body";
-    const provider = document.createElement("span");
-    provider.className = "facebook-microlink-provider";
-    provider.textContent = "Facebook";
-    const author = document.createElement("span");
-    author.className = "facebook-microlink-author";
-    author.textContent = (card.dataset.facebookPreviewAuthor || "facebook.com") + " · Facebook";
-    const title = document.createElement("span");
-    title.className = "facebook-microlink-title";
-    title.textContent = card.dataset.facebookPreviewTitle
-      || card.dataset.videoTitle
-      || "Facebook video";
-    const caption = document.createElement("span");
-    caption.className = "facebook-microlink-caption";
-    caption.textContent = card.dataset.facebookPreviewDescription || "Open to watch on Facebook";
-    body.append(provider, author, title, caption);
-    facade.append(imageWrap, body);
-    surface.append(facade);
-    card.classList.add("facebook-facade-ready");
-    card.dataset.facebookFacadeReady = "1";
-    const status = card.querySelector(".preview-status");
-    if (status) status.textContent = "Facebook preview · tap to open";
-  });
-}
-
-function makeFacebookPlaceholder() {
-  const placeholder = document.createElement("span");
-  placeholder.className = "facebook-microlink-placeholder";
-  placeholder.textContent = "Facebook";
-  return placeholder;
 }
 
 let tiktokFacadeLoading = false;
