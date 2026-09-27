@@ -203,7 +203,7 @@ test("home page contains the account, browser alert and shortcut controls", () =
   assert.match(source, /id="member-login-form"/);
   assert.match(source, /id="browser-alert-button"/);
   assert.match(source, /id="shortcut-button"/);
-  assert.doesNotMatch(source, /id="notification-feed"/);
+  assert.match(source, /id="notification-feed"/);
   assert.match(source, /manifest\.webmanifest/);
   assert.match(script, /Notification\.requestPermission/);
   assert.match(script, /beforeinstallprompt/);
@@ -219,6 +219,36 @@ test("homepage Facebook tiles stay lightweight link previews", () => {
   assert.doesNotMatch(source, /provider === "facebook"[\\s\\S]{0,1800}createPreviewPlayer/);
   assert.doesNotMatch(source, /else if \(provider === "facebook"\)/);
 });
+test("resolves a Facebook share URL into the official plugin player", async () => {
+  const context = createTestContext();
+  const share = "https://www.facebook.com/share/v/1EwUUT7MN8/";
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, options) => {
+    if (String(url) === share) {
+      return new Response("", {
+        status: 200,
+        url: "https://www.facebook.com/reel/1986667352042256/",
+        headers: { "Content-Type": "text/html" },
+      });
+    }
+    return originalFetch(url, options);
+  };
+  try {
+    const response = await send(context, "/api/facebook/resolve?url=" + encodeURIComponent(share));
+    assert.equal(response.status, 200);
+    const result = await response.json();
+    assert.equal(result.source_url, "https://www.facebook.com/reel/1986667352042256/");
+    const embed = new URL(result.embed_url);
+    assert.equal(embed.pathname, "/plugins/video.php");
+    assert.equal(embed.searchParams.get("href"), "https://www.facebook.com/reel/1986667352042256/");
+    assert.equal(embed.searchParams.get("show_text"), "false");
+    assert.equal(embed.searchParams.get("width"), "560");
+    assert.equal(embed.searchParams.get("height"), "314");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("renders Facebook Reel records through the official responsive plugin URL", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
