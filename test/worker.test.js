@@ -1015,19 +1015,27 @@ test("starts owned R2 analysis through the authenticated Teamwork API", async ()
 
 test("enriches Facebook share links with a Microlink-style thumbnail and official embed metadata", async () => {
   const context = createTestContext();
+  const share = "https://www.facebook.com/share/v/1EwUUT7MN8/";
+  const canonical = "https://www.facebook.com/darmalipi/videos/pause-for-a-moment-breathe-observe-dscover-the-profound-peace-of-theravada-vipas/1986667352042256/";
   context.sqlite.prepare(
     `INSERT INTO videos (
        slug, title, source_url, media_type, primary_category, subcategory, description, published
-     ) VALUES ('facebook-preview-test', 'Fallback title', 'https://www.facebook.com/share/v/1EwUUT7MN8/', 'raw', 'Social Media & Trending', 'Facebook Reels Highlights', 'Fallback description', 1)`,
-  ).run();
+     ) VALUES ('facebook-preview-test', 'Fallback title', ?, 'raw', 'Social Media & Trending', 'Facebook Reels Highlights', 'Fallback description', 1)`,
+  ).run(share);
 
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (url) => {
-    assert.equal(String(url), "https://www.facebook.com/darmalipi/videos/pause-for-a-moment-breathe-observe-dscover-the-profound-peace-of-theravada-vipas/1986667352042256/");
-    return new Response(
-      `<!doctype html><meta property="og:title" content="Pause for a moment, Breathe, Observe."><meta property="og:description" content="Discover the profound peace of Theravada Vipassana meditation."><meta property="og:image" content="https://scontent.xx.fbcdn.net/test.jpg">`,
-      { status: 200, headers: { "Content-Type": "text/html" } },
-    );
+    const value = String(url);
+    if (value === share) {
+      return { ok: true, url: canonical };
+    }
+    if (value === canonical) {
+      return new Response(
+        `<!doctype html><meta property="og:title" content="Pause for a moment, Breathe, Observe."><meta property="og:description" content="Discover the profound peace of Theravada Vipassana meditation."><meta property="og:image" content="https://scontent.xx.fbcdn.net/test.jpg">`,
+        { status: 200, headers: { "Content-Type": "text/html" } },
+      );
+    }
+    throw new Error("Unexpected Facebook request: " + value);
   };
   try {
     const response = await send(context, "/api/videos/facebook-preview-test");
@@ -1037,7 +1045,7 @@ test("enriches Facebook share links with a Microlink-style thumbnail and officia
     assert.equal(result.video.thumbnail_url, "https://scontent.xx.fbcdn.net/test.jpg");
     assert.equal(result.video.facebook_preview_title, "Pause for a moment, Breathe, Observe.");
     assert.match(result.video.facebook_preview_description, /Theravada Vipassana/);
-    assert.match(result.video.embed_url, /facebook\.com\/plugins\/video\.php/);
+    assert.match(result.video.embed_url, /facebook\\.com\\/plugins\\/video\\.php/);
     assert.match(result.video.embed_url, /show_text=false/);
     assert.match(result.video.embed_url, /width=560/);
     assert.match(result.video.embed_url, /height=314/);
