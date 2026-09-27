@@ -282,10 +282,13 @@ function renderFacebookFacades() {
     provider.textContent = "Facebook";
     const author = document.createElement("span");
     author.className = "facebook-microlink-author";
-    author.textContent = "Facebook video · official player on watch page";
+    author.textContent = (card.dataset.facebookPreviewAuthor || "facebook.com") + " · Facebook";
     const caption = document.createElement("span");
     caption.className = "facebook-microlink-caption";
-    caption.textContent = card.dataset.videoTitle || "View this Facebook video";
+    caption.textContent = card.dataset.facebookPreviewDescription
+      || card.dataset.facebookPreviewTitle
+      || card.dataset.videoTitle
+      || "View this Facebook video";
     body.append(provider, author, caption);
     facade.append(imageWrap, body);
     surface.append(facade);
