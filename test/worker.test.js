@@ -186,6 +186,35 @@ test("supports email magic-link account sessions and preferences", async () => {
   }
 });
 
+test("serves the public latest-video notification feed", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+       slug, title, source_url, media_type, primary_category, subcategory, description, published
+     ) VALUES
+       ('notify-one', 'Notification one', 'https://example.com/one.mp4', 'raw', 'Technology', 'Web Development', 'One', 1),
+       ('notify-two', 'Notification two', 'https://example.com/two.mp4', 'raw', 'Education', 'Tutorials & How-Tos', 'Two', 1)`,
+  ).run();
+  const response = await send(context, "/api/notifications/latest");
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(payload.videos.length, 2);
+  assert.equal(payload.videos[0].title, "Notification two");
+});
+
+test("home page contains the account, browser alert and shortcut controls", () => {
+  const source = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
+  const script = readFileSync(new URL("../public/notifications.js", import.meta.url), "utf8");
+  assert.match(source, /id="notification-hub"/);
+  assert.match(source, /id="member-login-form"/);
+  assert.match(source, /id="browser-alert-button"/);
+  assert.match(source, /id="shortcut-button"/);
+  assert.match(source, /manifest\.webmanifest/);
+  assert.match(script, /Notification\.requestPermission/);
+  assert.match(script, /beforeinstallprompt/);
+  assert.match(script, /\/api\/notifications\/latest/);
+});
+
 test("renders Facebook records through the official plugin URL even when stored embed_url is stale", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
@@ -920,7 +949,7 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(homeSource, /PREVIEW_DELAY_MS = 3000/);
   assert.doesNotMatch(homeSource, /ensureTikTokEmbedScript/);
   assert.doesNotMatch(homeSource, /className = "tiktok-embed"/);
-  assert.match(homeSource, /provider === "tiktok"/);
+  assert.match(homeSource, /provider === "tiktok"/);\n  assert.match(homeSource, /provider === "facebook"/);
   assert.match(homeSource, /tiktok-microlink-preview/);
   assert.match(homeSource, /TikTok preview · tap to open/);
 
