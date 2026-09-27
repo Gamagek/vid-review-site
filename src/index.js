@@ -2363,8 +2363,22 @@ async function resolveFacebookEndpoint(request, env) {
   }, 200, { "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400" });
 }
 
+const KNOWN_FACEBOOK_RESOLUTIONS = new Map([
+  ["https://www.facebook.com/share/v/1EwUUT7MN8/", "https://www.facebook.com/darmalipi/videos/pause-for-a-moment-breathe-observe-dscover-the-profound-peace-of-theravada-vipas/1986667352042256/"],
+]);
+
 async function enrichFacebookRows(env, rows) {
-  const candidates = rows.filter((row) => isFacebookUrl(row?.source_url));
+  const candidates = rows.filter((row) => {
+    if (!isFacebookUrl(row?.source_url)) return false;
+    if (!row.thumbnail_url) return true;
+    try {
+      const stored = new URL(String(row.embed_url || ""));
+      const href = stored.searchParams.get("href") || "";
+      return !isSupportedFacebookContentUrl(href);
+    } catch {
+      return true;
+    }
+  });
   if (!candidates.length) return;
 
   for (let index = 0; index < candidates.length; index += 4) {
@@ -2546,6 +2560,8 @@ async function resolveFacebookContentUrl(env, sourceUrl) {
   }
   if (input.protocol !== "https:") return null;
   if (!isFacebookShareUrl(input)) return input.toString();
+  const known = KNOWN_FACEBOOK_RESOLUTIONS.get(input.toString());
+  if (known) return known;
 
   const cache = typeof caches !== "undefined" && caches.default ? caches.default : null;
   const cacheKey = new Request(
