@@ -2325,9 +2325,11 @@ function buildFacebookPlayerUrl(sourceUrl) {
     const host = url.hostname.toLowerCase().replace(/^www\./, "");
     if (!(host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch")) return "";
     const params = new URLSearchParams({
+      height: "314",
       href: url.toString(),
       show_text: "false",
-      width: "1280",
+      width: "560",
+      t: "0",
     });
     return `https://www.facebook.com/plugins/video.php?${params.toString()}`;
   } catch {
@@ -2442,7 +2444,15 @@ function parseDurationSeconds(value) {
 
 function robotsResponse(request, env) {
   const base = getBaseUrl(request, env);
-  const body = `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nSitemap: ${base}/sitemap.xml\n`;
+  const body = [
+    "User-agent: *",
+    "Allow: /",
+    "Disallow: /admin",
+    "Disallow: /api/",
+    "Allow: /api/tiktok/thumbnail",
+    "Allow: /api/tiktok/preflight",
+    `Sitemap: ${base}/sitemap.xml`,
+  ].join("\n") + "\n";
   return new Response(body, {
     headers: securityHeaders(new Headers({ "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=3600" })),
   });

@@ -215,7 +215,7 @@ test("home page contains the account, browser alert and shortcut controls", () =
   assert.match(script, /\/api\/notifications\/latest/);
 });
 
-test("renders Facebook records through the official plugin URL even when stored embed_url is stale", async () => {
+test("renders Facebook Reel records through the official responsive plugin URL", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
@@ -224,7 +224,7 @@ test("renders Facebook records through the official plugin URL even when stored 
   ).run(
     "facebook-existing-one",
     "Facebook existing one",
-    "https://www.facebook.com/watch/?v=123456789",
+    "https://www.facebook.com/reel/1986667352042256",
     "https://www.facebook.com/broken-old-embed",
     "Facebook playback compatibility test",
   );
@@ -233,14 +233,47 @@ test("renders Facebook records through the official plugin URL even when stored 
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /facebook-official-player/);
-  assert.match(html, /facebook\.com\/plugins\/video\.php\?href=/);
   assert.doesNotMatch(html, /broken-old-embed/);
+  const frame = html.match(/class="facebook-official-player"[^>]+src="([^"]+)"/)?.[1];
+  assert.ok(frame);
+  const embed = new URL(frame.replace(/&amp;/g, "&"));
+  assert.equal(embed.hostname, "www.facebook.com");
+  assert.equal(embed.pathname, "/plugins/video.php");
+  assert.equal(embed.searchParams.get("href"), "https://www.facebook.com/reel/1986667352042256");
+  assert.equal(embed.searchParams.get("show_text"), "false");
+  assert.equal(embed.searchParams.get("width"), "560");
+  assert.equal(embed.searchParams.get("height"), "314");
+  assert.equal(embed.searchParams.get("t"), "0");
 
   const api = await send(context, "/api/videos/facebook-existing-one");
   assert.equal(api.status, 200);
   const video = (await api.json()).video;
   assert.equal(video.provider, "facebook");
-  assert.match(video.embed_url, /facebook\.com\/plugins\/video\.php/);
+  const storedEmbed = new URL(video.embed_url);
+  assert.equal(storedEmbed.searchParams.get("show_text"), "false");
+  assert.equal(storedEmbed.searchParams.get("width"), "560");
+  assert.equal(storedEmbed.searchParams.get("height"), "314");
+});
+
+test("uses the requested Facebook Reel plugin structure for any Facebook video URL", async () => {
+  const source = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
+  const admin = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
+  assert.match(source, /height: "314"/);
+  assert.match(source, /show_text: "false"/);
+  assert.match(source, /width: "560"/);
+  assert.match(source, /t: "0"/);
+  assert.match(admin, /height=314&href=\$\{encodeURIComponent\(url\.toString\(\)\)\}&show_text=false&width=560&t=0/);
+});
+
+test("robots allows public video preview endpoints while keeping admin and API mutations blocked", async () => {
+  const context = createTestContext();
+  const response = await send(context, "/robots.txt");
+  assert.equal(response.status, 200);
+  const body = await response.text();
+  assert.match(body, /Disallow: \/api\//);
+  assert.match(body, /Allow: \/api\/tiktok\/thumbnail/);
+  assert.match(body, /Allow: \/api\/tiktok\/preflight/);
+  assert.match(body, /Sitemap: https:\/\/example\.com\/sitemap\.xml/);
 });
 
 test("rejects non-object JSON before processing it", async () => {
