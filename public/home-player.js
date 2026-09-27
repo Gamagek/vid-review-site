@@ -75,9 +75,9 @@ function previewAvailabilityMessage(card) {
       : "TikTok preview needs a normal sharing link";
   }
   if (card.dataset.videoProvider === "facebook") {
-    return canPreview(card) ? "Facebook video preview" : "Open video to play";
+    return "Facebook preview · tap to open";
   }
-  return canPreview(card) ? "Hold for a 3-second preview" : "Open video to play";
+  return canPreview(card) ? "Preview loads automatically" : "Open video to play";
 }
 
 function canPreview(card) {
