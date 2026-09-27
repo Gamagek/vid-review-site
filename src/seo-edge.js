@@ -319,8 +319,9 @@ async function combinedSitemap(env) {
   const categoryEntry = hasCategories
     ? `<sitemap><loc>${escapeXml(CANONICAL_ORIGIN + "/sitemaps/categories.xml")}</loc></sitemap>`
     : "";
+  const pagesEntry = `<sitemap><loc>${escapeXml(CANONICAL_ORIGIN + "/sitemaps/pages.xml")}</loc></sitemap>`;
 
-  const body = `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${videoSitemaps}${categoryEntry}</sitemapindex>`;
+  const body = `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${pagesEntry}${videoSitemaps}${categoryEntry}</sitemapindex>`;
   return new Response(body, {
     status: 200,
     headers: standardHeaders("application/xml; charset=utf-8", "public, max-age=900")
@@ -333,13 +334,64 @@ function homepageTopicLinks() {
   ).join(" · ");
 }
 
-function enrichHomepageHtml(html) {
+async function videoIndexPage(env) {
+  let rows = [];
+  try {
+    const result = await env.DB.prepare(
+      `SELECT slug, title, primary_category, subcategory, description
+       FROM videos
+       WHERE published = 1
+       ORDER BY featured DESC, trending DESC, updated_at DESC, id DESC
+       LIMIT 200`,
+    ).all();
+    rows = result.results || [];
+  } catch (error) {
+    console.error("Video index query failed", error?.message || error);
+  }
+
+  const canonical = `${CANONICAL_ORIGIN}/videos`;
+  const itemList = rows.map((row, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: row.title,
+    url: `${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}`
+  }));
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": canonical,
+    url: canonical,
+    name: "All Video Reviews, Tutorials & Discoveries | Vid.Best",
+    description: "Browse published Vid.Best video pages with permanent watch URLs.",
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: rows.length,
+      itemListElement: itemList
+    }
+  };
+
+  const links = rows.map((row) => {
+    const url = `${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}`;
+    const description = cleanLongText(row.description || "", 220) || "Open this permanent Vid.Best watch page.";
+    return `<article class="video-tile glass-panel"><div class="tile-content"><div class="tile-badges"><span class="badge">${escapeHtml(row.primary_category || "Video")}</span><span class="badge secondary">${escapeHtml(row.subcategory || "")}</span></div><h2><a class="tile-title" href="${escapeHtml(url)}">${escapeHtml(row.title)}</a></h2><p class="tile-description">${escapeHtml(description)}</p></div></article>`;
+  }).join("");
+
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>All Video Reviews, Tutorials &amp; Discoveries | Vid.Best</title><meta name="description" content="Browse published Vid.Best video reviews, tutorials and discoveries with permanent watch pages."><meta name="robots" content="index,follow,max-image-preview:large,max-video-preview:-1,max-snippet:-1"><link rel="canonical" href="${escapeHtml(canonical)}"><meta property="og:type" content="website"><meta property="og:site_name" content="Vid.Best"><meta property="og:title" content="All Video Reviews, Tutorials &amp; Discoveries | Vid.Best"><meta property="og:url" content="${escapeHtml(canonical)}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"><script type="application/ld+json">${jsonForHtml(schema)}</script></head><body><header class="site-header compact"><a class="brand" href="/" aria-label="Vid.Best homepage"><span class="brand-mark">V</span><span>Vid.Best</span></a><a class="button ghost" href="/">Explore all</a></header><main><section class="section-pad"><div class="section-heading"><div><p class="eyebrow">Permanent video library</p><h1>All published videos</h1></div><p>Every listed title links directly to a permanent Vid.Best watch page.</p></div><div class="video-grid">${links}</div></section></main><footer class="site-footer"><a class="brand small" href="/"><span class="brand-mark">V</span><span>Vid.Best</span></a><p>Video review and discovery, designed for curiosity.</p></footer></body></html>`;
+}
+
+async function pagesSitemap() {
+  const body = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${escapeXml(CANONICAL_ORIGIN + "/")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/videos")}</loc></url></urlset>`;
+  return new Response(body, {
+    headers: standardHeaders("application/xml; charset=utf-8", "public, max-age=900")
+  });
+}
+async function enrichHomepageHtml(html, env) {
   let output = String(html);
 
   if (!output.includes("vidbest-seo-topic-nav")) {
     const nav = `<nav id="vidbest-seo-topic-nav" class="vidbest-seo-topic-nav" aria-label="Explore video review categories">
       <strong>Explore video reviews by topic:</strong>
-      <span>${homepageTopicLinks()}</span>
+      <span>${homepageTopicLinks()} · <a href="${CANONICAL_ORIGIN}/videos">Browse all videos</a></span>
     </nav>`;
     output = output.replace("</footer>", `${nav}</footer>`);
   }
@@ -411,7 +463,7 @@ async function passThroughHome(request, env, ctx) {
 
   const rawHtml = await response.text();
   const watchHtml = url.pathname.startsWith("/watch/") ? enrichWatchHtml(rawHtml) : rawHtml;
-  const html = url.pathname === "/" ? enrichHomepageHtml(watchHtml) : watchHtml;
+  const html = url.pathname === "/" ? await enrichHomepageHtml(watchHtml, env) : watchHtml;
   headers.delete("Content-Length");
   return new Response(html, {
     status: response.status,
@@ -438,8 +490,16 @@ export default {
       return categorySitemap(env);
     }
 
+    if (url.pathname === "/sitemaps/pages.xml" && ["GET", "HEAD"].includes(request.method)) {
+      return pagesSitemap();
+    }
+
     if (url.pathname === "/sitemap.xml" && ["GET", "HEAD"].includes(request.method)) {
       return combinedSitemap(env);
+    }
+
+    if (url.pathname === "/videos" && ["GET", "HEAD"].includes(request.method)) {
+      return htmlResponse(await videoIndexPage(env));
     }
 
     return passThroughHome(request, env, ctx);
