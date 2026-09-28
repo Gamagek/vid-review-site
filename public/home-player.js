@@ -47,7 +47,10 @@ function decorateVideoCards() {
     const media = card.querySelector(".tile-media");
     if (!media) return;
     card.querySelector(".preview-status").textContent = previewAvailabilityMessage(card);
-    if (card.dataset.videoProvider === "facebook") renderFacebookFacade(card);
+    if (card.dataset.videoProvider === "facebook") {
+      mountFacebookDirectPlayer(card);
+      return;
+    }
     media.addEventListener("pointerenter", () => schedulePreview(card));
     media.addEventListener("pointerleave", () => {
       if (previewState.candidateCard === card && (previewState.visibility.get(card) || 0) < PREVIEW_VISIBILITY) {
@@ -75,7 +78,7 @@ function previewAvailabilityMessage(card) {
       : "TikTok preview needs a normal sharing link";
   }
   if (card.dataset.videoProvider === "facebook") {
-    return "Facebook preview · tap to open";
+    return "Loading Facebook player…";
   }
   return canPreview(card) ? "Preview loads automatically" : "Open video to play";
 }
@@ -83,9 +86,7 @@ function previewAvailabilityMessage(card) {
 function canPreview(card) {
   const provider = card.dataset.videoProvider;
   if (provider === "tiktok") return false;
-  if (provider === "facebook") {
-    return Boolean(card.dataset.videoEmbed || card.dataset.videoSource);
-  }
+  if (provider === "facebook") return false;
   const direct = Boolean(card.dataset.videoSource) && ["direct", "raw", "r2"].includes(provider);
   const embed = Boolean(card.dataset.videoEmbed) && EMBED_PREVIEW_PROVIDERS.has(provider);
   return direct || embed;
@@ -272,53 +273,93 @@ function stopPreview(card = null, statusMessage = "") {
   active.querySelector(".preview-surface")?.replaceChildren();
   active.classList.remove("preview-playing");
   active.classList.remove("facebook-facade-ready");
+  active.classList.remove("facebook-direct-player-ready");
   active.querySelector(".preview-status").textContent = statusMessage || previewAvailabilityMessage(active);
   previewState.activeCard = null;
 }
 
-function renderFacebookFacade(card) {
+function mountFacebookDirectPlayer(card) {
+  if (!card?.isConnected || card.dataset.facebookPlayerMounted === "1") return;
   const surface = card.querySelector(".preview-surface");
   if (!surface) return;
-  const fallbackImageSource = buildFacebookMicrolinkImageUrl(card.dataset.videoSource);
-  const imageSource = card.dataset.videoThumbnail || fallbackImageSource;
-  const title = card.dataset.facebookPreviewTitle || card.dataset.videoTitle || "Facebook video";
-  const facade = document.createElement("span");
-  facade.className = "facebook-microlink-preview";
 
-  const imageWrap = document.createElement("span");
-  imageWrap.className = "facebook-microlink-image";
-  if (imageSource) {
-    const image = document.createElement("img");
-    image.alt = "";
-    const nearViewport = card.getBoundingClientRect().top < window.innerHeight * 1.5;
-    image.loading = nearViewport ? "eager" : "lazy";
-    image.decoding = "async";
-    if (nearViewport) image.fetchPriority = "high";
-    image.src = imageSource;
-    image.addEventListener("error", () => {
-      if (fallbackImageSource && image.src !== fallbackImageSource) {
-        image.src = fallbackImageSource;
-        return;
-      }
-      imageWrap.classList.add("is-empty");
-    });
-    imageWrap.append(image);
-  } else {
-    imageWrap.classList.add("is-empty");
+  const embedUrl = safeFacebookDirectEmbed(card.dataset.videoEmbed, card.dataset.videoSource);
+  if (!embedUrl) {
+    const status = card.querySelector(".preview-status");
+    if (status) status.textContent = "Open video to play";
+    return;
   }
 
-  const body = document.createElement("span");
-  body.className = "facebook-microlink-body";
-  const provider = document.createElement("span");
-  provider.className = "facebook-microlink-provider";
-  provider.textContent = "facebook.com";
-  const heading = document.createElement("span");
-  heading.className = "facebook-microlink-title";
-  heading.textContent = title;
-  body.append(provider, heading);
-  facade.append(imageWrap, body);
-  surface.replaceChildren(facade);
-  card.classList.add("facebook-facade-ready");
+  const nearViewport = isNearViewport(card);
+  const iframe = document.createElement("iframe");
+  iframe.className = "facebook-direct-player";
+  iframe.src = embedUrl;
+  iframe.title = card.dataset.videoTitle || "Facebook video";
+  iframe.loading = nearViewport ? "eager" : "lazy";
+  iframe.fetchPriority = nearViewport ? "high" : "auto";
+  iframe.referrerPolicy = "strict-origin-when-cross-origin";
+  iframe.allow = "autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share; fullscreen";
+  iframe.allowFullscreen = true;
+  iframe.setAttribute("playsinline", "true");
+
+  surface.replaceChildren(iframe);
+  surface.style.opacity = "1";
+  card.classList.add("facebook-direct-player-ready");
+  card.dataset.facebookPlayerMounted = "1";
+  const status = card.querySelector(".preview-status");
+  if (status) status.textContent = "";
+}
+
+function isNearViewport(card) {
+  const rect = card.getBoundingClientRect();
+  return rect.top < window.innerHeight * 1.5 && rect.bottom > -200;
+}
+
+function safeFacebookDirectEmbed(embedValue, sourceValue) {
+  try {
+    const embed = new URL(String(embedValue || ""));
+    const host = embed.hostname.toLowerCase().replace(/^www\./, "");
+    const href = embed.searchParams.get("href") || "";
+    if (
+      embed.protocol === "https:" &&
+      host === "facebook.com" &&
+      embed.pathname === "/plugins/video.php" &&
+      isFacebookDirectSource(href)
+    ) {
+      embed.searchParams.set("show_text", "false");
+      embed.searchParams.set("autoplay", "true");
+      embed.searchParams.set("muted", "true");
+      return embed.toString();
+    }
+  } catch {}
+
+  try {
+    const source = new URL(String(sourceValue || ""));
+    const host = source.hostname.toLowerCase().replace(/^www\./, "");
+    if (!(host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch")) return "";
+    const params = new URLSearchParams({
+      height: "314",
+      href: source.toString(),
+      show_text: "false",
+      width: "560",
+      t: "0",
+      autoplay: "true",
+      muted: "true",
+    });
+    return "https://www.facebook.com/plugins/video.php?" + params.toString();
+  } catch {
+    return "";
+  }
+}
+
+function isFacebookDirectSource(value) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    return host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch";
+  } catch {
+    return false;
+  }
 }
 
 let tiktokFacadeLoading = false;
