@@ -213,27 +213,23 @@ test("home page contains the account, browser alert and shortcut controls", () =
   assert.match(script, /notification-feed-item/);
 });
 
-test("home embed previews return the transformed URL for supported providers", () => {
+test("home embed previews keep Facebook on the direct-player path", () => {
   const source = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(source, /else if \(provider === "twitch"\)[\s\S]*?url\.searchParams\.set\("parent", location\.hostname\);\s*}\s*return url\.href;/);
-  assert.match(source, /const EMBED_PREVIEW_PROVIDERS = new Set\(\["youtube", "vimeo", "dailymotion", "twitch", "facebook"\]\)/);
-  assert.match(source, /function buildFacebookPreviewEmbedUrl/);
+  assert.match(source, /const EMBED_PREVIEW_PROVIDERS = new Set\(\["youtube", "vimeo", "dailymotion", "twitch"\]\)/);
+  assert.match(source, /function mountFacebookDirectPlayer/);
+  assert.match(source, /function safeFacebookDirectEmbed/);
 });
 
-test("homepage Facebook tiles use a lightweight Microlink thumbnail facade", () => {
+test("homepage Facebook tiles use the direct official player", () => {
   const source = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
-  assert.match(source, /function renderFacebookFacade/);
-  assert.match(source, /function buildFacebookMicrolinkImageUrl/);
-  assert.match(source, /api\\.microlink\\.io/);
-  assert.match(source, /meta/);
-  assert.match(source, /embed/);
-  assert.match(source, /image\\.url/);
-  assert.match(source, /image\\.loading = nearViewport \\? "eager" : "lazy"/);
-  assert.match(source, /facebook-microlink-preview/);
-  assert.match(source, /facebook-microlink-title/);
-  assert.doesNotMatch(source, /function createFacebookPreviewPlayer/);
-  assert.doesNotMatch(source, /facebook-mini-preview-player/);
-  assert.doesNotMatch(source, /plugins\\/video\\.php/);
+  assert.match(source, /function mountFacebookDirectPlayer/);
+  assert.match(source, /facebook-direct-player/);
+  assert.match(source, /loading = isNearViewport\(card\) \? "eager" : "lazy"/);
+  assert.match(source, /fetchPriority = isNearViewport\(card\) \? "high" : "auto"/);
+  assert.match(source, /plugins\\/video\\.php/);
+  assert.doesNotMatch(source, /function renderFacebookFacade/);
+  assert.doesNotMatch(source, /facebook-microlink-preview/);
 });
 
 test("Facebook mini preview stays separate from the original-quality watch player", async () => {
@@ -248,8 +244,8 @@ test("Facebook mini preview stays separate from the original-quality watch playe
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /class="facebook-official-player"/);
-  assert.doesNotMatch(html, /autoplay=true/);
-  assert.doesNotMatch(html, /mute=1/);
+  assert.match(html, /autoplay=true/);
+  assert.match(html, /muted=true/);
 });
 
 test("resolves a Facebook share URL into the official plugin player", async () => {
@@ -1189,10 +1185,12 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.doesNotMatch(homeSource, /className = "tiktok-embed"/);
   assert.match(homeSource, /provider === "tiktok"/);
   assert.match(homeSource, /provider === "facebook"/);
-  assert.match(homeSource, /renderFacebookFacade/);
-  assert.match(homeSource, /facebook-microlink-preview/);
-  assert.doesNotMatch(homeSource, /facebook-mini-preview-player/);
-  assert.doesNotMatch(homeSource, /plugins\/video\.php/);
+  assert.match(homeSource, /mountFacebookDirectPlayer/);
+  assert.match(homeSource, /safeFacebookDirectEmbed/);
+  assert.match(homeSource, /facebook-direct-player/);
+  assert.match(homeSource, /plugins\/video\.php/);
+  assert.doesNotMatch(homeSource, /renderFacebookFacade/);
+  assert.doesNotMatch(homeSource, /facebook-microlink-preview/);
   assert.match(homeSource, /tiktok-microlink-preview/);
   assert.match(homeSource, /TikTok preview · tap to open/);
 
@@ -1202,16 +1200,15 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(indexSource, /tiktokcdn(?:-[a-z0-9-]+)?\.com/);
 });
 
-test("builds a compact Facebook facade without loading the Facebook plugin on the home grid", () => {
+test("builds a direct Facebook player without the old card facade", () => {
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
-  assert.match(homeSource, /renderFacebookFacade/);
-  assert.match(homeSource, /facebook-microlink-preview/);
-  assert.match(homeSource, /facebook-microlink-title/);
-  assert.match(homeSource, /facebook-microlink-caption/);
-  assert.doesNotMatch(homeSource, /createFacebookPreviewPlayer/);
+  assert.match(homeSource, /mountFacebookDirectPlayer/);
+  assert.match(homeSource, /safeFacebookDirectEmbed/);
+  assert.match(homeSource, /plugins\/video\.php/);
+  assert.match(homeSource, /iframe\.loading = isNearViewport\(card\) \? "eager" : "lazy"/);
+  assert.doesNotMatch(homeSource, /renderFacebookFacade/);
+  assert.doesNotMatch(homeSource, /facebook-microlink-preview/);
   assert.doesNotMatch(homeSource, /facebook-mini-preview-player/);
-  assert.doesNotMatch(homeSource, /plugins\/video\.php/);
-  assert.match(homeSource, /canPreview\(card\)/);
 });
 
 test("builds a batch TikTok facade preview from the configured facade endpoint", async () => {
