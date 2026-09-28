@@ -2691,6 +2691,8 @@ function buildFacebookPlayerUrl(sourceUrl) {
       show_text: "false",
       width: "560",
       t: "0",
+      autoplay: "true",
+      muted: "true",
     });
     return `https://www.facebook.com/plugins/video.php?${params.toString()}`;
   } catch {
