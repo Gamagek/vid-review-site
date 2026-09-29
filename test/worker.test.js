@@ -227,11 +227,66 @@ test("homepage Facebook tiles use the direct official player", () => {
   assert.match(source, /facebook-direct-player/);
   assert.match(source, /loading = isNearViewport\(card\) \? "eager" : "lazy"/);
   assert.match(source, /fetchPriority = isNearViewport\(card\) \? "high" : "auto"/);
-  assert.match(source, /plugins\\/video\\.php/);
+  assert.match(source, /plugins\/video\.php/);
   assert.doesNotMatch(source, /function renderFacebookFacade/);
   assert.doesNotMatch(source, /facebook-microlink-preview/);
 });
 
+test("signed /watch route rejects bad ids", async () => {
+  const context = createTestContext({ SIGN_SECRET: "configured-for-test-only" });
+  const response = await seoEdge.fetch(
+    new Request("https://example.com/watch?user=umbralarchive&id=not-a-number"),
+    context.env,
+    context.ctx,
+  );
+  assert.equal(response.status, 400);
+  assert.equal(await response.text(), "Bad link");
+});
+
+test("signed /watch route rejects missing secret without generating a fallback signature", async () => {
+  const context = createTestContext();
+  const response = await seoEdge.fetch(
+    new Request("https://example.com/watch?user=umbralarchive&id=7552567024304540959"),
+    context.env,
+    context.ctx,
+  );
+  assert.equal(response.status, 500);
+  assert.equal(await response.text(), "Not configured");
+});
+
+test("signed /watch route returns a signed gateway iframe", async () => {
+  const context = createTestContext({ SIGN_SECRET: "configured-for-test-only" });
+  const response = await seoEdge.fetch(
+    new Request("https://example.com/watch?user=umbralarchive&id=7552567024304540959"),
+    context.env,
+    context.ctx,
+  );
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("Content-Type"), "text/html; charset=utf-8");
+  assert.equal(response.headers.get("Cache-Control"), "public, max-age=300");
+
+  const html = await response.text();
+  assert.match(
+    html,
+    /<iframe src="https://video\.megasale\.win/\?url=https%3A%2F%2Fwww\.tiktok\.com%2F%40umbralarchive%2Fvideo%2F7552567024304540959&amp;exp=\d+&amp;sig=[a-f0-9]{64}" width="325" height="580" style="border:0;max-width:100%" allow="fullscreen"></iframe>/,
+  );
+});
+
+test("TikTok watch pages include the signed gateway fallback for existing and future records", async () => {
+  const context = createTestContext({ SIGN_SECRET: "configured-for-test-only" });
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+       slug, title, source_url, embed_url, media_type, primary_category, subcategory, description, published
+     ) VALUES ('gateway-tiktok-test', 'Gateway TikTok test', 'https://www.tiktok.com/@umbralarchive/video/7552567024304540959', 'https://www.tiktok.com/player/v1/7552567024304540959', 'tiktok', 'Social Media & Trending', 'TikTok Viral Challenges', 'Gateway fallback test', 1)`,
+  ).run();
+
+  const page = await send(context, "/watch/gateway-tiktok-test");
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.match(html, /data-tiktok-gateway-src="https://video\.megasale\.win/\?url=/);
+  assert.match(html, /data-tiktok-gateway-src="[^"]*sig=[a-f0-9]{64}"/);
+});
+ 
 test("Facebook mini preview stays separate from the original-quality watch player", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
