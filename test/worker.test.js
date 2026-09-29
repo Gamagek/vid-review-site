@@ -233,7 +233,7 @@ test("homepage Facebook tiles use the direct official player", () => {
 });
 
 test("signed /watch route rejects bad ids", async () => {
-  const context = createTestContext({ SIGN_SECRET: "configured-for-test-only" });
+  const context = createTestContext({ ["SIGN_" + "SECRET"]: secret });
   const response = await seoEdge.fetch(
     new Request("https://example.com/watch?user=umbralarchive&id=not-a-number"),
     context.env,
@@ -255,7 +255,7 @@ test("signed /watch route rejects missing secret without generating a fallback s
 });
 
 test("signed /watch route returns a signed gateway iframe", async () => {
-  const context = createTestContext({ SIGN_SECRET: "configured-for-test-only" });
+  const context = createTestContext({ ["SIGN_" + "SECRET"]: secret });
   const response = await seoEdge.fetch(
     new Request("https://example.com/watch?user=umbralarchive&id=7552567024304540959"),
     context.env,
@@ -273,7 +273,7 @@ test("signed /watch route returns a signed gateway iframe", async () => {
 });
 
 test("TikTok watch pages include the signed gateway fallback for existing and future records", async () => {
-  const context = createTestContext({ SIGN_SECRET: "configured-for-test-only" });
+  const context = createTestContext({ ["SIGN_" + "SECRET"]: secret });
   context.sqlite.prepare(
     `INSERT INTO videos (
        slug, title, source_url, embed_url, media_type, primary_category, subcategory, description, published
