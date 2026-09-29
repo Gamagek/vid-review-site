@@ -729,7 +729,7 @@ function initializeEmbeddedMediaTools() {
 
     const recoveryText = document.createElement("p");
     recoveryText.className = "vidbest-tiktok-recovery-text";
-    recoveryText.textContent = "TikTok could not load in the embedded player. Vid.Best will try its standard official embed once.";
+    recoveryText.textContent = "TikTok could not load. Vid.Best will switch to the video gateway automatically.";
 
     const recoveryActions = document.createElement("div");
     recoveryActions.className = "vidbest-tiktok-recovery-actions";
@@ -753,9 +753,9 @@ function initializeEmbeddedMediaTools() {
 
     let ready = false;
     let watchdog = null;
-    let fallbackTried = false;
-    let fallbackShell = null;
-
+    let gatewayTried = false;
+    const originalSrc = frame.src;
+    const gatewaySrc = frame.dataset.tiktokGatewaySrc || "";
     const getShareUrl = () => frame.dataset.tiktokShare || "";
 
     const showRecovery = (messageText) => {
@@ -778,106 +778,54 @@ function initializeEmbeddedMediaTools() {
     const armWatchdog = () => {
       window.clearTimeout(watchdog);
       watchdog = window.setTimeout(() => {
-        if (!ready) showRecovery("TikTok did not report a ready player. Vid.Best can try the standard official embed.");
-      }, 8000);
+        if (!ready && !gatewayTried) void loadGatewayFallback("TikTok official player is taking too long to respond. Switching to the video gateway…");
+      }, 4000);
     };
 
-    const restoreOfficialPlayer = () => {
-      if (!fallbackShell || !frame.isConnected) return;
-      fallbackShell.replaceWith(frame);
-      fallbackShell = null;
-      frame.removeAttribute("hidden");
-      overlay.hidden = false;
-      ready = false;
-      hideRecovery();
-      const url = new URL(frame.src);
-      url.searchParams.set("retry", String(Date.now()));
-      frame.src = url.toString();
-      armWatchdog();
-    };
-
-    const loadStandardEmbed = async () => {
-      if (fallbackTried) return false;
-      fallbackTried = true;
-      const share = getShareUrl();
-      if (!share) return false;
-      try {
-        const preflight = await api("/api/tiktok/preflight?url=" + encodeURIComponent(share));
-        if (!preflight.ok) return false;
-        const match = share.match(/\/video\/(\d+)\/?$/);
-        if (!match) return false;
-
-        const shell = document.createElement("div");
-        shell.className = "vidbest-tiktok-standard-fallback";
-        const quote = document.createElement("blockquote");
-        quote.className = "tiktok-embed";
-        quote.cite = share;
-        quote.setAttribute("data-video-id", match[1]);
-        quote.setAttribute("data-embed-from", "oembed");
-        quote.style.cssText = "max-width:605px;min-width:325px;width:100%;margin:0 auto";
-        const section = document.createElement("section");
-        const link = document.createElement("a");
-        link.href = share;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        link.textContent = "View this video on TikTok";
-        section.append(link);
-        quote.append(section);
-        shell.append(quote);
-        frame.hidden = true;
-        frame.parentNode?.insertBefore(shell, frame);
-        overlay.hidden = true;
-        fallbackShell = shell;
-        openTikTok.href = share;
-        recoveryText.textContent = "Switched to TikTok’s standard official embed.";
-        retry.hidden = false;
-        return true;
-      } catch {
+    const loadGatewayFallback = (messageText) => {
+      if (gatewayTried || !gatewaySrc || !frame.isConnected) {
+        showRecovery(messageText || "TikTok could not load.");
         return false;
       }
-    };
-
-    const ensureTikTokEmbedScript = () => new Promise((resolve) => {
-      if (document.querySelector("script[data-vidbest-tiktok-embed]")) {
-        resolve(true);
-        return;
-      }
-      const script = document.createElement("script");
-      script.async = true;
-      script.src = "https://www.tiktok.com/embed.js";
-      script.dataset.vidbestTikTokEmbed = "1";
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.head.append(script);
-    });
-
-    const recoverTikTok = async (messageText) => {
+      gatewayTried = true;
       ready = false;
-      showRecovery(messageText);
-      const switched = await loadStandardEmbed();
-      if (switched) {
-        const loaded = await ensureTikTokEmbedScript();
-        if (loaded) {
-          recoveryText.textContent = "TikTok standard official embed loaded. Provider controls are active inside the embed.";
-          return;
-        }
-        recoveryText.textContent = "Standard TikTok embed could not load. Use Open on TikTok or Retry.";
-      }
+      window.clearTimeout(watchdog);
+      overlay.hidden = true;
+      frame.src = gatewaySrc;
+      frame.dataset.tiktokGatewayActive = "1";
+      retry.hidden = false;
+      recovery.hidden = false;
+      recoveryText.textContent = messageText || "TikTok official player failed. Switched to the video gateway.";
+      return true;
     };
 
     retry.addEventListener("click", () => {
-      if (fallbackShell) {
-        restoreOfficialPlayer();
-        return;
-      }
       ready = false;
+      gatewayTried = false;
       retry.hidden = true;
       hideRecovery();
+      overlay.hidden = false;
       try {
-        const url = new URL(frame.src);
+        const url = new URL(originalSrc);
         url.searchParams.set("retry", String(Date.now()));
+        frame.dataset.tiktokGatewayActive = "0";
         frame.src = url.toString();
-      } catch {}
+      } catch {
+        frame.src = originalSrc;
+      }
+      armWatchdog();
+    });
+
+    frame.addEventListener("error", () => {
+      void loadGatewayFallback("TikTok official player failed to load. Switching to the video gateway…");
+    });
+
+    frame.addEventListener("load", () => {
+      if (frame.dataset.tiktokGatewayActive === "1") {
+        retry.hidden = false;
+        recovery.hidden = true;
+        return;
+      }
       armWatchdog();
     });
 
@@ -897,8 +845,8 @@ function initializeEmbeddedMediaTools() {
           note.textContent = "TikTok official player ready · advanced controls active";
         }
         if (data.type === "onPlayerError") {
-          void recoverTikTok("TikTok official player reported an error. Trying the standard official embed…");
-          note.textContent = "TikTok is recovering · provider controls remain available when loaded";
+          void loadGatewayFallback("TikTok official player reported an error. Switching to the video gateway…");
+          note.textContent = "TikTok failed · video gateway fallback active";
         }
         if (data.type === "onStateChange") state.playing = Number(data.value) === 1;
         if (data.type === "onMute") state.muted = Boolean(data.value);
