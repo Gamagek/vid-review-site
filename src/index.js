@@ -125,6 +125,7 @@ const SAFE_UPLOAD_TYPES = new Set([
 ]);
 const encoder = new TextEncoder();
 const ADMIN_SESSION_COOKIE = "__Host-vidbest_admin";
+const TIKTOK_GATEWAY_ORIGIN = "https://video.megasale.win";
 const ADMIN_SESSION_SECONDS = 60 * 60 * 8;
 const REACTION_SALT_SETTING = "reaction_salt";
 
@@ -532,7 +533,7 @@ function securityHeaders(headers, html = false, scriptNonce = "") {
     const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.tiktok.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self' https://www.tiktok.com https://*.tiktok.com https://*.tiktokcdn.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.tiktok.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self' https://www.tiktok.com https://*.tiktok.com https://*.tiktokcdn.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://video.megasale.win https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
     );
   }
   return headers;
@@ -2074,6 +2075,15 @@ async function watchPage(request, env, ctx, slugInput) {
   if (!row) return dynamicHtml(notFoundPage(), 404);
   await enrichFacebookRows(env, [row]);
   const [video] = await hydrateVideos(env, [row]);
+  if (video.provider === "tiktok") {
+    const tiktokId = extractTikTokId(video.source_url);
+    const tiktokUser = extractTikTokUsername(video.source_url);
+    try {
+      video.tiktok_gateway_src = await buildSignedTikTokGatewaySrc(tiktokUser, tiktokId, env);
+    } catch {
+      video.tiktok_gateway_src = "";
+    }
+  }
   ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
   const scriptNonce = createCspNonce();
   return dynamicHtml(renderWatchHtml(video, request, env, scriptNonce), 200, scriptNonce);
@@ -2257,6 +2267,25 @@ function renderWatchHtml(video, request, env, scriptNonce) {
 </html>`;
 }
 
+async function buildSignedTikTokGatewaySrc(user, id, env) {
+  const secret = String(env.SIGN_SECRET || "");
+  if (!secret || !/^\d+$/.test(String(id || "")) || !/^[\w.]+$/.test(String(user || ""))) return "";
+
+  const exp = (Math.floor(Date.now() / 3600000) + 2) * 3600;
+  const secretBytes = new TextEncoder().encode(secret);
+  const dataBytes = new TextEncoder().encode(String(id) + "." + exp);
+  const key = await crypto.subtle.importKey(
+    "raw",
+    secretBytes,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signature = new Uint8Array(await crypto.subtle.sign("HMAC", key, dataBytes));
+  const sig = Array.from(signature, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  const tiktok = "https://www.tiktok.com/@" + user + "/video/" + id;
+  return TIKTOK_GATEWAY_ORIGIN + "/?url=" + encodeURIComponent(tiktok) + "&exp=" + exp + "&sig=" + sig;
+}
 function extractTikTokId(value) {
   if (!value) return "";
   try {
@@ -2326,7 +2355,7 @@ function renderMedia(video, playbackOrigin) {
     const tiktokId = extractTikTokId(video.source_url);
     if (!tiktokId) return "";
     const embedUrl = buildTikTokPlayerUrl(tiktokId);
-    return `<iframe id="watch-media-frame" class="tiktok-official-player" data-tiktok-share="${escapeHtml(video.source_url)}" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+    return `<iframe id="watch-media-frame" class="tiktok-official-player" data-tiktok-share="${escapeHtml(video.source_url)}" data-tiktok-gateway-src="${escapeHtml(video.tiktok_gateway_src || "")}" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   }
   if (provider === "facebook") {
     const facebookEmbed = getSafeFacebookEmbedUrl(video);
