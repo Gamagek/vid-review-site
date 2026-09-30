@@ -1,6 +1,7 @@
 import edgeWorker from "./edge.js";
 
 const CANONICAL_ORIGIN = "https://vid.best";
+const GATEWAY = "https://video.megasale.win";
 const LEGACY_HOSTS = new Set(["home.vid.best", "www.vid.best"]);
 const MIN_INDEXABLE_CATEGORY_VIDEOS = 3;
 const CATEGORY_DESCRIPTIONS = Object.freeze({
@@ -99,6 +100,46 @@ function redirectToCanonical(request) {
       "Cache-Control": "public, max-age=86400",
       "X-Content-Type-Options": "nosniff"
     }
+  });
+}
+
+async function signedWatchResponse(request, env) {
+  const params = new URL(request.url).searchParams;
+  const user = params.get("user") || "";
+  const id = params.get("id") || "";
+
+  if (!/^\d+$/.test(id) || !/^[\w.]+$/.test(user)) {
+    return new Response("Bad link", { status: 400 });
+  }
+
+  const secret = env.SIGN_SECRET;
+  if (!secret) {
+    return new Response("Not configured", { status: 500 });
+  }
+
+  const exp = (Math.floor(Date.now() / 3600000) + 2) * 3600;
+  const secretBytes = new TextEncoder().encode(secret);
+  const dataBytes = new TextEncoder().encode(id + "." + exp);
+  const key = await crypto.subtle.importKey(
+    "raw",
+    secretBytes,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signature = new Uint8Array(await crypto.subtle.sign("HMAC", key, dataBytes));
+  const sig = Array.from(signature, (byte) => byte.toString(16).padStart(2, "0")).join("");
+
+  const tiktok = "https://www.tiktok.com/@" + user + "/video/" + id;
+  const src = GATEWAY + "/?url=" + encodeURIComponent(tiktok) + "&exp=" + exp + "&sig=" + sig;
+  const html = '<iframe src="' + escapeHtml(src) + '" width="325" height="580" style="border:0;max-width:100%" allow="fullscreen"></iframe>';
+
+  return new Response(html, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "public, max-age=300",
+    },
   });
 }
 
@@ -496,6 +537,10 @@ export default {
 
     if (url.pathname === "/sitemap.xml" && ["GET", "HEAD"].includes(request.method)) {
       return combinedSitemap(env);
+    }
+
+    if (url.pathname === "/watch") {
+      return signedWatchResponse(request, env);
     }
 
     if (url.pathname === "/videos" && ["GET", "HEAD"].includes(request.method)) {
