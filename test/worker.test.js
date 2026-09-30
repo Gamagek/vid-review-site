@@ -268,7 +268,7 @@ test("signed /watch route returns a signed gateway iframe", async () => {
   const html = await response.text();
   assert.match(
     html,
-    /<iframe src="https://video\.megasale\.win/\?url=https%3A%2F%2Fwww\.tiktok\.com%2F%40umbralarchive%2Fvideo%2F7552567024304540959&amp;exp=\d+&amp;sig=[a-f0-9]{64}" width="325" height="580" style="border:0;max-width:100%" allow="fullscreen"></iframe>/,
+    /<iframe src="https:\/\/video\.megasale\.win\/\?url=https%3A%2F%2Fwww\.tiktok\.com%2F%40umbralarchive%2Fvideo%2F7552567024304540959&amp;exp=\d+&amp;sig=[a-f0-9]{64}" width="325" height="580" style="border:0;max-width:100%" allow="fullscreen"><\/iframe>/,
   );
 });
 
@@ -283,7 +283,7 @@ test("TikTok watch pages include the signed gateway fallback for existing and fu
   const page = await send(context, "/watch/gateway-tiktok-test");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /data-tiktok-gateway-src="https://video\.megasale\.win/\?url=/);
+  assert.match(html, /data-tiktok-gateway-src="https:\/\/video\.megasale\.win\/\?url=/);
   assert.match(html, /data-tiktok-gateway-src="[^"]*sig=[a-f0-9]{64}"/);
 });
  
