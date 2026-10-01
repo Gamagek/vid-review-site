@@ -226,7 +226,7 @@ test("homepage Facebook tiles use the direct official player", () => {
   assert.match(source, /function mountFacebookDirectPlayer/);
   assert.match(source, /facebook-direct-player/);
   assert.match(source, /const nearViewport = isNearViewport\(card\);[\s\S]*?iframe\.loading = nearViewport \? "eager" : "lazy"/);
-  assert.match(source, /fetchPriority = isNearViewport\(card\) \? "high" : "auto"/);
+  assert.match(source, /iframe\.fetchPriority = nearViewport \? "high" : "auto"/);
   assert.match(source, /plugins\/video\.php/);
   assert.doesNotMatch(source, /function renderFacebookFacade/);
   assert.doesNotMatch(source, /facebook-microlink-preview/);
@@ -1225,7 +1225,7 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.doesNotMatch(watchSource, /remote = provider === "youtube" \|\| provider === "vimeo" \|\| provider === "tiktok" \|\| provider === "facebook";[\s\S]{0,1200}overlay.append\(play, back, forward/);
   assert.match(watchSource, /Retry TikTok player/);
   assert.match(watchSource, /const loadGatewayFallback = \(messageText\) =>/);
-  assert.match(watchSource, /standard official embed/);
+  assert.match(watchSource, /TikTok official player reported an error/);
   assert.match(watchSource, /data-vidbest-tiktok-embed/);
   assert.match(watchSource, /dns\.google/);
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
