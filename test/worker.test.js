@@ -1226,7 +1226,7 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(watchSource, /Retry TikTok player/);
   assert.match(watchSource, /const loadGatewayFallback = \(messageText\) =>/);
   assert.match(watchSource, /TikTok official player reported an error/);
-  assert.match(watchSource, /data-vidbest-tiktok-embed/);
+  assert.match(watchSource, /data-tiktok-gateway-src/);
   assert.match(watchSource, /dns\.google/);
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /parseTikTokShareUrl/);
