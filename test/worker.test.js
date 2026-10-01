@@ -225,7 +225,7 @@ test("homepage Facebook tiles use the direct official player", () => {
   const source = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(source, /function mountFacebookDirectPlayer/);
   assert.match(source, /facebook-direct-player/);
-  assert.match(source, /loading = isNearViewport\(card\) \? "eager" : "lazy"/);
+  assert.match(source, /const nearViewport = isNearViewport\(card\);[\s\S]*?iframe\.loading = nearViewport \? "eager" : "lazy"/);
   assert.match(source, /fetchPriority = isNearViewport\(card\) \? "high" : "auto"/);
   assert.match(source, /plugins\/video\.php/);
   assert.doesNotMatch(source, /function renderFacebookFacade/);
@@ -1224,7 +1224,7 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(watchSource, /if \(remote\) \{/);
   assert.doesNotMatch(watchSource, /remote = provider === "youtube" \|\| provider === "vimeo" \|\| provider === "tiktok" \|\| provider === "facebook";[\s\S]{0,1200}overlay.append\(play, back, forward/);
   assert.match(watchSource, /Retry TikTok player/);
-  assert.match(watchSource, /\/api\/tiktok\/preflight/);
+  assert.match(watchSource, /const loadGatewayFallback = \(messageText\) =>/);
   assert.match(watchSource, /standard official embed/);
   assert.match(watchSource, /data-vidbest-tiktok-embed/);
   assert.match(watchSource, /dns\.google/);
@@ -1260,7 +1260,7 @@ test("builds a direct Facebook player without the old card facade", () => {
   assert.match(homeSource, /mountFacebookDirectPlayer/);
   assert.match(homeSource, /safeFacebookDirectEmbed/);
   assert.match(homeSource, /plugins\/video\.php/);
-  assert.match(homeSource, /iframe\.loading = isNearViewport\(card\) \? "eager" : "lazy"/);
+  assert.match(homeSource, /const nearViewport = isNearViewport\(card\);[\s\S]*?iframe\.loading = nearViewport \? "eager" : "lazy"/);
   assert.doesNotMatch(homeSource, /renderFacebookFacade/);
   assert.doesNotMatch(homeSource, /facebook-microlink-preview/);
   assert.doesNotMatch(homeSource, /facebook-mini-preview-player/);
