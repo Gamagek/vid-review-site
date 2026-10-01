@@ -1226,7 +1226,6 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(watchSource, /Retry TikTok player/);
   assert.match(watchSource, /const loadGatewayFallback = \(messageText\) =>/);
   assert.match(watchSource, /TikTok official player reported an error/);
-  assert.match(watchSource, /data-tiktok-gateway-src/);
   assert.match(watchSource, /dns\.google/);
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /parseTikTokShareUrl/);
@@ -1250,6 +1249,7 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(homeSource, /TikTok preview · tap to open/);
 
   const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
+  assert.match(indexSource, /data-tiktok-gateway-src/);
   assert.match(indexSource, /\/api\/tiktok\/preflight/);
   assert.match(indexSource, /www\.tiktok\.com\/oembed/);
   assert.match(indexSource, /tiktokcdn(?:-[a-z0-9-]+)?\.com/);
