@@ -192,7 +192,7 @@ async function route(request, env, ctx) {
   }
 
   if ((path === "/privacy" || path === "/terms") && request.method === "GET") {
-    const legalAsset = await env.ASSETS.fetch(new Request(new URL(`${path}.html`, request.url), request));
+    const legalAsset = await env.ASSETS.fetch(request);
     return secureAssetResponse(legalAsset, path);
   }
 
