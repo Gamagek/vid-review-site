@@ -191,6 +191,11 @@ async function route(request, env, ctx) {
     return robotsResponse(request, env);
   }
 
+  if ((path === "/privacy" || path === "/terms") && request.method === "GET") {
+    const legalAsset = await env.ASSETS.fetch(new Request(new URL(`${path}.html`, request.url), request));
+    return secureAssetResponse(legalAsset, path);
+  }
+
   if (path === "/sitemap.xml" && request.method === "GET") {
     return sitemapIndexResponse(request, env);
   }
@@ -2262,7 +2267,10 @@ function renderWatchHtml(video, request, env, scriptNonce) {
       <div id="watch-related" class="related-video-list" aria-live="polite"></div>
     </aside>
   </main>
-  <footer class="site-footer">Vid.Best · Human-curated video discovery</footer>
+  <footer class="site-footer">
+    <span>Vid.Best · Video discovery and reviews</span>
+    <span><a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a></span>
+  </footer>
 </body>
 </html>`;
 }
