@@ -729,7 +729,7 @@ function initializeEmbeddedMediaTools() {
 
     const recoveryText = document.createElement("p");
     recoveryText.className = "vidbest-tiktok-recovery-text";
-    recoveryText.textContent = "TikTok could not load. Vid.Best will switch to the video gateway automatically.";
+    recoveryText.textContent = "TikTok did not load. Vid.Best will try the cached media gateway automatically.";
 
     const recoveryActions = document.createElement("div");
     recoveryActions.className = "vidbest-tiktok-recovery-actions";
@@ -779,8 +779,9 @@ function initializeEmbeddedMediaTools() {
       window.clearTimeout(watchdog);
       watchdog = window.setTimeout(() => {
         if (!ready && !gatewayTried) {
-          showRecovery("TikTok official player is taking too long to respond. Press Retry to load the video gateway.");
-          note.textContent = "TikTok official player timeout · gateway waiting for manual load";
+          showRecovery("TikTok official player is taking too long to respond. Trying cached media…");
+          note.textContent = "TikTok official player timeout · trying cached media";
+          loadGatewayFallback("Loading cached media…");
         }
       }, 4000);
     };
@@ -841,8 +842,8 @@ function initializeEmbeddedMediaTools() {
         retry.textContent = "↻ Reload gateway";
         return;
       }
-      showRecovery("TikTok official player failed to load. Press Retry to load the video gateway.");
-      note.textContent = "TikTok official player failed · gateway waiting for manual load";
+      loadGatewayFallback("TikTok player failed · loading cached media…");
+      note.textContent = "TikTok official player failed · trying cached media";
     });
 
     frame.addEventListener("load", () => {
@@ -873,10 +874,8 @@ function initializeEmbeddedMediaTools() {
           note.textContent = "TikTok official player ready · advanced controls active";
         }
         if (data.type === "onPlayerError") {
-          showRecovery("TikTok official player reported an error. Press Retry to load the video gateway.");
-          retry.hidden = false;
-          retry.textContent = "↻ Retry";
-          note.textContent = "TikTok failed · gateway waiting for manual load";
+          loadGatewayFallback("TikTok reported an error · loading cached media…");
+          note.textContent = "TikTok failed · trying cached media";
         }
         if (data.type === "onStateChange") state.playing = Number(data.value) === 1;
         if (data.type === "onMute") state.muted = Boolean(data.value);
