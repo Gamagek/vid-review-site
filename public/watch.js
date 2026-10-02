@@ -778,31 +778,48 @@ function initializeEmbeddedMediaTools() {
     const armWatchdog = () => {
       window.clearTimeout(watchdog);
       watchdog = window.setTimeout(() => {
-        if (!ready && !gatewayTried) void loadGatewayFallback("TikTok official player is taking too long to respond. Switching to the video gateway…");
+        if (!ready && !gatewayTried) {
+          showRecovery("TikTok official player is taking too long to respond. Press Retry to load the video gateway.");
+          note.textContent = "TikTok official player timeout · gateway waiting for manual load";
+        }
       }, 4000);
     };
 
-    const loadGatewayFallback = (messageText) => {
-      if (gatewayTried || !gatewaySrc || !frame.isConnected) {
-        showRecovery(messageText || "TikTok could not load.");
+    const loadGatewayFallback = (messageText = "Loading the video gateway…") => {
+      if (!gatewaySrc || !frame.isConnected) {
+        showRecovery("TikTok gateway is unavailable.");
         return false;
       }
       gatewayTried = true;
       ready = false;
       window.clearTimeout(watchdog);
       overlay.hidden = true;
-      frame.src = gatewaySrc;
       frame.dataset.tiktokGatewayActive = "1";
       retry.hidden = false;
+      retry.textContent = "↻ Reload gateway";
       recovery.hidden = false;
-      recoveryText.textContent = messageText || "TikTok official player failed. Switched to the video gateway.";
+      recoveryText.textContent = messageText;
+
+      try {
+        const url = new URL(gatewaySrc);
+        url.searchParams.set("retry", String(Date.now()));
+        frame.src = url.toString();
+      } catch {
+        frame.src = gatewaySrc;
+      }
       return true;
     };
 
     retry.addEventListener("click", () => {
+      if (gatewaySrc && (gatewayTried || !ready)) {
+        loadGatewayFallback(gatewayTried ? "Reloading the video gateway…" : "Loading the video gateway…");
+        return;
+      }
+
       ready = false;
       gatewayTried = false;
       retry.hidden = true;
+      retry.textContent = "↻ Retry";
       hideRecovery();
       overlay.hidden = false;
       try {
@@ -817,12 +834,21 @@ function initializeEmbeddedMediaTools() {
     });
 
     frame.addEventListener("error", () => {
-      void loadGatewayFallback("TikTok official player failed to load. Switching to the video gateway…");
+      if (frame.dataset.tiktokGatewayActive === "1") {
+        showRecovery("The video gateway could not connect. Press Reload gateway to try again.");
+        recovery.hidden = false;
+        retry.hidden = false;
+        retry.textContent = "↻ Reload gateway";
+        return;
+      }
+      showRecovery("TikTok official player failed to load. Press Retry to load the video gateway.");
+      note.textContent = "TikTok official player failed · gateway waiting for manual load";
     });
 
     frame.addEventListener("load", () => {
       if (frame.dataset.tiktokGatewayActive === "1") {
         retry.hidden = false;
+        retry.textContent = "↻ Reload gateway";
         recovery.hidden = true;
         return;
       }
@@ -839,14 +865,18 @@ function initializeEmbeddedMediaTools() {
         if (!data?.["x-tiktok-player"]) return;
         if (data.type === "onPlayerReady") {
           ready = true;
+          gatewayTried = false;
           window.clearTimeout(watchdog);
           retry.hidden = true;
+          retry.textContent = "↻ Retry";
           hideRecovery();
           note.textContent = "TikTok official player ready · advanced controls active";
         }
         if (data.type === "onPlayerError") {
-          void loadGatewayFallback("TikTok official player reported an error. Switching to the video gateway…");
-          note.textContent = "TikTok failed · video gateway fallback active";
+          showRecovery("TikTok official player reported an error. Press Retry to load the video gateway.");
+          retry.hidden = false;
+          retry.textContent = "↻ Retry";
+          note.textContent = "TikTok failed · gateway waiting for manual load";
         }
         if (data.type === "onStateChange") state.playing = Number(data.value) === 1;
         if (data.type === "onMute") state.muted = Boolean(data.value);
