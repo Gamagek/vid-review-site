@@ -2530,7 +2530,9 @@ function safeInstagramThumbnailUrl(value) {
     const url = new URL(String(value || ""));
     if (url.protocol !== "https:" || url.username || url.password || url.port) return "";
     const host = url.hostname.toLowerCase().replace(/^www\./, "");
-    const allowed = host === "cdninstagram.com"
+    const allowed = host === "instagram.com"
+      || host.endsWith(".instagram.com")
+      || host === "cdninstagram.com"
       || host.endsWith(".cdninstagram.com")
       || host === "fbcdn.net"
       || host.endsWith(".fbcdn.net")
