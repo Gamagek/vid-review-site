@@ -693,7 +693,8 @@ function initializeEmbeddedMediaTools() {
   player.dataset.vidbestEmbeddedTools = "1";
 
   const provider = String(document.body.dataset.videoProvider || inferProvider(frame)).toLowerCase();
-  const remote = ["youtube", "vimeo", "tiktok", "facebook"].includes(provider);
+  if (provider === "tiktok") return;
+  const remote = ["youtube", "vimeo", "facebook"].includes(provider);
   const supportsPlaybackRate = provider === "youtube" || provider === "vimeo";
   const state = { playing: false, muted: false, rate: 1, currentTime: 0 };
 
@@ -1231,6 +1232,7 @@ function repairNativePlayerControls() {
 function initializeEmbeddedAudioLab() {
   const player = document.querySelector("#watch-player");
   if (!player || player.dataset.vidbestEmbeddedAudio === "1") return;
+  if (String(document.body.dataset.videoProvider || "").toLowerCase() === "tiktok") return;
   if (player.querySelector("video, audio")) return;
   const frame = player.querySelector("iframe");
   if (!frame) return;
