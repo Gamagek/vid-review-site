@@ -837,15 +837,27 @@ test("Instagram thumbnail endpoint extracts and serves an allowed public preview
   }
 });
 
-test("homepage uses the separate Instagram preview-card module", () => {
+test("homepage uses the dedicated Instagram inline player module", () => {
   const html = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
   const script = readFileSync(new URL("../public/instagram-preview-card.js", import.meta.url), "utf8");
-  assert.match(html, /type="module" src="\/instagram-preview-card\.js"/);
-  assert.doesNotMatch(html, /type="module" src="\/instagram-player\.js"/);
+  assert.match(html, /type="module" src="\\/instagram-preview-card\\.js"/);
+  assert.doesNotMatch(html, /type="module" src="\\/instagram-player\\.js"/);
   assert.match(script, /parseInstagramUrl/);
-  assert.match(script, /\/api\/instagram\/previews/);
-  assert.match(script, /source\.embedUrl/);
-  assert.match(script, /Play here/);
+  assert.match(script, /className = "instagram-home-player"/);
+  assert.match(script, /frame\\.src = source\\.embedUrl/);
+  assert.doesNotMatch(script, /Open on Instagram/);
+  assert.doesNotMatch(script, /instagram-preview-modal/);
+});
+
+test("Instagram homepage tiles never display the raw media-type badge", () => {
+  const source = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
+  assert.match(source, /card\\.dataset\\.videoProvider === "instagram" \\? "Instagram" : video\\.media_type/);
+});
+
+test("Instagram watch player has no obsolete homepage preview hook", () => {
+  const source = readFileSync(new URL("../public/instagram-player.js", import.meta.url), "utf8");
+  assert.doesNotMatch(source, /decoratePreviews/);
+  assert.match(source, /source\\.embedUrl/);
 });
 
 test("Instagram preview endpoint returns a thumbnail fallback and official Reel embed", async () => {
