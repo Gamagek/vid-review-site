@@ -828,6 +828,17 @@ test("Instagram thumbnail endpoint extracts and serves an allowed public preview
   }
 });
 
+test("homepage uses the separate Instagram preview-card module", () => {
+  const html = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
+  const script = readFileSync(new URL("../public/instagram-preview-card.js", import.meta.url), "utf8");
+  assert.match(html, /type="module" src="\/instagram-preview-card\.js"/);
+  assert.doesNotMatch(html, /type="module" src="\/instagram-player\.js"/);
+  assert.match(script, /parseInstagramUrl/);
+  assert.match(script, /\/api\/instagram\/thumbnail/);
+  assert.match(script, /source\.embedUrl/);
+  assert.match(script, /Play here/);
+});
+
 test("new Instagram discoveries use clean official URLs", async () => {
   const context = createTestContext();
   const response = await send(context, '/api/admin/discover?q=' + encodeURIComponent(
