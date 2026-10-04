@@ -2202,6 +2202,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   <script src="/watch.js" defer></script>
+  ${video.provider === "tiktok" ? '<script src="/tiktok-video-service.js" defer></script><script src="/tiktok-audio-lab.js" defer></script><script src="/tiktok-audio-lab-ui.js" defer></script><script src="/tiktok-player.js" defer></script>' : ""}
 </head>
 <body class="watch-page" data-video-id="${Number(video.id)}" data-video-provider="${escapeHtml(video.provider)}">
   <header class="site-header compact">
