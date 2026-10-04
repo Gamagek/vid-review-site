@@ -49,6 +49,11 @@ function renderCard(card) {
   // Meta resizes the iframe after loading. Preserve that height, including on
   // narrow cards below Instagram's minimum width, without cropping controls.
   function resize() {
+    const frame = stage.querySelector("iframe");
+    // The SDK writes a height attribute; override the generic preview CSS
+    // with that declared height rather than inheriting height:100%.
+    const declaredHeight = Number(frame?.getAttribute("height"));
+    if (frame && declaredHeight >= 100 && declaredHeight <= 5000) frame.style.height = `${declaredHeight}px`;
     const available = Math.min(540, media.clientWidth);
     if (!available) return;
     const width = Math.max(326, available);
@@ -62,7 +67,9 @@ function renderCard(card) {
   observer.observe(media);
   observer.observe(stage);
   resize();
-  mounted.set(card, observer);
+  const mutations = new MutationObserver(resize);
+  mutations.observe(stage, { childList: true, subtree: true, attributes: true, attributeFilter: ["height"] });
+  mounted.set(card, { disconnect() { observer.disconnect(); mutations.disconnect(); } });
   loadInstagramSdk().then((sdk) => {
     if (card.isConnected) sdk.Embeds.process();
   }).catch(() => {
