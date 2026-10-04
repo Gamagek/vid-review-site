@@ -189,6 +189,10 @@ async function route(request, env, ctx) {
     return tikTokPreviewBatch(request, env);
   }
 
+  if (path === "/api/instagram/previews" && request.method === "GET") {
+    return instagramPreviewBatch(request, env);
+  }
+
   if (path === "/robots.txt" && request.method === "GET") {
     return robotsResponse(request, env);
   }
@@ -799,6 +803,136 @@ function serializeVideo(row) {
 }
 
 
+function safeInstagramThumbnailUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    if (url.protocol !== "https:") return "";
+    const host = url.hostname.toLowerCase();
+    const allowed = host === "instagram.com"
+      || host.endsWith(".instagram.com")
+      || host === "cdninstagram.com"
+      || host.endsWith(".cdninstagram.com")
+      || host === "fbcdn.net"
+      || host.endsWith(".fbcdn.net");
+    return allowed ? url.toString() : "";
+  } catch {
+    return "";
+  }
+}
+
+async function instagramPreviewBatch(request, env) {
+  const requestUrl = new URL(request.url);
+  const requested = requestUrl.searchParams.getAll("url");
+  if (requested.length > 24) throw new AppError(400, "A maximum of 24 Instagram preview URLs is supported");
+  const normalized = [...new Map(requested
+    .map((value) => parseInstagramUrl(value))
+    .filter(Boolean)
+    .map((item) => [item.sourceUrl, item])).values()].slice(0, 24);
+  if (!normalized.length) throw new AppError(400, "Add at least one Instagram post or Reel URL");
+
+  const sorted = normalized.map((item) => item.sourceUrl).sort();
+  const cache = typeof caches !== "undefined" && caches.default ? caches.default : null;
+  const cacheKey = new Request(
+    requestUrl.origin + "/__vidbest-instagram-previews?urls=" + encodeURIComponent(sorted.join("|")),
+  );
+  if (cache) {
+    const cached = await cache.match(cacheKey);
+    if (cached) return cached;
+  }
+
+  const previews = [];
+  for (let index = 0; index < normalized.length; index += 4) {
+    const chunk = normalized.slice(index, index + 4);
+    const settled = await Promise.allSettled(chunk.map((item) => fetchInstagramPreview(item)));
+    settled.forEach((result, offset) => {
+      const item = chunk[offset];
+      if (result.status === "fulfilled") previews.push(result.value);
+      else previews.push({
+        url: item.sourceUrl, source_url: item.sourceUrl, embed_url: item.embedUrl, id: item.id,
+        kind: item.sourceUrl.includes("/reel/") ? "reel" : item.sourceUrl.includes("/tv/") ? "tv" : "post",
+        title: null, description: null, author_name: null, author_url: null, thumbnail_url: null, embed_available: false,
+      });
+    });
+  }
+
+  const response = json({ ok: true, count: previews.length, previews }, 200, {
+    "Cache-Control": "public, max-age=300, stale-while-revalidate=1800, stale-if-error=3600",
+  });
+  if (cache) { try { await cache.put(cacheKey, response.clone()); } catch {} }
+  return response;
+}
+
+async function fetchInstagramPreview(instagram) {
+  const cache = typeof caches !== "undefined" && caches.default ? caches.default : null;
+  const cacheKey = new Request(
+    "https://vid.best/__instagram-preview?url=" + encodeURIComponent(instagram.sourceUrl),
+  );
+  if (cache) {
+    const cached = await cache.match(cacheKey);
+    if (cached) {
+      try {
+        const payload = await cached.json();
+        if (payload?.source_url === instagram.sourceUrl) return payload;
+      } catch {}
+    }
+  }
+
+  const endpoint = new URL("https://graph.facebook.com/v26.0/instagram_oembed");
+  endpoint.searchParams.set("url", instagram.sourceUrl);
+  endpoint.searchParams.set("maxwidth", "540");
+  let metadata = {};
+  try {
+    const response = await fetch(endpoint.toString(), {
+      headers: { Accept: "application/json", "User-Agent": "VidBest-Instagram-Preview/1.0" },
+      signal: AbortSignal.timeout(7000),
+    });
+    if (response.ok) { try { metadata = await response.json(); } catch { metadata = {}; } }
+  } catch {}
+
+  let title = cleanText(metadata?.title || "", 180);
+  let description = cleanText(metadata?.description || "", 320);
+  let authorName = cleanText(metadata?.author_name || "", 120);
+  let authorUrl = "";
+  try {
+    const candidate = new URL(String(metadata?.author_url || ""));
+    const host = candidate.hostname.toLowerCase().replace(/^www\./, "");
+    if (candidate.protocol === "https:" && host === "instagram.com" && /^\/[^/]+\/?$/.test(candidate.pathname)) {
+      authorUrl = "https://www.instagram.com" + candidate.pathname;
+    }
+  } catch {}
+
+  let thumbnailUrl = safeInstagramThumbnailUrl(metadata?.thumbnail_url);
+  if (!thumbnailUrl || !title || !description || !authorName) {
+    try {
+      const response = await fetch(instagram.sourceUrl, {
+        redirect: "follow",
+        headers: { Accept: "text/html,application/xhtml+xml", "User-Agent": "Mozilla/5.0 (compatible; VidBest-Instagram-Preview/1.0)" },
+        signal: AbortSignal.timeout(7000),
+      });
+      if (response.ok) {
+        const html = await response.text();
+        thumbnailUrl = thumbnailUrl || safeInstagramThumbnailUrl(readMetaTag(html, "og:image")) || safeInstagramThumbnailUrl(readMetaTag(html, "twitter:image"));
+        title = title || decodeHtmlEntities(cleanText(readMetaTag(html, "og:title") || readMetaTag(html, "twitter:title"), 180));
+        description = description || decodeHtmlEntities(cleanText(readMetaTag(html, "og:description") || readMetaTag(html, "description"), 320));
+        authorName = authorName || cleanText(readMetaTag(html, "author"), 120);
+      }
+    } catch {}
+  }
+
+  const payload = {
+    url: instagram.sourceUrl, source_url: instagram.sourceUrl, embed_url: instagram.embedUrl, id: instagram.id,
+    kind: instagram.sourceUrl.includes("/reel/") ? "reel" : instagram.sourceUrl.includes("/tv/") ? "tv" : "post",
+    title: title || null, description: description || null, author_name: authorName || null, author_url: authorUrl || null,
+    thumbnail_url: thumbnailUrl || null, embed_available: Boolean(metadata?.html),
+  };
+  if (cache) {
+    try {
+      const cachedResponse = json(payload, 200, { "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800" });
+      await cache.put(cacheKey, cachedResponse.clone());
+    } catch {}
+  }
+  return payload;
+}
 function normalizeTikTokShareUrl(value) {
   try {
     const url = new URL(value);
