@@ -209,6 +209,7 @@
         cache: "no-store",
         credentials: "omit",
         signal,
+        headers: { Range: "bytes=0-0" },
       });
 
       const type = String(response.headers.get("content-type") || "").toLowerCase();
