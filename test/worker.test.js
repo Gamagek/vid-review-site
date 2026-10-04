@@ -780,10 +780,9 @@ test("published Instagram records get a same-origin thumbnail fallback when no t
       'https://www.instagram.com/reel/ABC_def-123/embed/',
     );
 
-  const response = await send(context, '/api/videos?limit=48');
+  const response = await send(context, '/api/videos/instagram-thumb-fallback');
   assert.equal(response.status, 200);
-  const payload = await response.json();
-  const video = payload.videos.find((item) => item.slug === 'instagram-thumb-fallback');
+  const video = (await response.json()).video;
   assert.ok(video);
   assert.equal(
     video.thumbnail_url,
@@ -1329,15 +1328,14 @@ test("renders the current Vid.Best TikTok direct player with separate home previ
   assert.match(tiktokServiceSource, /buildStreamUrl/);
 
   const tiktokPlayerSource = readFileSync(new URL("../public/tiktok-player.js", import.meta.url), "utf8");
-  assert.match(tiktokPlayerSource, /onPlayerReady/);
-  assert.match(tiktokPlayerSource, /onPlayerError/);
-  assert.match(tiktokPlayerSource, /OFFICIAL_GRACE_MS = 8000/);
   assert.match(tiktokPlayerSource, /MAX_ATTEMPTS = 15/);
   assert.match(tiktokPlayerSource, /POLL_INTERVAL_MS = 3000/);
   assert.match(tiktokPlayerSource, /crossorigin/);
-  assert.match(tiktokPlayerSource, /startFallback/);
+  assert.match(tiktokPlayerSource, /VidBestTikTokVideoService/);
+  assert.match(tiktokPlayerSource, /pollR2Video/);
   assert.match(tiktokPlayerSource, /Video ready/);
-  assert.match(tiktokPlayerSource, /AudioLab/);
+  assert.match(tiktokPlayerSource, /VidBestAudioLab/);
+  assert.match(tiktokPlayerSource, /data-fallback-retry/);
 
   const audioSource = readFileSync(new URL("../public/tiktok-audio-lab.js", import.meta.url), "utf8");
   assert.match(audioSource, /createMediaElementSource/);
