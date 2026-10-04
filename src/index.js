@@ -180,6 +180,7 @@ async function route(request, env, ctx) {
   if (path === "/api/notifications/latest" && request.method === "GET") return latestNotifications(env);
   if (path === "/api/facebook/resolve" && request.method === "GET") return resolveFacebookEndpoint(request, env);
   if (path === "/api/facebook/thumbnail" && request.method === "GET") return facebookThumbnailEndpoint(request, env);
+  if (path === "/api/instagram/thumbnail" && request.method === "GET") return instagramThumbnailEndpoint(request);
 
   if (path === "/api/tiktok/preflight" && request.method === "GET") {
     return tikTokPreflight(request, env, ctx);
@@ -780,11 +781,14 @@ function parseTags(value, fallback = []) {
 function serializeVideo(row) {
   if (!row) return null;
   const provider = detectMediaProvider(row);
+  const instagramThumbnail = provider === "instagram" && row.source_url
+    ? `/api/instagram/thumbnail?url=${encodeURIComponent(row.source_url)}`
+    : null;
   return {
     ...row,
     provider,
     embed_url: provider === "facebook" ? getSafeFacebookEmbedUrl(row) : row.embed_url,
-    thumbnail_url: row.thumbnail_url || null,
+    thumbnail_url: row.thumbnail_url || instagramThumbnail || null,
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
     published: Boolean(row.published),
@@ -2406,6 +2410,137 @@ async function resolveFacebookEndpoint(request, env) {
     source_url: resolved,
     embed_url: buildFacebookPlayerUrl(resolved),
   }, 200, { "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400" });
+}
+
+
+async function instagramThumbnailEndpoint(request) {
+  const requested = cleanText(new URL(request.url).searchParams.get("url"), 2000);
+  const instagram = parseInstagramUrl(requested);
+  if (!instagram) throw new AppError(400, "Add a full public Instagram post or Reel URL");
+
+  const cache = typeof caches !== "undefined" && caches.default ? caches.default : null;
+  const cacheKey = new Request(
+    "https://vid.best/__instagram-thumbnail?url=" + encodeURIComponent(instagram.sourceUrl),
+  );
+  if (cache) {
+    const cached = await cache.match(cacheKey);
+    if (cached) {
+      return new Response(cached.body, {
+        status: 200,
+        headers: {
+          "Content-Type": cached.headers.get("Content-Type") || "image/jpeg",
+          "Cache-Control": "public, max-age=604800, stale-while-revalidate=2592000",
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    }
+  }
+
+  const preview = await fetchInstagramPreview(instagram.sourceUrl);
+  const thumbnailUrl = safeInstagramThumbnailUrl(preview?.thumbnail_url);
+  if (!thumbnailUrl) throw new AppError(404, "Instagram thumbnail is unavailable");
+
+  const response = await fetch(thumbnailUrl, {
+    headers: {
+      Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+      Referer: "https://www.instagram.com/",
+      "User-Agent": "VidBest-Instagram-Preview/1.0",
+    },
+    signal: AbortSignal.timeout(7000),
+  });
+  if (!response.ok) throw new AppError(502, "Instagram thumbnail fetch failed");
+  const contentType = (response.headers.get("Content-Type") || "").toLowerCase().split(";", 1)[0].trim();
+  if (!contentType.startsWith("image/")) throw new AppError(502, "Instagram preview did not return an image");
+
+  const image = new Response(response.body, {
+    status: 200,
+    headers: {
+      "Content-Type": contentType,
+      "Cache-Control": "public, max-age=604800, stale-while-revalidate=2592000",
+      "X-Content-Type-Options": "nosniff",
+      "Cross-Origin-Resource-Policy": "same-origin",
+    },
+  });
+  if (cache) {
+    try { await cache.put(cacheKey, image.clone()); } catch {}
+  }
+  return image;
+}
+
+async function fetchInstagramPreview(sourceUrl) {
+  const instagram = parseInstagramUrl(sourceUrl);
+  if (!instagram) return null;
+
+  const cache = typeof caches !== "undefined" && caches.default ? caches.default : null;
+  const cacheKey = new Request(
+    "https://vid.best/__instagram-preview?url=" + encodeURIComponent(instagram.sourceUrl),
+  );
+  if (cache) {
+    const cached = await cache.match(cacheKey);
+    if (cached) {
+      try {
+        const payload = await cached.json();
+        if (payload?.thumbnail_url) return payload;
+      } catch {}
+    }
+  }
+
+  let html = "";
+  try {
+    const response = await fetch(instagram.sourceUrl, {
+      method: "GET",
+      redirect: "follow",
+      headers: {
+        Accept: "text/html,application/xhtml+xml",
+        "User-Agent": "VidBest-Instagram-Preview/1.0",
+      },
+      signal: AbortSignal.timeout(7000),
+    });
+    if (response.ok) html = await response.text();
+  } catch {}
+
+  if (!html) return null;
+
+  const thumbnailUrl = safeInstagramThumbnailUrl(
+    readMetaTag(html, "og:image")
+      || readMetaTag(html, "twitter:image")
+      || readMetaTag(html, "og:image:url"),
+  );
+  const payload = {
+    url: instagram.sourceUrl,
+    embed_url: instagram.embedUrl,
+    title: decodeHtmlEntities(cleanText(readMetaTag(html, "og:title") || readMetaTag(html, "twitter:title"), 180)),
+    description: decodeHtmlEntities(cleanText(readMetaTag(html, "og:description") || readMetaTag(html, "description"), 320)),
+    thumbnail_url: thumbnailUrl || null,
+  };
+
+  if (cache && payload.thumbnail_url) {
+    try {
+      const cached = json(payload, 200, {
+        "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800",
+      });
+      await cache.put(cacheKey, cached.clone());
+    } catch {}
+  }
+  return payload;
+}
+
+function safeInstagramThumbnailUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    if (url.protocol !== "https:" || url.username || url.password || url.port) return "";
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    const allowed = host === "instagram.com"
+      || host.endsWith(".instagram.com")
+      || host === "cdninstagram.com"
+      || host.endsWith(".cdninstagram.com")
+      || host === "fbcdn.net"
+      || host.endsWith(".fbcdn.net")
+      || host === "lookaside.fbsbx.com";
+    return allowed ? url.toString() : "";
+  } catch {
+    return "";
+  }
 }
 
 async function facebookThumbnailEndpoint(request, env) {
