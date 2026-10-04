@@ -62,7 +62,9 @@ this wrapper. Its own embed may send viewers to Instagram to watch; iframe load
 is not treated as proof of playback. Generic playback and Audio Lab controls are
 excluded from Instagram pages. Other providers keep their existing player paths.
 
-Self-hosted/raw video uses the browser's native player plus Vid.Best controls for play/pause, 10-second rewind/forward, playback speed, zoom, fullscreen and picture-in-picture when the browser supports it. Trusted provider links are converted into provider-owned embeds for YouTube, Vimeo, Dailymotion, Twitch, Instagram, TikTok and Facebook. Arbitrary iframe HTML is never accepted.
+TikTok watch pages use a dedicated Vid.Best direct player. The browser polls the signed `video.megasale.win` gateway, keeps a loading panel visible while the gateway prepares or uploads the MP4 to R2, and switches immediately to a native `<video crossorigin="anonymous">` stream when the cache is ready. TikTok watch pages do not depend on a TikTok iframe; the direct R2 player is the only TikTok playback surface, and Audio Lab attaches only after the direct media element exists.
+
+Self-hosted/raw video uses the browser's native player plus Vid.Best controls for play/pause, 10-second rewind/forward, playback speed, zoom, fullscreen and picture-in-picture when the browser supports it. Other trusted provider links keep their existing provider-owned embed paths for YouTube, Vimeo, Dailymotion, Twitch, Instagram and Facebook. Arbitrary iframe HTML is never accepted.
 
 On a watch page, scrolling beyond the player starts a three-second delay. The player then becomes a mini-player; native media and YouTube can begin muted when browser policy allows. **Return**, **Pop-up** and **Close** controls preserve a deliberate user escape path. Reduced-motion visitors do not get automatic playback.
 

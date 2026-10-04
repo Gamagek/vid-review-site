@@ -2370,8 +2370,7 @@ function renderMedia(video, playbackOrigin) {
   if (provider === "tiktok") {
     const tiktokId = extractTikTokId(video.source_url);
     if (!tiktokId) return "";
-    const embedUrl = buildTikTokPlayerUrl(tiktokId);
-    return `<iframe id="watch-media-frame" class="tiktok-official-player" data-tiktok-share="${escapeHtml(video.source_url)}" data-tiktok-gateway-src="${escapeHtml(video.tiktok_gateway_src || "")}" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+    return `<div class="vidbest-tiktok-direct-host" data-vidbest-tiktok-player data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${escapeHtml(video.source_url)}" data-tiktok-gateway-src="${escapeHtml(video.tiktok_gateway_src || "")}" role="status" aria-live="polite" aria-label="${escapeHtml(watchDisplayTitle(video))} video player"></div>`;
   }
   if (provider === "facebook") {
     const facebookEmbed = getSafeFacebookEmbedUrl(video);
