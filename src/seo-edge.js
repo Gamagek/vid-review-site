@@ -29,15 +29,15 @@ const CATEGORY_BY_SLUG = new Map(
 function cleanText(value, maximum, fallback = "") {
   if (value === undefined || value === null) return fallback;
   return String(value)
-    .replace(/[\\u0000-\\u001F\\u007F]/g, " ")
-    .replace(/\\s+/g, " ")
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/\s+/g, " ")
     .trim()
     .slice(0, maximum);
 }
 
 function cleanLongText(value, maximum, fallback = "") {
   if (value === undefined || value === null) return fallback;
-  return String(value).replace(/\\u0000/g, "").trim().slice(0, maximum);
+  return String(value).replace(/\u0000/g, "").trim().slice(0, maximum);
 }
 
 function escapeHtml(value) {
@@ -370,8 +370,8 @@ async function combinedSitemap(env) {
   });
 }
 
-function homepageTopicLinks() {
-  return CATEGORY_ORDER.map((name) =>
+function homepageTopicLinks(categories) {
+  return categories.map((name) =>
     `<a href="${escapeHtml(categoryUrl(name))}">${escapeHtml(name)}</a>`
   ).join(" · ");
 }
@@ -429,11 +429,31 @@ async function pagesSitemap() {
 }
 async function enrichHomepageHtml(html, env) {
   let output = String(html);
+  let categories = [];
+  let recent = [];
+  try {
+    const [stats, result] = await Promise.all([
+      categoryStats(env),
+      env.DB.prepare(`SELECT slug, title FROM videos WHERE published = 1
+        ORDER BY updated_at DESC, id DESC LIMIT 12`).all(),
+    ]);
+    categories = CATEGORY_ORDER.filter((name) => stats.some((row) =>
+      row.primary_category === name && Number(row.total) > 0));
+    recent = result.results || [];
+  } catch (error) {
+    // Keep the existing homepage usable if the optional discovery query fails.
+    console.error("Homepage discovery links unavailable", error?.message || error);
+  }
+
+  if (recent.length && !output.includes('id="vidbest-recent-reviews"')) {
+    const links = recent.map((row) => `<li><a href="${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}">${escapeHtml(row.title)}</a></li>`).join("");
+    output = output.replace("</main>", `<section id="vidbest-recent-reviews" class="section-pad" aria-labelledby="recent-reviews-heading"><h2 id="recent-reviews-heading">Recently updated reviews</h2><ul>${links}</ul><a class="button ghost" href="/videos">Browse all published videos</a></section></main>`);
+  }
 
   if (!output.includes("vidbest-seo-topic-nav")) {
     const nav = `<nav id="vidbest-seo-topic-nav" class="vidbest-seo-topic-nav" aria-label="Explore video review categories">
       <strong>Explore video reviews by topic:</strong>
-      <span>${homepageTopicLinks()} · <a href="${CANONICAL_ORIGIN}/videos">Browse all videos</a></span>
+      <span>${homepageTopicLinks(categories)}${categories.length ? " · " : ""}<a href="${CANONICAL_ORIGIN}/videos">Browse all videos</a></span>
     </nav>`;
     output = output.replace("</footer>", `${nav}</footer>`);
   }
@@ -486,11 +506,22 @@ function enrichWatchHtml(html) {
 }
 
 async function passThroughHome(request, env, ctx) {
-  const response = await edgeWorker.fetch(request, env, ctx);
   const url = new URL(request.url);
+  if (url.pathname === "/" && request.method === "GET") {
+    // Asset-only validators cannot represent links sourced from the current D1 rows.
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.delete("If-None-Match");
+    requestHeaders.delete("If-Modified-Since");
+    request = new Request(request, { headers: requestHeaders });
+  }
+  const response = await edgeWorker.fetch(request, env, ctx);
   const headers = new Headers(response.headers);
 
-  if (url.pathname === "/" && url.search) {
+  // Tracking parameters do not change the homepage content. Keep its canonical
+  // signal; only search, filters, login tokens and other functional queries are noindex.
+  const filteredHome = url.pathname === "/" && [...url.searchParams.keys()].some((key) =>
+    !/^(?:utm_[a-z0-9_]+|gclid|dclid|fbclid|msclkid)$/i.test(key));
+  if (filteredHome) {
     headers.set("X-Robots-Tag", "noindex,follow");
   }
 
@@ -505,8 +536,14 @@ async function passThroughHome(request, env, ctx) {
 
   const rawHtml = await response.text();
   const watchHtml = url.pathname.startsWith("/watch/") ? enrichWatchHtml(rawHtml) : rawHtml;
-  const html = url.pathname === "/" ? await enrichHomepageHtml(watchHtml, env) : watchHtml;
+  let html = url.pathname === "/" && response.ok ? await enrichHomepageHtml(watchHtml, env) : watchHtml;
+  if (filteredHome) {
+    html = html.replace(/<meta\s+name="robots"\s+content="[^"]*"\s*\/?\s*>/i,
+      '<meta name="robots" content="noindex,follow">');
+  }
   headers.delete("Content-Length");
+  // The asset validator describes the original HTML, not the enriched response.
+  if (html !== rawHtml) headers.delete("ETag");
   return new Response(html, {
     status: response.status,
     statusText: response.statusText,
@@ -521,6 +558,16 @@ export default {
 
     if (LEGACY_HOSTS.has(hostname) && ["GET", "HEAD"].includes(request.method)) {
       return redirectToCanonical(request);
+    }
+
+    if (["GET", "HEAD"].includes(request.method)) {
+      const normalizedPath = url.pathname === "/index.html" ? "/"
+        : /^\/(?:videos|privacy|terms|category\/[^/]+|watch\/[^/]+)\/$/.test(url.pathname)
+          ? url.pathname.slice(0, -1) : url.pathname;
+      if (normalizedPath !== url.pathname) {
+        url.pathname = normalizedPath;
+        return Response.redirect(url.toString(), 301);
+      }
     }
 
     const category = resolveCategory(url.pathname);
@@ -541,7 +588,10 @@ export default {
     }
 
     if (url.pathname === "/watch") {
-      return signedWatchResponse(request, env);
+      const response = await signedWatchResponse(request, env);
+      // This temporary gateway helper is not an editorial watch page.
+      response.headers.set("X-Robots-Tag", "noindex,follow");
+      return response;
     }
 
     if (url.pathname === "/videos" && ["GET", "HEAD"].includes(request.method)) {

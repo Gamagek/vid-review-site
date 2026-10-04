@@ -183,3 +183,84 @@ test("video pages expose a crawlable category breadcrumb", async () => {
   assert.match(html, /href="https:\/\/vid\.best\/category\/technology"/);
   assert.match(html, /"item":"https:\/\/vid\.best\/category\/technology"/);
 });
+
+test("homepage publishes escaped review links without JavaScript and excludes drafts and empty topics", async () => {
+  const context = createContext();
+  const insert = context.sqlite.prepare(`INSERT INTO videos
+    (slug, title, source_url, media_type, primary_category, subcategory, published)
+    VALUES (?, ?, 'https://example.com/video.mp4', 'raw', 'Technology', 'Web Development', ?)`);
+  insert.run("visible-review", "Useful <review> & details", 1);
+  insert.run("private-draft", "Private draft", 0);
+  const response = await request(context, "https://vid.best/");
+  const html = await response.text();
+  assert.equal(response.status, 200);
+  assert.match(html, /id="vidbest-recent-reviews"/);
+  assert.match(html, /href="https:\/\/vid.best\/watch\/visible-review">Useful &lt;review&gt; &amp; details<\/a>/);
+  assert.doesNotMatch(html, /private-draft|Private draft/);
+  assert.doesNotMatch(html, /href="https:\/\/vid.best\/category\/other"/);
+  assert.equal(response.headers.get("X-Robots-Tag"), null);
+});
+
+test("tracking URLs keep canonical eligibility while functional queries remain noindex", async () => {
+  const context = createContext();
+  for (const query of ["utm_source=chatgpt&utm_medium=link", "gclid=test", "fbclid=test"]) {
+    const response = await request(context, `https://vid.best/?${query}`);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("X-Robots-Tag"), null);
+  }
+  for (const query of ["utm_source=chatgpt&q=music", "category=Music", "login_token=test"]) {
+    const response = await request(context, `https://vid.best/?${query}`);
+    assert.equal(response.headers.get("X-Robots-Tag"), "noindex,follow");
+  }
+});
+
+test("duplicate public paths permanently redirect without losing functional parameters", async () => {
+  const context = createContext();
+  for (const [from, to] of [
+    ["/index.html?q=music", "/?q=music"],
+    ["/videos/", "/videos"],
+    ["/category/technology/", "/category/technology"],
+    ["/watch/example/?utm_source=chatgpt", "/watch/example?utm_source=chatgpt"],
+    ["/privacy/", "/privacy"],
+  ]) {
+    const response = await request(context, `https://vid.best${from}`);
+    assert.equal(response.status, 301);
+    assert.equal(response.headers.get("Location"), `https://vid.best${to}`);
+  }
+});
+
+test("signed gateway helper stays usable but is not indexable", async () => {
+  const context = createContext();
+  context.env.SIGN_SECRET = "test-only-signing-secret";
+  const response = await request(context, "https://vid.best/watch?user=example&id=6718335390845095173");
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("X-Robots-Tag"), "noindex,follow");
+  assert.match(await response.text(), /<iframe src="https:\/\/video.megasale.win\//);
+});
+
+test("category thumbnail URLs retain letters and digits during text normalization", async () => {
+  const context = createContext();
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug, title, source_url, media_type, primary_category, subcategory, published, thumbnail_url)
+    VALUES ('thumbnail-test', 'Thumbnail test', 'https://example.com/v.mp4', 'raw', 'Other', 'Other', 1, ?)`)
+    .run("https://example.com/uploads/Fun-sun-012.jpg");
+  const response = await request(context, "https://vid.best/category/other");
+  assert.match(await response.text(), /src="https:\/\/example.com\/uploads\/Fun-sun-012.jpg"/);
+});
+
+test("homepage enrichment is not skipped by an old static asset validator", async () => {
+  const context = createContext();
+  context.env.ASSETS.fetch = async (request) => {
+    assert.equal(request.headers.get("If-None-Match"), null);
+    assert.equal(request.headers.get("If-Modified-Since"), null);
+    return new Response('<html><head><meta name="robots" content="index,follow"></head><body><main></main><footer></footer></body></html>', {
+      headers: { "Content-Type": "text/html", ETag: '"asset-only"' },
+    });
+  };
+  const response = await request(context, "https://vid.best/?q=music", {
+    headers: { "If-None-Match": '"asset-only"', "If-Modified-Since": "Mon, 21 Sep 2026 00:00:00 GMT" },
+  });
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("ETag"), null);
+  assert.match(await response.text(), /<meta name="robots" content="noindex,follow">/);
+});

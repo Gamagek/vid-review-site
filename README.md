@@ -186,6 +186,16 @@ Worker runtime secrets such as `GEMINI_KEY`, `ADMIN_SECRET_KEY`, `REACTION_SALT`
 
 ## SEO notes
 
+### Search Console indexing checks
+
+- Submit `https://vid.best/sitemap.xml` in the verified Vid.Best property. It links to the public page, video and eligible category sitemaps.
+- The homepage includes server-rendered links to the 12 most recently updated published reviews; `/videos` provides the existing larger directory. Drafts remain excluded.
+- `/index.html` and trailing-slash variants of public page routes redirect to their preferred paths. Tracking parameters use the existing clean canonical; search/filter and sign-in URLs remain `noindex`.
+- The temporary signed `/watch?user=...&id=...` helper is `noindex`; editorial `/watch/:slug` pages remain eligible for indexing.
+- For **Duplicate without user-selected canonical**, inspect the affected URL and compare its declared canonical with Google's selected canonical. The report summary alone does not identify the affected URL.
+- For **Discovered – currently not indexed**, Google knows the URL but has not crawled it yet. Inspect a representative published URL, run the live test, check its rendered content and request indexing after fixes. Review originality and usefulness of the editorial text; demo pages are not a substitute for substantive reviews.
+- These changes support discovery and canonical consistency. They do not guarantee indexing or change Search Console's historical report immediately.
+
 - A sitemap supports discovery but never guarantees indexing.
 - Do not publish scraped/search-result pages merely to create more URLs.
 - AI output is a draft; factual accuracy, originality, rights and editorial usefulness still require review.
