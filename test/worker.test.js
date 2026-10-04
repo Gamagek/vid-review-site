@@ -780,9 +780,11 @@ test("published Instagram records get a same-origin thumbnail fallback when no t
       'https://www.instagram.com/reel/ABC_def-123/embed/',
     );
 
-  const response = await send(context, '/api/videos?q=' + encodeURIComponent('Instagram thumbnail fallback'));
+  const response = await send(context, '/api/videos?limit=48');
   assert.equal(response.status, 200);
-  const video = (await response.json()).videos[0];
+  const payload = await response.json();
+  const video = payload.videos.find((item) => item.slug === 'instagram-thumb-fallback');
+  assert.ok(video);
   assert.equal(
     video.thumbnail_url,
     '/api/instagram/thumbnail?url=' + encodeURIComponent('https://www.instagram.com/reel/ABC_def-123/'),
@@ -1286,7 +1288,7 @@ test("TikTok keeps separate share preview and player paths", () => {
   assert.match(adminSource, /TikTok preview needs the normal full sharing link/);
 });
 
-test("renders the official TikTok Embed Player iframe with separate home preview behavior", async () => {
+test("renders the current Vid.Best TikTok direct player with separate home preview behavior", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
@@ -1306,13 +1308,11 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   const page = await send(context, "/watch/tiktok-player-test");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /<iframe[^>]+class="tiktok-official-player"/);
-  assert.ok(html.includes("https://www.tiktok.com/player/v1/7669587518156705056?"));
-  assert.match(html, /controls=1/);
-  assert.match(html, /progress_bar=1/);
-  assert.match(html, /volume_control=1/);
-  assert.match(html, /fullscreen_button=1/);
-  assert.match(html, /closed_caption=1/);
+  assert.match(html, /data-vidbest-tiktok-player/);
+  assert.match(html, /data-tiktok-id="7669587518156705056"/);
+  assert.match(html, /data-tiktok-gateway-src=/);
+  assert.doesNotMatch(html, /<iframe[^>]+tiktok-official-player/);
+  assert.doesNotMatch(html, /https:\/\/www\.tiktok\.com\/player\/v1\/7669587518156705056\?/);
   assert.doesNotMatch(html, /class="tiktok-embed"/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
   assert.match(html, /data-video-provider="tiktok"/);
@@ -1443,11 +1443,11 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   const html = await page.text();
   assert.ok(html.includes("<title>Saiyaara; A Cinematic Romance | Vid.Best</title>"));
   assert.ok(html.includes("<h1>Saiyaara; A Cinematic Romance</h1>"));
-  assert.ok(html.includes('<iframe id="watch-media-frame" class="tiktok-official-player"'));
-  assert.ok(html.includes('https://www.tiktok.com/player/v1/6718335390845095173?'));
-  assert.ok(html.includes("controls=1"));
-  assert.ok(html.includes("closed_caption=1"));
+  assert.ok(html.includes('data-vidbest-tiktok-player'));
+  assert.ok(html.includes('data-tiktok-id="6718335390845095173"'));
+  assert.ok(html.includes('data-tiktok-gateway-src='));
   assert.ok(html.includes('data-video-provider="tiktok"'));
+  assert.ok(!html.includes('class="tiktok-official-player"'));
 });
 
 test("discovers direct TikTok URLs without server-side TikTok requests", async () => {
