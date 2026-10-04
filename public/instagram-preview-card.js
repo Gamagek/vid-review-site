@@ -86,7 +86,7 @@ function createPreview(card) {
     controls.append(close);
 
     panel.classList.add("is-playing");
-    panel.replaceChildren(frame, controls);
+    panel.replaceChildren(frame, controls, status);
     status.textContent = "Instagram controls playback inside the preview.";
     activeCard = panel;
     panel.__restore = restore;
