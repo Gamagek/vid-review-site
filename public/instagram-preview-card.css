@@ -1,19 +1,16 @@
-/* The official Instagram embed is a portrait post, not Facebook's compact
-   video-only plugin. Let Meta's SDK size it instead of clipping it to 230px. */
+/* Keep the shared tile height and contain the full official portrait embed. */
 .video-tile[data-video-provider="instagram"] .tile-media {
-  height: auto;
-  min-height: 230px;
-  overflow: visible;
+  overflow: hidden;
 }
 .video-tile[data-video-provider="instagram"] .tile-media .preview-surface {
-  position: relative;
-  inset: auto;
+  position: absolute;
+  inset: 0;
   display: block;
-  height: auto;
+  height: 100%;
   opacity: 1;
   pointer-events: auto;
   z-index: 1;
-  overflow: visible;
+  overflow: hidden;
   background: #05070d;
 }
 .video-tile[data-video-provider="instagram"] .tile-media::after,
@@ -22,7 +19,7 @@
 .video-tile[data-video-provider="instagram"] .play-orb,
 .video-tile[data-video-provider="instagram"] .media-type,
 .video-tile[data-video-provider="instagram"] .preview-status { display: none; }
-.instagram-preview-card { position: relative; margin-inline: auto; min-height: 100px; }
+.instagram-preview-card { position: relative; width: 100%; height: 100%; overflow: hidden; }
 .instagram-sdk-stage { position: absolute; top: 0; left: 0; transform-origin: top left; }
 .instagram-sdk-stage .instagram-media { margin: 0 !important; width: 100% !important; min-width: 0 !important; max-width: none !important; box-sizing: border-box; }
 .instagram-sdk-stage blockquote { padding: 20px; background: #fff; color: #222; }

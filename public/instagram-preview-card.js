@@ -46,8 +46,8 @@ function renderCard(card) {
   card.classList.add("instagram-preview-ready");
   card.querySelector(".preview-status")?.setAttribute("hidden", "");
 
-  // Meta resizes the iframe after loading. Preserve that height, including on
-  // narrow cards below Instagram's minimum width, without cropping controls.
+  // Fit the entire Meta embed into the shared tile dimensions, with
+  // letterboxing instead of growing the grid row or cropping the controls.
   function resize() {
     const frame = stage.querySelector("iframe");
     // The SDK writes a height attribute; override the generic preview CSS
@@ -57,11 +57,12 @@ function renderCard(card) {
     const available = Math.min(540, media.clientWidth);
     if (!available) return;
     const width = Math.max(326, available);
-    const scale = available / width;
     stage.style.width = `${width}px`;
+    const height = Math.max(1, stage.offsetHeight);
+    const scale = Math.min(1, media.clientWidth / width, media.clientHeight / height);
     stage.style.transform = `scale(${scale})`;
-    wrapper.style.width = `${available}px`;
-    wrapper.style.height = `${Math.ceil(stage.offsetHeight * scale)}px`;
+    stage.style.left = `${Math.max(0, (media.clientWidth - width * scale) / 2)}px`;
+    stage.style.top = `${Math.max(0, (media.clientHeight - height * scale) / 2)}px`;
   }
   const observer = new ResizeObserver(resize);
   observer.observe(media);
