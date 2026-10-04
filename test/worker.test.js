@@ -799,6 +799,13 @@ test("Instagram thumbnail endpoint extracts and serves an allowed public preview
 
   globalThis.fetch = async (url) => {
     calls.push(String(url));
+    if (String(url).startsWith("https://graph.facebook.com/v26.0/instagram_oembed?")) {
+      return new Response(JSON.stringify({
+        type: "rich",
+        author_name: "example.creator",
+        html: "<blockquote class=\"instagram-media\"></blockquote>",
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
     if (String(url) === source) {
       return new Response(
         '<html><head><meta property="og:image" content="' + image + '"></head></html>',
@@ -823,7 +830,8 @@ test("Instagram thumbnail endpoint extracts and serves an allowed public preview
     assert.equal(response.headers.get("Content-Type"), "image/jpeg");
     assert.equal(response.headers.get("Cache-Control"), "public, max-age=604800, stale-while-revalidate=2592000");
     assert.deepEqual([...new Uint8Array(await response.arrayBuffer())], [1, 2, 3, 4]);
-    assert.deepEqual(calls, [source, image]);
+    assert.equal(calls[0].startsWith("https://graph.facebook.com/v26.0/instagram_oembed?"), true);
+    assert.deepEqual(calls.slice(1), [source, image]);
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -835,7 +843,7 @@ test("homepage uses the separate Instagram preview-card module", () => {
   assert.match(html, /type="module" src="\/instagram-preview-card\.js"/);
   assert.doesNotMatch(html, /type="module" src="\/instagram-player\.js"/);
   assert.match(script, /parseInstagramUrl/);
-  assert.match(script, /\/api\/instagram\/thumbnail/);
+  assert.match(script, /\/api\/instagram\/previews/);
   assert.match(script, /source\.embedUrl/);
   assert.match(script, /Play here/);
 });
