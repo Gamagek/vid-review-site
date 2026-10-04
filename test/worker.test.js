@@ -770,6 +770,64 @@ test("Instagram legacy records receive a dedicated player without needing a data
   assert.doesNotMatch(html, /<video id="watch-media-video"/);
 });
 
+test("published Instagram records get a same-origin thumbnail fallback when no thumbnail was supplied", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug, title, source_url, embed_url, media_type, primary_category, subcategory, published)
+    VALUES ('instagram-thumb-fallback', 'Instagram thumbnail fallback', ?, ?, 'raw', 'Other', 'Instagram Reel', 1)`)
+    .run(
+      'https://www.instagram.com/reel/ABC_def-123/',
+      'https://www.instagram.com/reel/ABC_def-123/embed/',
+    );
+
+  const response = await send(context, '/api/videos?q=' + encodeURIComponent('Instagram thumbnail fallback'));
+  assert.equal(response.status, 200);
+  const video = (await response.json()).videos[0];
+  assert.equal(
+    video.thumbnail_url,
+    '/api/instagram/thumbnail?url=' + encodeURIComponent('https://www.instagram.com/reel/ABC_def-123/'),
+  );
+});
+
+test("Instagram thumbnail endpoint extracts and serves an allowed public preview image", async () => {
+  const context = createTestContext();
+  const source = 'https://www.instagram.com/reel/ABC_def-123/';
+  const image = 'https://scontent.cdninstagram.com/example/reel-preview.jpg';
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+
+  globalThis.fetch = async (url) => {
+    calls.push(String(url));
+    if (String(url) === source) {
+      return new Response(
+        '<html><head><meta property="og:image" content="' + image + '"></head></html>',
+        { status: 200, headers: { "Content-Type": "text/html" } },
+      );
+    }
+    if (String(url) === image) {
+      return new Response(new Uint8Array([1, 2, 3, 4]), {
+        status: 200,
+        headers: { "Content-Type": "image/jpeg" },
+      });
+    }
+    throw new Error('Unexpected upstream URL: ' + String(url));
+  };
+
+  try {
+    const response = await send(
+      context,
+      '/api/instagram/thumbnail?url=' + encodeURIComponent(source),
+    );
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Content-Type"), "image/jpeg");
+    assert.equal(response.headers.get("Cache-Control"), "public, max-age=604800, stale-while-revalidate=2592000");
+    assert.deepEqual([...new Uint8Array(await response.arrayBuffer())], [1, 2, 3, 4]);
+    assert.deepEqual(calls, [source, image]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("new Instagram discoveries use clean official URLs", async () => {
   const context = createTestContext();
   const response = await send(context, '/api/admin/discover?q=' + encodeURIComponent(
