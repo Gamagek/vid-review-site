@@ -324,7 +324,7 @@ function buildVideoCard(video) {
   card.querySelector(".category-badge").textContent = video.primary_category;
   card.querySelector(".subcategory-badge").textContent = video.subcategory;
   card.querySelector(".tile-description").textContent = video.description || "Open the review to discover more about this video.";
-  card.querySelector(".media-type").textContent = video.media_type;
+  card.querySelector(".media-type").textContent = card.dataset.videoProvider === "instagram" ? "Instagram" : video.media_type;
   card.querySelector(".views-count").textContent = `${formatNumber(video.views)} views`;
   const time = card.querySelector("time");
   time.dateTime = video.created_at;

@@ -93,7 +93,6 @@ function boot() {
     const source = parseInstagramUrl(target?.dataset.instagramSource);
     if (target && frame && source) mountPlayer(target, source, frame.title, frame);
   }
-  decoratePreviews();
 }
 
 window.addEventListener("pagehide", () => activePreview?.close());
