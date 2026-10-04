@@ -256,3 +256,16 @@ Vid.Best/
 ## License
 
 MIT. See `LICENSE`.
+
+### Instagram card sizing
+
+Homepage Instagram cards mount Meta's official `instagram.com/embed.js` SDK
+with a normalized post permalink. Like Facebook cards, the embed occupies the
+interactive preview surface, but it preserves Instagram's natural post height.
+The generic forced iframe height excludes this surface. ResizeObserver tracks
+SDK height changes and scales only cards narrower than 326px; it does not crop
+or hide Instagram controls. The card title opens the Vid.Best review.
+Facebook's `/plugins/video.php` is not an Instagram player, and its autoplay or
+`show_text` options are not applied to Instagram. A loaded embed is not proof of
+playback: Meta can still offer “Watch on Instagram” for a particular post.
+Reference: https://github.com/facebook/meta-embeds-for-wordpress

@@ -843,8 +843,8 @@ test("homepage uses the dedicated Instagram inline player module", () => {
   assert.ok(html.includes('type="module" src="/instagram-preview-card.js"'));
   assert.ok(!html.includes('type="module" src="/instagram-player.js"'));
   assert.ok(script.includes("parseInstagramUrl"));
-  assert.ok(script.includes('className = "instagram-home-player"'));
-  assert.ok(script.includes("frame.src = source.embedUrl"));
+  assert.ok(script.includes('script.src = "https://www.instagram.com/embed.js"'));
+  assert.ok(script.includes("embed.dataset.instgrmPermalink = source.sourceUrl"));
   assert.ok(!script.includes("Open on Instagram"));
   assert.ok(!script.includes("instagram-preview-modal"));
 });

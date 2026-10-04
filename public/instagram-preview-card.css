@@ -1,55 +1,28 @@
-.video-tile[data-video-provider="instagram"] .preview-surface {
+/* The official Instagram embed is a portrait post, not Facebook's compact
+   video-only plugin. Let Meta's SDK size it instead of clipping it to 230px. */
+.video-tile[data-video-provider="instagram"] .tile-media {
+  height: auto;
+  min-height: 230px;
+  overflow: visible;
+}
+.video-tile[data-video-provider="instagram"] .tile-media .preview-surface {
+  position: relative;
+  inset: auto;
+  display: block;
+  height: auto;
   opacity: 1;
   pointer-events: auto;
-  z-index: 3;
+  z-index: 1;
+  overflow: visible;
   background: #05070d;
 }
+.video-tile[data-video-provider="instagram"] .tile-media::after,
 .video-tile[data-video-provider="instagram"] .tile-media > img,
 .video-tile[data-video-provider="instagram"] .media-fallback,
 .video-tile[data-video-provider="instagram"] .play-orb,
 .video-tile[data-video-provider="instagram"] .media-type,
-.video-tile[data-video-provider="instagram"] .preview-status {
-  display: none;
-}
-.instagram-preview-card {
-  position: absolute;
-  inset: 0;
-  display: block;
-  overflow: hidden;
-  background: #000;
-  color: #fff;
-}
-.instagram-home-player {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 230px;
-  border: 0;
-  background: #000;
-}
-.instagram-preview-badge,
-.instagram-preview-status {
-  position: absolute;
-  z-index: 2;
-  pointer-events: none;
-  padding: 5px 8px;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 999px;
-  background: rgba(5,7,15,.78);
-  color: #fff;
-  font-size: .61rem;
-  font-weight: 800;
-  letter-spacing: .04em;
-  backdrop-filter: blur(8px);
-}
-.instagram-preview-badge {
-  left: 10px;
-  top: 10px;
-  text-transform: uppercase;
-}
-.instagram-preview-status {
-  left: 50%;
-  bottom: 10px;
-  transform: translateX(-50%);
-  white-space: nowrap;
-}
+.video-tile[data-video-provider="instagram"] .preview-status { display: none; }
+.instagram-preview-card { position: relative; margin-inline: auto; min-height: 100px; }
+.instagram-sdk-stage { position: absolute; top: 0; left: 0; transform-origin: top left; }
+.instagram-sdk-stage .instagram-media { margin: 0 !important; width: 100% !important; min-width: 0 !important; max-width: none !important; box-sizing: border-box; }
+.instagram-sdk-stage blockquote { padding: 20px; background: #fff; color: #222; }

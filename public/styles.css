@@ -934,7 +934,7 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
   overflow: hidden;
   background: #000;
 }
-.tile-media .preview-surface iframe {
+.tile-media .preview-surface:not(.instagram-sdk-host) iframe {
   width: 100% !important;
   height: 100% !important;
   min-width: 0 !important;
