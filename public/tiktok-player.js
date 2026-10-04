@@ -3,6 +3,42 @@
   const MAX_ATTEMPTS = 15;
   const POLL_INTERVAL_MS = 3000;
 
+  function injectStyles() {
+    if (document.getElementById("vidbest-tiktok-direct-player-styles")) return;
+    const style = document.createElement("style");
+    style.id = "vidbest-tiktok-direct-player-styles";
+    style.textContent = [
+      ".watch-player[data-provider=\"tiktok\"] .watch-player-stage{position:relative;width:min(100%,540px);height:min(78vh,760px);min-height:480px;margin-inline:auto;background:#000;overflow:hidden}",
+      ".watch-player[data-provider=\"tiktok\"] .tiktok-official-player{display:block;width:100%;height:100%;border:0;background:#000}",
+      ".watch-player[data-provider=\"tiktok\"] .vidbest-tiktok-direct-video{display:block;width:100%;height:100%;object-fit:contain;background:#000;border:0}",
+      ".watch-player[data-provider=\"tiktok\"] .vidbest-tiktok-fallback-overlay{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center;color:#fff;background:rgba(0,0,0,.82);backdrop-filter:blur(8px);box-sizing:border-box}",
+      ".watch-player[data-provider=\"tiktok\"] .vidbest-tiktok-fallback-overlay[hidden]{display:none}",
+      ".vidbest-tiktok-spinner{width:42px;height:42px;border:4px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:vidbestTikTokSpin .8s linear infinite}",
+      "@keyframes vidbestTikTokSpin{to{transform:rotate(360deg)}}",
+      ".vidbest-tiktok-fallback-overlay strong{font:700 16px/1.3 system-ui,sans-serif}",
+      ".vidbest-tiktok-fallback-overlay span{max-width:340px;color:#cbd5e1;font:13px/1.45 system-ui,sans-serif}",
+      ".vidbest-tiktok-progress{width:min(280px,80%);height:4px;border-radius:999px;background:rgba(255,255,255,.14);overflow:hidden}",
+      ".vidbest-tiktok-progress span{display:block;width:0;height:100%;border-radius:inherit;background:#fff;transition:width .25s ease}",
+      ".vidbest-tiktok-direct-controls{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px;padding:8px;border:1px solid rgba(148,163,184,.18);border-radius:12px;background:rgba(5,7,13,.92)}",
+      ".vidbest-tiktok-direct-controls .button{min-height:32px}",
+      ".vidbest-tiktok-audio-lab{width:min(100%,760px);margin:12px auto 0;padding:16px;border:1px solid rgba(148,163,184,.2);border-radius:16px;background:linear-gradient(135deg,rgba(8,12,22,.98),rgba(18,25,40,.92));color:#eef2ff;box-sizing:border-box}",
+      ".vidbest-tiktok-audio-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:14px}",
+      ".vidbest-tiktok-audio-head p{margin:0 0 3px;font:700 11px/1.2 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#94a3b8}",
+      ".vidbest-tiktok-audio-head h2{margin:0;font:700 18px/1.2 system-ui,sans-serif}",
+      ".vidbest-tiktok-audio-head small{display:block;margin-top:5px;color:#94a3b8;font:12px/1.35 system-ui,sans-serif}",
+      ".vidbest-tiktok-audio-head button,.vidbest-tiktok-audio-lab button{border:1px solid rgba(148,163,184,.25);border-radius:9px;background:rgba(30,41,59,.85);color:#fff;padding:7px 10px;cursor:pointer}",
+      ".vidbest-tiktok-audio-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}",
+      ".vidbest-tiktok-audio-grid label{display:grid;gap:6px;color:#cbd5e1;font:12px/1.2 system-ui,sans-serif}",
+      ".vidbest-tiktok-audio-grid output{font-weight:700;color:#fff}",
+      ".vidbest-tiktok-audio-grid input{width:100%;accent-color:#fff}",
+      ".vidbest-tiktok-audio-status{margin:12px 0 0;color:#94a3b8;font:12px/1.4 system-ui,sans-serif}",
+      ".vidbest-tiktok-audio-status[data-tone=\"ok\"]{color:#bbf7d0}",
+      ".vidbest-tiktok-audio-status[data-tone=\"warn\"]{color:#fde68a}",
+      "@media(max-width:640px){.watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:100%;height:min(78vh,calc((100vw - 24px)*1.7778));min-height:420px}.vidbest-tiktok-direct-controls{justify-content:center}.vidbest-tiktok-audio-lab{padding:12px}.vidbest-tiktok-audio-grid{grid-template-columns:1fr 1fr}}"
+    ].join("");
+    document.head.append(style);
+  }
+
   function boot() {
     const playerShell = document.querySelector("#watch-player");
     const stage = playerShell?.querySelector(".watch-player-stage");
@@ -12,6 +48,7 @@
     if (!playerShell || !stage || !frame || provider !== "tiktok") return;
     if (playerShell.dataset.vidbestTikTokArchitecture === "1") return;
     playerShell.dataset.vidbestTikTokArchitecture = "1";
+    injectStyles();
 
     const gatewayUrl = frame.dataset.tiktokGatewaySrc || "";
     const shareUrl = frame.dataset.tiktokShare || "";
@@ -38,6 +75,7 @@
     let fallbackStarted = false;
     let fallbackTimer = null;
     let abortController = null;
+    let audioController = null;
 
     function setOverlay(message, titleText) {
       overlay.hidden = false;
@@ -137,6 +175,7 @@
       video.setAttribute("controls", "");
       video.preload = "auto";
       video.autoplay = false;
+      video.hidden = true;
 
       if (!existing) {
         stage.insertBefore(video, overlay);
@@ -206,7 +245,8 @@
         video.src = result.streamUrl;
         video.load();
 
-        const audioController = window.VidBestAudioLab?.createAudioLab(video);
+        audioController?.destroy?.();
+        audioController = window.VidBestAudioLab?.createAudioLab(video) || null;
         if (audioController && window.VidBestAudioLabUI) {
           window.VidBestAudioLabUI.mountAudioLab(playerShell, audioController);
         }
@@ -247,6 +287,8 @@
       }
 
       const oldVideo = stage.querySelector("video[data-vidbest-tiktok-direct]");
+      audioController?.destroy?.();
+      audioController = null;
       oldVideo?.remove();
 
       const oldAudio = playerShell.querySelector(".vidbest-tiktok-audio-lab");
@@ -279,9 +321,7 @@
       }
 
       if (data.type === "onPlayerError") {
-        if (!officialReady) {
-          void startFallback("TikTok reported a playback error");
-        }
+        void startFallback("TikTok reported a playback error");
       }
     };
 
