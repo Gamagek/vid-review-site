@@ -1216,17 +1216,42 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(html, /data-video-provider="tiktok"/);
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
-  assert.doesNotMatch(watchSource, /initializeTikTokLazyPlayer/);
-  assert.match(watchSource, /"x-tiktok-player": true/);
-  assert.match(watchSource, /onPlayerError/);
-  assert.match(watchSource, /className = "vidbest-tiktok-retry"/);
-  assert.match(watchSource, /const remote = \[\"youtube\", \"vimeo\", \"tiktok\", \"facebook\"\]\.includes\(provider\)/);
-  assert.match(watchSource, /if \(remote\) \{/);
-  assert.doesNotMatch(watchSource, /remote = provider === "youtube" \|\| provider === "vimeo" \|\| provider === "tiktok" \|\| provider === "facebook";[\s\S]{0,1200}overlay.append\(play, back, forward/);
-  assert.match(watchSource, /Retry TikTok player/);
-  assert.match(watchSource, /const loadGatewayFallback = \(messageText\) =>/);
-  assert.match(watchSource, /TikTok official player reported an error/);
-  assert.match(watchSource, /dns\.google/);
+  assert.doesNotMatch(watchSource, /loadGatewayFallback/);
+  assert.doesNotMatch(watchSource, /vidbest-tiktok-retry/);
+  assert.match(watchSource, /if \(provider === "tiktok"\) return/);
+
+  const tiktokServiceSource = readFileSync(new URL("../public/tiktok-video-service.js", import.meta.url), "utf8");
+  assert.match(tiktokServiceSource, /DEFAULT_INTERVAL_MS = 3000/);
+  assert.match(tiktokServiceSource, /DEFAULT_MAX_ATTEMPTS = 15/);
+  assert.match(tiktokServiceSource, /status === "cached"/);
+  assert.match(tiktokServiceSource, /status === "scraping"/);
+  assert.match(tiktokServiceSource, /response.status === 404/);
+  assert.match(tiktokServiceSource, /buildStreamUrl/);
+
+  const tiktokPlayerSource = readFileSync(new URL("../public/tiktok-player.js", import.meta.url), "utf8");
+  assert.match(tiktokPlayerSource, /onPlayerReady/);
+  assert.match(tiktokPlayerSource, /onPlayerError/);
+  assert.match(tiktokPlayerSource, /OFFICIAL_GRACE_MS = 8000/);
+  assert.match(tiktokPlayerSource, /MAX_ATTEMPTS = 15/);
+  assert.match(tiktokPlayerSource, /POLL_INTERVAL_MS = 3000/);
+  assert.match(tiktokPlayerSource, /crossorigin/);
+  assert.match(tiktokPlayerSource, /startFallback/);
+  assert.match(tiktokPlayerSource, /Video ready/);
+  assert.match(tiktokPlayerSource, /AudioLab/);
+
+  const audioSource = readFileSync(new URL("../public/tiktok-audio-lab.js", import.meta.url), "utf8");
+  assert.match(audioSource, /createMediaElementSource/);
+  assert.match(audioSource, /createGain/);
+  assert.match(audioSource, /createBiquadFilter/);
+  assert.match(audioSource, /createStereoPanner/);
+  assert.match(audioSource, /context\.resume/);
+
+  const audioUiSource = readFileSync(new URL("../public/tiktok-audio-lab-ui.js", import.meta.url), "utf8");
+  assert.match(audioUiSource, /Bass/);
+  assert.match(audioUiSource, /Mid/);
+  assert.match(audioUiSource, /Treble/);
+  assert.match(audioUiSource, /Space/);
+  assert.match(audioUiSource, /Master/);
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /parseTikTokShareUrl/);
   assert.match(homeSource, /loadTikTokFacadePreviews/);
