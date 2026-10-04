@@ -86,37 +86,6 @@ function mountPlayer(target, source, title, existingFrame = null) {
   };
 }
 
-function decoratePreviews() {
-  if (activePreview && !activePreview.target.isConnected) activePreview.close();
-  document.querySelectorAll('.video-tile[data-video-provider="instagram"]:not([data-instagram-ready])').forEach((card) => {
-    const source = parseInstagramUrl(card.dataset.videoSource);
-    const media = card.querySelector(".tile-media");
-    if (!source || !media) return;
-    card.dataset.instagramReady = "1";
-    const preview = document.createElement("section");
-    preview.className = "instagram-preview";
-    preview.setAttribute("aria-label", `${card.dataset.videoTitle || "Instagram"} preview`);
-    const launch = button("Show Instagram preview", () => {
-      activePreview?.close();
-      launch.hidden = true;
-      media.hidden = true;
-      const player = mountPlayer(preview, source, card.dataset.videoTitle);
-      const close = () => {
-        player.destroy();
-        media.hidden = false;
-        launch.hidden = false;
-        if (activePreview?.target === preview) activePreview = null;
-      };
-      player.toolbar.append(button("Close preview", () => { close(); launch.focus(); }));
-      activePreview = { target: preview, close };
-    });
-    preview.append(launch);
-    media.after(preview);
-    const note = card.querySelector(".preview-status");
-    if (note) note.textContent = "Instagram · preview available below";
-  });
-}
-
 function boot() {
   if (document.body.dataset.videoProvider === "instagram") {
     const target = document.querySelector(".instagram-player");
@@ -127,7 +96,6 @@ function boot() {
   decoratePreviews();
 }
 
-document.addEventListener("vidbest:grid-rendered", decoratePreviews);
 window.addEventListener("pagehide", () => activePreview?.close());
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });
 else boot();
