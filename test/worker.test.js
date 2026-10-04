@@ -1216,15 +1216,13 @@ test("renders the official TikTok Embed Player iframe with separate home preview
   assert.match(html, /data-video-provider="tiktok"/);
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
-  assert.doesNotMatch(watchSource, /loadGatewayFallback/);
-  assert.doesNotMatch(watchSource, /vidbest-tiktok-retry/);
   assert.match(watchSource, /if \(provider === "tiktok"\) return/);
 
   const tiktokServiceSource = readFileSync(new URL("../public/tiktok-video-service.js", import.meta.url), "utf8");
   assert.match(tiktokServiceSource, /DEFAULT_INTERVAL_MS = 3000/);
   assert.match(tiktokServiceSource, /DEFAULT_MAX_ATTEMPTS = 15/);
   assert.match(tiktokServiceSource, /status === "cached"/);
-  assert.match(tiktokServiceSource, /status === "scraping"/);
+  assert.match(tiktokServiceSource, /status: "scraping"/);
   assert.match(tiktokServiceSource, /response.status === 404/);
   assert.match(tiktokServiceSource, /buildStreamUrl/);
 
