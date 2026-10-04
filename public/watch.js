@@ -693,6 +693,7 @@ function initializeEmbeddedMediaTools() {
   player.dataset.vidbestEmbeddedTools = "1";
 
   const provider = String(document.body.dataset.videoProvider || inferProvider(frame)).toLowerCase();
+  if (provider === "instagram") return;
   if (provider === "tiktok") return;
   const remote = ["youtube", "vimeo", "facebook"].includes(provider);
   const supportsPlaybackRate = provider === "youtube" || provider === "vimeo";
@@ -1230,6 +1231,7 @@ function repairNativePlayerControls() {
    parent page; only APIs exposed by the provider are used there. Same-origin frame media
    gets the same Web Audio EQ/reverb path as native media. */
 function initializeEmbeddedAudioLab() {
+  if (document.body.dataset.videoProvider === "instagram") return;
   const player = document.querySelector("#watch-player");
   if (!player || player.dataset.vidbestEmbeddedAudio === "1") return;
   if (String(document.body.dataset.videoProvider || "").toLowerCase() === "tiktok") return;

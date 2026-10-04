@@ -1,3 +1,4 @@
+import { parseInstagramUrl } from "../public/instagram-utils.js";
 import {
   requestMemberLogin,
   verifyMemberLogin,
@@ -1491,12 +1492,11 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
   }
 
   if (hostname === "instagram.com" || hostname.endsWith(".instagram.com")) {
-    const match = url.pathname.match(/^\/(p|reel|reels)\/([A-Za-z0-9_-]+)/);
-    if (!match) throw new AppError(400, "Use a full public Instagram post or Reel URL");
-    const kind = match[1] === "p" ? "p" : "reel";
+    const instagram = parseInstagramUrl(url.toString());
+    if (!instagram) throw new AppError(400, "Use a full public Instagram post or Reel URL");
     return {
-      source_url: url.toString(),
-      embed_url: `https://www.instagram.com/${kind}/${match[2]}/embed`,
+      source_url: instagram.sourceUrl,
+      embed_url: instagram.embedUrl,
       media_type: "raw",
       provider: "instagram",
       r2_key: null,
@@ -2202,6 +2202,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   <script src="/watch.js" defer></script>
+  ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
   ${video.provider === "tiktok" ? '<script src="/tiktok-video-service.js" defer></script><script src="/tiktok-audio-lab.js" defer></script><script src="/tiktok-audio-lab-ui.js" defer></script><script src="/tiktok-player.js" defer></script>' : ""}
 </head>
 <body class="watch-page" data-video-id="${Number(video.id)}" data-video-provider="${escapeHtml(video.provider)}">
@@ -2351,6 +2352,12 @@ function watchDisplayTitle(video) {
 
 function renderMedia(video, playbackOrigin) {
   const provider = String(video.provider || "").toLowerCase();
+
+  if (provider === "instagram") {
+    const instagram = parseInstagramUrl(video.source_url);
+    if (!instagram) return '<p>Use a full public Instagram post or Reel link to load this video.</p>';
+    return `<div class="instagram-player" data-instagram-source="${escapeHtml(instagram.sourceUrl)}"><iframe id="watch-media-frame" class="instagram-official-player" src="${escapeHtml(instagram.embedUrl)}" title="${escapeHtml(video.title)}" loading="eager" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><noscript><a href="${escapeHtml(instagram.sourceUrl)}" target="_blank" rel="noopener noreferrer">Open on Instagram</a></noscript></div>`;
+  }
 
   if (provider === "hls") {
     const poster = video.thumbnail_url ? ` poster="${escapeHtml(video.thumbnail_url)}"` : "";

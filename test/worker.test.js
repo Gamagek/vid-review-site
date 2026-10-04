@@ -748,6 +748,35 @@ test("stores TikTok source and renders the PR26-style player", async () => {
   assert.doesNotMatch(html, /"embedUrl":s*"https:\/\/www\.tiktok\.com\/player\/v1\//);
 });
 
+test("Instagram legacy records receive a dedicated player without needing a database rewrite", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug, title, source_url, embed_url, media_type, primary_category, subcategory, published)
+    VALUES ('instagram-latest', 'Instagram test', ?, ?, 'raw', 'Other', 'Instagram Reel', 1)`)
+    .run('https://www.instagram.com/reel/DcAcA_QnOLk/?stkn=old-share',
+      'https://www.instagram.com/reel/DcAcA_QnOLk/embed');
+  const response = await send(context, '/watch/instagram-latest');
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /class="instagram-player"/);
+  assert.match(html, /class="instagram-official-player" src="https:\/\/www.instagram.com\/reel\/DcAcA_QnOLk\/embed\/"/);
+  assert.match(html, /type="module" src="\/instagram-player.js"/);
+  assert.match(html, /href="\/instagram-player.css"/);
+  assert.doesNotMatch(html, /src="\/tiktok-player.js"/);
+  assert.doesNotMatch(html, /<video id="watch-media-video"/);
+});
+
+test("new Instagram discoveries use clean official URLs", async () => {
+  const context = createTestContext();
+  const response = await send(context, '/api/admin/discover?q=' + encodeURIComponent(
+    'https://www.instagram.com/reels/DcAcA_QnOLk/?igsh=test'),
+    { headers: { Authorization: `Bearer ${secret}` } });
+  assert.equal(response.status, 200);
+  const video = (await response.json()).results[0];
+  assert.equal(video.provider, 'instagram');
+  assert.equal(video.source_url, 'https://www.instagram.com/reel/DcAcA_QnOLk/');
+});
+
 test("normalizes trusted provider URLs into provider-owned embeds", async () => {
   const context = createTestContext();
   const cases = [

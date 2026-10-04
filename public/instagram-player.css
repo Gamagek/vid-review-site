@@ -1,0 +1,16 @@
+.instagram-player,.instagram-preview { width:100%; min-width:0; background:#101423; color:#eee; }
+.instagram-player { max-width:540px; margin-inline:auto; }
+.instagram-preview { padding:12px; box-sizing:border-box; }
+.instagram-official-player { display:block; width:100%; height:720px; border:0; background:#fff; }
+.instagram-preview .instagram-official-player { height:580px; }
+.instagram-player-actions { display:flex; flex-wrap:wrap; gap:8px; padding:12px; }
+.instagram-player-status,.instagram-player-help { margin:0; padding:0 12px 12px; line-height:1.5; font-size:13px; }
+.instagram-player-help { color:#b9c3d4; }
+.instagram-player:fullscreen,.instagram-preview:fullscreen { overflow:auto; max-width:none; }
+.instagram-player:fullscreen .instagram-official-player,.instagram-preview:fullscreen .instagram-official-player { max-width:540px; margin:auto; height:calc(100vh - 150px); }
+.watch-player[data-provider="instagram"] .watch-player-stage { display:block; min-height:0; overflow:visible; }
+.watch-player[data-provider="instagram"].is-mini { width:min(430px,calc(100vw - 24px)); }
+.watch-player[data-provider="instagram"].is-mini .watch-player-stage { aspect-ratio:auto; max-height:70vh; overflow:auto; }
+.watch-player[data-provider="instagram"].is-theater .watch-player-stage { overflow:auto; }
+.video-tile[data-video-provider="instagram"] .tile-media[hidden],.instagram-preview button[hidden] { display:none; }
+@media(max-width:600px) { .instagram-official-player { height:650px; } .instagram-player-actions .button { padding:8px 10px; font-size:12px; } }

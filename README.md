@@ -51,6 +51,17 @@ The watch page includes canonical, Open Graph and X/Twitter metadata. `VideoObje
 
 ### Player
 
+Instagram posts and Reels use a dedicated official embed wrapper in
+`public/instagram-player.js`, with a portrait layout, reload, fullscreen (where
+supported) and an original-post link. Homepage Instagram cards offer an explicit
+**Show Instagram preview** action; only one such preview stays open at a time.
+Closing the preview removes the iframe. URL normalization is shared with the
+Worker, so old published records also get clean embed URLs without database edits.
+Instagram does not share a direct media URL or a supported playback/EQ API with
+this wrapper. Its own embed may send viewers to Instagram to watch; iframe load
+is not treated as proof of playback. Generic playback and Audio Lab controls are
+excluded from Instagram pages. Other providers keep their existing player paths.
+
 Self-hosted/raw video uses the browser's native player plus Vid.Best controls for play/pause, 10-second rewind/forward, playback speed, zoom, fullscreen and picture-in-picture when the browser supports it. Trusted provider links are converted into provider-owned embeds for YouTube, Vimeo, Dailymotion, Twitch, Instagram, TikTok and Facebook. Arbitrary iframe HTML is never accepted.
 
 On a watch page, scrolling beyond the player starts a three-second delay. The player then becomes a mini-player; native media and YouTube can begin muted when browser policy allows. **Return**, **Pop-up** and **Close** controls preserve a deliberate user escape path. Reduced-motion visitors do not get automatic playback.
