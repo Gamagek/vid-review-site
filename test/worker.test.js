@@ -840,6 +840,50 @@ test("homepage uses the separate Instagram preview-card module", () => {
   assert.match(script, /Play here/);
 });
 
+test("Instagram preview endpoint returns a thumbnail fallback and official Reel embed", async () => {
+  const context = createTestContext();
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (request) => {
+    const url = String(request);
+    calls.push(url);
+    if (url.startsWith("https://graph.facebook.com/v26.0/instagram_oembed?")) {
+      return new Response(JSON.stringify({
+        type: "rich",
+        author_name: "example.creator",
+        author_url: "https://www.instagram.com/example.creator/",
+        html: "<blockquote class=\"instagram-media\"></blockquote>",
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    if (url === "https://www.instagram.com/reel/DcAcA_QnOLk/") {
+      return new Response(
+        '<meta property="og:title" content="Example Reel"><meta property="og:image" content="https://scontent.cdninstagram.com/example.jpg"><meta property="og:description" content="Example description">',
+        { status: 200, headers: { "Content-Type": "text/html" } },
+      );
+    }
+    throw new Error("Unexpected Instagram upstream request");
+  };
+  try {
+    const response = await send(
+      context,
+      "/api/instagram/previews?url=" + encodeURIComponent("https://www.instagram.com/reel/DcAcA_QnOLk/?igsh=test"),
+    );
+    assert.equal(response.status, 200);
+    const payload = await response.json();
+    assert.equal(payload.ok, true);
+    assert.equal(payload.previews.length, 1);
+    assert.equal(payload.previews[0].source_url, "https://www.instagram.com/reel/DcAcA_QnOLk/");
+    assert.equal(payload.previews[0].embed_url, "https://www.instagram.com/reel/DcAcA_QnOLk/embed/");
+    assert.equal(payload.previews[0].author_name, "example.creator");
+    assert.equal(payload.previews[0].title, "Example Reel");
+    assert.equal(payload.previews[0].thumbnail_url, "https://scontent.cdninstagram.com/example.jpg");
+    assert.equal(payload.previews[0].embed_available, true);
+    assert.equal(calls.length, 2);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("new Instagram discoveries use clean official URLs", async () => {
   const context = createTestContext();
   const response = await send(context, '/api/admin/discover?q=' + encodeURIComponent(
