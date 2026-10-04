@@ -739,13 +739,17 @@ test("stores TikTok source and renders the PR26-style player", async () => {
   const page = await send(context, `/watch/${result.video.slug}`);
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /<iframe[^>]+class="tiktok-official-player"/);
-  assert.match(html, /https:\/\/www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
-  assert.match(html, /controls=1/);
-  assert.match(html, /closed_caption=1/);
-  assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
+  assert.match(html, /data-vidbest-tiktok-player/);
+  assert.match(html, /data-tiktok-id="6718335390845095173"/);
   assert.match(html, /data-tiktok-share=/);
-  assert.doesNotMatch(html, /"embedUrl":s*"https:\/\/www\.tiktok\.com\/player\/v1\//);
+  assert.match(html, /data-tiktok-gateway-src=/);
+  assert.match(html, /src="\/tiktok-video-service\.js"/);
+  assert.match(html, /src="\/tiktok-audio-lab\.js"/);
+  assert.match(html, /src="\/tiktok-audio-lab-ui\.js"/);
+  assert.match(html, /src="\/tiktok-player\.js"/);
+  assert.doesNotMatch(html, /<iframe[^>]+tiktok-official-player/);
+  assert.doesNotMatch(html, /https:\/\/www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
+  assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
 });
 
 test("Instagram legacy records receive a dedicated player without needing a database rewrite", async () => {
