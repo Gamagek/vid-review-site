@@ -17,6 +17,7 @@ const migrations = [
   "0009_app_settings.sql",
   "0010_video_analysis.sql",
   "0014_member_notifications.sql",
+  "0016_rights_certified_r2_cache.sql",
 ];
 
 class TestD1Statement {
@@ -949,6 +950,86 @@ test("normalizes trusted provider URLs into provider-owned embeds", async () => 
   }
 });
 
+test("requires redistribution certification for uploaded video files", async () => {
+  const context = createTestContext();
+  const denied = await send(context, "/api/assets?filename=owned.mp4", {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${secret}`,
+      "Content-Type": "video/mp4",
+      "Content-Length": "4",
+      "X-File-Name": "owned.mp4",
+    },
+    body: "data",
+  });
+  assert.equal(denied.status, 400);
+  assert.match((await denied.json()).error, /redistribute and cache/i);
+
+  const allowed = await send(context, "/api/assets?filename=owned.mp4", {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${secret}`,
+      "Content-Type": "video/mp4",
+      "Content-Length": "4",
+      "X-File-Name": "owned.mp4",
+      "X-Media-Rights-Confirmed": "1",
+    },
+    body: "data",
+  });
+  assert.equal(allowed.status, 201);
+  const result = await allowed.json();
+  assert.match(result.key, /^uploads\//);
+  assert.equal(context.bucket.objects.get(result.key).options.customMetadata.redistributionCertified, "1");
+});
+
+test("stores a rights-certified R2 copy while preserving the original source page", async () => {
+  const context = createTestContext();
+  const denied = await send(context, "/api/videos", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "Cached TikTok copy",
+      source_url: "https://example.com/media/owned.mp4",
+      source_page_url: "https://www.tiktok.com/@creator/video/7552567024304540959",
+      r2_key: "uploads/2026-10-06/owned.mp4",
+      primary_category: "Technology",
+      subcategory: "Web Development",
+      published: true,
+    }),
+  });
+  assert.equal(denied.status, 400);
+  assert.match((await denied.json()).error, /redistribute and cache/i);
+
+  const created = await send(context, "/api/videos", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "Cached TikTok copy",
+      source_url: "https://example.com/media/owned.mp4",
+      source_page_url: "https://www.tiktok.com/@creator/video/7552567024304540959",
+      r2_key: "uploads/2026-10-06/owned.mp4",
+      primary_category: "Technology",
+      subcategory: "Web Development",
+      published: true,
+      media_rights_confirmed: true,
+    }),
+  });
+  assert.equal(created.status, 201);
+  const video = (await created.json()).video;
+  assert.equal(video.media_type, "r2");
+  assert.equal(video.provider, "r2");
+  assert.equal(video.redistribution_certified, true);
+  assert.match(video.redistribution_certified_at, /^\d{4}-\d{2}-\d{2}T/);
+  assert.equal(video.source_page_url, "https://www.tiktok.com/@creator/video/7552567024304540959");
+  assert.match(video.source_url, /\/media\/uploads\/2026-10-06\/owned\.mp4$/);
+
+  const page = await send(context, `/watch/${video.slug}`);
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.doesNotMatch(html, /www\.tiktok\.com\/player\/v1/);
+  assert.match(html, /\/media\/uploads\/2026-10-06\/owned\.mp4/);
+});
+
 test("renders an R2 HLS media record as a browser HLS player", async () => {
   const context = createTestContext();
   const response = await send(context, "/api/videos", {
@@ -967,6 +1048,8 @@ test("renders an R2 HLS media record as a browser HLS player", async () => {
   const result = await response.json();
   assert.equal(result.video.media_type, "r2");
   assert.equal(result.video.provider, "hls");
+  assert.equal(result.video.redistribution_certified, true);
+  assert.match(result.video.redistribution_certified_at, /^\d{4}-\d{2}-\d{2}T/);
   const page = await send(context, `/watch/${result.video.slug}`);
   const html = await page.text();
   assert.match(html, /data-hls="1"/);
@@ -1345,6 +1428,16 @@ test("notification hub hides mail transport details and keeps browser alert cont
   const script = readFileSync(new URL("../public/notifications.js", import.meta.url), "utf8");
   assert.doesNotMatch(script, /\[object HTMLParagraphElement\]/);
   assert.match(script, /message\.textContent/);
+});
+
+test("admin requires rights certification for cached video copies", () => {
+  const html = readFileSync(new URL("../public/admin.html", import.meta.url), "utf8");
+  const script = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
+  assert.match(html, /I certify that I own this media or have permission to redistribute and cache it on Vid\.Best/);
+  assert.match(html, /id="source-page-url"/);
+  assert.match(script, /X-Media-Rights-Confirmed/);
+  assert.match(script, /source_page_url:/);
+  assert.match(script, /redistribution_certified/);
 });
 
 test("TikTok keeps separate share preview and player paths", () => {
