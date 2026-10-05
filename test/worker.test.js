@@ -1390,6 +1390,10 @@ test("renders the current Vid.Best TikTok direct player with separate home previ
   assert.match(tiktokServiceSource, /status: "scraping"/);
   assert.match(tiktokServiceSource, /response.status === 404/);
   assert.match(tiktokServiceSource, /buildStreamUrl/);
+  assert.match(tiktokServiceSource, /GATEWAY_UNREACHABLE/);
+  assert.match(tiktokServiceSource, /GATEWAY_TIMEOUT/);
+  assert.match(tiktokServiceSource, /status === "cooldown"/);
+  assert.doesNotMatch(tiktokServiceSource, /mode:\s*"no-cors"/);
 
   const tiktokPlayerSource = readFileSync(new URL("../public/tiktok-player.js", import.meta.url), "utf8");
   assert.match(tiktokPlayerSource, /MAX_ATTEMPTS = 15/);
@@ -1400,6 +1404,9 @@ test("renders the current Vid.Best TikTok direct player with separate home previ
   assert.match(tiktokPlayerSource, /Video ready/);
   assert.match(tiktokPlayerSource, /VidBestAudioLab/);
   assert.match(tiktokPlayerSource, /data-fallback-retry/);
+  assert.match(tiktokPlayerSource, /Upload to R2 is finishing/);
+  assert.match(tiktokPlayerSource, /Video gateway unavailable/);
+  assert.doesNotMatch(tiktokPlayerSource, /compatibility mode/);
 
   const audioSource = readFileSync(new URL("../public/tiktok-audio-lab.js", import.meta.url), "utf8");
   assert.match(audioSource, /createMediaElementSource/);
@@ -1441,6 +1448,33 @@ test("renders the current Vid.Best TikTok direct player with separate home previ
   assert.match(indexSource, /www\.tiktok\.com\/oembed/);
   assert.match(indexSource, /tiktokcdn(?:-[a-z0-9-]+)?\.com/);
 });
+
+
+test("builds a signed TikTok gateway URL from the canonical source only", async () => {
+  const context = createTestContext({ SIGN_SECRET: "test-tiktok-signing-secret" });
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+       slug, title, source_url, media_type, primary_category, subcategory, description, published
+     ) VALUES (?, ?, ?, 'tiktok', 'Social Media & Trending', 'TikTok Trending', ?, 1)`,
+  ).run(
+    "signed-tiktok-gateway",
+    "Signed TikTok gateway",
+    "https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056?_r=1&_t=tracking",
+    "Gateway signing regression test",
+  );
+
+  const page = await send(context, "/watch/signed-tiktok-gateway");
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.match(
+    html,
+    /data-tiktok-gateway-src="https:\/\/video\.megasale\.win\/\?url=https%3A%2F%2Fwww\.tiktok\.com%2F%40saiyaara\.4ever%2Fvideo%2F7669587518156705056%2F&amp;exp=\d+&amp;sig=[0-9a-f]{64}"/,
+  );
+  assert.doesNotMatch(html, /_r%3D1|_t%3Dtracking/);
+  assert.match(html, /tiktok-video-service\.js\?v=20261005-3/);
+  assert.match(html, /tiktok-player\.js\?v=20261005-3/);
+});
+
 
 test("builds a direct Facebook player without the old card facade", () => {
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
