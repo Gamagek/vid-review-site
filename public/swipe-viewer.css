@@ -1,11 +1,11 @@
 .swipe-viewer { position:fixed; inset:0; z-index:2147483000; width:100%; height:100vh; height:100dvh; max-width:100vw; margin:0; padding:0; border:0; background:#05070c; color:#f6f8ff; display:grid; grid-template-rows:auto minmax(0,1fr); overflow:hidden; overscroll-behavior:none; font:14px/1.4 system-ui,sans-serif; text-align:left; box-sizing:border-box; }
-.swipe-viewer[hidden] { display:none!important; }
+.swipe-viewer[hidden],.swipe-viewer [hidden] { display:none!important; }
 .swipe-viewer:fullscreen { width:100%; height:100%; max-width:none; background:#05070c; }
 .swipe-viewer * { box-sizing:border-box; }
 .swipe-header { display:flex; align-items:center; justify-content:space-between; padding:calc(6px + env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 6px max(16px,env(safe-area-inset-left)); border-bottom:1px solid #ffffff18; }
 .swipe-header strong { font-size:18px; white-space:nowrap; }.swipe-header span { margin-left:12px; font-size:13px; font-weight:500; color:#abc1d8; }.swipe-header>div { display:flex; gap:6px; }
 .swipe-viewer button { font:inherit; cursor:pointer; color:#f6f8ff; background:#192233; border:1px solid #ffffff26; border-radius:12px; padding:8px 12px; min-height:44px; min-width:44px; }
-.swipe-viewer button:focus-visible,.swipe-viewer a:focus-visible,.swipe-feed:focus-visible { outline:3px solid #6ae3c7; outline-offset:-3px; }
+.swipe-viewer button:focus-visible,.swipe-viewer input:focus-visible,.swipe-viewer a:focus-visible,.swipe-feed:focus-visible { outline:3px solid #6ae3c7; outline-offset:-3px; }
 .swipe-viewer button[aria-pressed="true"] { border-color:#61dec4; background:#173d3c; color:#9bffe9; }
 .swipe-viewer button:disabled { opacity:.4; cursor:default; }
 .swipe-feed { height:100%; min-height:0; min-width:0; overflow-y:auto; overflow-x:hidden; scroll-snap-type:y mandatory; overscroll-behavior:contain; touch-action:pan-y pinch-zoom; scrollbar-width:none; }
@@ -18,11 +18,20 @@
 .swipe-play-hint { color:white; font-size:14px; padding:12px 18px; background:#121925b8; border-radius:28px; box-shadow:0 2px 25px #0005; }
 .is-playing .swipe-play-hint { opacity:0; }
 .is-interactive .swipe-gesture { display:none; }
-.swipe-player-actions { position:absolute; z-index:2; top:12px; left:12px; right:62px; display:flex; gap:6px; flex-wrap:wrap; pointer-events:none; }
-.swipe-player-actions button { pointer-events:auto; background:#101928dc; font-size:13px; min-height:40px; padding:7px 10px; }
+.swipe-player-actions { display:flex; gap:6px; flex-wrap:wrap; margin:0 0 9px; }
+.swipe-player-actions button { flex:1 0 auto; background:#101928; font-size:13px; min-height:44px; padding:7px 9px; }
+.swipe-player-actions [aria-expanded="true"] { border-color:#61dec4; background:#173d3c; color:#9bffe9; }
+.swipe-mini-controls { padding:10px; margin:0 0 10px; border:1px solid #ffffff26; border-radius:12px; background:#101928; }
+.swipe-timeline { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:2px 8px; font-size:12px; font-variant-numeric:tabular-nums; }
+.swipe-timeline [data-quality] { text-align:right; color:#9ec6ce; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.swipe-timeline input { grid-column:1/-1; width:100%; height:32px; margin:0; accent-color:#76e5c8; touch-action:pan-x; cursor:pointer; }
+.swipe-control-options { display:flex; gap:6px; }
+.swipe-control-options button { font-size:12px; padding:6px 9px; }
+.swipe-control-options [data-original] { margin-left:auto; }
+.swipe-controls-help { margin:5px 0 0; color:#a6bad0; font-size:11px; line-height:1.4; }
 .swipe-navigation { position:absolute; z-index:3; top:45%; right:10px; display:flex; flex-direction:column; gap:12px; }
 .swipe-navigation button { background:#131e32d9; font-size:22px; width:44px; height:48px; }
-.swipe-footer { width:100%; max-width:920px; justify-self:center; padding:10px max(12px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); border-top:1px solid #ffffff18; touch-action:pan-y; }
+.swipe-footer { width:100%; max-width:920px; min-height:0; max-height:100%; overflow-y:auto; justify-self:center; padding:10px max(12px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); border-top:1px solid #ffffff18; touch-action:pan-y; }
 .swipe-footer h2 { font-size:16px; line-height:1.35; font-weight:650; margin:0 0 3px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
 .swipe-count { font-size:13px; color:#76e5c8; margin:3px 0 8px; }
 .swipe-engagement { display:flex; gap:6px; flex-wrap:wrap; }.swipe-engagement button { font-size:14px; padding:7px 11px; }.swipe-engagement [data-review] { margin-left:auto; touch-action:none; }

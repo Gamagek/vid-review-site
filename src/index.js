@@ -2228,11 +2228,11 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
-  <script src="/watch.js?v=20261005-2" defer></script>
-  <link rel="stylesheet" href="/swipe-viewer.css?v=20261005-2">
-  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261005-2" defer></script>
+  <script src="/watch.js?v=20261006-1" defer></script>
+  <link rel="stylesheet" href="/swipe-viewer.css?v=20261006-1">
+  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261006-1" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
-  ${video.provider === "tiktok" ? '<script src="/tiktok-video-service.js?v=20261005-3" defer></script><script src="/tiktok-audio-lab.js" defer></script><script src="/tiktok-audio-lab-ui.js" defer></script><script src="/tiktok-player.js?v=20261005-3" defer></script>' : ""}
+  ${video.provider === "tiktok" ? '<script src="/tiktok-video-service.js?v=20261005-3" defer></script><script src="/tiktok-audio-lab.js" defer></script><script src="/tiktok-audio-lab-ui.js" defer></script><script src="/tiktok-player.js?v=20261006-1" defer></script>' : ""}
 </head>
 <body class="watch-page" data-viewer-embed="${viewer ? "1" : "0"}" data-video-slug="${escapeHtml(video.slug)}" data-site-views="${Number(video.views) + (viewer ? 0 : 1)}" data-video-id="${Number(video.id)}" data-video-provider="${escapeHtml(video.provider)}">
   <header class="site-header compact">

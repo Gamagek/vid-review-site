@@ -14,7 +14,7 @@
   const queue = [first], cards = [], pages = new Map(), counted = new Set([first.id]), counting = new Set();
   const warmProviders = new Set(["youtube", "vimeo", "tiktok", "raw", "r2", "hls"]);
   const symbols = { like: "👍", love: "♥", useful: "💡" };
-  let index = 0, opened = false, muted = true, focusReturn, overflow, suspension, savedInert = [];
+  let index = 0, opened = false, muted = false, focusReturn, overflow, suspension, savedInert = [];
   let timer, scrollTask = 0, suggesting = null, recommendationVersion = 0, catalogOffset = 0, catalogEnded = false;
   const viewer = document.createElement("section");
   viewer.className = "swipe-viewer"; viewer.hidden = true;
@@ -30,6 +30,7 @@
   const previous = viewer.querySelector("[data-prev]"), next = viewer.querySelector("[data-next]");
   const closeButton = viewer.querySelector("[data-close]");
   const format = (value) => new Intl.NumberFormat().format(value || 0);
+  const clock = (seconds) => { const s = Math.max(0, Math.floor(seconds || 0)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
   const path = (video) => `/watch/${encodeURIComponent(video.slug)}`;
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const announce = (text) => { viewer.querySelector(".swipe-announcement").textContent = text; };
@@ -43,10 +44,12 @@
   function makeCard(video) {
     const el = document.createElement("article"); el.className = "swipe-card";
     el.setAttribute("aria-label", video.title); el.dataset.videoId = video.id;
-    el.innerHTML = `<div class="swipe-media"><div class="swipe-frame-host"></div><button type="button" class="swipe-gesture" data-play aria-label="Play or pause. Swipe vertically for another video."><span class="swipe-play-hint">Tap to play · Swipe for next</span></button><div class="swipe-player-actions"><button type="button" data-play aria-label="Play or pause">▶ Play</button><button type="button" data-sound aria-label="Unmute video">🔇 Sound</button><button type="button" data-controls aria-pressed="false">Player controls</button></div></div>
-      <footer class="swipe-footer"><h2></h2><p class="swipe-count"></p><div class="swipe-engagement" aria-label="Video reactions"><button type="button" data-reaction="like" aria-label="Like video" aria-pressed="false"></button><button type="button" data-reaction="love" aria-label="Love video" aria-pressed="false"></button><button type="button" data-reaction="useful" aria-label="Mark video useful" aria-pressed="false"></button><button type="button" data-review aria-expanded="false">⌃ Review</button></div><div class="swipe-interests"><button type="button" data-interest="more">＋ More like this</button><button type="button" data-interest="less">− Fewer like this</button></div><p class="swipe-status" role="status">Preparing video…</p></footer>`;
+    el.innerHTML = `<div class="swipe-media"><div class="swipe-frame-host"></div><button type="button" class="swipe-gesture" data-play aria-label="Play or pause. Swipe vertically for another video."><span class="swipe-play-hint">Tap to play · Swipe for next</span></button></div>
+      <footer class="swipe-footer"><div class="swipe-player-actions"><button type="button" data-play aria-label="Play video">▶ Play</button><button type="button" data-sound aria-label="Unmute video">🔇 Sound</button><button type="button" data-controls aria-expanded="false" aria-controls="swipe-controls-${video.id}">Player controls</button></div>
+      <section class="swipe-mini-controls" id="swipe-controls-${video.id}" aria-label="Compact player controls" hidden><div class="swipe-timeline"><span data-time>0:00 / 0:00</span><span data-quality>Preparing…</span><input type="range" data-seek aria-label="Video position" min="0" max="1" step="1" value="0" disabled></div><div class="swipe-control-options"><button type="button" data-skip="-10" aria-label="Back 10 seconds" disabled>↶ 10s</button><button type="button" data-skip="10" aria-label="Forward 10 seconds" disabled>10s ↷</button><button type="button" data-original aria-pressed="false">Original controls</button></div><p class="swipe-controls-help">Swipe on the video for next. Original controls include captions and settings.</p></section>
+      <h2></h2><p class="swipe-count"></p><div class="swipe-engagement" aria-label="Video reactions"><button type="button" data-reaction="like" aria-label="Like video" aria-pressed="false"></button><button type="button" data-reaction="love" aria-label="Love video" aria-pressed="false"></button><button type="button" data-reaction="useful" aria-label="Mark video useful" aria-pressed="false"></button><button type="button" data-review aria-expanded="false">⌃ Review</button></div><div class="swipe-interests"><button type="button" data-interest="more">＋ More like this</button><button type="button" data-interest="less">− Fewer like this</button></div><p class="swipe-status" role="status">Preparing video…</p></footer>`;
     el.querySelector("h2").textContent = video.title;
-    const card = { video, el, host: el.querySelector(".swipe-frame-host"), frame: null, loading: null, ready: false, bridge: false, paused: false, playing: false, controllable: warmProviders.has(video.provider), suspended: null };
+    const card = { video, el, host: el.querySelector(".swipe-frame-host"), frame: null, loading: null, ready: false, bridge: false, paused: false, playing: false, actualMuted: true, seconds: 0, duration: 0, controllable: warmProviders.has(video.provider), suspended: null };
     refreshCounts(card); el.inert = true; el.setAttribute("aria-hidden", "true");
     cards.push(card); feed.append(el); return card;
   }
@@ -67,13 +70,25 @@
     return pages.get(video.id);
   }
   function desired(card) { return opened && card === cards[index] && !document.hidden; }
-  function command(card) {
-    card.frame?.contentWindow?.postMessage({ channel: "vidbest-viewer", type: "playback", active: desired(card), paused: card.paused, muted }, location.origin);
+  function sendCommand(card, data, gesture = false) {
+    const target = card.frame?.contentWindow;
+    if (!target) return;
+    const payload = { channel: "vidbest-viewer", ...data, gesture };
+    // Keep native playback inside a real click's user activation when available.
+    if (gesture && typeof target.vidbestPlayback === "function") target.vidbestPlayback(payload);
+    else target.postMessage(payload, location.origin);
+  }
+  function command(card, gesture = false) {
+    sendCommand(card, { type: "playback", active: desired(card), paused: card.paused, muted }, gesture);
   }
   function destroyPlayer(card) {
     card.loadToken = null; card.host.replaceChildren(); card.frame = null; card.ready = false; card.bridge = false;
-    card.loading = null; card.suspended = null; card.el.classList.remove("is-playing", "is-interactive");
-    card.el.querySelector("[data-controls]").setAttribute("aria-pressed", "false");
+    card.loading = null; card.suspended = null; card.playing = false; card.actualMuted = true; card.soundBlocked = false;
+    card.seconds = 0; card.duration = 0; card.el.classList.remove("is-playing", "is-interactive");
+    card.el.querySelector("[data-controls]").setAttribute("aria-expanded", "false");
+    card.el.querySelector(".swipe-mini-controls").hidden = true;
+    card.el.querySelector("[data-original]").setAttribute("aria-pressed", "false");
+    refreshPlayback(card); refreshTimeline(card);
   }
   async function prepareCard(card) {
     if (card.frame || card.loading || !opened) return;
@@ -116,11 +131,32 @@
   }
   function updateHint(card) {
     card.el.querySelector(".swipe-play-hint").textContent = card.controllable ? "Tap to play · Swipe for next" : "Tap for player controls · Swipe for next";
+    card.el.querySelector(".swipe-player-actions [data-play]").disabled = !card.controllable;
+    card.el.querySelector("[data-sound]").disabled = !card.controllable;
+    card.el.querySelector(".swipe-timeline").hidden = !card.controllable;
+    refreshTimeline(card);
+  }
+  function refreshPlayback(card) {
+    card.el.classList.toggle("is-playing", card.playing);
+    const play = card.el.querySelector(".swipe-player-actions [data-play]"), sound = card.el.querySelector("[data-sound]");
+    play.textContent = card.playing ? "Ⅱ Pause" : "▶ Play";
+    play.setAttribute("aria-label", card.playing ? "Pause video" : "Play video");
+    sound.textContent = card.actualMuted ? card.soundBlocked ? "🔇 Tap for sound" : "🔇 Sound" : "🔊 Sound";
+    sound.setAttribute("aria-label", card.actualMuted ? "Unmute video" : "Mute video");
+  }
+  function refreshTimeline(card) {
+    const input = card.el.querySelector("[data-seek]");
+    input.disabled = !card.controllable || card.duration <= 0;
+    input.max = String(Math.max(1, card.duration));
+    if (document.activeElement !== input) input.value = String(card.seconds);
+    input.setAttribute("aria-valuetext", `${clock(card.seconds)} of ${clock(card.duration)}`);
+    card.el.querySelector("[data-time]").textContent = `${clock(card.seconds)} / ${clock(card.duration)}`;
+    card.el.querySelectorAll("[data-skip]").forEach((button) => { button.disabled = input.disabled; });
   }
   function updatePreparation() {
     if (!opened) return;
     const card = cards[index], upcoming = cards[index + 1];
-    if (!card || card.el.dataset.feedback === "1") return;
+    if (!card || card.el.dataset.feedback === "1" || card.soundBlocked) return;
     const preparation = upcoming?.ready ? "Next player ready" : upcoming ? "Preparing next video" : catalogEnded ? "End of suggestions" : "Finding suggestions";
     message(card, `Swipe up for next · ${preparation}`);
   }
@@ -232,9 +268,15 @@
     if (returnFocus) cards[index]?.el.querySelector("[data-review]").focus();
   }
   function toggleControls(card) {
-    const interactive = card.el.classList.toggle("is-interactive");
-    card.el.querySelector("[data-controls]").setAttribute("aria-pressed", String(interactive));
-    message(card, interactive ? "Player controls enabled · Swipe the details below, or tap Player controls to resume swiping anywhere." : "Swipe anywhere on the video for the next suggestion.");
+    const panel = card.el.querySelector(".swipe-mini-controls");
+    panel.hidden = !panel.hidden;
+    card.el.querySelector("[data-controls]").setAttribute("aria-expanded", String(!panel.hidden));
+    if (panel.hidden || !card.controllable) setOriginalControls(card, !panel.hidden && !card.controllable);
+  }
+  function setOriginalControls(card, interactive) {
+    card.el.classList.toggle("is-interactive", interactive);
+    card.el.querySelector("[data-original]").setAttribute("aria-pressed", String(interactive));
+    card.el.querySelector(".swipe-controls-help").textContent = interactive ? "Original controls enabled. Swipe on the details below for next." : "Swipe on the video for next. Original controls include captions and settings.";
   }
   viewer.addEventListener("click", async (event) => {
     const button = event.target.closest("button"); if (!button) return;
@@ -246,16 +288,16 @@
     const card = cards.find((item) => item.el.contains(button)); if (!card || card !== cards[index]) return;
     if (button.hasAttribute("data-review")) { openReview(card); return; }
     if (button.hasAttribute("data-controls")) { toggleControls(card); return; }
+    if (button.hasAttribute("data-original")) { setOriginalControls(card, !card.el.classList.contains("is-interactive")); return; }
+    if (button.hasAttribute("data-skip")) { sendCommand(card, { type: "seek", seconds: card.seconds + Number(button.dataset.skip) }, true); return; }
     if (button.hasAttribute("data-retry")) { destroyPlayer(card); void prepareCard(card); return; }
     if (button.hasAttribute("data-play")) {
       if (!card.controllable) { toggleControls(card); return; }
-      card.paused = card.playing; command(card); return;
+      card.paused = card.playing; card.soundBlocked = false; command(card, true); return;
     }
     if (button.hasAttribute("data-sound")) {
       if (!card.controllable) { toggleControls(card); return; }
-      muted = !muted; command(card);
-      card.el.querySelector("[data-sound]").textContent = muted ? "🔇 Sound" : "🔊 Sound";
-      card.el.querySelector("[data-sound]").setAttribute("aria-label", muted ? "Unmute video" : "Mute video"); return;
+      muted = !card.actualMuted; card.soundBlocked = false; command(card, true); return;
     }
     const reaction = button.dataset.reaction, signal = button.dataset.interest;
     if (!reaction && !signal) return;
@@ -272,6 +314,17 @@
     } catch (error) { message(card, error.message); }
     finally { button.disabled = false; }
   });
+  viewer.addEventListener("input", (event) => {
+    if (!event.target.matches("[data-seek]")) return;
+    const card = cards[index];
+    if (!card?.el.contains(event.target)) return;
+    card.el.querySelector("[data-time]").textContent = `${clock(Number(event.target.value))} / ${clock(card.duration)}`;
+  });
+  viewer.addEventListener("change", (event) => {
+    if (!event.target.matches("[data-seek]")) return;
+    const card = cards[index];
+    if (card?.el.contains(event.target)) sendCommand(card, { type: "seek", seconds: Number(event.target.value) }, true);
+  });
   window.addEventListener("message", (event) => {
     if (!opened || event.origin !== location.origin || event.data?.channel !== "vidbest-player") return;
     const card = cards.find((item) => item.frame?.contentWindow === event.source); if (!card) return;
@@ -282,10 +335,13 @@
       if (desired(card)) scheduleCount(card); updatePreparation();
     }
     if (data.type === "state") {
-      card.playing = data.playing === true; card.el.classList.toggle("is-playing", card.playing);
-      card.el.querySelector(".swipe-player-actions [data-play]").textContent = card.playing ? "Ⅱ Pause" : "▶ Play";
-      card.el.querySelector("[data-sound]").textContent = data.muted ? "🔇 Sound" : "🔊 Sound";
+      card.playing = data.playing === true; card.actualMuted = data.muted === true || data.soundBlocked === true;
+      card.soundBlocked = data.soundBlocked === true;
+      refreshPlayback(card);
     }
+    if (data.type === "progress") { card.seconds = Math.max(0, Number(data.seconds) || 0); card.duration = Math.max(0, Number(data.duration) || 0); refreshTimeline(card); }
+    if (data.type === "quality") card.el.querySelector("[data-quality]").textContent = data.label;
+    if (data.type === "soundblocked" && desired(card)) { card.soundBlocked = true; message(card, "Tap Sound to enable audio · Swipe for next"); refreshPlayback(card); }
     if (data.type === "blocked" && desired(card)) message(card, "Tap Play to start · Swipe up for next");
     if (data.type === "error") { card.el.dataset.feedback = "1"; message(card, data.message); }
     if (data.type === "ended" && desired(card)) void move(1);
@@ -337,11 +393,11 @@
   });
   viewer.addEventListener("keydown", (event) => {
     if (event.key === "Escape") { event.preventDefault(); review.hidden ? close() : closeReview(); return; }
-    if (review.hidden && ["ArrowDown", "ArrowUp", "PageDown", "PageUp"].includes(event.key)) {
+    if (review.hidden && !event.target.matches("input,select,textarea") && ["ArrowDown", "ArrowUp", "PageDown", "PageUp"].includes(event.key)) {
       event.preventDefault(); void move(["ArrowDown", "PageDown"].includes(event.key) ? 1 : -1);
     }
     if (event.key === "Tab") {
-      const items = [...viewer.querySelectorAll("button:not(:disabled),a[href],iframe,[tabindex='0']")].filter((el) => !el.closest("[inert]") && el.getClientRects().length);
+      const items = [...viewer.querySelectorAll("button:not(:disabled),input:not(:disabled),a[href],iframe,[tabindex='0']")].filter((el) => !el.closest("[inert]") && el.getClientRects().length);
       if (event.shiftKey && document.activeElement === items[0]) { event.preventDefault(); items.at(-1)?.focus(); }
       else if (!event.shiftKey && document.activeElement === items.at(-1)) { event.preventDefault(); items[0]?.focus(); }
     }

@@ -232,9 +232,13 @@
         overlay.before(video);
         video.load();
 
-        audioController = window.VidBestAudioLab?.createAudioLab(video) || null;
-        if (audioController && window.VidBestAudioLabUI) {
-          window.VidBestAudioLabUI.mountAudioLab(playerShell, audioController);
+        // The swipe viewer uses the media element's own audio. Its hidden Audio Lab
+        // must not route sound through a suspended AudioContext during autoplay.
+        if (!swipeMode) {
+          audioController = window.VidBestAudioLab?.createAudioLab(video) || null;
+          if (audioController && window.VidBestAudioLabUI) {
+            window.VidBestAudioLabUI.mountAudioLab(playerShell, audioController);
+          }
         }
 
         directControls = makeControls(video);

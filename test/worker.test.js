@@ -1473,7 +1473,7 @@ test("builds a signed TikTok gateway URL from the canonical source only", async 
   const gatewayAttr = html.match(/data-tiktok-gateway-src="([^"]+)"/)?.[1] || "";
   assert.doesNotMatch(gatewayAttr, /_r%3D1|_t%3Dtracking/);
   assert.match(html, /tiktok-video-service\.js\?v=20261005-3/);
-  assert.match(html, /tiktok-player\.js\?v=20261005-3/);
+  assert.match(html, /tiktok-player\.js\?v=20261006-1/);
 });
 
 

@@ -85,8 +85,20 @@ function initializeHlsPlayback() {
       lowLatencyMode: false,
       backBufferLength: 30,
       maxBufferLength: 30,
+      ...(document.body.dataset.viewerEmbed === "1" ? {
+        // Begin with the smallest rendition. The swipe bridge releases the cap
+        // after playback has a safe buffer; HLS then measures bandwidth for ABR.
+        startLevel: 0,
+        backBufferLength: 4,
+        maxBufferLength: 6,
+        maxMaxBufferLength: 12,
+        maxBufferSize: 4 * 1024 * 1024,
+      } : {}),
     });
     watchPlayerState.hls = hls;
+    if (document.body.dataset.viewerEmbed === "1") {
+      video.dispatchEvent(new CustomEvent("vidbest:hls-ready", { detail: { hls, events: Hls.Events } }));
+    }
     hls.on(Hls.Events.ERROR, (_event, data) => {
       if (data?.fatal) {
         console.warn("Vid.Best HLS fatal error:", data.details || data.type || "unknown");
