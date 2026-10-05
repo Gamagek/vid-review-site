@@ -1395,16 +1395,27 @@ test("renders the current Vid.Best TikTok direct official player with separate h
 
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /parseTikTokShareUrl/);
-  assert.match(homeSource, /loadTikTokFacadePreviews/);
   assert.match(homeSource, /renderTikTokFacade/);
-  assert.match(homeSource, /\/api\/tiktok\/previews/);
+  assert.match(homeSource, /activateTikTokPlayer/);
+  assert.match(homeSource, /buildTikTokInlinePlayerUrl/);
+  assert.match(homeSource, /https:\/\/www\.tiktok\.com\/player\/v1\//);
+  assert.match(homeSource, /tiktok-player-active/);
+  assert.match(homeSource, /activeRatio < ACTIVE_MIN_VISIBILITY/);
+  assert.doesNotMatch(homeSource, /loadTikTokFacadePreviews/);
+  assert.doesNotMatch(homeSource, /fetch\("\/api\/tiktok\/previews/);
   assert.doesNotMatch(homeSource, /buildTikTokPreviewPlayerUrl/);
-  assert.doesNotMatch(homeSource, /tiktok\/player\/v1/);
   assert.match(homeSource, /PREVIEW_DELAY_MS = 450/);
   assert.doesNotMatch(homeSource, /ensureTikTokEmbedScript/);
   assert.doesNotMatch(homeSource, /className = "tiktok-embed"/);
   assert.match(homeSource, /provider === "tiktok"/);
   assert.match(homeSource, /provider === "facebook"/);
+
+  const appSource = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
+  assert.match(appSource, /video\.thumbnail_url && card\.dataset\.videoProvider !== "tiktok"/);
+
+  const homeCssSource = readFileSync(new URL("../public/home-player.css", import.meta.url), "utf8");
+  assert.match(homeCssSource, /\.tiktok-player-active \.preview-surface/);
+  assert.match(homeCssSource, /\.tiktok-facade-play/);
 
   const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
   assert.match(indexSource, /data-tiktok-player-mode="official-direct"/);
@@ -1450,6 +1461,18 @@ test("builds a direct Facebook player without the old card facade", () => {
   assert.doesNotMatch(homeSource, /renderFacebookFacade/);
   assert.doesNotMatch(homeSource, /facebook-microlink-preview/);
   assert.doesNotMatch(homeSource, /facebook-mini-preview-player/);
+});
+
+test("TikTok home cards defer all player creation until a user click and keep only one active card", () => {
+  const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
+  assert.match(homeSource, /media\.addEventListener\("click"/);
+  assert.match(homeSource, /event\.preventDefault\(\);[\s\S]*?activateTikTokPlayer\(card\)/);
+  assert.match(homeSource, /if \(previewState\.activeCard === card\) return;/);
+  assert.match(homeSource, /stopPreview\(\);[\s\S]*?const iframe = document\.createElement\("iframe"\)/);
+  assert.match(homeSource, /previewState\.activeCard = card;/);
+  assert.match(homeSource, /if \(previewState\.activeCard\?\.dataset\.videoProvider === "tiktok"\)/);
+  assert.match(homeSource, /if \(activeRatio < ACTIVE_MIN_VISIBILITY\) stopPreview\(previewState\.activeCard\)/);
+  assert.doesNotMatch(homeSource, /fetch\("\/api\/tiktok\/previews/);
 });
 
 test("builds a batch TikTok facade preview from the configured facade endpoint", async () => {

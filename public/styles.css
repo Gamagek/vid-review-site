@@ -951,8 +951,11 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
 .video-tile[data-video-provider="tiktok"] .preview-surface {
   z-index: 4;
 }
-.video-tile[data-video-provider="tiktok"].preview-playing .preview-surface iframe {
-  pointer-events: none;
+.video-tile[data-video-provider="tiktok"].tiktok-player-active .preview-surface {
+  pointer-events: auto;
+}
+.video-tile[data-video-provider="tiktok"].tiktok-player-active .preview-surface iframe {
+  pointer-events: auto;
 }
 .video-tile[data-video-provider="tiktok"].preview-playing .play-orb,
 .video-tile[data-video-provider="tiktok"].preview-playing .media-fallback,
