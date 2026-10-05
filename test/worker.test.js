@@ -18,6 +18,7 @@ const migrations = [
   "0010_video_analysis.sql",
   "0014_member_notifications.sql",
   "0016_rights_certified_r2_cache.sql",
+  "0017_authorized_auto_cache.sql",
 ];
 
 class TestD1Statement {
@@ -950,6 +951,79 @@ test("normalizes trusted provider URLs into provider-owned embeds", async () => 
   }
 });
 
+test("rejects social-platform media URLs as automatic cache sources", async () => {
+  const context = createTestContext();
+  const response = await send(context, "/api/videos", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: "Blocked automatic cache source",
+      source_url: "https://www.tiktok.com/@creator/video/7552567024304540959",
+      cache_source_url: "https://v16-webapp.tiktok.com/video.mp4",
+      primary_category: "Technology",
+      subcategory: "Web Development",
+      published: false,
+      media_rights_confirmed: true,
+    }),
+  });
+  assert.equal(response.status, 400);
+  assert.match((await response.json()).error, /social-platform|private-network/i);
+});
+
+test("automatically copies an authorized direct media URL to R2 and preserves the source page", async () => {
+  const context = createTestContext({ PUBLIC_BASE_URL: "https://vid.best" });
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    if (String(url) !== "https://media.example.com/owned-video.mp4") return originalFetch(url);
+    return new Response("video-data", {
+      status: 200,
+      headers: {
+        "Content-Type": "video/mp4",
+        "Content-Length": "10",
+      },
+    });
+  };
+  try {
+    const response = await send(context, "/api/videos", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: "Automatic authorized cache",
+        source_url: "https://www.tiktok.com/@creator/video/7552567024304540959",
+        cache_source_url: "https://media.example.com/owned-video.mp4",
+        primary_category: "Technology",
+        subcategory: "Web Development",
+        published: false,
+        media_rights_confirmed: true,
+      }),
+    });
+    assert.equal(response.status, 201);
+    const created = (await response.json()).video;
+    assert.equal(created.cache_status, "pending");
+    assert.equal(created.redistribution_certified, true);
+    assert.equal(created.source_page_url, "https://www.tiktok.com/@creator/video/7552567024304540959");
+
+    await Promise.all(context.pending.splice(0));
+    const stored = context.sqlite.prepare(
+      "SELECT source_url, source_page_url, media_type, r2_key, cache_status, cache_error, cache_attempts, cached_at FROM videos WHERE id = ?",
+    ).get(created.id);
+    assert.equal(stored.media_type, "r2");
+    assert.equal(stored.cache_status, "complete");
+    assert.equal(stored.cache_error, null);
+    assert.equal(stored.cache_attempts, 1);
+    assert.ok(stored.cached_at);
+    assert.equal(stored.source_page_url, "https://www.tiktok.com/@creator/video/7552567024304540959");
+    assert.match(stored.source_url, /^https:\/\/vid\.best\/media\/uploads\/auto\//);
+    assert.match(stored.r2_key, /^uploads\/auto\//);
+    const object = context.bucket.objects.get(stored.r2_key);
+    assert.equal(object.options.httpMetadata.contentType, "video/mp4");
+    assert.equal(object.options.customMetadata.redistributionCertified, "1");
+    assert.equal(object.options.customMetadata.autoCached, "1");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("requires redistribution certification for uploaded video files", async () => {
   const context = createTestContext();
   const denied = await send(context, "/api/assets?filename=owned.mp4", {
@@ -1428,6 +1502,15 @@ test("notification hub hides mail transport details and keeps browser alert cont
   const script = readFileSync(new URL("../public/notifications.js", import.meta.url), "utf8");
   assert.doesNotMatch(script, /\[object HTMLParagraphElement\]/);
   assert.match(script, /message\.textContent/);
+});
+
+test("admin exposes automatic authorized cache controls", () => {
+  const html = readFileSync(new URL("../public/admin.html", import.meta.url), "utf8");
+  const script = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
+  assert.match(html, /id="cache-source-url"/);
+  assert.match(html, /automatic R2 cache/i);
+  assert.match(script, /cache_source_url:/);
+  assert.match(script, /Auto-cache/);
 });
 
 test("admin requires rights certification for cached video copies", () => {
