@@ -58,7 +58,8 @@
               <div id="link-source-panel">
                 <label><span>Video page or direct media URL</span><input id="source-url" name="source_url" type="url" maxlength="2000" placeholder="https://…"></label>
                 <p class="field-help">Trusted embeds: YouTube, Vimeo, Dailymotion, Twitch, Instagram, TikTok and Facebook. Paste a normal Facebook share or Reel link and Vid.Best automatically prepares the official Facebook player plus a compact preview card. Direct MP4/WebM links and your R2 uploads use the native player.</p>
-                <p class="field-help tiktok-auto-cache-note">TikTok links use the official TikTok player. If you own a video or have explicit redistribution permission, switch to R2 upload and attach an authorized media copy; Vid.Best will then serve that cached copy from R2 instead.</p>
+                <p class="field-help tiktok-auto-cache-note">External links keep using the provider player unless an authorized direct media file is supplied below. Vid.Best can automatically copy that direct file to R2 after you certify redistribution rights.</p>
+                <label><span>Authorized direct media file URL for automatic R2 cache (optional)</span><input id="cache-source-url" type="url" maxlength="2000" placeholder="https://media.your-domain.example/video.mp4"><small>Use a direct MP4, WebM, Ogg or MOV URL from storage/CDN you control or are licensed to redistribute. Social-platform/CDN extraction URLs are not accepted.</small></label>
               </div>
               <div id="upload-source-panel" hidden>
                 <label class="upload-dropzone" id="upload-dropzone">
@@ -80,7 +81,7 @@
               </div>
               <div class="media-rights-options">
                 <label class="switch-label rights-confirmation"><input id="media-rights-confirmed" type="checkbox"><span></span>I certify that I own this media or have permission to redistribute and cache it on Vid.Best</label>
-                <p class="field-help">Required for every uploaded video or HLS copy. Checking this box records your certification; it does not itself grant redistribution rights.</p>
+                <p class="field-help">Required for uploaded video/HLS copies and automatic cache URLs. Checking this box records your certification; it does not itself grant redistribution rights.</p>
               </div>
                             <div id="media-preview" class="admin-preview"><span>Secure media preview appears here</span></div>
             </div>

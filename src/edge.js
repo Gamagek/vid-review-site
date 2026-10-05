@@ -1,4 +1,4 @@
-import app, { resolveReactionSalt } from "./index.js";
+import app, { processAuthorizedCacheJobs, resolveReactionSalt } from "./index.js";
 
 const CRAWLER_PATTERN = /\b(?:bot|crawler|spider|slurp|bingpreview|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|pinterestbot|duckduckbot|baiduspider|yandexbot)\b/i;
 const EXTERNAL_VIDEO_HOSTS = new Set([
@@ -615,7 +615,13 @@ async function fetchHandler(request, env, ctx) {
   return response;
 }
 
-async function scheduledHandler(_controller, env, ctx) {
+async function scheduledHandler(controller, env, ctx) {
+  ctx.waitUntil(
+    processAuthorizedCacheJobs(env, { limit: 2 })
+      .catch((error) => console.error("Scheduled authorized auto-cache failed", error?.message || error)),
+  );
+
+  if (controller?.cron !== "17 3 * * *") return;
   const nowSeconds = Math.floor(Date.now() / 1000);
   const twoDaysAgo = nowSeconds - (2 * 24 * 60 * 60);
   const cleanup = Promise.all([

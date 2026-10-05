@@ -124,6 +124,18 @@ const SAFE_UPLOAD_TYPES = new Set([
   "application/vnd.apple.mpegurl", "application/x-mpegurl",
   "video/mp2t", "video/iso.segment", "audio/aac", "audio/mp4",
 ]);
+const AUTO_CACHE_VIDEO_TYPES = new Map([
+  ["video/mp4", "mp4"],
+  ["video/webm", "webm"],
+  ["video/ogg", "ogv"],
+  ["video/quicktime", "mov"],
+]);
+const AUTO_CACHE_BLOCKED_HOST_SUFFIXES = [
+  "tiktok.com", "tiktokcdn.com", "tiktokv.com", "muscdn.com", "byteoversea.com", "ibytedtos.com",
+  "youtube.com", "youtu.be", "googlevideo.com",
+  "facebook.com", "fbcdn.net", "instagram.com", "cdninstagram.com",
+  "vimeo.com", "vimeocdn.com", "dailymotion.com", "dmcdn.net", "twitch.tv",
+];
 const encoder = new TextEncoder();
 const ADMIN_SESSION_COOKIE = "__Host-vidbest_admin";
 const TIKTOK_GATEWAY_ORIGIN = "https://video.megasale.win";
@@ -1215,10 +1227,11 @@ async function createVideo(request, env, ctx) {
     `INSERT INTO videos (
       slug, title, source_url, source_page_url, embed_url, media_type, r2_key,
       redistribution_certified, redistribution_certified_at,
+      cache_source_url, cache_status, cache_error, cache_attempts, cache_next_attempt_at, cached_at,
       primary_category, subcategory, description, review_text,
       seo_title, seo_description, seo_tags, thumbnail_url,
       featured, trending, published
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     RETURNING *`,
   ).bind(
     data.slug,
@@ -1230,6 +1243,12 @@ async function createVideo(request, env, ctx) {
     data.r2_key,
     Number(data.redistribution_certified),
     data.redistribution_certified_at,
+    data.cache_source_url,
+    data.cache_status,
+    data.cache_error,
+    data.cache_attempts,
+    data.cache_next_attempt_at,
+    data.cached_at,
     data.primary_category,
     data.subcategory,
     data.description,
@@ -1247,6 +1266,9 @@ async function createVideo(request, env, ctx) {
     ctx?.waitUntil?.(notifyNewVideoSubscribers(env, row));
     if (detectMediaProvider(row) === "facebook") ctx?.waitUntil?.(persistFacebookPreview(env, row));
   }
+  if (row?.cache_status === "pending") {
+    ctx?.waitUntil?.(processAuthorizedCacheJobs(env, { videoId: Number(row.id), limit: 1 }));
+  }
   return json({ success: true, video: serializeVideo(row) }, 201);
 }
 
@@ -1260,6 +1282,7 @@ async function updateVideo(request, env, id, ctx) {
     `UPDATE videos SET
       title = ?, source_url = ?, source_page_url = ?, embed_url = ?, media_type = ?, r2_key = ?,
       redistribution_certified = ?, redistribution_certified_at = ?,
+      cache_source_url = ?, cache_status = ?, cache_error = ?, cache_attempts = ?, cache_next_attempt_at = ?, cached_at = ?,
       primary_category = ?, subcategory = ?, description = ?, review_text = ?,
       seo_title = ?, seo_description = ?, seo_tags = ?, thumbnail_url = ?,
       featured = ?, trending = ?, published = ?,
@@ -1274,6 +1297,12 @@ async function updateVideo(request, env, id, ctx) {
     data.r2_key,
     Number(data.redistribution_certified),
     data.redistribution_certified_at,
+    data.cache_source_url,
+    data.cache_status,
+    data.cache_error,
+    data.cache_attempts,
+    data.cache_next_attempt_at,
+    data.cached_at,
     data.primary_category,
     data.subcategory,
     data.description,
@@ -1305,6 +1334,9 @@ async function updateVideo(request, env, id, ctx) {
   }
   if (row?.published && detectMediaProvider(row) === "facebook") {
     ctx?.waitUntil?.(persistFacebookPreview(env, row));
+  }
+  if (row?.cache_status === "pending") {
+    ctx?.waitUntil?.(processAuthorizedCacheJobs(env, { videoId: Number(row.id), limit: 1 }));
   }
   return json({ success: true, video: serializeVideo(row) });
 }
@@ -1375,23 +1407,38 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
   const thumbnailUrl = customThumbnail || media.thumbnail_url;
 
   const storedVideo = Boolean(media.r2_key && isStoredVideoKey(media.r2_key));
-  const redistributionCertified = storedVideo && toBoolean(
+  const cacheSourceCandidate = body.cache_source_url === undefined
+    ? existing?.cache_source_url
+    : body.cache_source_url;
+  const cacheSourceUrl = cleanText(cacheSourceCandidate, 2000)
+    ? validateAuthorizedCacheSourceUrl(cacheSourceCandidate)
+    : null;
+  const redistributionCertified = toBoolean(
     body.media_rights_confirmed,
     Boolean(existing?.redistribution_certified),
   );
-  if (storedVideo && !redistributionCertified) {
-    throw new AppError(400, "Certify that you own this video or have permission to redistribute and cache it before storing it on Vid.Best");
+  if ((storedVideo || cacheSourceUrl) && !redistributionCertified) {
+    throw new AppError(400, "Certify that you own this video or have permission to redistribute and cache it before storing or auto-caching it on Vid.Best");
   }
 
   const sourcePageCandidate = body.source_page_url === undefined
     ? existing?.source_page_url
     : body.source_page_url;
-  const sourcePageUrl = media.r2_key
-    ? validateOptionalUrl(cleanText(sourcePageCandidate, 2000))
+  const sourcePageUrl = media.r2_key || cacheSourceUrl
+    ? validateOptionalUrl(cleanText(sourcePageCandidate || suppliedSource, 2000))
     : null;
   const redistributionCertifiedAt = redistributionCertified
     ? (existing?.redistribution_certified_at || new Date().toISOString())
     : null;
+
+  const cacheSourceChanged = Boolean(existing) && cacheSourceUrl !== (existing?.cache_source_url || null);
+  const shouldQueueAutoCache = Boolean(cacheSourceUrl && redistributionCertified && !media.r2_key)
+    && (!existing || cacheSourceChanged || existing.cache_status !== "complete");
+  const cacheStatus = media.r2_key
+    ? (existing?.cached_at ? "complete" : "none")
+    : shouldQueueAutoCache
+      ? "pending"
+      : (cacheSourceUrl ? cleanText(existing?.cache_status, 20, "pending") : "none");
 
   return {
     title,
@@ -1402,6 +1449,12 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
     r2_key: media.r2_key,
     redistribution_certified: redistributionCertified,
     redistribution_certified_at: redistributionCertifiedAt,
+    cache_source_url: cacheSourceUrl,
+    cache_status: cacheStatus,
+    cache_error: shouldQueueAutoCache ? null : (existing?.cache_error || null),
+    cache_attempts: shouldQueueAutoCache ? 0 : Number(existing?.cache_attempts || 0),
+    cache_next_attempt_at: shouldQueueAutoCache ? null : (existing?.cache_next_attempt_at || null),
+    cached_at: media.r2_key ? (existing?.cached_at || null) : null,
     primary_category: category,
     subcategory,
     description: cleanLongText(body.description, 2400, existing?.description || ""),
@@ -2106,6 +2159,149 @@ function isHlsManifestKey(key) {
 
 function isStoredVideoKey(key) {
   return /\.(?:mp4|webm|ogg|ogv|mov|m3u8|ts|m4s|aac|m4a)$/i.test(String(key || ""));
+}
+
+function isBlockedAutoCacheHost(hostname) {
+  const host = String(hostname || "").toLowerCase().replace(/\.$/, "");
+  if (!host || host === "localhost" || host.endsWith(".localhost")) return true;
+  if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(host) || host.includes(":")) return true;
+  return AUTO_CACHE_BLOCKED_HOST_SUFFIXES.some((suffix) => host === suffix || host.endsWith(`.${suffix}`));
+}
+
+function validateAuthorizedCacheSourceUrl(value) {
+  let url;
+  try {
+    url = new URL(cleanText(value, 2000));
+  } catch {
+    throw new AppError(400, "Authorized cache source URL is invalid");
+  }
+  if (url.protocol !== "https:" || url.username || url.password || isBlockedAutoCacheHost(url.hostname)) {
+    throw new AppError(400, "Use a public HTTPS media URL from storage or a CDN you control. Social-platform and private-network media URLs are not accepted for automatic caching.");
+  }
+  return url.toString();
+}
+
+function autoCacheBaseUrl(env) {
+  try {
+    const url = new URL(cleanText(env.PUBLIC_BASE_URL, 500, "https://vid.best"));
+    if (url.protocol === "https:" || url.protocol === "http:") return url.origin;
+  } catch {}
+  return "https://vid.best";
+}
+
+function autoCacheRetryDelay(attempts) {
+  return attempts <= 1 ? "+15 minutes" : attempts === 2 ? "+1 hour" : "+6 hours";
+}
+
+async function cacheAuthorizedVideo(env, video) {
+  const id = Number(video.id);
+  const attempts = Number(video.cache_attempts || 0) + 1;
+  await env.DB.prepare(
+    `UPDATE videos
+     SET cache_status = 'running', cache_error = NULL, cache_attempts = ?,
+         cache_next_attempt_at = NULL,
+         updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')
+     WHERE id = ? AND r2_key IS NULL`,
+  ).bind(attempts, id).run();
+
+  let key = null;
+  try {
+    const requestedUrl = validateAuthorizedCacheSourceUrl(video.cache_source_url);
+    const response = await fetch(requestedUrl, {
+      method: "GET",
+      headers: { Accept: "video/mp4,video/webm,video/ogg,video/quicktime" },
+      redirect: "follow",
+      signal: AbortSignal.timeout(25000),
+    });
+    if (!response.ok || !response.body) throw new Error(`Authorized media source returned HTTP ${response.status}`);
+
+    validateAuthorizedCacheSourceUrl(response.url || requestedUrl);
+    const contentType = (response.headers.get("Content-Type") || "").split(";", 1)[0].trim().toLowerCase();
+    const extension = AUTO_CACHE_VIDEO_TYPES.get(contentType);
+    if (!extension) {
+      throw new Error("Automatic cache accepts direct MP4, WebM, Ogg or MOV files. HLS packages must use the existing authorized folder upload.");
+    }
+
+    const maximum = clampInteger(env.MAX_AUTO_CACHE_BYTES || env.MAX_UPLOAD_BYTES, 1_000_000, 500_000_000, 104_857_600);
+    const contentLength = Number(response.headers.get("Content-Length"));
+    if (!Number.isSafeInteger(contentLength) || contentLength < 1) {
+      throw new Error("Authorized media source must provide a valid Content-Length");
+    }
+    if (contentLength > maximum) {
+      throw new Error(`Authorized media file exceeds the ${Math.floor(maximum / 1_048_576)} MB automatic-cache limit`);
+    }
+
+    const date = new Date().toISOString().slice(0, 10);
+    key = `uploads/auto/${date}/${id}-${crypto.randomUUID()}.${extension}`;
+    await env.BUCKET.put(key, response.body, {
+      httpMetadata: {
+        contentType,
+        cacheControl: "public, max-age=31536000, immutable",
+        contentDisposition: "inline",
+      },
+      customMetadata: {
+        redistributionCertified: "1",
+        autoCached: "1",
+        sourceOrigin: new URL(requestedUrl).origin.slice(0, 180),
+      },
+    });
+
+    const mediaUrl = `${autoCacheBaseUrl(env)}/media/${encodeR2Key(key)}`;
+    await env.DB.prepare(
+      `UPDATE videos SET
+         source_page_url = COALESCE(source_page_url, source_url),
+         source_url = ?, embed_url = NULL, media_type = 'r2', r2_key = ?,
+         cache_status = 'complete', cache_error = NULL, cache_next_attempt_at = NULL,
+         cached_at = strftime('%Y-%m-%dT%H:%M:%fZ','now'),
+         updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')
+       WHERE id = ? AND redistribution_certified = 1`,
+    ).bind(mediaUrl, key, id).run();
+    return { id, status: "complete", key };
+  } catch (error) {
+    if (key) {
+      try { await env.BUCKET.delete(key); } catch {}
+    }
+    const message = cleanText(error?.message || "Automatic cache failed", 400);
+    const exhausted = attempts >= 3;
+    await env.DB.prepare(
+      `UPDATE videos SET
+         cache_status = 'failed', cache_error = ?,
+         cache_next_attempt_at = ${exhausted ? "NULL" : "datetime('now', ?)"},
+         updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')
+       WHERE id = ?`,
+    ).bind(...(exhausted ? [message, id] : [message, autoCacheRetryDelay(attempts), id])).run();
+    console.error("Authorized auto-cache failed", id, message);
+    return { id, status: "failed", error: message };
+  }
+}
+
+export async function processAuthorizedCacheJobs(env, options = {}) {
+  const limit = clampInteger(options.limit, 1, 4, 2);
+  const videoId = Number(options.videoId || 0);
+  const whereVideo = Number.isSafeInteger(videoId) && videoId > 0 ? "AND id = ?" : "";
+  const statement = env.DB.prepare(
+    `SELECT id, cache_source_url, cache_status, cache_attempts
+     FROM videos
+     WHERE redistribution_certified = 1
+       AND r2_key IS NULL
+       AND cache_source_url IS NOT NULL
+       AND length(cache_source_url) > 0
+       AND cache_status IN ('pending', 'failed')
+       AND cache_attempts < 3
+       AND (cache_next_attempt_at IS NULL OR cache_next_attempt_at <= datetime('now'))
+       ${whereVideo}
+     ORDER BY updated_at ASC
+     LIMIT ?`,
+  );
+  const result = Number.isSafeInteger(videoId) && videoId > 0
+    ? await statement.bind(videoId, limit).all()
+    : await statement.bind(limit).all();
+
+  const outcomes = [];
+  for (const video of result.results || []) {
+    outcomes.push(await cacheAuthorizedVideo(env, video));
+  }
+  return outcomes;
 }
 
 function secureStoredContentType(headers) {

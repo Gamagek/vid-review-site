@@ -24,6 +24,7 @@ const ui = {
   videoSearchResults: document.querySelector("#video-search-results"),
   sourceUrl: document.querySelector("#source-url"),
   sourcePageUrl: document.querySelector("#source-page-url"),
+  cacheSourceUrl: document.querySelector("#cache-source-url"),
   r2Key: document.querySelector("#r2-key"),
   linkPanel: document.querySelector("#link-source-panel"),
   uploadPanel: document.querySelector("#upload-source-panel"),
@@ -272,6 +273,7 @@ function selectDiscoveredVideo(video) {
   ui.r2Key.value = "";
   ui.r2Key.dataset.url = "";
   ui.sourcePageUrl.value = video.source_url || "";
+  ui.cacheSourceUrl.value = "";
   ui.seoTitle.value = "";
   ui.seoDescription.value = "";
   ui.description.value = "";
@@ -859,6 +861,7 @@ async function saveVideo(event) {
     title: ui.title.value,
     source_url: ui.sourceUrl.value,
     source_page_url: ui.sourcePageUrl?.value || "",
+    cache_source_url: ui.cacheSourceUrl?.value || "",
     r2_key: r2Key,
     primary_category: ui.category.value,
     subcategory: ui.category.value === "Other" ? ui.otherSubcategory.value.trim() : ui.subcategory.value,
@@ -903,7 +906,12 @@ async function saveVideo(event) {
         queueWarning = ` The discovery queue was not updated: ${error.message}`;
       }
     }
-    setStatus(ui.saveStatus, `Saved: \${result.video.title}.\${queueWarning}\${analysisWarning}`, queueWarning || analysisWarning ? "error" : "success");
+    const cacheMessage = result.video.cache_status === "pending"
+      ? " Authorized R2 cache queued automatically."
+      : result.video.cache_status === "failed"
+        ? ` Auto-cache needs attention: ${result.video.cache_error || "retry pending"}.`
+        : "";
+    setStatus(ui.saveStatus, `Saved: \${result.video.title}.\${cacheMessage}\${queueWarning}\${analysisWarning}`, queueWarning || analysisWarning ? "error" : "success");
     resetEditor(false);
     await Promise.all([loadAdminVideos(), loadDiscoveryRequests()]);
   } catch (error) {
@@ -940,7 +948,9 @@ function renderAdminVideo(video) {
   meta.className = "admin-list-meta";
   const cacheState = video.r2_key
     ? (video.redistribution_certified ? " · Rights-certified R2 copy" : " · R2 copy")
-    : "";
+    : video.cache_status && video.cache_status !== "none"
+      ? ` · Auto-cache ${video.cache_status}`
+      : "";
   meta.textContent = `${video.published ? "Published" : "Draft"}${cacheState} · ${formatDate(video.created_at)}`;
   const actions = document.createElement("div");
   actions.className = "admin-item-actions";
@@ -969,6 +979,7 @@ async function editVideo(video) {
   ui.title.value = video.title || "";
   ui.sourceUrl.value = video.source_url || "";
   ui.sourcePageUrl.value = video.source_page_url || (video.media_type === "r2" ? "" : video.source_url || "");
+  ui.cacheSourceUrl.value = video.cache_source_url || "";
   ui.r2Key.value = video.r2_key || "";
   ui.r2Key.dataset.url = video.media_type === "r2" ? video.source_url : "";
   ui.category.value = video.primary_category;
@@ -1156,6 +1167,7 @@ function resetEditor(clearStatus = true) {
   ui.r2Key.value = "";
   ui.r2Key.dataset.url = "";
   ui.sourcePageUrl.value = "";
+  ui.cacheSourceUrl.value = "";
   ui.subcategory.innerHTML = '<option value="">Choose subcategory</option>';
   ui.subcategory.disabled = true;
   ui.published.checked = true;
