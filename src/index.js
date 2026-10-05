@@ -799,6 +799,7 @@ function serializeVideo(row) {
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
     published: Boolean(row.published),
+    redistribution_certified: Boolean(row.redistribution_certified),
     has_captions: Boolean(row.has_captions),
     seo_tags: parseTags(row.seo_tags),
     reactions: row.reactions || { like: 0, love: 0, useful: 0 },
@@ -1212,19 +1213,23 @@ async function createVideo(request, env, ctx) {
 
   const row = await env.DB.prepare(
     `INSERT INTO videos (
-      slug, title, source_url, embed_url, media_type, r2_key,
+      slug, title, source_url, source_page_url, embed_url, media_type, r2_key,
+      redistribution_certified, redistribution_certified_at,
       primary_category, subcategory, description, review_text,
       seo_title, seo_description, seo_tags, thumbnail_url,
       featured, trending, published
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     RETURNING *`,
   ).bind(
     data.slug,
     data.title,
     data.source_url,
+    data.source_page_url,
     data.embed_url,
     data.media_type,
     data.r2_key,
+    Number(data.redistribution_certified),
+    data.redistribution_certified_at,
     data.primary_category,
     data.subcategory,
     data.description,
@@ -1253,7 +1258,8 @@ async function updateVideo(request, env, id, ctx) {
 
   const row = await env.DB.prepare(
     `UPDATE videos SET
-      title = ?, source_url = ?, embed_url = ?, media_type = ?, r2_key = ?,
+      title = ?, source_url = ?, source_page_url = ?, embed_url = ?, media_type = ?, r2_key = ?,
+      redistribution_certified = ?, redistribution_certified_at = ?,
       primary_category = ?, subcategory = ?, description = ?, review_text = ?,
       seo_title = ?, seo_description = ?, seo_tags = ?, thumbnail_url = ?,
       featured = ?, trending = ?, published = ?,
@@ -1262,9 +1268,12 @@ async function updateVideo(request, env, id, ctx) {
   ).bind(
     data.title,
     data.source_url,
+    data.source_page_url,
     data.embed_url,
     data.media_type,
     data.r2_key,
+    Number(data.redistribution_certified),
+    data.redistribution_certified_at,
     data.primary_category,
     data.subcategory,
     data.description,
@@ -1364,16 +1373,35 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
   const thumbnailText = cleanText(thumbnailCandidate, 2000);
   const customThumbnail = validateOptionalUrl(thumbnailText);
   const thumbnailUrl = customThumbnail || media.thumbnail_url;
-  if (media.provider === "hls" && !toBoolean(body.media_rights_confirmed)) {
-    throw new AppError(400, "Confirm that you have permission to store and serve this HLS media before publishing");
+
+  const storedVideo = Boolean(media.r2_key && isStoredVideoKey(media.r2_key));
+  const redistributionCertified = storedVideo && toBoolean(
+    body.media_rights_confirmed,
+    Boolean(existing?.redistribution_certified),
+  );
+  if (storedVideo && !redistributionCertified) {
+    throw new AppError(400, "Certify that you own this video or have permission to redistribute and cache it before storing it on Vid.Best");
   }
+
+  const sourcePageCandidate = body.source_page_url === undefined
+    ? existing?.source_page_url
+    : body.source_page_url;
+  const sourcePageUrl = media.r2_key
+    ? validateOptionalUrl(cleanText(sourcePageCandidate, 2000))
+    : null;
+  const redistributionCertifiedAt = redistributionCertified
+    ? (existing?.redistribution_certified_at || new Date().toISOString())
+    : null;
 
   return {
     title,
     source_url: media.source_url,
+    source_page_url: sourcePageUrl,
     embed_url: media.embed_url,
     media_type: media.media_type,
     r2_key: media.r2_key,
+    redistribution_certified: redistributionCertified,
+    redistribution_certified_at: redistributionCertifiedAt,
     primary_category: category,
     subcategory,
     description: cleanLongText(body.description, 2400, existing?.description || ""),
@@ -1969,8 +1997,9 @@ async function uploadAsset(request, env) {
 
   const requestedKey = cleanText(request.headers.get("X-Asset-Key"), 700);
   const isHlsUpload = /\.(m3u8|ts|m4s|aac|m4a)$/i.test(filename) || /\.(m3u8|ts|m4s|aac|m4a)$/i.test(requestedKey);
-  if (isHlsUpload && request.headers.get("X-Media-Rights-Confirmed") !== "1") {
-    throw new AppError(400, "Confirm that you have permission to store and serve this media before uploading HLS files");
+  const isVideoUpload = contentType.startsWith("video/") || isHlsUpload || ["audio/aac", "audio/mp4"].includes(contentType);
+  if (isVideoUpload && request.headers.get("X-Media-Rights-Confirmed") !== "1") {
+    throw new AppError(400, "Certify that you own this video or have permission to redistribute and cache it before uploading");
   }
   let key;
   if (requestedKey) {
@@ -1995,7 +2024,10 @@ async function uploadAsset(request, env) {
       cacheControl: "public, max-age=31536000, immutable",
       contentDisposition: "inline",
     },
-    customMetadata: { originalFilename: filename.slice(0, 180) },
+    customMetadata: {
+      originalFilename: filename.slice(0, 180),
+      ...(isVideoUpload ? { redistributionCertified: "1" } : {}),
+    },
   });
   const baseUrl = getBaseUrl(request, env);
   return json({ success: true, key, url: `${baseUrl}/media/${encodeR2Key(key)}` }, 201);
@@ -2070,6 +2102,10 @@ async function serveR2Object(request, env, keyInput) {
 
 function isHlsManifestKey(key) {
   return /\.m3u8$/i.test(String(key || ""));
+}
+
+function isStoredVideoKey(key) {
+  return /\.(?:mp4|webm|ogg|ogv|mov|m3u8|ts|m4s|aac|m4a)$/i.test(String(key || ""));
 }
 
 function secureStoredContentType(headers) {
