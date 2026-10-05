@@ -23,6 +23,7 @@ const ui = {
   videoSearchStatus: document.querySelector("#video-search-status"),
   videoSearchResults: document.querySelector("#video-search-results"),
   sourceUrl: document.querySelector("#source-url"),
+  sourcePageUrl: document.querySelector("#source-page-url"),
   r2Key: document.querySelector("#r2-key"),
   linkPanel: document.querySelector("#link-source-panel"),
   uploadPanel: document.querySelector("#upload-source-panel"),
@@ -270,6 +271,7 @@ function selectDiscoveredVideo(video) {
   ui.editingId.value = "";
   ui.r2Key.value = "";
   ui.r2Key.dataset.url = "";
+  ui.sourcePageUrl.value = video.source_url || "";
   ui.seoTitle.value = "";
   ui.seoDescription.value = "";
   ui.description.value = "";
@@ -529,6 +531,11 @@ function uploadFile() {
     setStatus(ui.uploadStatus, "Choose a video or image first.", "error");
     return;
   }
+  const videoFile = String(file.type || "").startsWith("video/") || /\.(?:mp4|webm|ogg|ogv|mov)$/i.test(file.name);
+  if (videoFile && !ui.mediaRightsConfirmed.checked) {
+    setStatus(ui.uploadStatus, "Certify that you own this video or have permission to redistribute and cache it before uploading.", "error");
+    return;
+  }
   ui.uploadButton.disabled = true;
   ui.uploadProgress.style.width = "0%";
   setStatus(ui.uploadStatus, "Uploading securely…");
@@ -536,6 +543,7 @@ function uploadFile() {
   request.open("PUT", `/api/assets?filename=${encodeURIComponent(file.name)}`);
   request.withCredentials = true;
   request.setRequestHeader("X-File-Name", file.name);
+  if (videoFile) request.setRequestHeader("X-Media-Rights-Confirmed", "1");
   request.setRequestHeader("Content-Type", file.type || "application/octet-stream");
   request.upload.addEventListener("progress", (event) => {
     if (event.lengthComputable) ui.uploadProgress.style.width = `${Math.round((event.loaded / event.total) * 100)}%`;
@@ -546,6 +554,9 @@ function uploadFile() {
     try { result = JSON.parse(request.responseText || "{}"); } catch { /* Ignore malformed error payload. */ }
     if (request.status >= 200 && request.status < 300) {
       clearAnalysisDraft();
+      if (!ui.sourcePageUrl.value && /^https?:\/\//i.test(ui.sourceUrl.value) && !ui.sourceUrl.value.startsWith(location.origin)) {
+        ui.sourcePageUrl.value = ui.sourceUrl.value;
+      }
       ui.r2Key.value = result.key;
       ui.r2Key.dataset.url = result.url;
       ui.sourceUrl.value = result.url;
@@ -609,14 +620,14 @@ async function uploadHlsFolder() {
   const files = [...(ui.hlsFolderInput?.files || [])];
   if (!files.length) {
     if (!ui.mediaRightsConfirmed.checked) {
-      setStatus(ui.uploadStatus, "Confirm that you have permission to store and serve this media first.", "error");
+      setStatus(ui.uploadStatus, "Certify that you own this media or have permission to redistribute and cache it first.", "error");
       return;
     }
     setStatus(ui.uploadStatus, "Choose an HLS folder first.", "error");
     return;
   }
   if (!ui.mediaRightsConfirmed.checked) {
-    setStatus(ui.uploadStatus, "Confirm that you have permission to store and serve this media first.", "error");
+    setStatus(ui.uploadStatus, "Certify that you own this media or have permission to redistribute and cache it first.", "error");
     return;
   }
   const manifest = files.find((file) => /\.m3u8$/i.test(file.name));
@@ -647,6 +658,9 @@ async function uploadHlsFolder() {
     }
     const manifestRelative = String(manifest.webkitRelativePath || manifest.name).split("/").slice(1).join("/");
     const manifestKey = `${folder}/${manifestRelative.split("/").map((part) => part.replace(/[^A-Za-z0-9._-]+/g, "-")).filter(Boolean).join("/")}`;
+    if (!ui.sourcePageUrl.value && /^https?:\/\//i.test(ui.sourceUrl.value) && !ui.sourceUrl.value.startsWith(location.origin)) {
+      ui.sourcePageUrl.value = ui.sourceUrl.value;
+    }
     ui.r2Key.value = manifestKey;
     ui.r2Key.dataset.url = `/media/${encodeURIComponent(manifestKey).replace(/%2F/g, "/")}`;
     ui.sourceUrl.value = ui.r2Key.dataset.url;
@@ -844,6 +858,7 @@ async function saveVideo(event) {
   const payload = {
     title: ui.title.value,
     source_url: ui.sourceUrl.value,
+    source_page_url: ui.sourcePageUrl?.value || "",
     r2_key: r2Key,
     primary_category: ui.category.value,
     subcategory: ui.category.value === "Other" ? ui.otherSubcategory.value.trim() : ui.subcategory.value,
@@ -923,7 +938,10 @@ function renderAdminVideo(video) {
   detail.textContent = `${video.primary_category} · ${video.subcategory}`;
   const meta = document.createElement("div");
   meta.className = "admin-list-meta";
-  meta.textContent = `\${video.published ? "Published" : "Draft"} · \${formatDate(video.created_at)}`;
+  const cacheState = video.r2_key
+    ? (video.redistribution_certified ? " · Rights-certified R2 copy" : " · R2 copy")
+    : "";
+  meta.textContent = `${video.published ? "Published" : "Draft"}${cacheState} · ${formatDate(video.created_at)}`;
   const actions = document.createElement("div");
   actions.className = "admin-item-actions";
   const edit = document.createElement("button");
@@ -950,6 +968,7 @@ async function editVideo(video) {
   ui.editingId.value = video.id;
   ui.title.value = video.title || "";
   ui.sourceUrl.value = video.source_url || "";
+  ui.sourcePageUrl.value = video.source_page_url || (video.media_type === "r2" ? "" : video.source_url || "");
   ui.r2Key.value = video.r2_key || "";
   ui.r2Key.dataset.url = video.media_type === "r2" ? video.source_url : "";
   ui.category.value = video.primary_category;
@@ -965,7 +984,7 @@ async function editVideo(video) {
   ui.featured.checked = Boolean(video.featured);
   ui.trending.checked = Boolean(video.trending);
   ui.published.checked = Boolean(video.published);
-  ui.mediaRightsConfirmed.checked = false;
+  ui.mediaRightsConfirmed.checked = Boolean(video.redistribution_certified);
   setSourceMode(["r2", "hls"].includes(video.media_type) ? "upload" : "link");
   adminState.analysisSource = video.source_url || "";
   adminState.analysisDraft = null;
@@ -1136,6 +1155,7 @@ function resetEditor(clearStatus = true) {
   adminState.activeDiscoveryRequestId = null;
   ui.r2Key.value = "";
   ui.r2Key.dataset.url = "";
+  ui.sourcePageUrl.value = "";
   ui.subcategory.innerHTML = '<option value="">Choose subcategory</option>';
   ui.subcategory.disabled = true;
   ui.published.checked = true;
