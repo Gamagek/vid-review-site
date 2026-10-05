@@ -167,6 +167,26 @@
   z-index: 1;
 }
 
+.tiktok-facade-play {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  padding-left: 3px;
+  border: 1px solid rgba(255,255,255,.34);
+  border-radius: 50%;
+  background: rgba(8,10,20,.62);
+  color: #fff;
+  font-size: 1.15rem;
+  box-shadow: 0 14px 30px rgba(0,0,0,.34);
+  backdrop-filter: blur(10px);
+}
+
 .tiktok-microlink-body,
 .facebook-microlink-body {
   position: absolute;
