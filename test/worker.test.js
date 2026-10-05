@@ -282,6 +282,11 @@ test("TikTok watch pages include the signed gateway fallback for existing and fu
 
   const page = await send(context, "/watch/gateway-tiktok-test");
   assert.equal(page.status, 200);
+  const policy = page.headers.get("Content-Security-Policy");
+  const connections = policy.match(/(?:^|;)\s*connect-src ([^;]+)/)?.[1].split(/\s+/);
+  assert.ok(connections.includes("https://video.megasale.win"), "the signed gateway status API must be reachable from prepared cards");
+  assert.ok(!connections.includes("https:") && !connections.includes("*"), "keep connections restricted to approved origins");
+  assert.match(policy, /worker-src 'self' blob:;/, "hls.js can initialize its local media worker");
   const html = await page.text();
   assert.match(html, /data-tiktok-gateway-src="https:\/\/video\.megasale\.win\/\?url=/);
   assert.match(html, /data-tiktok-gateway-src="[^"]*sig=[a-f0-9]{64}"/);
