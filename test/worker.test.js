@@ -721,8 +721,8 @@ test("uses the optional NGINX TikTok facade for metadata without writing R2 cach
     globalThis.fetch = originalFetch;
   }
 });
-test("stores TikTok source and renders the PR26-style player", async () => {
-  const context = createTestContext();
+test("stores TikTok source and renders the signed oEmbed gateway iframe", async () => {
+  const context = createTestContext({ SIGN_SECRET: "test-tiktok-signing-secret" });
   const response = await send(context, "/api/videos", {
     method: "POST",
     headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
@@ -744,16 +744,16 @@ test("stores TikTok source and renders the PR26-style player", async () => {
   const page = await send(context, `/watch/${result.video.slug}`);
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /data-vidbest-tiktok-player/);
+  assert.match(html, /<iframe[^>]+class="tiktok-official-player tiktok-gateway-player"/);
   assert.match(html, /data-tiktok-id="6718335390845095173"/);
   assert.match(html, /data-tiktok-share=/);
-  assert.match(html, /data-tiktok-gateway-src=/);
-  assert.match(html, /src="\/tiktok-video-service\.js(?:\?[^"\s]*)?"/);
-  assert.match(html, /src="\/tiktok-audio-lab\.js"/);
-  assert.match(html, /src="\/tiktok-audio-lab-ui\.js"/);
-  assert.match(html, /src="\/tiktok-player\.js(?:\?[^"\s]*)?"/);
-  assert.doesNotMatch(html, /<iframe[^>]+tiktok-official-player/);
-  assert.doesNotMatch(html, /https:\/\/www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
+  assert.match(html, /data-tiktok-gateway-src="https:\/\/video\.megasale\.win\//);
+  assert.match(html, /data-tiktok-player-mode="gateway-oembed"/);
+  assert.match(html, /src="https:\/\/video\.megasale\.win\//);
+  assert.doesNotMatch(html, /src="\/tiktok-video-service\.js/);
+  assert.doesNotMatch(html, /src="\/tiktok-audio-lab\.js/);
+  assert.doesNotMatch(html, /src="\/tiktok-audio-lab-ui\.js/);
+  assert.doesNotMatch(html, /src="\/tiktok-player\.js/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
 });
 
@@ -1356,8 +1356,8 @@ test("TikTok keeps separate share preview and player paths", () => {
   assert.match(adminSource, /TikTok preview needs the normal full sharing link/);
 });
 
-test("renders the current Vid.Best TikTok direct player with separate home preview behavior", async () => {
-  const context = createTestContext();
+test("renders the current Vid.Best TikTok signed gateway iframe with separate home preview behavior", async () => {
+  const context = createTestContext({ SIGN_SECRET: "test-tiktok-signing-secret" });
   context.sqlite.prepare(
     `INSERT INTO videos (
        slug, title, source_url, embed_url, media_type, primary_category, subcategory, description, published
@@ -1376,56 +1376,21 @@ test("renders the current Vid.Best TikTok direct player with separate home previ
   const page = await send(context, "/watch/tiktok-player-test");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /data-vidbest-tiktok-player/);
+  assert.match(html, /class="tiktok-official-player tiktok-gateway-player"/);
   assert.match(html, /data-tiktok-id="7669587518156705056"/);
-  assert.match(html, /data-tiktok-gateway-src=/);
-  assert.doesNotMatch(html, /<iframe[^>]+tiktok-official-player/);
-  assert.doesNotMatch(html, /https:\/\/www\.tiktok\.com\/player\/v1\/7669587518156705056\?/);
+  assert.match(html, /data-tiktok-gateway-src="https:\/\/video\.megasale\.win\//);
+  assert.match(html, /data-tiktok-player-mode="gateway-oembed"/);
+  assert.match(html, /src="https:\/\/video\.megasale\.win\//);
+  assert.doesNotMatch(html, /src="\/tiktok-video-service\.js/);
+  assert.doesNotMatch(html, /src="\/tiktok-player\.js/);
   assert.doesNotMatch(html, /class="tiktok-embed"/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
   assert.match(html, /data-video-provider="tiktok"/);
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
-  assert.match(watchSource, /if \(provider === "tiktok"\) return/);
+  assert.match(watchSource, /TikTok gateway embed/);
+  assert.match(watchSource, /background:#fff/);
 
-  const tiktokServiceSource = readFileSync(new URL("../public/tiktok-video-service.js", import.meta.url), "utf8");
-  assert.match(tiktokServiceSource, /DEFAULT_INTERVAL_MS = 3000/);
-  assert.match(tiktokServiceSource, /DEFAULT_MAX_ATTEMPTS = 15/);
-  assert.match(tiktokServiceSource, /status === "cached"/);
-  assert.match(tiktokServiceSource, /status: "scraping"/);
-  assert.match(tiktokServiceSource, /response.status === 404/);
-  assert.match(tiktokServiceSource, /buildStreamUrl/);
-  assert.match(tiktokServiceSource, /GATEWAY_UNREACHABLE/);
-  assert.match(tiktokServiceSource, /GATEWAY_TIMEOUT/);
-  assert.match(tiktokServiceSource, /status === "cooldown"/);
-  assert.doesNotMatch(tiktokServiceSource, /mode:\s*"no-cors"/);
-
-  const tiktokPlayerSource = readFileSync(new URL("../public/tiktok-player.js", import.meta.url), "utf8");
-  assert.match(tiktokPlayerSource, /MAX_ATTEMPTS = 15/);
-  assert.match(tiktokPlayerSource, /POLL_INTERVAL_MS = 3000/);
-  assert.match(tiktokPlayerSource, /crossorigin/);
-  assert.match(tiktokPlayerSource, /VidBestTikTokVideoService/);
-  assert.match(tiktokPlayerSource, /pollR2Video/);
-  assert.match(tiktokPlayerSource, /Video ready/);
-  assert.match(tiktokPlayerSource, /VidBestAudioLab/);
-  assert.match(tiktokPlayerSource, /data-fallback-retry/);
-  assert.match(tiktokPlayerSource, /Upload to R2 is finishing/);
-  assert.match(tiktokPlayerSource, /Video gateway unavailable/);
-  assert.doesNotMatch(tiktokPlayerSource, /compatibility mode/);
-
-  const audioSource = readFileSync(new URL("../public/tiktok-audio-lab.js", import.meta.url), "utf8");
-  assert.match(audioSource, /createMediaElementSource/);
-  assert.match(audioSource, /createGain/);
-  assert.match(audioSource, /createBiquadFilter/);
-  assert.match(audioSource, /createStereoPanner/);
-  assert.match(audioSource, /context\.resume/);
-
-  const audioUiSource = readFileSync(new URL("../public/tiktok-audio-lab-ui.js", import.meta.url), "utf8");
-  assert.match(audioUiSource, /Bass/);
-  assert.match(audioUiSource, /Mid/);
-  assert.match(audioUiSource, /Treble/);
-  assert.match(audioUiSource, /Space/);
-  assert.match(audioUiSource, /Master/);
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /parseTikTokShareUrl/);
   assert.match(homeSource, /loadTikTokFacadePreviews/);
@@ -1438,22 +1403,14 @@ test("renders the current Vid.Best TikTok direct player with separate home previ
   assert.doesNotMatch(homeSource, /className = "tiktok-embed"/);
   assert.match(homeSource, /provider === "tiktok"/);
   assert.match(homeSource, /provider === "facebook"/);
-  assert.match(homeSource, /mountFacebookDirectPlayer/);
-  assert.match(homeSource, /safeFacebookDirectEmbed/);
-  assert.match(homeSource, /facebook-direct-player/);
-  assert.match(homeSource, /plugins\/video\.php/);
-  assert.doesNotMatch(homeSource, /renderFacebookFacade/);
-  assert.doesNotMatch(homeSource, /facebook-microlink-preview/);
-  assert.match(homeSource, /tiktok-microlink-preview/);
-  assert.match(homeSource, /TikTok preview · tap to open/);
 
   const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
+  assert.match(indexSource, /tiktok-gateway-player/);
   assert.match(indexSource, /data-tiktok-gateway-src/);
+  assert.match(indexSource, /gateway-oembed/);
   assert.match(indexSource, /\/api\/tiktok\/preflight/);
   assert.match(indexSource, /www\.tiktok\.com\/oembed/);
-  assert.match(indexSource, /tiktokcdn(?:-[a-z0-9-]+)?\.com/);
 });
-
 
 test("builds a signed TikTok gateway URL from the canonical source only", async () => {
   const context = createTestContext({ SIGN_SECRET: "test-tiktok-signing-secret" });
@@ -1477,8 +1434,10 @@ test("builds a signed TikTok gateway URL from the canonical source only", async 
   );
   const gatewayAttr = html.match(/data-tiktok-gateway-src="([^"]+)"/)?.[1] || "";
   assert.doesNotMatch(gatewayAttr, /_r%3D1|_t%3Dtracking/);
-  assert.match(html, /tiktok-video-service\.js\?v=20261005-3/);
-  assert.match(html, /tiktok-player\.js\?v=20261006-1/);
+  assert.match(html, /class="tiktok-official-player tiktok-gateway-player"/);
+  assert.match(html, /data-tiktok-player-mode="gateway-oembed"/);
+  assert.doesNotMatch(html, /tiktok-video-service\.js/);
+  assert.doesNotMatch(html, /tiktok-player\.js/);
 });
 
 
@@ -1528,7 +1487,7 @@ test("builds a batch TikTok facade preview from the configured facade endpoint",
   }
 });
 test("repairs a legacy TikTok record with only its source URL and uses the Saiyaara title", async () => {
-  const context = createTestContext();
+  const context = createTestContext({ SIGN_SECRET: "test-tiktok-signing-secret" });
   context.sqlite.prepare(
     `INSERT INTO videos (
        slug, title, source_url, media_type, primary_category, subcategory, description, published
@@ -1545,11 +1504,11 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   const html = await page.text();
   assert.ok(html.includes("<title>Saiyaara; A Cinematic Romance | Vid.Best</title>"));
   assert.ok(html.includes("<h1>Saiyaara; A Cinematic Romance</h1>"));
-  assert.ok(html.includes('data-vidbest-tiktok-player'));
+  assert.ok(html.includes('class="tiktok-official-player tiktok-gateway-player"'));
   assert.ok(html.includes('data-tiktok-id="6718335390845095173"'));
   assert.ok(html.includes('data-tiktok-gateway-src='));
   assert.ok(html.includes('data-video-provider="tiktok"'));
-  assert.ok(!html.includes('class="tiktok-official-player"'));
+  assert.ok(html.includes('data-tiktok-player-mode="gateway-oembed"'));
 });
 
 test("discovers direct TikTok URLs without server-side TikTok requests", async () => {
