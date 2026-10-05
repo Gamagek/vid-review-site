@@ -2103,14 +2103,6 @@ async function watchPage(request, env, ctx, slugInput) {
   if (!row) return dynamicHtml(notFoundPage(), 404);
   await enrichFacebookRows(env, [row]);
   const [video] = await hydrateVideos(env, [row]);
-  if (video.provider === "tiktok") {
-    const tiktokId = extractTikTokId(video.source_url);
-    try {
-      video.tiktok_gateway_src = await buildSignedTikTokGatewaySrc(video.source_url, tiktokId, env);
-    } catch {
-      video.tiktok_gateway_src = "";
-    }
-  }
   const viewer = new URL(request.url).searchParams.get("viewer") === "1";
   if (!viewer) ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
   const scriptNonce = createCspNonce();
@@ -2232,7 +2224,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261006-1">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261006-1" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
-  ${video.provider === "tiktok" ? '<script src="/tiktok-video-service.js?v=20261005-3" defer></script><script src="/tiktok-audio-lab.js" defer></script><script src="/tiktok-audio-lab-ui.js" defer></script><script src="/tiktok-player.js?v=20261006-1" defer></script>' : ""}
+  ${video.provider === "tiktok" ? '<!-- TikTok uses the signed oEmbed gateway iframe; no R2 polling bundle is loaded. -->' : ""}
 </head>
 <body class="watch-page" data-viewer-embed="${viewer ? "1" : "0"}" data-video-slug="${escapeHtml(video.slug)}" data-site-views="${Number(video.views) + (viewer ? 0 : 1)}" data-video-id="${Number(video.id)}" data-video-provider="${escapeHtml(video.provider)}">
   <header class="site-header compact">
@@ -2414,7 +2406,8 @@ function renderMedia(video, playbackOrigin) {
   if (provider === "tiktok") {
     const tiktokId = extractTikTokId(video.source_url);
     if (!tiktokId) return "";
-    return `<div class="vidbest-tiktok-direct-host" data-vidbest-tiktok-player data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${escapeHtml(video.source_url)}" data-tiktok-gateway-src="${escapeHtml(video.tiktok_gateway_src || "")}" role="status" aria-live="polite" aria-label="${escapeHtml(watchDisplayTitle(video))} video player"></div>`;
+    const playerSrc = buildTikTokPlayerUrl(tiktokId);
+    return `<iframe id="watch-media-frame" class="tiktok-official-player" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${escapeHtml(video.source_url)}" data-tiktok-player-mode="official-direct" src="${escapeHtml(playerSrc)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   }
   if (provider === "facebook") {
     const facebookEmbed = getSafeFacebookEmbedUrl(video);
