@@ -2302,7 +2302,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
       </div>
       ${video.review_text ? `<section class="review-copy"><h2>Review & discovery notes</h2>${paragraphs(video.review_text)}</section>` : ""}
       ${video.transcript ? `<details class="transcript-panel"><summary>Read transcript</summary><div>${paragraphs(video.transcript)}</div></details>` : ""}
-      <a class="source-link" href="${escapeHtml(video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open original source ↗</a>
+      <a class="source-link" href="${escapeHtml(video.source_page_url || video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open original source ↗</a>
     </article>
     <section class="comments-panel glass-panel">
       <h2>Community comments</h2>
