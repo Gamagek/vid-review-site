@@ -130,7 +130,19 @@ function handleVisibility(entries) {
 }
 
 function chooseVisibleCandidate() {
-  if (document.hidden || !previewsAllowed()) return;
+  if (document.hidden) return;
+
+  const activeRatio = previewState.activeCard
+    ? previewState.visibility.get(previewState.activeCard) || 0
+    : 0;
+
+  if (previewState.activeCard?.dataset.videoProvider === "tiktok") {
+    if (activeRatio < ACTIVE_MIN_VISIBILITY) stopPreview(previewState.activeCard);
+    else return;
+  }
+
+  if (!previewsAllowed()) return;
+
   let bestCard = null;
   let bestScore = 0;
   for (const [card, ratio] of previewState.visibility) {
@@ -142,15 +154,6 @@ function chooseVisibleCandidate() {
       bestCard = card;
       bestScore = ratio;
     }
-  }
-
-  const activeRatio = previewState.activeCard
-    ? previewState.visibility.get(previewState.activeCard) || 0
-    : 0;
-
-  if (previewState.activeCard?.dataset.videoProvider === "tiktok") {
-    if (activeRatio < ACTIVE_MIN_VISIBILITY) stopPreview(previewState.activeCard);
-    else return;
   }
 
   if (previewState.activeCard && (
@@ -490,8 +493,13 @@ function renderTikTokFacade(card) {
   caption.className = "tiktok-microlink-caption";
   caption.textContent = card.dataset.videoTitle || "Play this TikTok video";
 
+  const play = document.createElement("span");
+  play.className = "tiktok-facade-play";
+  play.setAttribute("aria-hidden", "true");
+  play.textContent = "▶";
+
   body.append(providerRow, author, caption);
-  facade.append(imageWrap, body);
+  facade.append(imageWrap, play, body);
   surface.append(facade);
   card.classList.add("tiktok-facade-ready");
   if (status) status.textContent = "TikTok · tap to play";
