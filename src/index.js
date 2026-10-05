@@ -547,7 +547,7 @@ function securityHeaders(headers, html = false, scriptNonce = "") {
     const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.tiktok.com https://www.instagram.com/embed.js https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self' https://www.tiktok.com https://*.tiktok.com https://*.tiktokcdn.com; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://video.megasale.win https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.tiktok.com https://www.instagram.com/embed.js https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self' https://www.tiktok.com https://*.tiktok.com https://*.tiktokcdn.com; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://video.megasale.win https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
     );
   }
   return headers;
@@ -2229,11 +2229,11 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
-  <script src="/watch.js" defer></script>
-  <link rel="stylesheet" href="/swipe-viewer.css">
-  <script src="/swipe-viewer.js" defer></script>
+  <script src="/watch.js?v=20261005-2" defer></script>
+  <link rel="stylesheet" href="/swipe-viewer.css?v=20261005-2">
+  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261005-2" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
-  ${video.provider === "tiktok" ? '<script src="/tiktok-video-service.js" defer></script><script src="/tiktok-audio-lab.js" defer></script><script src="/tiktok-audio-lab-ui.js" defer></script><script src="/tiktok-player.js" defer></script>' : ""}
+  ${video.provider === "tiktok" ? '<script src="/tiktok-video-service.js" defer></script><script src="/tiktok-audio-lab.js" defer></script><script src="/tiktok-audio-lab-ui.js" defer></script><script src="/tiktok-player.js?v=20261005-2" defer></script>' : ""}
 </head>
 <body class="watch-page" data-viewer-embed="${viewer ? "1" : "0"}" data-video-slug="${escapeHtml(video.slug)}" data-site-views="${Number(video.views) + (viewer ? 0 : 1)}" data-video-id="${Number(video.id)}" data-video-provider="${escapeHtml(video.provider)}">
   <header class="site-header compact">

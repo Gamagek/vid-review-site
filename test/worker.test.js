@@ -746,7 +746,7 @@ test("stores TikTok source and renders the PR26-style player", async () => {
   assert.match(html, /src="\/tiktok-video-service\.js"/);
   assert.match(html, /src="\/tiktok-audio-lab\.js"/);
   assert.match(html, /src="\/tiktok-audio-lab-ui\.js"/);
-  assert.match(html, /src="\/tiktok-player\.js"/);
+  assert.match(html, /src="\/tiktok-player\.js(?:\?[^"\s]*)?"/);
   assert.doesNotMatch(html, /<iframe[^>]+tiktok-official-player/);
   assert.doesNotMatch(html, /https:\/\/www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
@@ -766,7 +766,7 @@ test("Instagram legacy records receive a dedicated player without needing a data
   assert.match(html, /class="instagram-official-player" src="https:\/\/www.instagram.com\/reel\/DcAcA_QnOLk\/embed\/"/);
   assert.match(html, /type="module" src="\/instagram-player.js"/);
   assert.match(html, /href="\/instagram-player.css"/);
-  assert.doesNotMatch(html, /src="\/tiktok-player.js"/);
+  assert.doesNotMatch(html, /src="\/tiktok-player\.js(?:\?[^"\s]*)?"/);
   assert.doesNotMatch(html, /<video id="watch-media-video"/);
 });
 
@@ -1551,7 +1551,10 @@ test("swipe preparation does not count a view and stays out of caches and search
   assert.equal(prepared.status, 200);
   assert.match(prepared.headers.get('Cache-Control'), /no-store/);
   assert.match(prepared.headers.get('X-Robots-Tag'), /noindex/);
-  assert.match(await prepared.text(), /data-viewer-embed="1"/);
+  const preparedHtml = await prepared.text();
+  assert.match(preparedHtml, /data-viewer-embed="1"/);
+  assert.match(preparedHtml, /src="\/swipe-player-bridge\.js\?v=/);
+  assert.doesNotMatch(preparedHtml, /src="\/swipe-viewer\.js/);
   await Promise.all(context.pending);
   assert.equal(context.sqlite.prepare('SELECT views FROM videos WHERE id = 1').get().views, 0);
   const normal = await send(context, '/watch/swipe-test');

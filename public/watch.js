@@ -25,9 +25,7 @@ document.addEventListener("DOMContentLoaded", initializeWatchPage);
 
 function initializeWatchPage() {
   if (document.body.dataset.viewerEmbed === "1") {
-    enhanceNativePlayer();
     initializeHlsPlayback();
-    initializeEmbeddedMediaTools();
     repairNativePlayerControls();
     return;
   }

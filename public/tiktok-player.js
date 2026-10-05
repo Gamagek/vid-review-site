@@ -195,7 +195,8 @@
         video.setAttribute("webkit-playsinline", "");
         video.controls = true;
         video.preload = "auto";
-        video.autoplay = true;
+        const swipeMode = document.body.dataset.viewerEmbed === "1";
+        video.autoplay = !swipeMode;
         video.src = result.streamUrl;
 
         video.addEventListener("error", () => {
@@ -222,6 +223,10 @@
         progress.style.width = "100%";
         setOverlay("The video is ready. Starting playback…", "Ready");
 
+        if (swipeMode) {
+          overlay.hidden = true;
+          return; // The swipe bridge activates the visible card; the next card only buffers.
+        }
         try {
           await video.play();
           overlay.hidden = true;
