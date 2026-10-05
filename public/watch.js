@@ -1251,7 +1251,6 @@ function initializeEmbeddedAudioLab() {
   if (document.body.dataset.videoProvider === "instagram") return;
   const player = document.querySelector("#watch-player");
   if (!player || player.dataset.vidbestEmbeddedAudio === "1") return;
-  if (String(document.body.dataset.videoProvider || "").toLowerCase() === "tiktok") return;
   if (player.querySelector("video, audio")) return;
   const frame = player.querySelector("iframe");
   if (!frame) return;
@@ -1348,11 +1347,19 @@ function initializeEmbeddedAudioLab() {
   };
 
   try { provider = vb4Provider(frame); } catch {}
+  if (String(document.body.dataset.videoProvider || "").toLowerCase() === "tiktok") {
+    provider = "tiktok";
+  }
   if (!trySameOrigin()) {
     const disableEq = () => panel.querySelectorAll("input[data-v4-a]").forEach((x)=>{ if(x.dataset.v4A!=="master")x.disabled=true; });
     disableEq();
-    if(provider==="youtube"||provider==="vimeo") setStatus("Embedded "+provider+" · Master volume works; EQ/3D needs direct media access","warn");
-    else setStatus("Cross-origin embed · EQ/3D cannot be applied by the parent page","warn");
+    if(provider==="youtube"||provider==="vimeo") {
+      setStatus("Embedded "+provider+" · Master volume works; EQ/3D needs direct media access","warn");
+    } else if (provider === "tiktok") {
+      setStatus("TikTok gateway embed · playback controls stay inside the player; EQ/3D cannot cross the iframe boundary","warn");
+    } else {
+      setStatus("Cross-origin embed · EQ/3D cannot be applied by the parent page","warn");
+    }
     frame.addEventListener("load",()=>{ if(!trySameOrigin())disableEq(); });
   }
 
@@ -1367,8 +1374,8 @@ function initializeEmbeddedAudioLab() {
   style.id = "vidbest-player-polish-v4-css";
   style.textContent = [
     ".watch-player-stage{position:relative}",
-    ".watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:min(100%,540px);height:min(78vh,760px);min-height:480px;margin-inline:auto;background:#000;overflow:hidden}",
-    ".watch-player[data-provider=\"tiktok\"] .tiktok-official-player{display:block;width:100%;height:100%;min-height:0;border:0;background:#000}",
+    ".watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:min(100%,540px);height:min(78vh,760px);min-height:480px;margin-inline:auto;background:#fff;overflow:hidden}",
+    ".watch-player[data-provider=\"tiktok\"] .tiktok-official-player{display:block;width:100%;height:100%;min-height:0;border:0;background:#fff}",
     ".watch-player.is-mini[data-provider=\"tiktok\"]{width:min(430px,calc(100vw - 36px))}",
     ".watch-player.is-mini[data-provider=\"tiktok\"] .watch-player-stage{width:100%;height:min(70vh,calc((100vw - 36px) * 1.7778));min-height:0}",
     ".watch-player.is-theater[data-provider=\"tiktok\"] .watch-player-stage{width:min(100%,720px);height:calc(100vh - 90px);min-height:0}",
