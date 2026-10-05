@@ -582,7 +582,7 @@ test("rejects HLS uploads without media rights confirmation", async () => {
     body: "#EXTM3U",
   });
   assert.equal(response.status, 400);
-  assert.match((await response.json()).error, /permission to store and serve/i);
+  assert.match((await response.json()).error, /permission to redistribute and cache/i);
 });
 
 test("serves HLS manifests with cacheable HLS headers", async () => {
