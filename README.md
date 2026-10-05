@@ -270,3 +270,9 @@ Facebook's `/plugins/video.php` is not an Instagram player, and its autoplay or
 `show_text` options are not applied to Instagram. A loaded embed is not proof of
 playback: Meta can still offer “Watch on Instagram” for a particular post.
 Reference: https://github.com/facebook/meta-embeds-for-wordpress
+
+### Screen-fit swipe viewer
+
+Watch pages offer **Fullscreen / Swipe**, which opens a screen-filling viewer using the existing provider players. Use the side swipe strip, up/down buttons, or arrow keys to move through site recommendations. Swipe upward from the bottom details area to reveal the review; the full review/comments link remains available. Unsupported fullscreen browsers use the same screen-fit dialog.
+
+The viewer prepares the next watch document without starting a hidden player. Only one player document is active. `/watch/:slug?viewer=1` never increments views and is private/no-store/noindex. After an active document is visible for 1.5 seconds, the viewer posts to `/api/videos/:id/view`; counts come only from Vid.Best D1, with repeated viewer visits deduplicated per fingerprint/video in 30-minute windows. The initial watch page is already counted, and revisiting a video within the viewer does not count again. These are site visits, not proof of completed playback. Provider buffering, autoplay restrictions, and embed availability still apply. Cross-origin embeds require the side strip for swiping; their internal controls remain under the provider's control.

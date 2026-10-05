@@ -1542,3 +1542,36 @@ test("redirects the legacy Saiyaara slug to the permanent SEO slug", async () =>
   assert.equal(response.status, 301);
   assert.equal(response.headers.get("location"), "https://example.com/watch/saiyaara-a-cinematic-romance");
 });
+
+test("swipe preparation does not count a view and stays out of caches and search", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(`INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, published)
+    VALUES ('swipe-test', 'Swipe test', 'https://example.com/video.mp4', 'raw', 'Technology', 'Web Development', 1)`).run();
+  const prepared = await seoEdge.fetch(new Request('https://example.com/watch/swipe-test?viewer=1'), context.env, context.ctx);
+  assert.equal(prepared.status, 200);
+  assert.match(prepared.headers.get('Cache-Control'), /no-store/);
+  assert.match(prepared.headers.get('X-Robots-Tag'), /noindex/);
+  assert.match(await prepared.text(), /data-viewer-embed="1"/);
+  await Promise.all(context.pending);
+  assert.equal(context.sqlite.prepare('SELECT views FROM videos WHERE id = 1').get().views, 0);
+  const normal = await send(context, '/watch/swipe-test');
+  assert.equal(normal.status, 200);
+  await Promise.all(context.pending);
+  assert.equal(context.sqlite.prepare('SELECT views FROM videos WHERE id = 1').get().views, 1);
+});
+
+test("swipe views count on Vid.Best, deduplicate visits, and reject cross-origin or unpublished videos", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(`INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, published)
+    VALUES ('count-test', 'Count test', 'https://example.com/video.mp4', 'raw', 'Technology', 'Web Development', 1)`).run();
+  const headers = { Origin: 'https://example.com', 'CF-Connecting-IP': '192.0.2.88', 'User-Agent': 'viewer-test' };
+  const first = await send(context, '/api/videos/1/view', { method: 'POST', headers });
+  assert.equal(first.status, 200);
+  assert.deepEqual(await first.json(), { views: 1, counted: true });
+  const repeat = await send(context, '/api/videos/1/view', { method: 'POST', headers });
+  assert.deepEqual(await repeat.json(), { views: 1, counted: false });
+  assert.equal((await send(context, '/api/videos/1/view', { method: 'POST', headers: { ...headers, Origin: 'https://other.example' } })).status, 403);
+  context.sqlite.exec('UPDATE videos SET published = 0 WHERE id = 1');
+  assert.equal((await send(context, '/api/videos/1/view', { method: 'POST', headers })).status, 404);
+  assert.equal(context.sqlite.prepare('SELECT views FROM videos WHERE id = 1').get().views, 1);
+});

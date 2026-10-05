@@ -236,6 +236,9 @@ async function route(request, env, ctx) {
     return toggleReaction(request, env, Number(match[1]));
   }
 
+  match = path.match(/^\/api\/videos\/(\d+)\/view$/);
+  if (match && request.method === "POST") return recordViewerView(request, env, Number(match[1]));
+
   match = path.match(/^\/api\/videos\/(\d+)\/recommendations$/);
   if (match && request.method === "GET") {
     return recommendVideos(request, env, Number(match[1]));
@@ -544,7 +547,7 @@ function securityHeaders(headers, html = false, scriptNonce = "") {
     const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.tiktok.com https://www.instagram.com/embed.js https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self' https://www.tiktok.com https://*.tiktok.com https://*.tiktokcdn.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://video.megasale.win https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.tiktok.com https://www.instagram.com/embed.js https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self' https://www.tiktok.com https://*.tiktok.com https://*.tiktokcdn.com; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://video.megasale.win https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
     );
   }
   return headers;
@@ -1124,6 +1127,18 @@ async function getPublicVideo(env, slug) {
   await enrichFacebookRows(env, [row]);
   const [video] = await hydrateVideos(env, [row]);
   return json({ video });
+}
+
+// A prepared player is not a view. The active swipe viewer records its own visits.
+async function recordViewerView(request, env, videoId) {
+  requireSameOrigin(request);
+  const video = await env.DB.prepare("SELECT id FROM videos WHERE id = ? AND published = 1").bind(videoId).first();
+  if (!video) throw new AppError(404, "Video not found");
+  const fingerprint = await requestFingerprint(request, await resolveReactionSalt(env));
+  const attempts = await recordRateLimit(env, `video-view:${videoId}`, fingerprint, 1, 1800, false);
+  if (attempts === 1) await env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ? AND published = 1").bind(videoId).run();
+  const row = await env.DB.prepare("SELECT views FROM videos WHERE id = ? AND published = 1").bind(videoId).first();
+  return json({ views: Number(row?.views || 0), counted: attempts === 1 }, 200, { "Cache-Control": "no-store" });
 }
 
 async function recommendVideos(request, env, videoId) {
@@ -2097,12 +2112,17 @@ async function watchPage(request, env, ctx, slugInput) {
       video.tiktok_gateway_src = "";
     }
   }
-  ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
+  const viewer = new URL(request.url).searchParams.get("viewer") === "1";
+  if (!viewer) ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
   const scriptNonce = createCspNonce();
-  return dynamicHtml(renderWatchHtml(video, request, env, scriptNonce), 200, scriptNonce);
+  const response = dynamicHtml(renderWatchHtml(video, request, env, scriptNonce), 200, scriptNonce);
+  response.headers.set("Cache-Control", "private, no-store");
+  if (viewer) response.headers.set("X-Robots-Tag", "noindex,nofollow");
+  return response;
 }
 
 function renderWatchHtml(video, request, env, scriptNonce) {
+  const viewer = new URL(request.url).searchParams.get("viewer") === "1";
   const baseUrl = getBaseUrl(request, env);
   const playbackOrigin = new URL(request.url).origin;
   const canonical = `${baseUrl}/watch/${encodeURIComponent(video.slug)}`;
@@ -2210,10 +2230,12 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   <script src="/watch.js" defer></script>
+  <link rel="stylesheet" href="/swipe-viewer.css">
+  <script src="/swipe-viewer.js" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
   ${video.provider === "tiktok" ? '<script src="/tiktok-video-service.js" defer></script><script src="/tiktok-audio-lab.js" defer></script><script src="/tiktok-audio-lab-ui.js" defer></script><script src="/tiktok-player.js" defer></script>' : ""}
 </head>
-<body class="watch-page" data-video-id="${Number(video.id)}" data-video-provider="${escapeHtml(video.provider)}">
+<body class="watch-page" data-viewer-embed="${viewer ? "1" : "0"}" data-video-slug="${escapeHtml(video.slug)}" data-site-views="${Number(video.views) + (viewer ? 0 : 1)}" data-video-id="${Number(video.id)}" data-video-provider="${escapeHtml(video.provider)}">
   <header class="site-header compact">
     <a class="brand" href="/" aria-label="Vid.Best homepage"><span class="brand-mark">V</span><span>Vid.Best</span></a>
     <form class="watch-search" action="/" method="get" role="search">
@@ -2228,6 +2250,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     <section id="watch-player" class="watch-player glass-panel" data-provider="${escapeHtml(video.provider)}" aria-label="Video player">
       <div class="persistent-player-bar">
         <strong>Now playing</strong>
+        <button type="button" data-swipe-open>⛶ Fullscreen / Swipe</button>
         <span id="persistent-player-status" role="status">Scroll to keep watching</span>
         <button type="button" data-player-mode="restore" hidden>Return</button>
         <button type="button" data-player-mode="theater">Pop-up</button>
@@ -2239,6 +2262,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
       <div class="tile-badges"><span class="badge">${escapeHtml(video.primary_category)}</span><span class="badge secondary">${escapeHtml(video.subcategory)}</span></div>
       <h1>${escapeHtml(watchDisplayTitle(video))}</h1>
       <p class="lead">${escapeHtml(video.description)}</p>
+      <p class="site-view-count">${Number(video.views) + (viewer ? 0 : 1)} Vid.Best views</p>
       <div class="watch-reactions" data-reactions='${escapeHtml(JSON.stringify(video.reactions))}'>
         <button type="button" data-reaction="like">👍 <span>${video.reactions.like}</span></button>
         <button type="button" data-reaction="love">✨ <span>${video.reactions.love}</span></button>

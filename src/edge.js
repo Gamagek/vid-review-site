@@ -603,7 +603,7 @@ async function fetchHandler(request, env, ctx) {
       const html = sanitizeWatchHtml(rawHtml, sourceMetadata);
       const headers = new Headers(response.headers);
       headers.delete("Content-Length");
-      headers.set("Cache-Control", "public, max-age=60");
+      headers.set("Cache-Control", "private, no-store");
       return new Response(html, {
         status: response.status,
         statusText: response.statusText,
