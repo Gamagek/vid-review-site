@@ -8,6 +8,7 @@ APP_NAME = "Vid.Best"
 PUBLIC_BASE_URL = "https://vid.best"
 GEMINI_MODEL = "gemini-3.1-flash-lite"
 MAX_UPLOAD_BYTES = "104857600"
+MAX_AUTO_CACHE_BYTES = "104857600"
 
 [assets]
 directory = "./public"
@@ -15,7 +16,7 @@ binding = "ASSETS"
 run_worker_first = true
 
 [triggers]
-crons = ["17 3 * * *"]
+crons = ["*/15 * * * *", "17 3 * * *"]
 
 [[d1_databases]]
 binding = "DB"
