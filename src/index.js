@@ -2105,9 +2105,8 @@ async function watchPage(request, env, ctx, slugInput) {
   const [video] = await hydrateVideos(env, [row]);
   if (video.provider === "tiktok") {
     const tiktokId = extractTikTokId(video.source_url);
-    const tiktokUser = extractTikTokUsername(video.source_url);
     try {
-      video.tiktok_gateway_src = await buildSignedTikTokGatewaySrc(tiktokUser, tiktokId, env);
+      video.tiktok_gateway_src = await buildSignedTikTokGatewaySrc(video.source_url, tiktokId, env);
     } catch {
       video.tiktok_gateway_src = "";
     }
@@ -2233,7 +2232,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261005-2">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261005-2" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
-  ${video.provider === "tiktok" ? '<script src="/tiktok-video-service.js" defer></script><script src="/tiktok-audio-lab.js" defer></script><script src="/tiktok-audio-lab-ui.js" defer></script><script src="/tiktok-player.js?v=20261005-2" defer></script>' : ""}
+  ${video.provider === "tiktok" ? '<script src="/tiktok-video-service.js?v=20261005-3" defer></script><script src="/tiktok-audio-lab.js" defer></script><script src="/tiktok-audio-lab-ui.js" defer></script><script src="/tiktok-player.js?v=20261005-3" defer></script>' : ""}
 </head>
 <body class="watch-page" data-viewer-embed="${viewer ? "1" : "0"}" data-video-slug="${escapeHtml(video.slug)}" data-site-views="${Number(video.views) + (viewer ? 0 : 1)}" data-video-id="${Number(video.id)}" data-video-provider="${escapeHtml(video.provider)}">
   <header class="site-header compact">
@@ -2309,9 +2308,23 @@ function renderWatchHtml(video, request, env, scriptNonce) {
 </html>`;
 }
 
-async function buildSignedTikTokGatewaySrc(user, id, env) {
+async function buildSignedTikTokGatewaySrc(sourceUrl, id, env) {
   const secret = String(env.SIGN_SECRET || "");
-  if (!secret || !/^\d+$/.test(String(id || "")) || !/^[\w.]+$/.test(String(user || ""))) return "";
+  if (!secret || !/^\d{15,25}$/.test(String(id || ""))) return "";
+
+  let tiktok;
+  try {
+    const source = new URL(String(sourceUrl || ""));
+    const host = source.hostname.toLowerCase().replace(/^www\./, "");
+    const match = source.pathname.match(/^\/@([^/]+)\/video\/(\d+)\/?$/);
+    if (source.protocol !== "https:" || host !== "tiktok.com" || !match || match[2] !== String(id)) return "";
+    source.hostname = "www.tiktok.com";
+    source.search = "";
+    source.hash = "";
+    tiktok = source.toString();
+  } catch {
+    return "";
+  }
 
   const exp = (Math.floor(Date.now() / 3600000) + 2) * 3600;
   const secretBytes = new TextEncoder().encode(secret);
@@ -2325,7 +2338,6 @@ async function buildSignedTikTokGatewaySrc(user, id, env) {
   );
   const signature = new Uint8Array(await crypto.subtle.sign("HMAC", key, dataBytes));
   const sig = Array.from(signature, (byte) => byte.toString(16).padStart(2, "0")).join("");
-  const tiktok = "https://www.tiktok.com/@" + user + "/video/" + id;
   return TIKTOK_GATEWAY_ORIGIN + "/?url=" + encodeURIComponent(tiktok) + "&exp=" + exp + "&sig=" + sig;
 }
 function extractTikTokId(value) {
