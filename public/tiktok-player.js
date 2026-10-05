@@ -171,18 +171,38 @@
 
             if (info.status === "cached") {
               setOverlay("Cached video is ready. Starting the player…", "Video ready");
-            } else if (info.status === "transient-error") {
-              setOverlay(
-                "The gateway is temporarily busy. Retrying automatically… " +
-                info.attempt + "/" + info.maxAttempts
-              );
-            } else {
-              setOverlay(
-                "Preparing the video in R2… " +
-                info.attempt + "/" + info.maxAttempts +
-                (info.transport === "opaque" ? " · compatibility mode" : "")
-              );
+              return;
             }
+
+            if (info.status === "uploading") {
+              setOverlay(
+                "Upload to R2 is finishing… " + info.attempt + "/" + info.maxAttempts,
+                "Almost ready…"
+              );
+              return;
+            }
+
+            if (info.status === "queued") {
+              setOverlay(
+                "The cache job is queued… " + info.attempt + "/" + info.maxAttempts,
+                "Preparing video…"
+              );
+              return;
+            }
+
+            if (info.status === "transient-error") {
+              setOverlay(
+                (info.message || "The gateway is temporarily unavailable.") +
+                " Retrying… " + info.attempt + "/" + info.maxAttempts,
+                "Connecting to video gateway…"
+              );
+              return;
+            }
+
+            setOverlay(
+              "Preparing the video in R2… " + info.attempt + "/" + info.maxAttempts,
+              "Preparing video…"
+            );
           },
         });
 
@@ -236,9 +256,10 @@
       } catch (error) {
         if (error?.name === "AbortError") return;
         console.warn("Vid.Best TikTok direct player:", error);
+        const gatewayProblem = ["GATEWAY_TIMEOUT", "GATEWAY_UNREACHABLE", "GATEWAY_UNAVAILABLE"].includes(error?.code);
         setOverlay(
           error?.message || "The video could not be prepared.",
-          "Video unavailable"
+          gatewayProblem ? "Video gateway unavailable" : "Video unavailable"
         );
         retry.hidden = false;
       }
