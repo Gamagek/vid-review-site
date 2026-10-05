@@ -2,12 +2,14 @@
   const GATEWAY_ORIGIN = "https://video.megasale.win";
   const DEFAULT_INTERVAL_MS = 3000;
   const DEFAULT_MAX_ATTEMPTS = 15;
+  const REQUEST_TIMEOUT_MS = 8000;
 
   class VideoServiceError extends Error {
-    constructor(message, code = "VIDEO_SERVICE_ERROR") {
+    constructor(message, code = "VIDEO_SERVICE_ERROR", details = {}) {
       super(message);
       this.name = "VideoServiceError";
       this.code = code;
+      this.details = details;
     }
   }
 
@@ -49,13 +51,7 @@
       throw new VideoServiceError("Signed gateway parameters are missing.", "MISSING_SIGNATURE");
     }
 
-    return {
-      gatewayUrl: url,
-      sourceUrl: source.toString(),
-      id,
-      exp,
-      sig,
-    };
+    return { gatewayUrl: url, sourceUrl: source.toString(), id, exp, sig };
   }
 
   function buildStatusUrl(parsed) {
@@ -104,28 +100,51 @@
         reject(new DOMException("Aborted", "AbortError"));
         return;
       }
-
-      let settled = false;
-      const cleanup = () => signal?.removeEventListener("abort", onAbort);
-      const finish = () => {
-        if (settled) return;
-        settled = true;
-        cleanup();
+      const timer = window.setTimeout(() => {
+        signal?.removeEventListener("abort", abort);
         resolve();
-      };
-      const onAbort = () => {
-        if (settled) return;
-        settled = true;
+      }, ms);
+      const abort = () => {
         window.clearTimeout(timer);
-        cleanup();
         reject(new DOMException("Aborted", "AbortError"));
       };
-      const timer = window.setTimeout(finish, ms);
-      signal?.addEventListener("abort", onAbort, { once: true });
+      signal?.addEventListener("abort", abort, { once: true });
     });
   }
 
-  async function parseJson(response) {
+  async function fetchWithTimeout(url, signal) {
+    const controller = new AbortController();
+    let externalAbort = null;
+    if (signal) {
+      if (signal.aborted) throw new DOMException("Aborted", "AbortError");
+      externalAbort = () => controller.abort();
+      signal.addEventListener("abort", externalAbort, { once: true });
+    }
+
+    const timer = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      return await fetch(url, {
+        method: "GET",
+        cache: "no-store",
+        credentials: "omit",
+        signal: controller.signal,
+        headers: { Accept: "application/json" },
+      });
+    } catch (error) {
+      if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+      if (error?.name === "AbortError") {
+        throw new VideoServiceError("The video gateway did not respond in time.", "GATEWAY_TIMEOUT");
+      }
+      throw new VideoServiceError("The video gateway is unreachable right now.", "GATEWAY_UNREACHABLE");
+    } finally {
+      window.clearTimeout(timer);
+      if (signal && externalAbort) signal.removeEventListener("abort", externalAbort);
+    }
+  }
+
+  async function readPayload(response) {
+    const type = String(response.headers.get("content-type") || "").toLowerCase();
+    if (!type.includes("application/json")) return {};
     try {
       return await response.json();
     } catch {
@@ -133,117 +152,72 @@
     }
   }
 
-  async function requestStatus(parsed, signal, mode) {
-    const statusUrl = buildStatusUrl(parsed);
+  async function fetchStatus(parsed, signal) {
+    const response = await fetchWithTimeout(buildStatusUrl(parsed), signal);
+    const payload = await readPayload(response);
 
-    if (mode === "opaque") {
-      try {
-        await fetch(statusUrl, {
-          method: "GET",
-          mode: "no-cors",
-          cache: "no-store",
-          credentials: "omit",
-          signal,
-        });
-      } catch (error) {
-        if (signal?.aborted) throw error;
-      }
-      return { mode: "opaque", payload: null };
+    if (response.status === 403) {
+      throw new VideoServiceError(
+        payload.error || "The signed video link expired. Reload this page.",
+        "FORBIDDEN"
+      );
     }
 
-    try {
-      const response = await fetch(statusUrl, {
-        method: "GET",
-        cache: "no-store",
-        credentials: "omit",
-        signal,
-        headers: { Accept: "application/json" },
-      });
-
-      if (response.status === 404 || response.status === 425) {
-        return { mode: "cors", payload: { status: "scraping" } };
-      }
-
-      if (response.status === 429 || response.status >= 500) {
-        return { mode: "cors", payload: { status: "transient-error" } };
-      }
-
-      const payload = await parseJson(response);
-      if (!response.ok) {
-        const status = String(payload.status || "").toLowerCase();
-        if (status === "forbidden" || response.status === 403) {
-          throw new VideoServiceError("The signed video link expired. Reload this page.", "FORBIDDEN");
-        }
-        throw new VideoServiceError(
-          payload.error || payload.message || "Video status request failed.",
-          "STATUS_REQUEST_FAILED"
-        );
-      }
-
-      return { mode: "cors", payload };
-    } catch (error) {
-      if (signal?.aborted || error instanceof VideoServiceError) throw error;
-
-      try {
-        await fetch(statusUrl, {
-          method: "GET",
-          mode: "no-cors",
-          cache: "no-store",
-          credentials: "omit",
-          signal,
-        });
-      } catch (opaqueError) {
-        if (signal?.aborted) throw opaqueError;
-      }
-
-      return { mode: "opaque", payload: null };
+    if (response.status === 429) {
+      return { status: "transient-error", message: "The gateway is busy. Retrying shortly." };
     }
-  }
 
-  async function probeStream(parsed, signal) {
-    const streamUrl = buildStreamUrl(parsed);
-
-    try {
-      const response = await fetch(streamUrl, {
-        method: "GET",
-        cache: "no-store",
-        credentials: "omit",
-        signal,
-        headers: { Range: "bytes=0-0" },
-      });
-
-      const type = String(response.headers.get("content-type") || "").toLowerCase();
-      const ready = response.ok && type.includes("video/");
-      try {
-        await response.body?.cancel();
-      } catch {}
-
-      return ready ? streamUrl : "";
-    } catch (error) {
-      if (signal?.aborted) throw error;
-      return "";
+    if (response.status === 404 || response.status === 425) {
+      return { status: "scraping" };
     }
+
+    if (response.status >= 500) {
+      return {
+        status: "transient-error",
+        message: "The video gateway is temporarily unavailable."
+      };
+    }
+
+    if (!response.ok) {
+      throw new VideoServiceError(
+        payload.error || payload.message || "Video status request failed.",
+        "STATUS_REQUEST_FAILED"
+      );
+    }
+
+    return payload;
   }
 
   async function pollR2Video(options = {}) {
     const parsed = parseGatewayUrl(options.gatewayUrl);
     const maxAttempts = Math.max(1, Number(options.maxAttempts || DEFAULT_MAX_ATTEMPTS));
-    const intervalMs = Math.max(250, Number(options.intervalMs || DEFAULT_INTERVAL_MS));
+    const intervalMs = Math.max(500, Number(options.intervalMs || DEFAULT_INTERVAL_MS));
     const signal = options.signal;
-    let statusMode = "cors";
+    let lastTransient = "";
 
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-      const result = await requestStatus(parsed, signal, statusMode);
-      statusMode = result.mode;
-      const payload = result.payload || {};
-      const status = String(payload.status || (statusMode === "opaque" ? "scraping" : "")).toLowerCase();
+      let payload;
+      try {
+        payload = await fetchStatus(parsed, signal);
+      } catch (error) {
+        if (error?.name === "AbortError") throw error;
+        if (["GATEWAY_TIMEOUT", "GATEWAY_UNREACHABLE"].includes(error?.code)) {
+          lastTransient = error.message;
+          payload = { status: "transient-error", message: error.message };
+        } else {
+          throw error;
+        }
+      }
+
+      const status = String(payload?.status || "scraping").toLowerCase();
 
       if (typeof options.onStatus === "function") {
         options.onStatus({
-          status: status || "scraping",
+          status,
           attempt,
           maxAttempts,
-          transport: statusMode,
+          message: payload?.message || payload?.error || "",
+          retryAfter: payload?.retryAfter || payload?.retry_after || "",
         });
       }
 
@@ -256,6 +230,14 @@
         };
       }
 
+      if (status === "cooldown") {
+        throw new VideoServiceError(
+          payload.error || payload.message || "This video is temporarily waiting before another source attempt.",
+          "COOLDOWN",
+          { retryAfter: payload.retryAfter || payload.retry_after || "" }
+        );
+      }
+
       if (status === "error" || status === "forbidden" || status === "invalid_id") {
         throw new VideoServiceError(
           payload.error || payload.message || "The video could not be prepared.",
@@ -263,34 +245,12 @@
         );
       }
 
-      if (statusMode === "opaque" || status === "transient-error") {
-        const streamUrl = await probeStream(parsed, signal);
-        if (streamUrl) {
-          if (typeof options.onStatus === "function") {
-            options.onStatus({
-              status: "cached",
-              attempt,
-              maxAttempts,
-              transport: statusMode,
-            });
-          }
-          return {
-            id: parsed.id,
-            streamUrl,
-            sourceUrl: parsed.sourceUrl,
-            attempt,
-          };
-        }
-      }
-
-      if (attempt < maxAttempts) {
-        await wait(intervalMs, signal);
-      }
+      if (attempt < maxAttempts) await wait(intervalMs, signal);
     }
 
     throw new VideoServiceError(
-      "The video is still being prepared. Please try again.",
-      "POLL_TIMEOUT"
+      lastTransient || "The video is still being prepared. Please try again.",
+      lastTransient ? "GATEWAY_UNAVAILABLE" : "POLL_TIMEOUT"
     );
   }
 
