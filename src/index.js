@@ -2103,14 +2103,6 @@ async function watchPage(request, env, ctx, slugInput) {
   if (!row) return dynamicHtml(notFoundPage(), 404);
   await enrichFacebookRows(env, [row]);
   const [video] = await hydrateVideos(env, [row]);
-  if (video.provider === "tiktok") {
-    const tiktokId = extractTikTokId(video.source_url);
-    try {
-      video.tiktok_gateway_src = await buildSignedTikTokGatewaySrc(video.source_url, tiktokId, env);
-    } catch {
-      video.tiktok_gateway_src = "";
-    }
-  }
   const viewer = new URL(request.url).searchParams.get("viewer") === "1";
   if (!viewer) ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
   const scriptNonce = createCspNonce();
@@ -2414,9 +2406,8 @@ function renderMedia(video, playbackOrigin) {
   if (provider === "tiktok") {
     const tiktokId = extractTikTokId(video.source_url);
     if (!tiktokId) return "";
-    const gatewaySrc = String(video.tiktok_gateway_src || "");
-    const playerSrc = gatewaySrc || buildTikTokPlayerUrl(tiktokId);
-    return `<iframe id="watch-media-frame" class="tiktok-official-player tiktok-gateway-player" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${escapeHtml(video.source_url)}" data-tiktok-gateway-src="${escapeHtml(gatewaySrc)}" data-tiktok-player-mode="${gatewaySrc ? "gateway-oembed" : "official-fallback"}" src="${escapeHtml(playerSrc)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+    const playerSrc = buildTikTokPlayerUrl(tiktokId);
+    return `<iframe id="watch-media-frame" class="tiktok-official-player" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${escapeHtml(video.source_url)}" data-tiktok-player-mode="official-direct" src="${escapeHtml(playerSrc)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
   }
   if (provider === "facebook") {
     const facebookEmbed = getSafeFacebookEmbedUrl(video);
