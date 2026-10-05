@@ -1357,8 +1357,8 @@ test("TikTok keeps separate share preview and player paths", () => {
   assert.match(adminSource, /TikTok preview needs the normal full sharing link/);
 });
 
-test("renders the current Vid.Best TikTok signed gateway iframe with separate home preview behavior", async () => {
-  const context = createTestContext({ SIGN_SECRET: "test-tiktok-signing-secret" });
+test("renders the current Vid.Best TikTok direct official player with separate home preview behavior", async () => {
+  const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
        slug, title, source_url, embed_url, media_type, primary_category, subcategory, description, published
@@ -1377,11 +1377,12 @@ test("renders the current Vid.Best TikTok signed gateway iframe with separate ho
   const page = await send(context, "/watch/tiktok-player-test");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /class="tiktok-official-player tiktok-gateway-player"/);
+  assert.match(html, /class="tiktok-official-player"/);
   assert.match(html, /data-tiktok-id="7669587518156705056"/);
-  assert.match(html, /data-tiktok-gateway-src="https:\/\/video\.megasale\.win\//);
-  assert.match(html, /data-tiktok-player-mode="gateway-oembed"/);
-  assert.match(html, /src="https:\/\/video\.megasale\.win\//);
+  assert.match(html, /data-tiktok-player-mode="official-direct"/);
+  assert.match(html, /src="https:\/\/www\.tiktok\.com\/player\/v1\/7669587518156705056\?/);
+  assert.doesNotMatch(html, /data-tiktok-gateway-src/);
+  assert.doesNotMatch(html, /video\.megasale\.win/);
   assert.doesNotMatch(html, /src="\/tiktok-video-service\.js/);
   assert.doesNotMatch(html, /src="\/tiktok-player\.js/);
   assert.doesNotMatch(html, /class="tiktok-embed"/);
@@ -1389,7 +1390,7 @@ test("renders the current Vid.Best TikTok signed gateway iframe with separate ho
   assert.match(html, /data-video-provider="tiktok"/);
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
-  assert.match(watchSource, /TikTok gateway embed/);
+  assert.match(watchSource, /Official TikTok player/);
   assert.match(watchSource, /background:#fff/);
 
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
@@ -1406,37 +1407,35 @@ test("renders the current Vid.Best TikTok signed gateway iframe with separate ho
   assert.match(homeSource, /provider === "facebook"/);
 
   const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
-  assert.match(indexSource, /tiktok-gateway-player/);
-  assert.match(indexSource, /data-tiktok-gateway-src/);
-  assert.match(indexSource, /gateway-oembed/);
+  assert.match(indexSource, /data-tiktok-player-mode="official-direct"/);
+  assert.match(indexSource, /buildTikTokPlayerUrl/);
+  assert.doesNotMatch(indexSource, /tiktok-gateway-player/);
   assert.match(indexSource, /\/api\/tiktok\/preflight/);
   assert.match(indexSource, /www\.tiktok\.com\/oembed/);
 });
 
-test("builds a signed TikTok gateway URL from the canonical source only", async () => {
-  const context = createTestContext({ SIGN_SECRET: "test-tiktok-signing-secret" });
+
+test("builds TikTok watch playback without requiring SIGN_SECRET or the private gateway", async () => {
+  const context = createTestContext({ SIGN_SECRET: "" });
   context.sqlite.prepare(
     `INSERT INTO videos (
        slug, title, source_url, media_type, primary_category, subcategory, description, published
      ) VALUES (?, ?, ?, 'tiktok', 'Social Media & Trending', 'TikTok Trending', ?, 1)`,
   ).run(
     "signed-tiktok-gateway",
-    "Signed TikTok gateway",
+    "Direct TikTok player",
     "https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056?_r=1&_t=tracking",
-    "Gateway signing regression test",
+    "Direct player regression test",
   );
 
   const page = await send(context, "/watch/signed-tiktok-gateway");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(
-    html,
-    /data-tiktok-gateway-src="https:\/\/video\.megasale\.win\/\?url=https%3A%2F%2Fwww\.tiktok\.com%2F%40saiyaara\.4ever%2Fvideo%2F7669587518156705056(?:%2F)?&amp;exp=\d+&amp;sig=[0-9a-f]{64}"/,
-  );
-  const gatewayAttr = html.match(/data-tiktok-gateway-src="([^"]+)"/)?.[1] || "";
-  assert.doesNotMatch(gatewayAttr, /_r%3D1|_t%3Dtracking/);
-  assert.match(html, /class="tiktok-official-player tiktok-gateway-player"/);
-  assert.match(html, /data-tiktok-player-mode="gateway-oembed"/);
+  assert.match(html, /class="tiktok-official-player"/);
+  assert.match(html, /data-tiktok-player-mode="official-direct"/);
+  assert.match(html, /src="https:\/\/www\.tiktok\.com\/player\/v1\/7669587518156705056\?/);
+  assert.doesNotMatch(html, /data-tiktok-gateway-src/);
+  assert.doesNotMatch(html, /video\.megasale\.win/);
   assert.doesNotMatch(html, /tiktok-video-service\.js/);
   assert.doesNotMatch(html, /tiktok-player\.js/);
 });
@@ -1488,7 +1487,7 @@ test("builds a batch TikTok facade preview from the configured facade endpoint",
   }
 });
 test("repairs a legacy TikTok record with only its source URL and uses the Saiyaara title", async () => {
-  const context = createTestContext({ SIGN_SECRET: "test-tiktok-signing-secret" });
+  const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
        slug, title, source_url, media_type, primary_category, subcategory, description, published
@@ -1505,11 +1504,12 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   const html = await page.text();
   assert.ok(html.includes("<title>Saiyaara; A Cinematic Romance | Vid.Best</title>"));
   assert.ok(html.includes("<h1>Saiyaara; A Cinematic Romance</h1>"));
-  assert.ok(html.includes('class="tiktok-official-player tiktok-gateway-player"'));
+  assert.ok(html.includes('class="tiktok-official-player"'));
   assert.ok(html.includes('data-tiktok-id="6718335390845095173"'));
-  assert.ok(html.includes('data-tiktok-gateway-src='));
   assert.ok(html.includes('data-video-provider="tiktok"'));
-  assert.ok(html.includes('data-tiktok-player-mode="gateway-oembed"'));
+  assert.ok(html.includes('data-tiktok-player-mode="official-direct"'));
+  assert.ok(!html.includes('data-tiktok-gateway-src='));
+  assert.ok(!html.includes('video.megasale.win'));
 });
 
 test("discovers direct TikTok URLs without server-side TikTok requests", async () => {
