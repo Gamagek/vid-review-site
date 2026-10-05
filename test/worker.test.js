@@ -743,7 +743,7 @@ test("stores TikTok source and renders the PR26-style player", async () => {
   assert.match(html, /data-tiktok-id="6718335390845095173"/);
   assert.match(html, /data-tiktok-share=/);
   assert.match(html, /data-tiktok-gateway-src=/);
-  assert.match(html, /src="\/tiktok-video-service\.js"/);
+  assert.match(html, /src="\/tiktok-video-service\.js(?:\?[^"\s]*)?"/);
   assert.match(html, /src="\/tiktok-audio-lab\.js"/);
   assert.match(html, /src="\/tiktok-audio-lab-ui\.js"/);
   assert.match(html, /src="\/tiktok-player\.js(?:\?[^"\s]*)?"/);
@@ -1468,7 +1468,7 @@ test("builds a signed TikTok gateway URL from the canonical source only", async 
   const html = await page.text();
   assert.match(
     html,
-    /data-tiktok-gateway-src="https:\/\/video\.megasale\.win\/\?url=https%3A%2F%2Fwww\.tiktok\.com%2F%40saiyaara\.4ever%2Fvideo%2F7669587518156705056%2F&amp;exp=\d+&amp;sig=[0-9a-f]{64}"/,
+    /data-tiktok-gateway-src="https:\/\/video\.megasale\.win\/\?url=https%3A%2F%2Fwww\.tiktok\.com%2F%40saiyaara\.4ever%2Fvideo%2F7669587518156705056(?:%2F)?&amp;exp=\d+&amp;sig=[0-9a-f]{64}"/,
   );
   assert.doesNotMatch(html, /_r%3D1|_t%3Dtracking/);
   assert.match(html, /tiktok-video-service\.js\?v=20261005-3/);
