@@ -1356,7 +1356,7 @@ function initializeEmbeddedAudioLab() {
     if(provider==="youtube"||provider==="vimeo") {
       setStatus("Embedded "+provider+" · Master volume works; EQ/3D needs direct media access","warn");
     } else if (provider === "tiktok") {
-      setStatus("TikTok gateway embed · playback controls stay inside the player; EQ/3D cannot cross the iframe boundary","warn");
+      setStatus("Official TikTok player · playback controls stay inside the player; EQ/3D cannot cross the iframe boundary","warn");
     } else {
       setStatus("Cross-origin embed · EQ/3D cannot be applied by the parent page","warn");
     }
