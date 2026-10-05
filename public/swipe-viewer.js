@@ -156,7 +156,7 @@
     const button = event.target.closest("button");
     if (!button || dialog.contains(button)) return;
     const label = `${button.textContent} ${button.title} ${button.getAttribute("aria-label")}`;
-    if (button.hasAttribute("data-swipe-open") || (original.contains(button) && /fullscreen/i.test(label))) {
+    if (button.hasAttribute("data-swipe-open") || ((original.contains(button) || button.closest(".vidbest-embed-overlay")) && /fullscreen/i.test(label))) {
       event.preventDefault(); event.stopImmediatePropagation(); void open();
     }
   }, true);
@@ -207,7 +207,18 @@
         status.textContent = "Swipe the side rail for next · Pull up below for review";
         scheduleCount(video, token);
       }, { once: true });
-      frame.srcdoc = html; media.replaceChildren(frame);
+      const prepared = new DOMParser().parseFromString(html, "text/html");
+      const providerFrame = prepared.querySelector("#watch-media-frame");
+      if (providerFrame) {
+        const source = new URL(providerFrame.getAttribute("src"), location.origin);
+        if (["www.youtube-nocookie.com", "www.youtube.com", "player.vimeo.com"].includes(source.hostname)) {
+          source.searchParams.set("autoplay", "1");
+          source.searchParams.set(source.hostname === "player.vimeo.com" ? "muted" : "mute", "1");
+          providerFrame.setAttribute("src", source.href);
+        }
+      }
+      frame.srcdoc = "<!doctype html>" + prepared.documentElement.outerHTML;
+      media.replaceChildren(frame);
     } catch (error) {
       if (token === generation) {
         status.textContent = error.message;
