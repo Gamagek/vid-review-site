@@ -272,25 +272,26 @@ test("signed /watch route returns a signed gateway iframe", async () => {
   );
 });
 
-test("TikTok watch pages include the signed gateway fallback for existing and future records", async () => {
-  const context = createTestContext({ ["SIGN_" + "SECRET"]: secret });
+test("TikTok watch pages use the direct official player without the private gateway", async () => {
+  const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
        slug, title, source_url, embed_url, media_type, primary_category, subcategory, description, published
-     ) VALUES ('gateway-tiktok-test', 'Gateway TikTok test', 'https://www.tiktok.com/@umbralarchive/video/7552567024304540959', 'https://www.tiktok.com/player/v1/7552567024304540959', 'tiktok', 'Social Media & Trending', 'TikTok Viral Challenges', 'Gateway fallback test', 1)`,
+     ) VALUES ('gateway-tiktok-test', 'Gateway TikTok test', 'https://www.tiktok.com/@umbralarchive/video/7552567024304540959', 'https://www.tiktok.com/player/v1/7552567024304540959', 'tiktok', 'Social Media & Trending', 'TikTok Viral Challenges', 'Direct player test', 1)`,
   ).run();
 
   const page = await send(context, "/watch/gateway-tiktok-test");
   assert.equal(page.status, 200);
   const policy = page.headers.get("Content-Security-Policy");
-  const connections = policy.match(/(?:^|;)\s*connect-src ([^;]+)/)?.[1].split(/\s+/);
-  assert.ok(connections.includes("https://video.megasale.win"), "the signed gateway status API must be reachable from prepared cards");
-  assert.ok(!connections.includes("https:") && !connections.includes("*"), "keep connections restricted to approved origins");
   assert.match(policy, /worker-src 'self' blob:;/, "hls.js can initialize its local media worker");
   const html = await page.text();
-  assert.match(html, /data-tiktok-gateway-src="https:\/\/video\.megasale\.win\/\?url=/);
-  assert.match(html, /data-tiktok-gateway-src="[^"]*sig=[a-f0-9]{64}"/);
+  assert.match(html, /class="tiktok-official-player"/);
+  assert.match(html, /data-tiktok-player-mode="official-direct"/);
+  assert.match(html, /src="https:\/\/www\.tiktok\.com\/player\/v1\/7552567024304540959\?/);
+  assert.doesNotMatch(html, /data-tiktok-gateway-src/);
+  assert.doesNotMatch(html, /video\.megasale\.win/);
 });
+
  
 test("Facebook mini preview stays separate from the original-quality watch player", async () => {
   const context = createTestContext();
@@ -721,8 +722,8 @@ test("uses the optional NGINX TikTok facade for metadata without writing R2 cach
     globalThis.fetch = originalFetch;
   }
 });
-test("stores TikTok source and renders the signed oEmbed gateway iframe", async () => {
-  const context = createTestContext({ SIGN_SECRET: "test-tiktok-signing-secret" });
+test("stores TikTok source and renders the direct official player", async () => {
+  const context = createTestContext();
   const response = await send(context, "/api/videos", {
     method: "POST",
     headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
@@ -744,18 +745,18 @@ test("stores TikTok source and renders the signed oEmbed gateway iframe", async 
   const page = await send(context, `/watch/${result.video.slug}`);
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /<iframe[^>]+class="tiktok-official-player tiktok-gateway-player"/);
+  assert.match(html, /<iframe[^>]+class="tiktok-official-player"/);
   assert.match(html, /data-tiktok-id="6718335390845095173"/);
   assert.match(html, /data-tiktok-share=/);
-  assert.match(html, /data-tiktok-gateway-src="https:\/\/video\.megasale\.win\//);
-  assert.match(html, /data-tiktok-player-mode="gateway-oembed"/);
-  assert.match(html, /src="https:\/\/video\.megasale\.win\//);
+  assert.match(html, /data-tiktok-player-mode="official-direct"/);
+  assert.match(html, /src="https:\/\/www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
+  assert.doesNotMatch(html, /data-tiktok-gateway-src/);
+  assert.doesNotMatch(html, /video\.megasale\.win/);
   assert.doesNotMatch(html, /src="\/tiktok-video-service\.js/);
-  assert.doesNotMatch(html, /src="\/tiktok-audio-lab\.js/);
-  assert.doesNotMatch(html, /src="\/tiktok-audio-lab-ui\.js/);
   assert.doesNotMatch(html, /src="\/tiktok-player\.js/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
 });
+
 
 test("Instagram legacy records receive a dedicated player without needing a database rewrite", async () => {
   const context = createTestContext();
