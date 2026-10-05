@@ -41,7 +41,7 @@
   };
   const queue = [first], counted = new Set([first.id]), pages = new Map();
   let index = 0, generation = 0, timer, focused, originalOverflow, suspended = [], observer;
-  let recommending = null, catalogOffset = 0, catalogEnded = false;
+  let recommending = null, catalogOffset = 0, catalogEnded = false, viewerFullscreen = false;
   const dialog = document.createElement("dialog");
   dialog.className = "swipe-viewer";
   dialog.setAttribute("aria-label", "Vid.Best swipe video viewer");
@@ -111,7 +111,11 @@
     originalOverflow = document.documentElement.style.overflow;
     dialog.showModal(); document.documentElement.style.overflow = "hidden";
     // Fullscreen requires the original tap. Unsupported browsers still get a screen-fit dialog.
-    dialog.requestFullscreen?.().catch(() => {});
+    // Dialog elements cannot enter the Fullscreen API themselves.
+    document.documentElement.requestFullscreen?.().then(() => {
+      viewerFullscreen = true;
+      if (!dialog.open) { viewerFullscreen = false; document.exitFullscreen().catch(() => {}); }
+    }).catch(() => {});
     pauseOriginal();
     observer = new MutationObserver(pauseOriginal);
     observer.observe(original, { childList: true, subtree: true });
@@ -123,7 +127,8 @@
     for (const [frame, src] of suspended) if (frame.isConnected) frame.src = src;
     suspended = []; document.documentElement.style.overflow = originalOverflow;
     review.hidden = true;
-    if (document.fullscreenElement === dialog) document.exitFullscreen().catch(() => {});
+    if (viewerFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    viewerFullscreen = false;
     focused?.focus();
   }
   dialog.addEventListener("close", cleanup);
