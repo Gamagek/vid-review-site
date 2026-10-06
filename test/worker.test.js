@@ -422,7 +422,7 @@ test("robots allows public video preview endpoints while keeping admin and API m
   assert.equal(response.status, 200);
   const body = await response.text();
   assert.match(body, /Disallow: \/api\//);
-  assert.match(body, /Allow: \/api\/tiktok\/thumbnail/);
+  assert.match(body, /Allow: \/api\/tiktok\/cached-poster/);
   assert.match(body, /Allow: \/api\/tiktok\/preflight/);
   assert.match(body, /Sitemap: https:\/\/example\.com\/sitemap\.xml/);
 });
@@ -1617,7 +1617,7 @@ test("renders the current Vid.Best TikTok cache-first watch player with separate
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
   assert.match(watchSource, /initializeTikTokCacheFirstPlayer/);
   assert.match(watchSource, /data-tiktok-load-player/);
-  assert.match(watchSource, /document.createElement("iframe")/);
+  assert.ok(watchSource.includes('document.createElement("iframe")'));
   assert.match(watchSource, /official-after-cache/);
 
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
