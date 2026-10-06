@@ -5,6 +5,7 @@ import {
   memberMe,
   updateMemberPreferences,
   logoutMember,
+  getCurrentMember,
   notifyNewVideoSubscribers,
 } from "./member-auth.js";
 
@@ -188,6 +189,8 @@ async function route(request, env, ctx) {
   if (path === "/api/account/me" && request.method === "GET") return memberMe(request, env);
   if (path === "/api/account/preferences" && request.method === "POST") return updateMemberPreferences(request, env);
   if (path === "/api/account/session" && request.method === "DELETE") return logoutMember(request, env);
+  if (path === "/api/account/saved" && request.method === "GET") return listSavedVideos(request, env);
+  if (path === "/api/home/mini-feed" && request.method === "GET") return homeMiniFeed(request, env);
   if (path === "/api/notifications/latest" && request.method === "GET") return latestNotifications(env);
   if (path === "/api/facebook/resolve" && request.method === "GET") return resolveFacebookEndpoint(request, env);
   if (path === "/api/facebook/thumbnail" && request.method === "GET") return facebookThumbnailEndpoint(request, env);
@@ -264,6 +267,11 @@ async function route(request, env, ctx) {
   match = path.match(/^\/api\/videos\/(\d+)\/interest$/);
   if (match && request.method === "POST") {
     return recordVideoInterest(request, env, Number(match[1]));
+  }
+
+  match = path.match(/^\/api\/videos\/(\d+)\/save$/);
+  if (match && request.method === "POST") {
+    return setSavedVideo(request, env, Number(match[1]));
   }
 
   match = path.match(/^\/api\/videos\/(\d+)\/comments$/);
@@ -1174,6 +1182,169 @@ function detectMediaProvider(video) {
     // Relative and malformed values are handled by their existing media type.
   }
   return video.embed_url ? "embed" : "direct";
+}
+
+async function requireCurrentMember(request, env) {
+  const member = await getCurrentMember(request, env);
+  if (!member) throw new AppError(401, "Sign in with email to save videos and personalize Vid.Best.");
+  return member;
+}
+
+async function setSavedVideo(request, env, videoId) {
+  requireSameOrigin(request);
+  const member = await requireCurrentMember(request, env);
+  const video = await env.DB.prepare(
+    "SELECT id, primary_category, subcategory FROM videos WHERE id = ? AND published = 1",
+  ).bind(videoId).first();
+  if (!video) throw new AppError(404, "Video not found");
+
+  const body = await readJson(request, 2048);
+  const existing = await env.DB.prepare(
+    "SELECT 1 AS saved FROM member_saved_videos WHERE member_id = ? AND video_id = ?",
+  ).bind(member.id, videoId).first();
+  const shouldSave = body.saved === undefined ? !existing : toBoolean(body.saved, Boolean(existing));
+
+  if (shouldSave) {
+    await env.DB.prepare(
+      "INSERT OR IGNORE INTO member_saved_videos (member_id, video_id) VALUES (?, ?)",
+    ).bind(member.id, videoId).run();
+  } else {
+    await env.DB.prepare(
+      "DELETE FROM member_saved_videos WHERE member_id = ? AND video_id = ?",
+    ).bind(member.id, videoId).run();
+  }
+
+  const countRow = await env.DB.prepare(
+    "SELECT COUNT(*) AS count FROM member_saved_videos WHERE member_id = ?",
+  ).bind(member.id).first();
+  return json({
+    success: true,
+    saved: shouldSave,
+    saved_count: Number(countRow?.count || 0),
+    message: shouldSave
+      ? "Saved. Vid.Best will use this to improve your suggestions."
+      : "Removed from saved videos.",
+  });
+}
+
+async function listSavedVideos(request, env) {
+  const member = await requireCurrentMember(request, env);
+  const limit = clampInteger(new URL(request.url).searchParams.get("limit"), 1, 48, 24);
+  const result = await env.DB.prepare(
+    `SELECT v.*, s.created_at AS saved_at
+     FROM member_saved_videos s
+     JOIN videos v ON v.id = s.video_id
+     WHERE s.member_id = ? AND v.published = 1
+     ORDER BY s.created_at DESC
+     LIMIT ?`,
+  ).bind(member.id, limit).all();
+  const videos = await hydrateVideos(env, result.results || []);
+  return json({ videos, count: videos.length }, 200, { "Cache-Control": "private, no-store" });
+}
+
+async function homeMiniFeed(request, env) {
+  const limit = clampInteger(new URL(request.url).searchParams.get("limit"), 4, 12, 8);
+  const member = await getCurrentMember(request, env);
+
+  const [watchedResult, likedResult] = await env.DB.batch([
+    env.DB.prepare(
+      `SELECT v.* FROM videos v
+       WHERE v.published = 1
+       ORDER BY v.views DESC, v.reaction_count DESC, v.updated_at DESC
+       LIMIT ?`,
+    ).bind(limit),
+    env.DB.prepare(
+      `SELECT v.*, COALESCE(r.positive_reactions, 0) AS positive_reactions
+       FROM videos v
+       LEFT JOIN (
+         SELECT video_id,
+           SUM(CASE WHEN reaction IN ('like','love') THEN 1 ELSE 0 END) AS positive_reactions
+         FROM reactions
+         GROUP BY video_id
+       ) r ON r.video_id = v.id
+       WHERE v.published = 1
+       ORDER BY positive_reactions DESC, v.reaction_count DESC, v.views DESC, v.updated_at DESC
+       LIMIT ?`,
+    ).bind(limit),
+  ]);
+
+  let personalizedRows = [];
+  let savedRows = [];
+  if (member) {
+    const categories = Array.isArray(member.category_filter) ? member.category_filter.filter(Boolean).slice(0, 8) : [];
+    const categoryBonus = categories.length
+      ? `CASE WHEN v.primary_category IN (${categories.map(() => "?").join(",")}) THEN 36 ELSE 0 END`
+      : "0";
+    const personalized = await env.DB.prepare(
+      `SELECT v.*,
+       (
+         ${categoryBonus}
+         + COALESCE((
+           SELECT COUNT(*) * 12
+           FROM member_saved_videos s
+           JOIN videos sv ON sv.id = s.video_id
+           WHERE s.member_id = ? AND sv.primary_category = v.primary_category
+         ), 0)
+         + COALESCE((
+           SELECT COUNT(*) * 18
+           FROM member_saved_videos s
+           JOIN videos sv ON sv.id = s.video_id
+           WHERE s.member_id = ? AND sv.subcategory = v.subcategory
+         ), 0)
+         + MIN(v.reaction_count * 2, 30)
+         + MIN(CAST(v.views / 25 AS INTEGER), 30)
+         + v.featured * 6
+         + v.trending * 10
+       ) AS personalization_score
+       FROM videos v
+       WHERE v.published = 1
+         AND NOT EXISTS (
+           SELECT 1 FROM member_saved_videos saved
+           WHERE saved.member_id = ? AND saved.video_id = v.id
+         )
+       ORDER BY personalization_score DESC, v.updated_at DESC
+       LIMIT ?`,
+    ).bind(...categories, member.id, member.id, member.id, limit).all();
+    personalizedRows = personalized.results || [];
+
+    const saved = await env.DB.prepare(
+      `SELECT v.*, s.created_at AS saved_at
+       FROM member_saved_videos s
+       JOIN videos v ON v.id = s.video_id
+       WHERE s.member_id = ? AND v.published = 1
+       ORDER BY s.created_at DESC
+       LIMIT ?`,
+    ).bind(member.id, limit).all();
+    savedRows = saved.results || [];
+  } else {
+    const generic = await env.DB.prepare(
+      `SELECT v.* FROM videos v
+       WHERE v.published = 1
+       ORDER BY v.trending DESC, v.featured DESC, v.reaction_count DESC, v.views DESC, v.updated_at DESC
+       LIMIT ?`,
+    ).bind(limit).all();
+    personalizedRows = generic.results || [];
+  }
+
+  const [forYou, mostWatched, mostLiked, saved] = await Promise.all([
+    hydrateVideos(env, personalizedRows),
+    hydrateVideos(env, watchedResult.results || []),
+    hydrateVideos(env, likedResult.results || []),
+    hydrateVideos(env, savedRows),
+  ]);
+
+  return json({
+    authenticated: Boolean(member),
+    personalized: Boolean(member),
+    saved_count: saved.length,
+    saved_ids: saved.map((video) => Number(video.id)),
+    sections: {
+      for_you: forYou,
+      most_watched: mostWatched,
+      most_liked: mostLiked,
+      saved,
+    },
+  }, 200, { "Cache-Control": "private, no-store" });
 }
 
 async function latestNotifications(env) {
