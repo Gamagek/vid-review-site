@@ -275,7 +275,7 @@ test("TikTok watch pages start from a cached preview and only viewer mode embeds
   assert.match(html, /class="tiktok-cache-player"/);
   assert.match(html, /data-tiktok-player-mode="cache-first"/);
   assert.match(html, /Cached preview description/);
-  assert.match(html, //api/tiktok/cached-poster?id=7552567024304540959/);
+  assert.ok(html.includes("/api/tiktok/cached-poster?id=7552567024304540959"));
   assert.ok(html.includes(`data-tiktok-player-src="https://www.tiktok.com/player/v1/7552567024304540959?`));
   assert.equal(html.includes('<iframe id="watch-media-frame" class="tiktok-official-player"'), false);
 
@@ -1627,7 +1627,7 @@ test("renders the current Vid.Best TikTok cache-first watch player with separate
   assert.match(homeSource, /loadCachedTikTokFacadePreviews/);
   assert.match(homeSource, /tiktokPoster/);
   assert.match(homeSource, /poster_url/);
-  assert.match(homeSource, //api/tiktok/cached-previews/);
+  assert.ok(homeSource.includes("/api/tiktok/cached-previews"));
   assert.match(homeSource, /activeTikTokIsFullscreen/);
 
   const homeCssSource = readFileSync(new URL("../public/home-player.css", import.meta.url), "utf8");
@@ -1637,7 +1637,7 @@ test("renders the current Vid.Best TikTok cache-first watch player with separate
   const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
   assert.match(indexSource, /data-tiktok-player-mode="cache-first"/);
   assert.match(indexSource, /data-tiktok-player-mode="official-direct"/);
-  assert.match(indexSource, //api/tiktok/cached-poster/);
+  assert.ok(indexSource.includes("/api/tiktok/cached-poster"));
   assert.match(indexSource, /buildTikTokPlayerUrl/);
   assert.doesNotMatch(indexSource, /tiktok-gateway-player/);
   assert.match(indexSource, /www.tiktok.com/oembed/);
