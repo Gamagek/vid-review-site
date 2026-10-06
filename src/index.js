@@ -138,7 +138,6 @@ const AUTO_CACHE_BLOCKED_HOST_SUFFIXES = [
 ];
 const encoder = new TextEncoder();
 const ADMIN_SESSION_COOKIE = "__Host-vidbest_admin";
-const TIKTOK_GATEWAY_ORIGIN = "https://video.megasale.win";
 const ADMIN_SESSION_SECONDS = 60 * 60 * 8;
 const REACTION_SALT_SETTING = "reaction_salt";
 
@@ -396,7 +395,8 @@ async function tikTokPreflight(request, env) {
       thumbnail_url: preview.thumbnail_url,
       official_player: true,
       standard_embed: true,
-      cached: Boolean(env.TIKTOK_FACADE_API_URL),
+      cached: preview.cache_source !== "origin",
+      cache_source: preview.cache_source,
     }, 200, {
       "Cache-Control": "public, max-age=300, stale-while-revalidate=1800",
     });
@@ -410,58 +410,6 @@ async function tikTokPreflight(request, env) {
   }
 }
 
-async function fetchTikTokPreview(env, share) {
-  const facadeBase = String(env.TIKTOK_FACADE_API_URL || "").trim();
-  let metadataUrl;
-  if (facadeBase) {
-    try {
-      metadataUrl = new URL(facadeBase);
-      if (metadataUrl.protocol !== "https:" || metadataUrl.username || metadataUrl.password) {
-        throw new Error("TIKTOK_FACADE_API_URL must be HTTPS without credentials");
-      }
-      metadataUrl.searchParams.set("url", share);
-    } catch {
-      throw new AppError(503, "TIKTOK_FACADE_API_URL is invalid");
-    }
-  } else {
-    metadataUrl = new URL("https://www.tiktok.com/oembed");
-    metadataUrl.searchParams.set("url", share);
-  }
-
-  const response = await fetch(metadataUrl.toString(), {
-    headers: { Accept: "application/json", "User-Agent": "VidBest-TikTok-Facade/1.0" },
-    signal: AbortSignal.timeout(7000),
-  });
-  if (!response.ok) throw new AppError(502, `TikTok preview metadata returned HTTP ${response.status}`);
-
-  let metadata;
-  try { metadata = await response.json(); } catch { metadata = null; }
-  const videoId = share.match(/\/video\/(\d+)\/?$/)?.[1] || null;
-  if (!videoId || String(metadata?.type || "") !== "video") {
-    throw new AppError(502, "TikTok did not return an embeddable video preview");
-  }
-
-  let thumbnailUrl = "";
-  try {
-    const parsedThumbnail = new URL(String(metadata?.thumbnail_url || ""));
-    const host = parsedThumbnail.hostname.toLowerCase();
-    const allowed = /^([a-z0-9-]+\.)*tiktokcdn(?:-[a-z0-9-]+)?\.com$/.test(host)
-      || host === "muscdn.com"
-      || host.endsWith(".muscdn.com");
-    if (parsedThumbnail.protocol === "https:" && allowed) thumbnailUrl = parsedThumbnail.toString();
-  } catch {}
-
-  return {
-    video_id: videoId,
-    title: cleanText(metadata?.title, 160, "TikTok video"),
-    caption: cleanText(metadata?.title, 220),
-    author_name: cleanText(metadata?.author_name, 120),
-    author_url: normalizeTikTokAuthorUrl(metadata?.author_url),
-    description: cleanText(metadata?.description || metadata?.video_description || metadata?.text, 260),
-    thumbnail_url: thumbnailUrl || null,
-  };
-}
-
 function normalizeTikTokAuthorUrl(value) {
   try {
     const url = new URL(String(value || ""));
@@ -470,6 +418,192 @@ function normalizeTikTokAuthorUrl(value) {
     if (!/^\/@[^/]+\/?$/.test(url.pathname)) return null;
     return `https://www.tiktok.com${url.pathname}`;
   } catch {
+    return null;
+  }
+}
+
+function normalizeTikTokThumbnailUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    const host = url.hostname.toLowerCase();
+    const allowed = /^([a-z0-9-]+\.)*tiktokcdn(?:-[a-z0-9-]+)?\.com$/.test(host)
+      || host === "muscdn.com"
+      || host.endsWith(".muscdn.com");
+    return url.protocol === "https:" && allowed ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+function tikTokPreviewFromRow(row, cacheSource = "d1") {
+  if (!row) return null;
+  return {
+    video_id: String(row.video_id || ""),
+    title: cleanText(row.title, 160, "TikTok video"),
+    caption: cleanText(row.title, 220),
+    author_name: cleanText(row.author_name, 120),
+    author_url: normalizeTikTokAuthorUrl(row.author_url),
+    description: cleanText(row.description, 260),
+    thumbnail_url: normalizeTikTokThumbnailUrl(row.thumbnail_url),
+    cache_source: cacheSource,
+    fetched_at: row.fetched_at || null,
+  };
+}
+
+async function readTikTokOEmbedCache(env, videoId) {
+  if (!env.DB || !/^\d{15,25}$/.test(String(videoId || ""))) return null;
+  return env.DB.prepare(
+    `SELECT video_id, share_url, title, author_name, author_url, description, thumbnail_url, fetched_at
+     FROM tiktok_oembed_cache
+     WHERE video_id = ?`,
+  ).bind(String(videoId)).first();
+}
+
+async function writeTikTokOEmbedCache(env, share, preview) {
+  if (!env.DB) return;
+  await env.DB.prepare(
+    `INSERT INTO tiktok_oembed_cache (
+       video_id, share_url, title, author_name, author_url, description, thumbnail_url, fetched_at, updated_at
+     ) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now'), strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+     ON CONFLICT(video_id) DO UPDATE SET
+       share_url = excluded.share_url,
+       title = excluded.title,
+       author_name = excluded.author_name,
+       author_url = excluded.author_url,
+       description = excluded.description,
+       thumbnail_url = excluded.thumbnail_url,
+       fetched_at = excluded.fetched_at,
+       updated_at = excluded.updated_at`,
+  ).bind(
+    preview.video_id,
+    share,
+    preview.title || null,
+    preview.author_name || null,
+    preview.author_url || null,
+    preview.description || null,
+    preview.thumbnail_url || null,
+  ).run();
+}
+
+function tikTokEdgeCache() {
+  return typeof caches !== "undefined" && caches.default ? caches.default : null;
+}
+
+function tikTokEdgeCacheKey(videoId) {
+  return new Request(`https://vid.best/__tiktok-oembed-cache/${encodeURIComponent(videoId)}`);
+}
+
+async function readTikTokEdgeCache(videoId) {
+  const cache = tikTokEdgeCache();
+  if (!cache) return null;
+  try {
+    const response = await cache.match(tikTokEdgeCacheKey(videoId));
+    if (!response) return null;
+    const payload = await response.json();
+    return payload?.video_id ? { ...payload, cache_source: "edge" } : null;
+  } catch {
+    return null;
+  }
+}
+
+async function writeTikTokEdgeCache(preview) {
+  const cache = tikTokEdgeCache();
+  if (!cache || !preview?.video_id) return;
+  const response = new Response(JSON.stringify(preview), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "public, max-age=300, stale-while-revalidate=1800",
+    },
+  });
+  try { await cache.put(tikTokEdgeCacheKey(preview.video_id), response); } catch {}
+}
+
+function tikTokD1RowIsFresh(row) {
+  const timestamp = Date.parse(String(row?.fetched_at || ""));
+  return Number.isFinite(timestamp) && Date.now() - timestamp < 24 * 60 * 60 * 1000;
+}
+
+async function fetchTikTokPreview(env, share, options = {}) {
+  const canonicalShare = normalizeTikTokShareUrl(share);
+  if (!canonicalShare) throw new AppError(400, "Use a normal TikTok sharing link");
+  const videoId = canonicalShare.match(/\/video\/(\d+)\/?$/)?.[1] || "";
+  if (!/^\d{15,25}$/.test(videoId)) throw new AppError(400, "TikTok video ID is invalid");
+
+  if (!options.force) {
+    const edgeHit = await readTikTokEdgeCache(videoId);
+    if (edgeHit) return edgeHit;
+  }
+
+  const durable = await readTikTokOEmbedCache(env, videoId);
+  if (!options.force && durable && tikTokD1RowIsFresh(durable)) {
+    const preview = tikTokPreviewFromRow(durable, "d1");
+    await writeTikTokEdgeCache(preview);
+    return preview;
+  }
+
+  try {
+    const metadataUrl = new URL("https://www.tiktok.com/oembed");
+    metadataUrl.searchParams.set("url", canonicalShare);
+    const response = await fetch(metadataUrl.toString(), {
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "VidBest-oEmbed/2.0",
+      },
+      signal: AbortSignal.timeout(7000),
+    });
+    if (!response.ok) throw new AppError(502, `TikTok oEmbed returned HTTP ${response.status}`);
+
+    const contentType = (response.headers.get("Content-Type") || "").toLowerCase();
+    if (!contentType.includes("application/json")) {
+      throw new AppError(502, "TikTok oEmbed returned a non-JSON response");
+    }
+
+    let metadata;
+    try { metadata = await response.json(); } catch { metadata = null; }
+    if (String(metadata?.type || "") !== "video") {
+      throw new AppError(502, "TikTok did not return an embeddable video oEmbed response");
+    }
+
+    const preview = {
+      video_id: videoId,
+      title: cleanText(metadata?.title, 160, "TikTok video"),
+      caption: cleanText(metadata?.title, 220),
+      author_name: cleanText(metadata?.author_name, 120),
+      author_url: normalizeTikTokAuthorUrl(metadata?.author_url),
+      description: cleanText(metadata?.description || metadata?.video_description || metadata?.text, 260),
+      thumbnail_url: normalizeTikTokThumbnailUrl(metadata?.thumbnail_url),
+      cache_source: "origin",
+      fetched_at: new Date().toISOString(),
+    };
+
+    await writeTikTokOEmbedCache(env, canonicalShare, preview);
+    await writeTikTokEdgeCache(preview);
+    return preview;
+  } catch (error) {
+    if (durable) {
+      const stale = tikTokPreviewFromRow(durable, "d1-stale");
+      await writeTikTokEdgeCache(stale);
+      return stale;
+    }
+    throw error;
+  }
+}
+
+async function persistTikTokOEmbedMetadata(env, row) {
+  if (!row || detectMediaProvider(row) !== "tiktok") return null;
+  const share = normalizeTikTokShareUrl(row.source_url);
+  if (!share) return null;
+  try {
+    const preview = await fetchTikTokPreview(env, share, { force: true });
+    if (preview.thumbnail_url && !row.thumbnail_url) {
+      await env.DB.prepare(
+        "UPDATE videos SET thumbnail_url = COALESCE(thumbnail_url, ?) WHERE id = ?",
+      ).bind(preview.thumbnail_url, Number(row.id)).run();
+    }
+    return preview;
+  } catch (error) {
+    console.error("TikTok oEmbed metadata refresh failed", error?.message || error);
     return null;
   }
 }
@@ -559,7 +693,7 @@ function securityHeaders(headers, html = false, scriptNonce = "") {
     const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.tiktok.com https://www.instagram.com/embed.js https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self' https://www.tiktok.com https://*.tiktok.com https://*.tiktokcdn.com https://video.megasale.win; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://video.megasale.win https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.tiktok.com https://www.instagram.com/embed.js https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self' https://www.tiktok.com https://*.tiktok.com https://*.tiktokcdn.com; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
     );
   }
   return headers;
@@ -1266,6 +1400,9 @@ async function createVideo(request, env, ctx) {
     ctx?.waitUntil?.(notifyNewVideoSubscribers(env, row));
     if (detectMediaProvider(row) === "facebook") ctx?.waitUntil?.(persistFacebookPreview(env, row));
   }
+  if (detectMediaProvider(row) === "tiktok") {
+    ctx?.waitUntil?.(persistTikTokOEmbedMetadata(env, row));
+  }
   if (row?.cache_status === "pending") {
     ctx?.waitUntil?.(processAuthorizedCacheJobs(env, { videoId: Number(row.id), limit: 1 }));
   }
@@ -1334,6 +1471,9 @@ async function updateVideo(request, env, id, ctx) {
   }
   if (row?.published && detectMediaProvider(row) === "facebook") {
     ctx?.waitUntil?.(persistFacebookPreview(env, row));
+  }
+  if (detectMediaProvider(row) === "tiktok" && (existing.source_url !== row.source_url || (!existing.published && row.published))) {
+    ctx?.waitUntil?.(persistTikTokOEmbedMetadata(env, row));
   }
   if (row?.cache_status === "pending") {
     ctx?.waitUntil?.(processAuthorizedCacheJobs(env, { videoId: Number(row.id), limit: 1 }));
@@ -2456,7 +2596,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261006-1">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261006-1" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
-  ${video.provider === "tiktok" ? '<!-- TikTok uses the signed oEmbed gateway iframe; no R2 polling bundle is loaded. -->' : ""}
+  ${video.provider === "tiktok" ? '<!-- TikTok metadata is cached in D1/Cache API; playback uses the official direct player. -->' : ""}
 </head>
 <body class="watch-page" data-viewer-embed="${viewer ? "1" : "0"}" data-video-slug="${escapeHtml(video.slug)}" data-site-views="${Number(video.views) + (viewer ? 0 : 1)}" data-video-id="${Number(video.id)}" data-video-provider="${escapeHtml(video.provider)}">
   <header class="site-header compact">
@@ -2532,38 +2672,6 @@ function renderWatchHtml(video, request, env, scriptNonce) {
 </html>`;
 }
 
-async function buildSignedTikTokGatewaySrc(sourceUrl, id, env) {
-  const secret = String(env.SIGN_SECRET || "");
-  if (!secret || !/^\d{15,25}$/.test(String(id || ""))) return "";
-
-  let tiktok;
-  try {
-    const source = new URL(String(sourceUrl || ""));
-    const host = source.hostname.toLowerCase().replace(/^www\./, "");
-    const match = source.pathname.match(/^\/@([^/]+)\/video\/(\d+)\/?$/);
-    if (source.protocol !== "https:" || host !== "tiktok.com" || !match || match[2] !== String(id)) return "";
-    source.hostname = "www.tiktok.com";
-    source.search = "";
-    source.hash = "";
-    tiktok = source.toString();
-  } catch {
-    return "";
-  }
-
-  const exp = (Math.floor(Date.now() / 3600000) + 2) * 3600;
-  const secretBytes = new TextEncoder().encode(secret);
-  const dataBytes = new TextEncoder().encode(String(id) + "." + exp);
-  const key = await crypto.subtle.importKey(
-    "raw",
-    secretBytes,
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const signature = new Uint8Array(await crypto.subtle.sign("HMAC", key, dataBytes));
-  const sig = Array.from(signature, (byte) => byte.toString(16).padStart(2, "0")).join("");
-  return TIKTOK_GATEWAY_ORIGIN + "/?url=" + encodeURIComponent(tiktok) + "&exp=" + exp + "&sig=" + sig;
-}
 function extractTikTokId(value) {
   if (!value) return "";
   try {
