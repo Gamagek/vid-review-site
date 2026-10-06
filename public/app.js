@@ -192,9 +192,7 @@ function renderCarousel() {
     badge.textContent = video.subcategory;
     const heading = document.createElement("h2");
     heading.textContent = video.title;
-    const description = document.createElement("p");
-    description.textContent = video.description || "Open this discovery to read the full review.";
-    copy.append(badge, heading, description);
+    copy.append(badge, heading);
     const link = document.createElement("a");
     link.className = "featured-card-link";
     link.href = `/watch/${encodeURIComponent(video.slug)}`;
