@@ -229,13 +229,12 @@ test("duplicate public paths permanently redirect without losing functional para
   }
 });
 
-test("signed gateway helper stays usable but is not indexable", async () => {
+test("legacy TikTok gateway helper is retired and remains non-indexable", async () => {
   const context = createContext();
-  context.env.SIGN_SECRET = "test-only-signing-secret";
   const response = await request(context, "https://vid.best/watch?user=example&id=6718335390845095173");
-  assert.equal(response.status, 200);
+  assert.equal(response.status, 410);
   assert.equal(response.headers.get("X-Robots-Tag"), "noindex,follow");
-  assert.match(await response.text(), /<iframe src="https:\/\/video.megasale.win\//);
+  assert.equal(await response.text(), "Legacy TikTok gateway route retired");
 });
 
 test("category thumbnail URLs retain letters and digits during text normalization", async () => {
