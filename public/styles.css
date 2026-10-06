@@ -872,6 +872,100 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
 .watch-player[data-provider="tiktok"] .watch-player-stage {
   position: relative;
 }
+
+.tiktok-cache-player {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  overflow: hidden;
+  background: #0a0d1b;
+  color: #fff;
+  isolation: isolate;
+}
+.tiktok-cache-poster {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.tiktok-cache-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(180deg, rgba(5,7,16,.12) 20%, rgba(5,7,16,.84) 75%, rgba(5,7,16,.97) 100%);
+}
+.tiktok-cache-copy {
+  position: absolute;
+  z-index: 3;
+  left: 24px;
+  right: 24px;
+  bottom: 112px;
+  display: grid;
+  gap: 8px;
+  text-align: left;
+}
+.tiktok-cache-kicker {
+  color: #7ceaf0;
+  font-size: .7rem;
+  font-weight: 850;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.tiktok-cache-copy strong {
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  line-height: 1.08;
+  letter-spacing: -.025em;
+}
+.tiktok-cache-author { color: #e3e7f5; font-weight: 700; }
+.tiktok-cache-copy small { color: #aab3cf; }
+.tiktok-cache-actions {
+  position: absolute;
+  z-index: 4;
+  left: 24px;
+  right: 24px;
+  bottom: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.tiktok-cache-player .tiktok-official-player {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  background: #fff;
+  opacity: 0;
+  transition: opacity .16s ease;
+}
+.tiktok-cache-player.is-player-ready .tiktok-official-player { opacity: 1; }
+.tiktok-cache-player.is-player-ready .tiktok-cache-poster,
+.tiktok-cache-player.is-player-ready .tiktok-cache-overlay,
+.tiktok-cache-player.is-player-ready .tiktok-cache-copy,
+.tiktok-cache-player.is-player-ready .tiktok-cache-actions { visibility: hidden; }
+.tiktok-cache-back {
+  position: absolute;
+  z-index: 22;
+  top: 12px;
+  left: 12px;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 999px;
+  background: rgba(7,9,18,.88);
+  color: #fff;
+  font-weight: 750;
+  cursor: pointer;
+}
+.tiktok-cache-back[hidden] { display: none !important; }
+.tiktok-cache-player.is-loading .tiktok-cache-play { opacity: .7; }
+
 .vidbest-tiktok-retry {
   position: absolute;
   right: 10px;

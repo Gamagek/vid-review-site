@@ -33,6 +33,7 @@ function initializeWatchPage() {
   enhanceNativePlayer();
   initializeHlsPlayback();
   initializePersistentPlayer();
+  initializeTikTokCacheFirstPlayer();
   initializeEmbeddedMediaTools();
   initializeAudioLab();
   initializeEmbeddedAudioLab();
@@ -51,6 +52,95 @@ function initializeWatchPage() {
   loadRecommendations();
 }
 
+
+function initializeTikTokCacheFirstPlayer() {
+  const shell = document.querySelector(".tiktok-cache-player");
+  if (!shell || shell.dataset.vidbestCacheFirst === "1") return;
+  shell.dataset.vidbestCacheFirst = "1";
+
+  const player = shell.closest("#watch-player");
+  const stage = shell.closest(".watch-player-stage");
+  const loadButton = shell.querySelector("[data-tiktok-load-player]");
+  const backButton = shell.querySelector("[data-tiktok-back-preview]");
+  const playerSrc = shell.dataset.tiktokPlayerSrc || "";
+  const shareUrl = shell.dataset.tiktokShare || "";
+
+  const resetEmbeddedEnhancements = () => {
+    if (player) {
+      delete player.dataset.vidbestEmbeddedTools;
+      delete player.dataset.vidbestEmbeddedAudio;
+    }
+    document.querySelector(".vidbest-embedded-audio-lab")?.remove();
+  };
+
+  const showCachedPreview = () => {
+    const frame = shell.querySelector("iframe");
+    if (frame) frame.remove();
+    shell.classList.remove("is-loading", "is-player-ready");
+    if (loadButton) {
+      loadButton.disabled = false;
+      loadButton.textContent = "▶ Load player";
+    }
+    if (backButton) backButton.hidden = true;
+    resetEmbeddedEnhancements();
+  };
+
+  const loadOfficialPlayer = () => {
+    if (!playerSrc || shell.querySelector("iframe")) return;
+    if (loadButton) {
+      loadButton.disabled = true;
+      loadButton.textContent = "Loading TikTok…";
+    }
+    shell.classList.add("is-loading");
+
+    const frame = document.createElement("iframe");
+    frame.id = "watch-media-frame";
+    frame.className = "tiktok-official-player";
+    frame.src = playerSrc;
+    frame.title = document.querySelector("h1")?.textContent?.trim() || "TikTok video";
+    frame.loading = "eager";
+    frame.referrerPolicy = "strict-origin-when-cross-origin";
+    frame.allow = "autoplay; fullscreen; picture-in-picture";
+    frame.allowFullscreen = true;
+    frame.dataset.tiktokId = shell.dataset.tiktokId || "";
+    frame.dataset.tiktokShare = shareUrl;
+    frame.dataset.tiktokPlayerMode = "official-after-cache";
+
+    frame.addEventListener("load", () => {
+      shell.classList.add("is-player-ready");
+      shell.classList.remove("is-loading");
+      if (backButton) backButton.hidden = false;
+      if (loadButton) {
+        loadButton.disabled = false;
+        loadButton.textContent = "Reload player";
+      }
+    }, { once: true });
+
+    shell.append(frame);
+    window.setTimeout(() => {
+      if (!shell.classList.contains("is-player-ready") && frame.isConnected) {
+        shell.classList.remove("is-loading");
+        if (loadButton) {
+          loadButton.disabled = false;
+          loadButton.textContent = "Retry player";
+        }
+        if (backButton) backButton.hidden = false;
+      }
+    }, 8000);
+
+    // Audio/embedded helpers should only initialize after the cross-origin player exists.
+    queueMicrotask(() => {
+      initializeEmbeddedMediaTools();
+      initializeEmbeddedAudioLab();
+    });
+  };
+
+  loadButton?.addEventListener("click", loadOfficialPlayer);
+  backButton?.addEventListener("click", showCachedPreview);
+
+  // Keep the first render entirely same-origin: no TikTok iframe exists until this click.
+  if (stage) stage.dataset.tiktokCacheFirst = "1";
+}
 
 function initializeHlsPlayback() {
   const video = document.querySelector("#watch-media-video[data-hls='1']");
@@ -1374,7 +1464,7 @@ function initializeEmbeddedAudioLab() {
   style.id = "vidbest-player-polish-v4-css";
   style.textContent = [
     ".watch-player-stage{position:relative}",
-    ".watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:min(100%,540px);height:min(78vh,760px);min-height:480px;margin-inline:auto;background:#fff;overflow:hidden}",
+    ".watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:min(100%,540px);height:min(78vh,760px);min-height:480px;margin-inline:auto;background:#0a0d1b;overflow:hidden}",
     ".watch-player[data-provider=\"tiktok\"] .tiktok-official-player{display:block;width:100%;height:100%;min-height:0;border:0;background:#fff}",
     ".watch-player.is-mini[data-provider=\"tiktok\"]{width:min(430px,calc(100vw - 36px))}",
     ".watch-player.is-mini[data-provider=\"tiktok\"] .watch-player-stage{width:100%;height:min(70vh,calc((100vw - 36px) * 1.7778));min-height:0}",

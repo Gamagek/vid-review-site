@@ -202,6 +202,9 @@ async function route(request, env, ctx) {
   if (path === "/api/tiktok/cached-previews" && request.method === "GET") {
     return tikTokCachedPreviewBatch(request, env);
   }
+  if (path === "/api/tiktok/cached-poster" && request.method === "GET") {
+    return tikTokCachedPoster(request, env);
+  }
 
   if (path === "/api/instagram/previews" && request.method === "GET") {
     return instagramPreviewBatch(request, env);
@@ -633,6 +636,7 @@ async function tikTokCachedPreviewBatch(request, env) {
       author_url: preview?.author_url || null,
       description: preview?.description || null,
       thumbnail_url: null,
+      poster_url: videoId ? `/api/tiktok/cached-poster?id=${encodeURIComponent(videoId)}` : null,
       cache_source: preview ? "d1" : "missing",
     });
   }
@@ -643,6 +647,71 @@ async function tikTokCachedPreviewBatch(request, env) {
     previews,
   }, 200, {
     "Cache-Control": "public, max-age=120, stale-while-revalidate=600",
+  });
+}
+
+function splitPosterLines(value, maxChars = 25, maxLines = 4) {
+  const words = cleanText(value, 180, "TikTok video").split(" ").filter(Boolean);
+  const lines = [];
+  let current = "";
+  for (const word of words) {
+    const next = current ? current + " " + word : word;
+    if (next.length > maxChars && current) {
+      lines.push(current);
+      current = word;
+      if (lines.length >= maxLines - 1) break;
+    } else {
+      current = next;
+    }
+  }
+  if (current && lines.length < maxLines) lines.push(current);
+  return lines.slice(0, maxLines);
+}
+
+async function tikTokCachedPoster(request, env) {
+  const videoId = cleanText(new URL(request.url).searchParams.get("id"), 30);
+  if (!/^\d{15,25}$/.test(videoId)) throw new AppError(400, "TikTok video ID is invalid");
+
+  const row = await readTikTokOEmbedCache(env, videoId);
+  const title = cleanText(row?.description || row?.title, 180, "TikTok video");
+  const author = cleanText(row?.author_name, 80, "TikTok");
+  const lines = splitPosterLines(title);
+  const lineSvg = lines.map((line, index) =>
+    `<text x="64" y="${690 + index * 62}" font-size="42" font-weight="750" fill="#ffffff">${escapeXml(line)}</text>`
+  ).join("");
+  const suffix = escapeXml(videoId.slice(-8));
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1280" viewBox="0 0 720 1280" role="img" aria-label="${escapeXml(title)}">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10152b"/>
+      <stop offset=".55" stop-color="#23294a"/>
+      <stop offset="1" stop-color="#11141f"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".72" cy=".18" r=".72">
+      <stop offset="0" stop-color="#25f4ee" stop-opacity=".42"/>
+      <stop offset=".48" stop-color="#fe2c55" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="720" height="1280" fill="url(#bg)"/>
+  <rect width="720" height="1280" fill="url(#glow)"/>
+  <circle cx="360" cy="420" r="104" fill="#070914" fill-opacity=".62" stroke="#fff" stroke-opacity=".16" stroke-width="2"/>
+  <text x="360" y="443" text-anchor="middle" font-family="system-ui,sans-serif" font-size="72" font-weight="800" fill="#fff">TikTok</text>
+  <text x="64" y="620" font-family="system-ui,sans-serif" font-size="25" font-weight="800" letter-spacing="4" fill="#7debf0">CACHED PREVIEW</text>
+  <g font-family="system-ui,sans-serif">${lineSvg}</g>
+  <text x="64" y="1010" font-family="system-ui,sans-serif" font-size="30" font-weight="650" fill="#d8dcf0">@${escapeXml(author.replace(/^@/, ""))}</text>
+  <text x="64" y="1120" font-family="system-ui,sans-serif" font-size="22" fill="#9fa8c8">No TikTok player request yet</text>
+  <text x="64" y="1170" font-family="system-ui,sans-serif" font-size="20" fill="#76809f">Video …${suffix}</text>
+  </svg>`;
+
+  return new Response(svg, {
+    status: 200,
+    headers: securityHeaders(new Headers({
+      "Content-Type": "image/svg+xml; charset=utf-8",
+      "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
+      "Cross-Origin-Resource-Policy": "same-origin",
+    })),
   });
 }
 
@@ -2602,6 +2671,11 @@ async function watchPage(request, env, ctx, slugInput) {
   if (!row) return dynamicHtml(notFoundPage(), 404);
   await enrichFacebookRows(env, [row]);
   const [video] = await hydrateVideos(env, [row]);
+  if (video.provider === "tiktok") {
+    const tiktokId = extractTikTokId(video.source_url);
+    const previewRow = tiktokId ? await readTikTokOEmbedCache(env, tiktokId) : null;
+    video.tiktok_preview = tikTokPreviewFromRow(previewRow, previewRow ? "d1" : "missing");
+  }
   const viewer = new URL(request.url).searchParams.get("viewer") === "1";
   if (!viewer) ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
   const scriptNonce = createCspNonce();
@@ -2618,10 +2692,11 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   const canonical = `${baseUrl}/watch/${encodeURIComponent(video.slug)}`;
   const title = cleanText(watchDisplayTitle(video), 70);
   const description = cleanText(video.seo_description || video.description || `Discover ${video.title} on Vid.Best.`, 180);
+  const tiktokId = video.provider === "tiktok" ? extractTikTokId(video.source_url) : "";
   const thumbnail = video.thumbnail_url
     ? absoluteUrl(video.thumbnail_url, baseUrl)
-    : video.provider === "tiktok"
-      ? `${baseUrl}/api/tiktok/thumbnail?url=${encodeURIComponent(video.source_url)}`
+    : tiktokId
+      ? `${baseUrl}/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`
       : "";
   const tags = Array.isArray(video.seo_tags) ? video.seo_tags.slice(0, 20) : [];
   const uploadDate = video.source_published_at || video.created_at;
@@ -2719,11 +2794,11 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
-  <script src="/watch.js?v=20261006-1" defer></script>
+  <script src="/watch.js?v=20261006-2" defer></script>
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261006-1">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261006-1" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
-  ${video.provider === "tiktok" ? '<!-- TikTok metadata is cached in D1/Cache API; playback uses the official direct player. -->' : ""}
+  ${video.provider === "tiktok" ? '<!-- TikTok watch pages start with a same-origin cached preview; the official player is created only after user action. -->' : ""}
 </head>
 <body class="watch-page" data-viewer-embed="${viewer ? "1" : "0"}" data-video-slug="${escapeHtml(video.slug)}" data-site-views="${Number(video.views) + (viewer ? 0 : 1)}" data-video-id="${Number(video.id)}" data-video-provider="${escapeHtml(video.provider)}">
   <header class="site-header compact">
@@ -2746,7 +2821,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
         <button type="button" data-player-mode="theater">Pop-up</button>
         <button type="button" data-player-mode="close" aria-label="Close persistent player">Close</button>
       </div>
-      <div class="watch-player-stage">${renderMedia(video, playbackOrigin)}</div>
+      <div class="watch-player-stage">${renderMedia(video, playbackOrigin, viewer)}</div>
     </section>
     <article class="watch-copy glass-panel">
       <div class="tile-badges"><span class="badge">${escapeHtml(video.primary_category)}</span><span class="badge secondary">${escapeHtml(video.subcategory)}</span></div>
@@ -2853,7 +2928,7 @@ function watchDisplayTitle(video) {
     : video.title;
 }
 
-function renderMedia(video, playbackOrigin) {
+function renderMedia(video, playbackOrigin, viewer = false) {
   const provider = String(video.provider || "").toLowerCase();
 
   if (provider === "instagram") {
@@ -2874,7 +2949,29 @@ function renderMedia(video, playbackOrigin) {
     const tiktokId = extractTikTokId(video.source_url);
     if (!tiktokId) return "";
     const playerSrc = buildTikTokPlayerUrl(tiktokId);
-    return `<iframe id="watch-media-frame" class="tiktok-official-player" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${escapeHtml(video.source_url)}" data-tiktok-player-mode="official-direct" src="${escapeHtml(playerSrc)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+    if (viewer) {
+      return `<iframe id="watch-media-frame" class="tiktok-official-player" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${escapeHtml(video.source_url)}" data-tiktok-player-mode="official-direct" src="${escapeHtml(playerSrc)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+    }
+
+    const preview = video.tiktok_preview || {};
+    const previewTitle = cleanText(preview.description || preview.title || watchDisplayTitle(video), 180, watchDisplayTitle(video));
+    const previewAuthor = cleanText(preview.author_name || extractTikTokUsername(video.source_url), 90, "TikTok creator");
+    const poster = `/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`;
+    return `<div class="tiktok-cache-player" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${escapeHtml(video.source_url)}" data-tiktok-player-src="${escapeHtml(playerSrc)}" data-tiktok-player-mode="cache-first">
+      <img class="tiktok-cache-poster" src="${escapeHtml(poster)}" alt="" loading="eager" decoding="async">
+      <div class="tiktok-cache-overlay" aria-hidden="true"></div>
+      <div class="tiktok-cache-copy">
+        <span class="tiktok-cache-kicker">Cached preview</span>
+        <strong>${escapeHtml(previewTitle)}</strong>
+        <span class="tiktok-cache-author">${escapeHtml(previewAuthor)}</span>
+        <small>No TikTok player request has been made yet.</small>
+      </div>
+      <div class="tiktok-cache-actions">
+        <button type="button" class="button primary tiktok-cache-play" data-tiktok-load-player>▶ Load player</button>
+        <a class="button ghost" href="${escapeHtml(video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open on TikTok</a>
+      </div>
+      <button type="button" class="tiktok-cache-back" data-tiktok-back-preview hidden>← Cached preview</button>
+    </div>`;
   }
   if (provider === "facebook") {
     const facebookEmbed = getSafeFacebookEmbedUrl(video);
@@ -3548,7 +3645,7 @@ async function videoSitemapResponse(request, env, page) {
     const thumbnail = row.thumbnail_url
       ? absoluteUrl(row.thumbnail_url, base)
       : provider === "tiktok"
-        ? `${base}/api/tiktok/thumbnail?url=${encodeURIComponent(row.source_url)}`
+        ? `${base}/api/tiktok/cached-poster?id=${encodeURIComponent(row.source_url.match(/\/video\/(\d+)/)?.[1] || "")}`
         : "";
     const description = cleanText(row.seo_description || row.description || `Discover ${row.title} on Vid.Best.`, 180);
     let videoEntry = "";
@@ -3591,7 +3688,7 @@ function robotsResponse(request, env) {
     "Allow: /",
     "Disallow: /admin",
     "Disallow: /api/",
-    "Allow: /api/tiktok/thumbnail",
+    "Allow: /api/tiktok/cached-poster",
     "Allow: /api/tiktok/preflight",
     `Sitemap: ${base}/sitemap.xml`,
   ].join("\n") + "\n";

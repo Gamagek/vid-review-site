@@ -493,6 +493,7 @@ function applyCachedTikTokPreview(card, preview) {
   if (preview.author_name) card.dataset.tiktokAuthor = preview.author_name;
   if (preview.caption || preview.title) card.dataset.tiktokCaption = preview.caption || preview.title;
   if (preview.description) card.dataset.tiktokDescription = preview.description;
+  if (preview.poster_url) card.dataset.tiktokPoster = preview.poster_url;
   renderTikTokFacade(card);
 }
 
@@ -541,6 +542,16 @@ function renderTikTokFacade(card) {
   placeholder.className = "tiktok-microlink-placeholder";
   placeholder.textContent = "TikTok";
   imageWrap.append(placeholder);
+  if (card.dataset.tiktokPoster) {
+    const image = document.createElement("img");
+    image.src = card.dataset.tiktokPoster;
+    image.alt = "";
+    image.loading = "lazy";
+    image.decoding = "async";
+    image.addEventListener("load", () => imageWrap.classList.add("has-image"), { once: true });
+    image.addEventListener("error", () => image.remove(), { once: true });
+    imageWrap.append(image);
+  }
 
   const body = document.createElement("span");
   body.className = "tiktok-microlink-body";
