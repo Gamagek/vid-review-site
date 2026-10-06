@@ -235,44 +235,16 @@ test("homepage Facebook tiles use the direct official player", () => {
   assert.doesNotMatch(source, /facebook-microlink-preview/);
 });
 
-test("signed /watch route rejects bad ids", async () => {
-  const context = createTestContext({ ["SIGN_" + "SECRET"]: secret });
-  const response = await seoEdge.fetch(
-    new Request("https://example.com/watch?user=umbralarchive&id=not-a-number"),
-    context.env,
-    context.ctx,
-  );
-  assert.equal(response.status, 400);
-  assert.equal(await response.text(), "Bad link");
-});
-
-test("signed /watch route rejects missing secret without generating a fallback signature", async () => {
-  const context = createTestContext();
-  const response = await seoEdge.fetch(
-    new Request("https://example.com/watch?user=umbralarchive&id=7552567024304540959"),
-    context.env,
-    context.ctx,
-  );
-  assert.equal(response.status, 500);
-  assert.equal(await response.text(), "Not configured");
-});
-
-test("signed /watch route returns a signed gateway iframe", async () => {
+test("legacy signed /watch gateway route is permanently retired", async () => {
   const context = createTestContext({ ["SIGN_" + "SECRET"]: secret });
   const response = await seoEdge.fetch(
     new Request("https://example.com/watch?user=umbralarchive&id=7552567024304540959"),
     context.env,
     context.ctx,
   );
-  assert.equal(response.status, 200);
-  assert.equal(response.headers.get("Content-Type"), "text/html; charset=utf-8");
-  assert.equal(response.headers.get("Cache-Control"), "public, max-age=300");
-
-  const html = await response.text();
-  assert.match(
-    html,
-    /<iframe src="https:\/\/video\.megasale\.win\/\?url=https%3A%2F%2Fwww\.tiktok\.com%2F%40umbralarchive%2Fvideo%2F7552567024304540959&amp;exp=\d+&amp;sig=[a-f0-9]{64}" width="325" height="580" style="border:0;max-width:100%" allow="fullscreen"><\/iframe>/,
-  );
+  assert.equal(response.status, 410);
+  assert.equal(response.headers.get("X-Robots-Tag"), "noindex,follow");
+  assert.equal(await response.text(), "Legacy TikTok gateway route retired");
 });
 
 test("TikTok watch pages use the direct official player without the private gateway", async () => {
