@@ -21,6 +21,7 @@ const migrations = [
   "0017_authorized_auto_cache.sql",
   "0018_tiktok_oembed_cache.sql",
   "0019_tiktok_oembed_backfill.sql",
+  "0020_member_personalization.sql",
 ];
 
 class TestD1Statement {
@@ -201,6 +202,122 @@ test("supports email magic-link account sessions and preferences", async () => {
   }
 });
 
+test("uses Brevo transactional email for magic-link sign in", async () => {
+  const context = createTestContext({
+    BREVO_API_KEY: "xkeysib-test",
+    EMAIL_FROM: "Vid.Best <info@vid.best>",
+  });
+  const originalFetch = globalThis.fetch;
+  let requestBody;
+  let requestHeaders;
+  globalThis.fetch = async (url, options) => {
+    if (String(url) !== "https://api.brevo.com/v3/smtp/email") return originalFetch(url, options);
+    requestBody = JSON.parse(options.body);
+    requestHeaders = options.headers;
+    return new Response(JSON.stringify({ messageId: "<brevo-test@vid.best>" }), {
+      status: 201,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+  try {
+    const response = await send(context, "/api/account/login", {
+      method: "POST",
+      headers: { Origin: "https://example.com", "Content-Type": "application/json" },
+      body: JSON.stringify({ email: "viewer@example.com" }),
+    });
+    assert.equal(response.status, 200);
+    assert.equal(requestHeaders["api-key"], "xkeysib-test");
+    assert.deepEqual(requestBody.sender, { email: "info@vid.best", name: "Vid.Best" });
+    assert.deepEqual(requestBody.to, [{ email: "viewer@example.com" }]);
+    assert.match(requestBody.subject, /Vid\.Best sign-in link/);
+    assert.match(requestBody.htmlContent, /login_token=/);
+    assert.deepEqual(requestBody.tags, ["vidbest-transactional"]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("signed-in members can save videos and receive personalized home lanes", async () => {
+  const context = createTestContext({
+    BREVO_API_KEY: "xkeysib-test",
+    EMAIL_FROM: "Vid.Best <info@vid.best>",
+  });
+  const originalFetch = globalThis.fetch;
+  let magicToken = "";
+  globalThis.fetch = async (url, options) => {
+    if (String(url) !== "https://api.brevo.com/v3/smtp/email") return originalFetch(url, options);
+    const body = JSON.parse(options.body);
+    magicToken = String(body.htmlContent || "").match(/login_token=([A-Za-z0-9_-]{40,120})/)?.[1] || "";
+    return new Response(JSON.stringify({ messageId: "<brevo-test@vid.best>" }), {
+      status: 201,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+  try {
+    const requested = await send(context, "/api/account/login", {
+      method: "POST",
+      headers: { Origin: "https://example.com", "Content-Type": "application/json" },
+      body: JSON.stringify({ email: "smart@example.com" }),
+    });
+    assert.equal(requested.status, 200);
+    assert.ok(magicToken);
+
+    const verified = await send(context, "/api/account/verify", {
+      method: "POST",
+      headers: { Origin: "https://example.com", "Content-Type": "application/json" },
+      body: JSON.stringify({ token: magicToken }),
+    });
+    assert.equal(verified.status, 200);
+    const cookie = verified.headers.get("Set-Cookie").split(";", 1)[0];
+
+    context.sqlite.prepare(
+      `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, views, reaction_count, published)
+       VALUES
+         ('saved-tech', 'Saved tech', 'https://example.com/saved.mp4', 'raw', 'Technology', 'Web Development', 20, 2, 1),
+         ('similar-tech', 'Similar tech', 'https://example.com/similar.mp4', 'raw', 'Technology', 'Web Development', 5, 1, 1),
+         ('popular-food', 'Popular food', 'https://example.com/food.mp4', 'raw', 'Food & Cooking', 'Quick Recipes', 200, 8, 1)`,
+    ).run();
+
+    const preferences = await send(context, "/api/account/preferences", {
+      method: "POST",
+      headers: { Origin: "https://example.com", Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ email_notifications: true, category_filter: ["Technology"] }),
+    });
+    assert.equal(preferences.status, 200);
+
+    const saved = await send(context, "/api/videos/1/save", {
+      method: "POST",
+      headers: { Origin: "https://example.com", Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ saved: true }),
+    });
+    assert.equal(saved.status, 200);
+    assert.equal((await saved.json()).saved, true);
+
+    const miniFeed = await send(context, "/api/home/mini-feed?limit=6", {
+      headers: { Cookie: cookie },
+    });
+    assert.equal(miniFeed.status, 200);
+    const payload = await miniFeed.json();
+    assert.equal(payload.authenticated, true);
+    assert.equal(payload.personalized, true);
+    assert.equal(payload.saved_count, 1);
+    assert.deepEqual(payload.saved_ids, [1]);
+    assert.equal(payload.sections.saved[0].slug, "saved-tech");
+    assert.equal(payload.sections.for_you[0].slug, "similar-tech");
+    assert.equal(payload.sections.most_watched[0].slug, "popular-food");
+
+    const removed = await send(context, "/api/videos/1/save", {
+      method: "POST",
+      headers: { Origin: "https://example.com", Cookie: cookie, "Content-Type": "application/json" },
+      body: JSON.stringify({ saved: false }),
+    });
+    assert.equal(removed.status, 200);
+    assert.equal((await removed.json()).saved_count, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("home page contains the account, browser alert and shortcut controls", () => {
   const source = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
   const script = readFileSync(new URL("../public/notifications.js", import.meta.url), "utf8");
@@ -209,12 +326,30 @@ test("home page contains the account, browser alert and shortcut controls", () =
   assert.match(source, /id="browser-alert-button"/);
   assert.match(source, /id="shortcut-button"/);
   assert.match(source, /id="notification-feed"/);
+  assert.match(source, /id="smart-picks"/);
+  assert.match(source, /id="smart-pick-track"/);
+  assert.match(source, /class="save-video-button"/);
+  assert.match(source, /id="member-saved-count"/);
+  assert.match(source, /personalization\.js/);
   assert.match(source, /manifest\.webmanifest/);
   assert.match(script, /Notification\.requestPermission/);
   assert.match(script, /beforeinstallprompt/);
   assert.match(script, /\/api\/notifications\/latest/);
   assert.doesNotMatch(script, /renderNotificationFeed/);
   assert.match(script, /notification-feed-item/);
+});
+
+test("personalization client renders horizontal smart lanes and account saves", () => {
+  const source = readFileSync(new URL("../public/personalization.js", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../public/personalization.css", import.meta.url), "utf8");
+  assert.match(source, /\/api\/home\/mini-feed/);
+  assert.match(source, /\/api\/videos\/\$\{videoId\}\/save/);
+  assert.match(source, /scrollBy\(/);
+  assert.match(source, /setInterval/);
+  assert.match(source, /vidbest:member-changed/);
+  assert.match(css, /\.smart-pick-track/);
+  assert.match(css, /scroll-snap-type: x mandatory/);
+  assert.match(css, /\.account-dashboard/);
 });
 
 test("home embed previews keep Facebook on the direct-player path", () => {
