@@ -25,6 +25,8 @@
   <link rel="stylesheet" href="/instagram-preview-card.css">
   <script type="module" src="/instagram-preview-card.js"></script>
   <script src="/notifications.js" defer></script>
+  <link rel="stylesheet" href="/personalization.css">
+  <script src="/personalization.js" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -122,33 +124,64 @@
         <aside id="notification-hub" class="notification-hub glass-panel" aria-labelledby="notification-heading">
           <div class="notification-hub-head">
             <div>
-              <p class="eyebrow">Stay in the loop</p>
-              <h2 id="notification-heading">Smart video alerts</h2>
-              <p>Keep up with new videos and get quick browser alerts from this device.</p>
+              <p class="eyebrow">Your Vid.Best</p>
+              <h2 id="notification-heading">Account, saves & smart alerts</h2>
+              <p>One email sign-in unlocks saved videos, personal picks and optional alerts.</p>
             </div>
             <span class="notification-pulse" aria-hidden="true">●</span>
           </div>
 
           <form id="member-login-form" class="notification-login">
             <label>
-              <span>Account email</span>
+              <span>Email address</span>
               <input id="member-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" maxlength="320" required>
             </label>
-            <button id="member-login-button" class="button primary" type="submit">Continue with email</button>
+            <button id="member-login-button" class="button primary" type="submit">Email me a sign-in link</button>
+            <p class="notification-login-help">No password. Your one-time link signs you in securely on this device.</p>
+            <div class="account-benefits" aria-label="Account benefits">
+              <span>♡ Save videos</span>
+              <span>✦ Smarter suggestions</span>
+              <span>✉ Optional email alerts</span>
+            </div>
           </form>
 
-          <div id="member-account-view" class="notification-account" hidden>
-            <div class="notification-account-line"><strong>Signed in</strong><span id="member-account-email"></span></div>
-            <label>
-              <span>Email alerts</span>
-              <input id="email-notifications-enabled" type="checkbox" checked>
-            </label>
-            <label>
-              <span>Topic</span>
-              <select id="notification-category">
-                <option value="">All categories</option>
-              </select>
-            </label>
+          <div id="member-account-view" class="notification-account account-dashboard" hidden>
+            <div class="account-identity">
+              <div>
+                <span class="account-state-dot" aria-hidden="true"></span>
+                <strong>Signed in</strong>
+              </div>
+              <span id="member-account-email"></span>
+            </div>
+
+            <div class="account-stats">
+              <a href="#smart-picks" class="account-stat">
+                <strong id="member-saved-count">0</strong>
+                <span>saved</span>
+              </a>
+              <a href="#smart-picks" class="account-stat">
+                <strong>For You</strong>
+                <span>personalized</span>
+              </a>
+            </div>
+
+            <div class="account-settings-grid">
+              <label class="account-toggle">
+                <span>
+                  <strong>Email alerts</strong>
+                  <small>New matching videos</small>
+                </span>
+                <input id="email-notifications-enabled" type="checkbox" checked>
+              </label>
+              <label>
+                <span>Favorite topic</span>
+                <select id="notification-category">
+                  <option value="">All categories</option>
+                </select>
+              </label>
+            </div>
+
+            <p class="account-learning-note">Saving videos and choosing “More like this” helps Vid.Best rank your recommendations. You stay in control and can remove saved videos anytime.</p>
             <button id="member-logout-button" class="button text-button" type="button">Sign out</button>
           </div>
 
@@ -157,9 +190,31 @@
             <button id="shortcut-button" class="button ghost" type="button">Add Vid.Best shortcut</button>
           </div>
           <div id="notification-feed" class="notification-feed" aria-label="Latest Vid.Best videos" aria-live="polite"></div>
-          
-          <p id="notification-status" class="form-status" role="status">Browser alerts can work on this device.</p>
+          <p id="notification-status" class="form-status" role="status">Use email, browser alerts, or both — notifications are optional.</p>
         </aside>
+      </div>
+    </section>
+
+    <section class="smart-picks section-pad" id="smart-picks" aria-labelledby="smart-picks-heading">
+      <div class="section-heading smart-picks-heading">
+        <div>
+          <p class="eyebrow">Quick watch lanes</p>
+          <h2 id="smart-picks-heading">Popular now, plus picks for you</h2>
+        </div>
+        <p id="smart-picks-summary">Loading the strongest signals from the library…</p>
+      </div>
+
+      <div class="smart-pick-tabs" role="tablist" aria-label="Video recommendation lanes">
+        <button type="button" role="tab" aria-selected="true" data-smart-lane="for_you">For you</button>
+        <button type="button" role="tab" aria-selected="false" data-smart-lane="most_watched">Most watched</button>
+        <button type="button" role="tab" aria-selected="false" data-smart-lane="most_liked">Most liked</button>
+        <button type="button" role="tab" aria-selected="false" data-smart-lane="saved">Saved</button>
+      </div>
+
+      <div class="smart-pick-shell glass-panel">
+        <button class="smart-pick-nav previous" type="button" data-smart-scroll="-1" aria-label="Scroll recommendations left">←</button>
+        <div id="smart-pick-track" class="smart-pick-track" tabindex="0" aria-live="polite"></div>
+        <button class="smart-pick-nav next" type="button" data-smart-scroll="1" aria-label="Scroll recommendations right">→</button>
       </div>
     </section>
 
@@ -338,6 +393,9 @@
         <div class="tile-interest-row">
           <button class="interest-button" type="button">
             ＋ More like this
+          </button>
+          <button class="save-video-button" type="button" aria-pressed="false">
+            ♡ Save
           </button>
           <span class="interest-status" role="status"></span>
         </div>

@@ -5,6 +5,7 @@ const HUB = {
   loginButton: document.querySelector("#member-login-button"),
   accountView: document.querySelector("#member-account-view"),
   accountEmail: document.querySelector("#member-account-email"),
+  savedCount: document.querySelector("#member-saved-count"),
   category: document.querySelector("#notification-category"),
   emailEnabled: document.querySelector("#email-notifications-enabled"),
   browserButton: document.querySelector("#browser-alert-button"),
@@ -22,6 +23,9 @@ let pollTimer = null;
 let notificationRegistration = null;
 
 document.addEventListener("DOMContentLoaded", initNotificationHub);
+document.addEventListener("vidbest:saved-count", (event) => {
+  if (HUB.savedCount) HUB.savedCount.textContent = String(Number(event.detail?.count || 0));
+});
 window.addEventListener("beforeinstallprompt", (event) => {
   event.preventDefault();
   installPrompt = event;
@@ -91,6 +95,9 @@ async function loadMember() {
     currentMember = null;
   }
   renderMember();
+  document.dispatchEvent(new CustomEvent("vidbest:member-changed", {
+    detail: { authenticated: Boolean(currentMember), member: currentMember },
+  }));
 }
 
 function renderMember() {
@@ -103,7 +110,7 @@ function renderMember() {
     HUB.emailEnabled.checked = Boolean(currentMember.email_notifications);
     const filters = currentMember.category_filter || [];
     HUB.category.value = filters[0] || "";
-    setStatus("Email alerts are ready.", "success");
+    setStatus("Your account is ready. Saves and suggestions sync on this device.", "success");
   }
 }
 
@@ -142,7 +149,10 @@ async function verifyLogin(token) {
   if (!response.ok) throw new Error(payload.error || "The sign-in link could not be verified.");
   currentMember = payload.member;
   renderMember();
-  setStatus("Signed in successfully.", "success");
+  document.dispatchEvent(new CustomEvent("vidbest:member-changed", {
+    detail: { authenticated: true, member: currentMember },
+  }));
+  setStatus("Signed in successfully. Your personal picks are updating.", "success");
 }
 
 async function savePreferences() {
@@ -161,7 +171,10 @@ async function savePreferences() {
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(payload.error || "Could not save notification preferences.");
     currentMember = payload.member;
-    setStatus("Notification preferences saved.", "success");
+    document.dispatchEvent(new CustomEvent("vidbest:member-changed", {
+      detail: { authenticated: true, member: currentMember },
+    }));
+    setStatus("Preferences saved. Alerts and recommendations will use this topic.", "success");
   } catch (error) {
     setStatus(error.message, "error");
   }
@@ -172,8 +185,12 @@ async function logout() {
     await fetch("/api/account/session", { method: "DELETE", credentials: "same-origin" });
   } finally {
     currentMember = null;
+    if (HUB.savedCount) HUB.savedCount.textContent = "0";
     renderMember();
-    setStatus("Signed out.", "success");
+    document.dispatchEvent(new CustomEvent("vidbest:member-changed", {
+      detail: { authenticated: false, member: null },
+    }));
+    setStatus("Signed out. Popular picks are still available.", "success");
   }
 }
 
