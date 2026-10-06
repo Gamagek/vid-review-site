@@ -204,9 +204,46 @@ async function sendEmail(env, email) {
     }
   }
 
+  const brevoKey = String(env.BREVO_API_KEY || "").trim();
+  if (brevoKey) {
+    const sender = parseMailbox(from);
+    if (!sender.email) throw new AppError(503, "EMAIL_FROM must contain a valid sender email address.");
+    const recipients = (Array.isArray(email.to) ? email.to : [email.to])
+      .map((value) => parseMailbox(value))
+      .filter((value) => value.email)
+      .map((value) => ({ email: value.email, ...(value.name ? { name: value.name } : {}) }));
+    if (!recipients.length) throw new AppError(400, "No valid email recipient was supplied.");
+
+    const body = {
+      sender: { email: sender.email, ...(sender.name ? { name: sender.name } : {}) },
+      to: recipients,
+      subject: String(email.subject || "Vid.Best"),
+      ...(email.html
+        ? { htmlContent: String(email.html) }
+        : { textContent: String(email.text || "") }),
+      tags: ["vidbest-transactional"],
+    };
+
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "api-key": brevoKey,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!response.ok) {
+      console.error("Brevo email failed", response.status);
+      throw new AppError(502, "Brevo could not send the message.");
+    }
+    return response.json();
+  }
+
   const apiKey = String(env.RESEND_API_KEY || "").trim();
   if (!apiKey) {
-    throw new AppError(503, "Email sign-in is not configured. Connect Cloudflare Email Service or add RESEND_API_KEY.");
+    throw new AppError(503, "Email sign-in is not configured. Add BREVO_API_KEY, connect Cloudflare Email Service, or add RESEND_API_KEY.");
   }
 
   const response = await fetch("https://api.resend.com/emails", {
@@ -225,10 +262,21 @@ async function sendEmail(env, email) {
   return response.json();
 }
 
+function parseMailbox(value) {
+  const input = String(value || "").trim();
+  const named = input.match(/^\s*(.*?)\s*<([^<>\s]+@[^<>\s]+)>\s*$/);
+  if (named) return { name: cleanText(named[1], 100), email: normalizeEmail(named[2]) };
+  return { name: "", email: normalizeEmail(input) };
+}
+
 function hasEmailTransport(env) {
   return Boolean(
     String(env.EMAIL_FROM || "").trim()
-      && ((env.EMAIL && typeof env.EMAIL.send === "function") || String(env.RESEND_API_KEY || "").trim()),
+      && (
+        (env.EMAIL && typeof env.EMAIL.send === "function")
+        || String(env.BREVO_API_KEY || "").trim()
+        || String(env.RESEND_API_KEY || "").trim()
+      ),
   );
 }
 
