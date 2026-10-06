@@ -12,7 +12,7 @@
     reactions: JSON.parse(document.querySelector(".watch-reactions")?.dataset.reactions || "{}"),
   };
   const queue = [first], cards = [], pages = new Map(), counted = new Set([first.id]), counting = new Set();
-  const warmProviders = new Set(["youtube", "vimeo", "tiktok", "raw", "r2", "hls"]);
+  const warmProviders = new Set(["youtube", "vimeo", "raw", "r2", "hls"]);
   const symbols = { like: "👍", love: "♥", useful: "💡" };
   let index = 0, opened = false, muted = false, focusReturn, overflow, suspension, savedInert = [];
   let timer, scrollTask = 0, suggesting = null, recommendationVersion = 0, catalogOffset = 0, catalogEnded = false;
@@ -205,6 +205,7 @@
       }
     }
     void prepareCard(cards[index]);
+    // TikTok stays metadata-only until it becomes active, so fullscreen/swipe never warms a second TikTok iframe.
     if (cards[index + 1]) void prepareCard(cards[index + 1]);
     updatePreparation();
   }
