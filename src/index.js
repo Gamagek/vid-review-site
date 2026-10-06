@@ -199,6 +199,9 @@ async function route(request, env, ctx) {
   if (path === "/api/tiktok/previews" && request.method === "GET") {
     return tikTokPreviewBatch(request, env);
   }
+  if (path === "/api/tiktok/cached-previews" && request.method === "GET") {
+    return tikTokCachedPreviewBatch(request, env);
+  }
 
   if (path === "/api/instagram/previews" && request.method === "GET") {
     return instagramPreviewBatch(request, env);
@@ -606,6 +609,126 @@ async function persistTikTokOEmbedMetadata(env, row) {
     console.error("TikTok oEmbed metadata refresh failed", error?.message || error);
     return null;
   }
+}
+
+async function tikTokCachedPreviewBatch(request, env) {
+  const requestUrl = new URL(request.url);
+  const requested = requestUrl.searchParams.getAll("url");
+  if (requested.length > 24) throw new AppError(400, "A maximum of 24 cached TikTok preview URLs is supported");
+
+  const shares = [...new Set(requested.map(normalizeTikTokShareUrl).filter(Boolean))].slice(0, 24);
+  if (!shares.length) throw new AppError(400, "Add at least one TikTok video URL");
+
+  const previews = [];
+  for (const share of shares) {
+    const videoId = share.match(/\/video\/(\d+)\/?$/)?.[1] || "";
+    const row = await readTikTokOEmbedCache(env, videoId);
+    const preview = tikTokPreviewFromRow(row, "d1");
+    previews.push({
+      url: share,
+      video_id: videoId || null,
+      title: preview?.title || null,
+      caption: preview?.caption || null,
+      author_name: preview?.author_name || null,
+      author_url: preview?.author_url || null,
+      description: preview?.description || null,
+      thumbnail_url: null,
+      cache_source: preview ? "d1" : "missing",
+    });
+  }
+
+  return json({
+    ok: true,
+    count: previews.length,
+    previews,
+  }, 200, {
+    "Cache-Control": "public, max-age=120, stale-while-revalidate=600",
+  });
+}
+
+function tikTokBackfillRetryDelay(attempt) {
+  if (attempt <= 1) return "+15 minutes";
+  if (attempt === 2) return "+1 hour";
+  if (attempt === 3) return "+6 hours";
+  if (attempt === 4) return "+1 day";
+  return null;
+}
+
+async function recordTikTokBackfillFailure(env, share, error) {
+  const videoId = share.match(/\/video\/(\d+)\/?$/)?.[1] || "";
+  if (!videoId) return;
+  const existing = await env.DB.prepare(
+    "SELECT failure_count FROM tiktok_oembed_backfill_failures WHERE video_id = ?",
+  ).bind(videoId).first();
+  const attempt = Number(existing?.failure_count || 0) + 1;
+  const retry = tikTokBackfillRetryDelay(attempt);
+  const message = cleanText(error?.message || "TikTok oEmbed backfill failed", 300);
+  await env.DB.prepare(
+    `INSERT INTO tiktok_oembed_backfill_failures (
+       video_id, share_url, failure_count, last_error, next_retry_at, updated_at
+     ) VALUES (?, ?, ?, ?, ${retry ? "datetime('now', ?)" : "NULL"}, strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+     ON CONFLICT(video_id) DO UPDATE SET
+       share_url = excluded.share_url,
+       failure_count = excluded.failure_count,
+       last_error = excluded.last_error,
+       next_retry_at = excluded.next_retry_at,
+       updated_at = excluded.updated_at`,
+  ).bind(...(retry
+    ? [videoId, share, attempt, message, retry]
+    : [videoId, share, attempt, message])).run();
+}
+
+export async function processTikTokOEmbedBackfill(env, options = {}) {
+  if (!env.DB) return [];
+  const limit = clampInteger(options.limit, 1, 6, 3);
+  const candidates = await env.DB.prepare(
+    `SELECT v.id, v.source_url, v.thumbnail_url
+     FROM videos v
+     WHERE (
+       v.media_type = 'tiktok'
+       OR v.source_url LIKE 'https://www.tiktok.com/%/video/%'
+       OR v.source_url LIKE 'https://tiktok.com/%/video/%'
+     )
+       AND NOT EXISTS (
+         SELECT 1 FROM tiktok_oembed_cache c
+         WHERE v.source_url LIKE '%/video/' || c.video_id || '%'
+       )
+       AND NOT EXISTS (
+         SELECT 1 FROM tiktok_oembed_backfill_failures f
+         WHERE v.source_url LIKE '%/video/' || f.video_id || '%'
+           AND (f.failure_count >= 5 OR (f.next_retry_at IS NOT NULL AND f.next_retry_at > datetime('now')))
+       )
+     ORDER BY v.id ASC
+     LIMIT ?`,
+  ).bind(limit).all();
+
+  const outcomes = [];
+  for (const row of candidates.results || []) {
+    const share = normalizeTikTokShareUrl(row.source_url);
+    if (!share) continue;
+    const videoId = share.match(/\/video\/(\d+)\/?$/)?.[1] || "";
+    try {
+      const preview = await fetchTikTokPreview(env, share, { force: true });
+      if (preview.thumbnail_url && !row.thumbnail_url) {
+        await env.DB.prepare(
+          "UPDATE videos SET thumbnail_url = COALESCE(thumbnail_url, ?) WHERE id = ?",
+        ).bind(preview.thumbnail_url, Number(row.id)).run();
+      }
+      await env.DB.prepare(
+        "DELETE FROM tiktok_oembed_backfill_failures WHERE video_id = ?",
+      ).bind(videoId).run();
+      outcomes.push({ id: Number(row.id), video_id: videoId, status: "complete" });
+    } catch (error) {
+      await recordTikTokBackfillFailure(env, share, error);
+      outcomes.push({
+        id: Number(row.id),
+        video_id: videoId,
+        status: "failed",
+        error: cleanText(error?.message || "Backfill failed", 120),
+      });
+    }
+  }
+  return outcomes;
 }
 
 async function tikTokPreviewBatch(request, env) {

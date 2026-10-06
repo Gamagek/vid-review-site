@@ -83,6 +83,22 @@
   pointer-events: auto;
 }
 
+.tiktok-player-active .tiktok-inline-player {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  opacity: 0;
+  transition: opacity .16s ease;
+}
+
+.tiktok-player-active.tiktok-player-ready .tiktok-inline-player {
+  opacity: 1;
+}
+
+.tiktok-player-active.tiktok-player-ready .tiktok-microlink-preview {
+  visibility: hidden;
+}
+
 .tiktok-player-active .tile-media::after,
 .tiktok-player-active .play-orb,
 .tiktok-player-active .preview-status {

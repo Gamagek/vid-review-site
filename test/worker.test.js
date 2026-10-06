@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
-import worker from "../src/index.js";
+import worker, { processTikTokOEmbedBackfill } from "../src/index.js";
 import { refreshSourceMetadata, sanitizeWatchHtml } from "../src/edge.js";
 import seoEdge from "../src/seo-edge.js";
 
@@ -20,6 +20,7 @@ const migrations = [
   "0016_rights_certified_r2_cache.sql",
   "0017_authorized_auto_cache.sql",
   "0018_tiktok_oembed_cache.sql",
+  "0019_tiktok_oembed_backfill.sql",
 ];
 
 class TestD1Statement {
@@ -1612,7 +1613,9 @@ test("renders the current Vid.Best TikTok direct official player with separate h
   assert.match(homeSource, /https:\/\/www\.tiktok\.com\/player\/v1\//);
   assert.match(homeSource, /tiktok-player-active/);
   assert.match(homeSource, /activeRatio < ACTIVE_MIN_VISIBILITY/);
-  assert.doesNotMatch(homeSource, /loadTikTokFacadePreviews/);
+  assert.match(homeSource, /loadCachedTikTokFacadePreviews/);
+  assert.match(homeSource, /\/api\/tiktok\/cached-previews/);
+  assert.match(homeSource, /activeTikTokIsFullscreen/);
   assert.doesNotMatch(homeSource, /fetch\("\/api\/tiktok\/previews/);
   assert.doesNotMatch(homeSource, /buildTikTokPreviewPlayerUrl/);
   assert.match(homeSource, /PREVIEW_DELAY_MS = 450/);
@@ -1693,7 +1696,90 @@ test("TikTok home cards defer all player creation until a user click and keep on
   assert.match(homeSource, /previewState\.activeCard = card;/);
   assert.match(homeSource, /if \(previewState\.activeCard\?\.dataset\.videoProvider === "tiktok"\)/);
   assert.match(homeSource, /if \(activeRatio < ACTIVE_MIN_VISIBILITY\) stopPreview\(previewState\.activeCard\)/);
+  assert.match(homeSource, /surface\.append\(iframe\)/);
+  assert.match(homeSource, /tiktok-player-ready/);
+  assert.match(homeSource, /activeTikTokIsFullscreen/);
   assert.doesNotMatch(homeSource, /fetch\("\/api\/tiktok\/previews/);
+});
+
+test("serves homepage TikTok preview cards from D1 without contacting TikTok", async () => {
+  const context = createTestContext();
+  const share = "https://www.tiktok.com/@cachedcreator/video/7622472784039415061";
+  context.sqlite.prepare(
+    `INSERT INTO tiktok_oembed_cache (
+       video_id, share_url, title, author_name, author_url, description, thumbnail_url
+     ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+  ).run(
+    "7622472784039415061",
+    share,
+    "Cached title",
+    "Cached Creator",
+    "https://www.tiktok.com/@cachedcreator",
+    "Fast cached card",
+    "https://p16-common-sign.tiktokcdn-us.com/cached.jpg",
+  );
+
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => { throw new Error("cached-only preview must not contact TikTok"); };
+  try {
+    const response = await send(context, "/api/tiktok/cached-previews?url=" + encodeURIComponent(share));
+    assert.equal(response.status, 200);
+    const payload = await response.json();
+    assert.equal(payload.previews[0].cache_source, "d1");
+    assert.equal(payload.previews[0].author_name, "Cached Creator");
+    assert.equal(payload.previews[0].description, "Fast cached card");
+    assert.equal(payload.previews[0].thumbnail_url, null);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("backfills existing TikTok records conservatively into D1", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, published)
+     VALUES
+       ('old-tiktok-one', 'Old one', 'https://www.tiktok.com/@one/video/7622472784039415061', 'tiktok', 'Social Media & Trending', 'TikTok Viral Challenges', 1),
+       ('old-tiktok-two', 'Old two', 'https://www.tiktok.com/@two/video/6718335390845095173', 'tiktok', 'Social Media & Trending', 'TikTok Viral Challenges', 1)`,
+  ).run();
+
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url) => {
+    calls.push(String(url));
+    const parsed = new URL(String(url));
+    const share = parsed.searchParams.get("url") || "";
+    const id = share.match(/\/video\/(\d+)/)?.[1];
+    return new Response(JSON.stringify({
+      type: "video",
+      title: "Cached " + id,
+      author_name: "creator",
+      author_url: "https://www.tiktok.com/@creator",
+      description: "Backfilled",
+    }), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  try {
+    const outcomes = await processTikTokOEmbedBackfill(context.env, { limit: 2 });
+    assert.equal(outcomes.length, 2);
+    assert.equal(outcomes.every((item) => item.status === "complete"), true);
+    assert.equal(calls.length, 2);
+    assert.equal(
+      context.sqlite.prepare("SELECT COUNT(*) AS count FROM tiktok_oembed_cache").get().count,
+      2,
+    );
+
+    globalThis.fetch = async () => { throw new Error("already cached records must not refetch"); };
+    assert.deepEqual(await processTikTokOEmbedBackfill(context.env, { limit: 2 }), []);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("fullscreen swipe does not warm a second TikTok iframe", () => {
+  const source = readFileSync(new URL("../public/swipe-viewer.js", import.meta.url), "utf8");
+  assert.match(source, /const warmProviders = new Set\(\["youtube", "vimeo", "raw", "r2", "hls"\]\)/);
+  assert.doesNotMatch(source, /warmProviders = new Set\([^\n]*"tiktok"/);
+  assert.match(source, /if \(!warmProviders\.has\(card\.video\.provider\) && card !== cards\[index\]\) return;/);
 });
 
 test("builds a batch TikTok preview from official oEmbed and then D1 cache", async () => {

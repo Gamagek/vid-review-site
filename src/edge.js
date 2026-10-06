@@ -1,4 +1,4 @@
-import app, { processAuthorizedCacheJobs, resolveReactionSalt } from "./index.js";
+import app, { processAuthorizedCacheJobs, processTikTokOEmbedBackfill, resolveReactionSalt } from "./index.js";
 
 const CRAWLER_PATTERN = /\b(?:bot|crawler|spider|slurp|bingpreview|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|pinterestbot|duckduckbot|baiduspider|yandexbot)\b/i;
 const EXTERNAL_VIDEO_HOSTS = new Set([
@@ -619,6 +619,11 @@ async function scheduledHandler(controller, env, ctx) {
   ctx.waitUntil(
     processAuthorizedCacheJobs(env, { limit: 2 })
       .catch((error) => console.error("Scheduled authorized auto-cache failed", error?.message || error)),
+  );
+  ctx.waitUntil(
+    processTikTokOEmbedBackfill(env, {
+      limit: Number(env.TIKTOK_OEMBED_BACKFILL_BATCH || 3),
+    }).catch((error) => console.error("Scheduled TikTok oEmbed backfill failed", error?.message || error)),
   );
 
   if (controller?.cron !== "17 3 * * *") return;
