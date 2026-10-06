@@ -1640,7 +1640,7 @@ test("renders the current Vid.Best TikTok cache-first watch player with separate
   assert.ok(indexSource.includes("/api/tiktok/cached-poster"));
   assert.match(indexSource, /buildTikTokPlayerUrl/);
   assert.doesNotMatch(indexSource, /tiktok-gateway-player/);
-  assert.match(indexSource, /www.tiktok.com/oembed/);
+  assert.ok(indexSource.includes("www.tiktok.com/oembed"));
   assert.match(indexSource, /tiktok_oembed_cache/);
   assert.doesNotMatch(indexSource, /video.megasale.win/);
 
