@@ -20,10 +20,14 @@ const previewState = {
   visibility: new Map(),
   observer: null,
   activeCleanup: null,
+  tiktokMetadataRequested: new Set(),
 };
 
 document.addEventListener("DOMContentLoaded", initializePreviews);
-document.addEventListener("vidbest:grid-rendered", decorateVideoCards);
+document.addEventListener("vidbest:grid-rendered", () => {
+  decorateVideoCards();
+  void loadCachedTikTokFacadePreviews();
+});
 
 function initializePreviews() {
   if ("IntersectionObserver" in window) {
@@ -33,11 +37,14 @@ function initializePreviews() {
     });
   }
   decorateVideoCards();
+  void loadCachedTikTokFacadePreviews();
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) stopPreview();
     else chooseVisibleCandidate();
   });
   window.addEventListener("pagehide", () => stopPreview());
+  document.addEventListener("fullscreenchange", chooseVisibleCandidate);
+  document.addEventListener("webkitfullscreenchange", chooseVisibleCandidate);
 }
 
 function decorateVideoCards() {
@@ -129,6 +136,11 @@ function handleVisibility(entries) {
   chooseVisibleCandidate();
 }
 
+function activeTikTokIsFullscreen(card) {
+  const fullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+  return Boolean(fullscreen && card?.contains(fullscreen));
+}
+
 function chooseVisibleCandidate() {
   if (document.hidden) return;
 
@@ -137,6 +149,7 @@ function chooseVisibleCandidate() {
     : 0;
 
   if (previewState.activeCard?.dataset.videoProvider === "tiktok") {
+    if (activeTikTokIsFullscreen(previewState.activeCard)) return;
     if (activeRatio < ACTIVE_MIN_VISIBILITY) stopPreview(previewState.activeCard);
     else return;
   }
@@ -297,6 +310,8 @@ function stopPreview(card = null, statusMessage = "") {
   active.querySelector(".preview-surface")?.replaceChildren();
   active.classList.remove("preview-playing");
   active.classList.remove("tiktok-player-active");
+  active.classList.remove("tiktok-player-loading");
+  active.classList.remove("tiktok-player-ready");
   active.classList.remove("facebook-facade-ready");
   active.classList.remove("facebook-direct-player-ready");
   previewState.activeCard = null;
@@ -442,9 +457,20 @@ function activateTikTokPlayer(card) {
   iframe.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
   iframe.allowFullscreen = true;
 
-  surface.replaceChildren(iframe);
-  card.classList.add("preview-playing", "tiktok-player-active");
+  const revealPlayer = () => {
+    if (previewState.activeCard !== card) return;
+    card.classList.add("tiktok-player-ready");
+  };
+  const revealTimer = window.setTimeout(revealPlayer, 8000);
+  iframe.addEventListener("load", revealPlayer, { once: true });
+
+  surface.append(iframe);
+  card.classList.add("preview-playing", "tiktok-player-active", "tiktok-player-loading");
   previewState.activeCard = card;
+  previewState.activeCleanup = () => {
+    window.clearTimeout(revealTimer);
+    iframe.removeEventListener("load", revealPlayer);
+  };
 
   const status = card.querySelector(".preview-status");
   if (status) status.textContent = "";
@@ -458,6 +484,44 @@ function buildFacebookMicrolinkImageUrl(sourceUrl) {
     return "/api/facebook/thumbnail?url=" + encodeURIComponent(url.toString());
   } catch {
     return "";
+  }
+}
+
+function applyCachedTikTokPreview(card, preview) {
+  if (!card?.isConnected || !preview || card.classList.contains("tiktok-player-active")) return;
+  card.dataset.tiktokCacheReady = preview.cache_source === "d1" ? "1" : "0";
+  if (preview.author_name) card.dataset.tiktokAuthor = preview.author_name;
+  if (preview.caption || preview.title) card.dataset.tiktokCaption = preview.caption || preview.title;
+  if (preview.description) card.dataset.tiktokDescription = preview.description;
+  renderTikTokFacade(card);
+}
+
+async function loadCachedTikTokFacadePreviews() {
+  const pending = [...document.querySelectorAll('.video-tile[data-video-provider="tiktok"]')]
+    .map((card) => ({ card, share: parseTikTokShareUrl(card.dataset.videoSource) }))
+    .filter(({ card, share }) => share && !previewState.tiktokMetadataRequested.has(share.id) && !card.classList.contains("tiktok-player-active"));
+  if (!pending.length) return;
+
+  for (let index = 0; index < pending.length; index += 24) {
+    const batch = pending.slice(index, index + 24);
+    const params = new URLSearchParams();
+    for (const { share } of batch) {
+      previewState.tiktokMetadataRequested.add(share.id);
+      params.append("url", share.url);
+    }
+
+    try {
+      const response = await fetch("/api/tiktok/cached-previews?" + params.toString(), {
+        credentials: "same-origin",
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) continue;
+      const payload = await response.json();
+      const byId = new Map((payload.previews || []).map((preview) => [String(preview.video_id || ""), preview]));
+      for (const { card, share } of batch) applyCachedTikTokPreview(card, byId.get(share.id));
+    } catch {
+      // The existing local facade remains available when cached metadata cannot be read.
+    }
   }
 }
 
@@ -483,15 +547,21 @@ function renderTikTokFacade(card) {
 
   const providerRow = document.createElement("span");
   providerRow.className = "tiktok-microlink-provider";
-  providerRow.textContent = "TikTok · click to play";
+  providerRow.textContent = card.dataset.tiktokCacheReady === "1"
+    ? "TikTok preview · tap to play"
+    : "TikTok · tap to play";
 
   const author = document.createElement("span");
   author.className = "tiktok-microlink-author";
-  author.textContent = share.username ? "@" + share.username : "TikTok creator";
+  author.textContent = card.dataset.tiktokAuthor
+    || (share.username ? "@" + share.username : "TikTok creator");
 
   const caption = document.createElement("span");
   caption.className = "tiktok-microlink-caption";
-  caption.textContent = card.dataset.videoTitle || "Play this TikTok video";
+  caption.textContent = card.dataset.tiktokDescription
+    || card.dataset.tiktokCaption
+    || card.dataset.videoTitle
+    || "Play this TikTok video";
 
   const play = document.createElement("span");
   play.className = "tiktok-facade-play";
