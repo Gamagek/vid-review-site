@@ -19,6 +19,7 @@ const migrations = [
   "0014_member_notifications.sql",
   "0016_rights_certified_r2_cache.sql",
   "0017_authorized_auto_cache.sql",
+  "0018_tiktok_oembed_cache.sql",
 ];
 
 class TestD1Statement {
@@ -234,44 +235,16 @@ test("homepage Facebook tiles use the direct official player", () => {
   assert.doesNotMatch(source, /facebook-microlink-preview/);
 });
 
-test("signed /watch route rejects bad ids", async () => {
-  const context = createTestContext({ ["SIGN_" + "SECRET"]: secret });
-  const response = await seoEdge.fetch(
-    new Request("https://example.com/watch?user=umbralarchive&id=not-a-number"),
-    context.env,
-    context.ctx,
-  );
-  assert.equal(response.status, 400);
-  assert.equal(await response.text(), "Bad link");
-});
-
-test("signed /watch route rejects missing secret without generating a fallback signature", async () => {
-  const context = createTestContext();
-  const response = await seoEdge.fetch(
-    new Request("https://example.com/watch?user=umbralarchive&id=7552567024304540959"),
-    context.env,
-    context.ctx,
-  );
-  assert.equal(response.status, 500);
-  assert.equal(await response.text(), "Not configured");
-});
-
-test("signed /watch route returns a signed gateway iframe", async () => {
+test("legacy signed /watch gateway route is permanently retired", async () => {
   const context = createTestContext({ ["SIGN_" + "SECRET"]: secret });
   const response = await seoEdge.fetch(
     new Request("https://example.com/watch?user=umbralarchive&id=7552567024304540959"),
     context.env,
     context.ctx,
   );
-  assert.equal(response.status, 200);
-  assert.equal(response.headers.get("Content-Type"), "text/html; charset=utf-8");
-  assert.equal(response.headers.get("Cache-Control"), "public, max-age=300");
-
-  const html = await response.text();
-  assert.match(
-    html,
-    /<iframe src="https:\/\/video\.megasale\.win\/\?url=https%3A%2F%2Fwww\.tiktok\.com%2F%40umbralarchive%2Fvideo%2F7552567024304540959&amp;exp=\d+&amp;sig=[a-f0-9]{64}" width="325" height="580" style="border:0;max-width:100%" allow="fullscreen"><\/iframe>/,
-  );
+  assert.equal(response.status, 410);
+  assert.equal(response.headers.get("X-Robots-Tag"), "noindex,follow");
+  assert.equal(await response.text(), "Legacy TikTok gateway route retired");
 });
 
 test("TikTok watch pages use the direct official player without the private gateway", async () => {
@@ -697,8 +670,8 @@ test("gives AI generation a longer browser timeout than ordinary requests", () =
   assert.match(source, /url\.startsWith\("\/api\/ai\/generate"\) \? 35000 : 15000/);
 });
 
-test("uses the optional NGINX TikTok facade for metadata without writing R2 cache files", async () => {
-  const context = createTestContext({ TIKTOK_FACADE_API_URL: "https://gateway.example.com/api/tiktok-oembed" });
+test("caches official TikTok oEmbed metadata durably in D1", async () => {
+  const context = createTestContext();
   const originalFetch = globalThis.fetch;
   const sample = "https://www.tiktok.com/@rorozya/video/7622472784039415061";
   const calls = [];
@@ -708,22 +681,84 @@ test("uses the optional NGINX TikTok facade for metadata without writing R2 cach
       type: "video",
       title: "ro² (@rorozya) on TikTok",
       author_name: "ro²",
+      author_url: "https://www.tiktok.com/@rorozya",
       thumbnail_url: "https://p19-common-sign.tiktokcdn-us.com/example/preview.jpg",
+      description: "Cached metadata",
     }), { status: 200, headers: { "Content-Type": "application/json" } });
   };
   try {
-    const response = await send(context, "/api/tiktok/preflight?url=" + encodeURIComponent(sample));
-    assert.equal(response.status, 200);
-    const payload = await response.json();
-    assert.equal(payload.ok, true);
-    assert.equal(payload.cached, true);
-    assert.equal(payload.video_id, "7622472784039415061");
-    assert.match(calls[0], /^https:\/\/gateway\.example\.com\/api\/tiktok-oembed\?url=/);
+    const first = await send(context, "/api/tiktok/preflight?url=" + encodeURIComponent(sample));
+    assert.equal(first.status, 200);
+    const firstPayload = await first.json();
+    assert.equal(firstPayload.ok, true);
+    assert.equal(firstPayload.cached, false);
+    assert.equal(firstPayload.cache_source, "origin");
+    assert.equal(firstPayload.video_id, "7622472784039415061");
+    assert.equal(calls.length, 1);
+    assert.match(calls[0], /^https:\/\/www\.tiktok\.com\/oembed\?url=/);
+
+    const row = context.sqlite.prepare(
+      "SELECT video_id, share_url, author_name, description, thumbnail_url FROM tiktok_oembed_cache WHERE video_id = ?",
+    ).get("7622472784039415061");
+    assert.equal(row.share_url, sample);
+    assert.equal(row.author_name, "ro²");
+    assert.equal(row.description, "Cached metadata");
     assert.equal(context.bucket.objects.size, 0);
+
+    globalThis.fetch = async () => {
+      throw new Error("D1 cache should satisfy the second request");
+    };
+    const second = await send(context, "/api/tiktok/preflight?url=" + encodeURIComponent(sample));
+    assert.equal(second.status, 200);
+    const secondPayload = await second.json();
+    assert.equal(secondPayload.ok, true);
+    assert.equal(secondPayload.cached, true);
+    assert.equal(secondPayload.cache_source, "d1");
+    assert.equal(secondPayload.author_name, "ro²");
   } finally {
     globalThis.fetch = originalFetch;
   }
 });
+
+test("refreshes TikTok oEmbed metadata when a TikTok record is published", async () => {
+  const context = createTestContext({ TIKTOK_OEMBED_REFRESH_ON_PUBLISH: "1" });
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    if (!String(url).startsWith("https://www.tiktok.com/oembed?")) return originalFetch(url);
+    return new Response(JSON.stringify({
+      type: "video",
+      title: "Publish metadata",
+      author_name: "creator",
+      author_url: "https://www.tiktok.com/@creator",
+      thumbnail_url: "https://p16-common-sign.tiktokcdn-us.com/publish.jpg",
+      description: "Fetched after publish",
+    }), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  try {
+    const response = await send(context, "/api/videos", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: "Published TikTok",
+        source_url: "https://www.tiktok.com/@creator/video/6718335390845095173",
+        primary_category: "Social Media & Trending",
+        subcategory: "TikTok Viral Challenges",
+        published: true,
+      }),
+    });
+    assert.equal(response.status, 201);
+    await Promise.all(context.pending.splice(0));
+    const cached = context.sqlite.prepare(
+      "SELECT title, author_name, description FROM tiktok_oembed_cache WHERE video_id = ?",
+    ).get("6718335390845095173");
+    assert.equal(cached.title, "Publish metadata");
+    assert.equal(cached.author_name, "creator");
+    assert.equal(cached.description, "Fetched after publish");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("stores TikTok source and renders the direct official player", async () => {
   const context = createTestContext();
   const response = await send(context, "/api/videos", {
@@ -1599,6 +1634,16 @@ test("renders the current Vid.Best TikTok direct official player with separate h
   assert.doesNotMatch(indexSource, /tiktok-gateway-player/);
   assert.match(indexSource, /\/api\/tiktok\/preflight/);
   assert.match(indexSource, /www\.tiktok\.com\/oembed/);
+  assert.match(indexSource, /tiktok_oembed_cache/);
+  assert.match(indexSource, /__tiktok-oembed-cache/);
+  assert.doesNotMatch(indexSource, /video\.megasale\.win/);
+  assert.doesNotMatch(indexSource, /TIKTOK_GATEWAY_ORIGIN/);
+  assert.doesNotMatch(indexSource, /TIKTOK_FACADE_API_URL/);
+
+  const seoSource = readFileSync(new URL("../src/seo-edge.js", import.meta.url), "utf8");
+  assert.doesNotMatch(seoSource, /video\.megasale\.win/);
+  assert.doesNotMatch(seoSource, /signedWatchResponse/);
+  assert.doesNotMatch(seoSource, /SIGN_SECRET/);
 });
 
 
@@ -1651,8 +1696,8 @@ test("TikTok home cards defer all player creation until a user click and keep on
   assert.doesNotMatch(homeSource, /fetch\("\/api\/tiktok\/previews/);
 });
 
-test("builds a batch TikTok facade preview from the configured facade endpoint", async () => {
-  const context = createTestContext({ TIKTOK_FACADE_API_URL: "https://gateway.example.com/tiktok-preview" });
+test("builds a batch TikTok preview from official oEmbed and then D1 cache", async () => {
+  const context = createTestContext();
   const share = "https://www.tiktok.com/@rorozya/video/7622472784039415061";
   const originalFetch = globalThis.fetch;
   const calls = [];
@@ -1679,12 +1724,19 @@ test("builds a batch TikTok facade preview from the configured facade endpoint",
     assert.equal(result.previews[0].author_name, "ro²");
     assert.equal(result.previews[0].description, "Kisah cinta antara pelayan dan majikan #meriaashiqui");
     assert.equal(result.previews[0].thumbnail_url, "https://p16-common-sign.tiktokcdn-us.com/example.jpg");
+    assert.equal(result.previews[0].cache_source, "origin");
     assert.equal(calls.length, 1);
-    assert.match(calls[0], /^https:\/\/gateway\.example\.com\/tiktok-preview\?url=/);
+    assert.match(calls[0], /^https:\/\/www\.tiktok\.com\/oembed\?url=/);
+
+    globalThis.fetch = async () => { throw new Error("Should use D1"); };
+    const cached = await send(context, "/api/tiktok/previews?url=" + encodeURIComponent(share));
+    const cachedResult = await cached.json();
+    assert.equal(cachedResult.previews[0].cache_source, "d1");
   } finally {
     globalThis.fetch = originalFetch;
   }
 });
+
 test("repairs a legacy TikTok record with only its source URL and uses the Saiyaara title", async () => {
   const context = createTestContext();
   context.sqlite.prepare(

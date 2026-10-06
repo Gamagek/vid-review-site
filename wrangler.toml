@@ -9,6 +9,7 @@ PUBLIC_BASE_URL = "https://vid.best"
 GEMINI_MODEL = "gemini-3.1-flash-lite"
 MAX_UPLOAD_BYTES = "104857600"
 MAX_AUTO_CACHE_BYTES = "104857600"
+TIKTOK_OEMBED_REFRESH_ON_PUBLISH = "1"
 
 [assets]
 directory = "./public"
