@@ -1682,7 +1682,7 @@ test("notification hub hides mail transport details and keeps browser alert cont
   assert.match(source, /id="shortcut-button"/);
   assert.doesNotMatch(source, /Email sign-in and new-video emails use your verified sending setup/);
   assert.doesNotMatch(source, />New video emails</);
-  assert.match(source, /Account email/);
+  assert.match(source, /Email address/);
   assert.match(source, />Email alerts</);
   const script = readFileSync(new URL("../public/notifications.js", import.meta.url), "utf8");
   assert.doesNotMatch(script, /\[object HTMLParagraphElement\]/);
