@@ -1246,13 +1246,13 @@ async function homeMiniFeed(request, env) {
   const limit = clampInteger(new URL(request.url).searchParams.get("limit"), 4, 12, 8);
   const member = await getCurrentMember(request, env);
 
-  const [watchedResult, likedResult] = await env.DB.batch([
+  const [watchedResult, likedResult] = await Promise.all([
     env.DB.prepare(
       `SELECT v.* FROM videos v
        WHERE v.published = 1
        ORDER BY v.views DESC, v.reaction_count DESC, v.updated_at DESC
        LIMIT ?`,
-    ).bind(limit),
+    ).bind(limit).all(),
     env.DB.prepare(
       `SELECT v.*, COALESCE(r.positive_reactions, 0) AS positive_reactions
        FROM videos v
@@ -1265,7 +1265,7 @@ async function homeMiniFeed(request, env) {
        WHERE v.published = 1
        ORDER BY positive_reactions DESC, v.reaction_count DESC, v.views DESC, v.updated_at DESC
        LIMIT ?`,
-    ).bind(limit),
+    ).bind(limit).all(),
   ]);
 
   let personalizedRows = [];
