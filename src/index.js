@@ -1400,7 +1400,7 @@ async function createVideo(request, env, ctx) {
     ctx?.waitUntil?.(notifyNewVideoSubscribers(env, row));
     if (detectMediaProvider(row) === "facebook") ctx?.waitUntil?.(persistFacebookPreview(env, row));
   }
-  if (detectMediaProvider(row) === "tiktok") {
+  if (detectMediaProvider(row) === "tiktok" && String(env.TIKTOK_OEMBED_REFRESH_ON_PUBLISH || "") === "1") {
     ctx?.waitUntil?.(persistTikTokOEmbedMetadata(env, row));
   }
   if (row?.cache_status === "pending") {
@@ -1472,7 +1472,11 @@ async function updateVideo(request, env, id, ctx) {
   if (row?.published && detectMediaProvider(row) === "facebook") {
     ctx?.waitUntil?.(persistFacebookPreview(env, row));
   }
-  if (detectMediaProvider(row) === "tiktok" && (existing.source_url !== row.source_url || (!existing.published && row.published))) {
+  if (
+    detectMediaProvider(row) === "tiktok"
+    && String(env.TIKTOK_OEMBED_REFRESH_ON_PUBLISH || "") === "1"
+    && (existing.source_url !== row.source_url || (!existing.published && row.published))
+  ) {
     ctx?.waitUntil?.(persistTikTokOEmbedMetadata(env, row));
   }
   if (row?.cache_status === "pending") {
