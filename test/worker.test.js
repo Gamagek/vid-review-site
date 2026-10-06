@@ -276,14 +276,14 @@ test("TikTok watch pages start from a cached preview and only viewer mode embeds
   assert.match(html, /data-tiktok-player-mode="cache-first"/);
   assert.match(html, /Cached preview description/);
   assert.match(html, //api/tiktok/cached-poster?id=7552567024304540959/);
-  assert.ok(html.includes('data-tiktok-player-src="https://www.tiktok.com/player/v1/7552567024304540959?'));
+  assert.ok(html.includes(`data-tiktok-player-src="https://www.tiktok.com/player/v1/7552567024304540959?`));
   assert.equal(html.includes('<iframe id="watch-media-frame" class="tiktok-official-player"'), false);
 
   const viewer = await send(context, "/watch/gateway-tiktok-test?viewer=1");
   const viewerHtml = await viewer.text();
   assert.match(viewerHtml, /class="tiktok-official-player"/);
   assert.match(viewerHtml, /data-tiktok-player-mode="official-direct"/);
-  assert.ok(viewerHtml.includes('src="https://www.tiktok.com/player/v1/7552567024304540959?'));
+  assert.ok(viewerHtml.includes(`src="https://www.tiktok.com/player/v1/7552567024304540959?`));
   assert.doesNotMatch(viewerHtml, /video.megasale.win/);
 });
 test("Facebook mini preview stays separate from the original-quality watch player", async () => {
@@ -804,7 +804,7 @@ test("stores TikTok source and renders the cache-first watch stage", async () =>
   assert.match(html, /data-tiktok-id="6718335390845095173"/);
   assert.match(html, /data-tiktok-share=/);
   assert.match(html, /data-tiktok-player-mode="cache-first"/);
-  assert.ok(html.includes('data-tiktok-player-src="https://www.tiktok.com/player/v1/6718335390845095173?'));
+  assert.ok(html.includes(`data-tiktok-player-src="https://www.tiktok.com/player/v1/6718335390845095173?`));
   assert.doesNotMatch(html, /<iframe[^>]+class="tiktok-official-player"/);
   assert.doesNotMatch(html, /data-tiktok-gateway-src/);
   assert.doesNotMatch(html, /video.megasale.win/);
@@ -1606,7 +1606,7 @@ test("renders the current Vid.Best TikTok cache-first watch player with separate
   assert.match(html, /class="tiktok-cache-player"/);
   assert.match(html, /data-tiktok-id="7669587518156705056"/);
   assert.match(html, /data-tiktok-player-mode="cache-first"/);
-  assert.ok(html.includes('data-tiktok-player-src="https://www.tiktok.com/player/v1/7669587518156705056?'));
+  assert.ok(html.includes(`data-tiktok-player-src="https://www.tiktok.com/player/v1/7669587518156705056?`));
   assert.doesNotMatch(html, /<iframe[^>]+class="tiktok-official-player"/);
   assert.doesNotMatch(html, /data-tiktok-gateway-src/);
   assert.doesNotMatch(html, /video.megasale.win/);
@@ -1666,7 +1666,7 @@ test("builds TikTok cache-first watch playback without requiring SIGN_SECRET or 
   const html = await page.text();
   assert.match(html, /class="tiktok-cache-player"/);
   assert.match(html, /data-tiktok-player-mode="cache-first"/);
-  assert.ok(html.includes('data-tiktok-player-src="https://www.tiktok.com/player/v1/7669587518156705056?'));
+  assert.ok(html.includes(`data-tiktok-player-src="https://www.tiktok.com/player/v1/7669587518156705056?`));
   assert.equal(html.includes('<iframe id="watch-media-frame" class="tiktok-official-player"'), false);
   assert.doesNotMatch(html, /data-tiktok-gateway-src/);
   assert.doesNotMatch(html, /video.megasale.win/);
