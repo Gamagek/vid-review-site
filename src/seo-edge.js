@@ -546,6 +546,18 @@ export default {
       return combinedSitemap(env);
     }
 
+    if (url.pathname === "/watch") {
+      return new Response("Legacy TikTok gateway route retired", {
+        status: 410,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "public, max-age=86400",
+          "X-Robots-Tag": "noindex,follow",
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    }
+
     if (url.pathname === "/videos" && ["GET", "HEAD"].includes(request.method)) {
       return htmlResponse(await videoIndexPage(env));
     }
