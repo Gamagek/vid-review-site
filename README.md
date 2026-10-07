@@ -39,6 +39,14 @@ The Teamwork API can query an operator-configured 4get JSON endpoint during an a
 
 Published watch pages are rendered from D1 by the Worker. Workers caching is enabled for responses that are explicitly cacheable; administrator and sensitive API responses already use `no-store`. Watch pages use a short freshness period plus `stale-while-revalidate` for resilience.
 
+### TikTok oEmbed gateway and cache
+
+TikTok metadata requests are centralized in `src/index.js`. The configured Worker variable is:
+
+`TIKTOK_OEMBED_GATEWAY=https://tiktok-oembed-gateway.gkasunc.workers.dev/`
+
+The public browser never calls that gateway directly. Browser code calls Vid.Best's same-origin endpoints such as `/api/tiktok/embed`, while the Worker handles the upstream gateway request. Normalized oEmbed metadata is cached in D1 and Cloudflare Cache API for 24 hours. Raw upstream HTML is not returned to the frontend; the frontend builds the minimal official TikTok blockquote from the validated canonical URL and video ID.
+
 ### Video SEO correctness
 
 The watch page includes canonical, Open Graph and X/Twitter metadata. `VideoObject` JSON-LD is emitted conservatively:
@@ -62,7 +70,7 @@ this wrapper. Its own embed may send viewers to Instagram to watch; iframe load
 is not treated as proof of playback. Generic playback and Audio Lab controls are
 excluded from Instagram pages. Other providers keep their existing player paths.
 
-TikTok watch pages use a dedicated Vid.Best direct player. The browser polls the signed `video.megasale.win` gateway, keeps a loading panel visible while the gateway prepares or uploads the MP4 to R2, and switches immediately to a native `<video crossorigin="anonymous">` stream when the cache is ready. TikTok watch pages do not depend on a TikTok iframe; the direct R2 player is the only TikTok playback surface, and Audio Lab attaches only after the direct media element exists.
+TikTok now uses a metadata-first oEmbed architecture. Vid.Best never calls TikTok's oEmbed endpoint directly: the Worker fetches metadata through `https://tiktok-oembed-gateway.gkasunc.workers.dev/?url=...`, validates the JSON response, stores normalized metadata in D1 for 24 hours, and also uses the Cloudflare Cache API for a 24-hour edge cache. Watch pages and homepage cards render a same-origin cached preview first. On user action, Vid.Best requests a same-origin `/api/tiktok/embed` model and mounts TikTok's standard embed markup/script. If the oEmbed gateway is temporarily unavailable, stale D1 metadata remains the fallback. The old signed Portainer player gateway, direct `player/v1` construction, and TikTok-specific R2 player scripts have been removed.
 
 Self-hosted/raw video uses the browser's native player plus Vid.Best controls for play/pause, 10-second rewind/forward, playback speed, zoom, fullscreen and picture-in-picture when the browser supports it. Other trusted provider links keep their existing provider-owned embed paths for YouTube, Vimeo, Dailymotion, Twitch, Instagram and Facebook. Arbitrary iframe HTML is never accepted.
 
