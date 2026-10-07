@@ -53,7 +53,7 @@ class TestD1Database {
   }
 }
 
-function createContext() {
+function createContext(overrides = {}) {
   const sqlite = new DatabaseSync(":memory:");
   for (const migration of migrations) {
     sqlite.exec(readFileSync(new URL(`../migrations/${migration}`, import.meta.url), "utf8"));
@@ -72,6 +72,7 @@ function createContext() {
           });
         },
       },
+      ...overrides,
     },
     ctx: { waitUntil() {} },
   };
@@ -229,12 +230,20 @@ test("duplicate public paths permanently redirect without losing functional para
   }
 });
 
-test("legacy TikTok gateway helper is retired and remains non-indexable", async () => {
-  const context = createContext();
+test("signed TikTok watch wrapper remains non-indexable and points at the v7 gateway", async () => {
+  const context = createContext({
+    SIGN_SECRET: "0123456789abcdef0123456789abcdef",
+    TIKTOK_GATEWAY_ORIGIN: "https://video.megasale.win",
+  });
   const response = await request(context, "https://vid.best/watch?user=example&id=6718335390845095173");
-  assert.equal(response.status, 410);
-  assert.equal(response.headers.get("X-Robots-Tag"), "noindex,follow");
-  assert.equal(await response.text(), "Legacy TikTok gateway route retired");
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("X-Robots-Tag"), "noindex,nofollow");
+  assert.match(response.headers.get("Content-Security-Policy"), /frame-src https:\/\/video\.megasale\.win/);
+  const html = await response.text();
+  assert.match(html, /https:\/\/video\.megasale\.win\//);
+  assert.match(html, /url=https%3A%2F%2Fwww\.tiktok\.com%2F%40example%2Fvideo%2F6718335390845095173/);
+  assert.match(html, /exp=\d+/);
+  assert.match(html, /sig=[a-f0-9]{64}/);
 });
 
 test("category thumbnail URLs retain letters and digits during text normalization", async () => {

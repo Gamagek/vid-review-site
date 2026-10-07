@@ -371,19 +371,27 @@ test("homepage Facebook tiles use the direct official player", () => {
   assert.doesNotMatch(source, /facebook-microlink-preview/);
 });
 
-test("legacy signed /watch gateway route is permanently retired", async () => {
-  const context = createTestContext({ ["SIGN_" + "SECRET"]: secret });
+test("signed /watch route wraps the deployed v7 gateway without exposing the secret", async () => {
+  const context = createTestContext({
+    SIGN_SECRET: secret,
+    TIKTOK_GATEWAY_ORIGIN: "https://video.megasale.win",
+  });
   const response = await seoEdge.fetch(
     new Request("https://example.com/watch?user=umbralarchive&id=7552567024304540959"),
     context.env,
     context.ctx,
   );
-  assert.equal(response.status, 410);
-  assert.equal(response.headers.get("X-Robots-Tag"), "noindex,follow");
-  assert.equal(await response.text(), "Legacy TikTok gateway route retired");
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("X-Robots-Tag"), "noindex,nofollow");
+  const html = await response.text();
+  assert.match(html, /https:\/\/video\.megasale\.win\//);
+  assert.match(html, /url=https%3A%2F%2Fwww\.tiktok\.com%2F%40umbralarchive%2Fvideo%2F7552567024304540959/);
+  assert.match(html, /exp=\d+/);
+  assert.match(html, /sig=[a-f0-9]{64}/);
+  assert.doesNotMatch(html, new RegExp(secret));
 });
 
-test("TikTok watch pages start from a cached preview and only viewer mode embeds TikTok directly", async () => {
+test("TikTok watch pages keep the oEmbed cache preview and route playback through v7", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
@@ -408,18 +416,18 @@ test("TikTok watch pages start from a cached preview and only viewer mode embeds
   assert.match(policy, /worker-src 'self' blob:;/, "hls.js can initialize its local media worker");
   const html = await page.text();
   assert.match(html, /class="tiktok-cache-player"/);
-  assert.match(html, /data-tiktok-player-mode="cache-first"/);
+  assert.match(html, /data-tiktok-player-mode="cache-first-v7"/);
   assert.match(html, /Cached preview description/);
   assert.ok(html.includes("/api/tiktok/cached-poster?id=7552567024304540959"));
-  assert.ok(html.includes(`data-tiktok-player-src="https://www.tiktok.com/player/v1/7552567024304540959?`));
+  assert.ok(html.includes(`data-tiktok-watch-src="/watch?user=umbralarchive&amp;id=7552567024304540959"`));
   assert.equal(html.includes('<iframe id="watch-media-frame" class="tiktok-official-player"'), false);
 
   const viewer = await send(context, "/watch/gateway-tiktok-test?viewer=1");
   const viewerHtml = await viewer.text();
-  assert.match(viewerHtml, /class="tiktok-official-player"/);
-  assert.match(viewerHtml, /data-tiktok-player-mode="official-direct"/);
-  assert.ok(viewerHtml.includes(`src="https://www.tiktok.com/player/v1/7552567024304540959?`));
-  assert.doesNotMatch(viewerHtml, /video.megasale.win/);
+  assert.match(viewerHtml, /class="tiktok-official-player tiktok-gateway-player"/);
+  assert.match(viewerHtml, /data-tiktok-player-mode="v7-gateway"/);
+  assert.ok(viewerHtml.includes(`src="/watch?user=umbralarchive&amp;id=7552567024304540959"`));
+  assert.doesNotMatch(viewerHtml, /www\.tiktok\.com\/player\/v1/);
 });
 test("Facebook mini preview stays separate from the original-quality watch player", async () => {
   const context = createTestContext();
@@ -938,10 +946,10 @@ test("stores TikTok source and renders the cache-first watch stage", async () =>
   assert.match(html, /class="tiktok-cache-player"/);
   assert.match(html, /data-tiktok-id="6718335390845095173"/);
   assert.match(html, /data-tiktok-share=/);
-  assert.match(html, /data-tiktok-player-mode="cache-first"/);
-  assert.ok(html.includes(`data-tiktok-player-src="https://www.tiktok.com/player/v1/6718335390845095173?`));
+  assert.match(html, /data-tiktok-player-mode="cache-first-v7"/);
+  assert.ok(html.includes(`data-tiktok-watch-src="/watch?user=example&amp;id=6718335390845095173"`));
   assert.doesNotMatch(html, /<iframe[^>]+class="tiktok-official-player"/);
-  assert.doesNotMatch(html, /data-tiktok-gateway-src/);
+  assert.doesNotMatch(html, /data-tiktok-player-src=/);
   assert.doesNotMatch(html, /video.megasale.win/);
   assert.ok(!html.includes("https://www.tiktok.com/embed.js"));
 });
@@ -1740,8 +1748,8 @@ test("renders the current Vid.Best TikTok cache-first watch player with separate
   const html = await page.text();
   assert.match(html, /class="tiktok-cache-player"/);
   assert.match(html, /data-tiktok-id="7669587518156705056"/);
-  assert.match(html, /data-tiktok-player-mode="cache-first"/);
-  assert.ok(html.includes(`data-tiktok-player-src="https://www.tiktok.com/player/v1/7669587518156705056?`));
+  assert.match(html, /data-tiktok-player-mode="cache-first-v7"/);
+  assert.ok(html.includes(`data-tiktok-watch-src="/watch?user=saiyaara.4ever&amp;id=7669587518156705056"`));
   assert.doesNotMatch(html, /<iframe[^>]+class="tiktok-official-player"/);
   assert.doesNotMatch(html, /data-tiktok-gateway-src/);
   assert.doesNotMatch(html, /video.megasale.win/);
@@ -1753,7 +1761,7 @@ test("renders the current Vid.Best TikTok cache-first watch player with separate
   assert.match(watchSource, /initializeTikTokCacheFirstPlayer/);
   assert.match(watchSource, /data-tiktok-load-player/);
   assert.ok(watchSource.includes('document.createElement("iframe")'));
-  assert.match(watchSource, /official-after-cache/);
+  assert.match(watchSource, /v7-gateway-after-cache/);
 
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /parseTikTokShareUrl/);
@@ -1770,20 +1778,20 @@ test("renders the current Vid.Best TikTok cache-first watch player with separate
   assert.match(homeCssSource, /.tiktok-facade-play/);
 
   const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
-  assert.match(indexSource, /data-tiktok-player-mode="cache-first"/);
-  assert.match(indexSource, /data-tiktok-player-mode="official-direct"/);
+  assert.match(indexSource, /data-tiktok-player-mode="cache-first-v7"/);
+  assert.match(indexSource, /data-tiktok-player-mode="v7-gateway"/);
   assert.ok(indexSource.includes("/api/tiktok/cached-poster"));
   assert.match(indexSource, /buildTikTokPlayerUrl/);
-  assert.doesNotMatch(indexSource, /tiktok-gateway-player/);
+  assert.match(indexSource, /tiktok-gateway-player/);
   assert.ok(indexSource.includes("www.tiktok.com/oembed"));
   assert.match(indexSource, /tiktok_oembed_cache/);
   assert.doesNotMatch(indexSource, /video.megasale.win/);
 
   const seoSource = readFileSync(new URL("../src/seo-edge.js", import.meta.url), "utf8");
-  assert.doesNotMatch(seoSource, /video.megasale.win/);
-  assert.doesNotMatch(seoSource, /signedWatchResponse/);
+  assert.match(seoSource, /video.megasale.win/);
+  assert.match(seoSource, /signedWatchResponse/);
 });
-test("builds TikTok cache-first watch playback without requiring SIGN_SECRET or the private gateway", async () => {
+test("builds the TikTok cache preview before SIGN_SECRET is needed by the clicked gateway route", async () => {
   const context = createTestContext({ SIGN_SECRET: "" });
   context.sqlite.prepare(
     `INSERT INTO videos (
@@ -1800,8 +1808,8 @@ test("builds TikTok cache-first watch playback without requiring SIGN_SECRET or 
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /class="tiktok-cache-player"/);
-  assert.match(html, /data-tiktok-player-mode="cache-first"/);
-  assert.ok(html.includes(`data-tiktok-player-src="https://www.tiktok.com/player/v1/7669587518156705056?`));
+  assert.match(html, /data-tiktok-player-mode="cache-first-v7"/);
+  assert.ok(html.includes(`data-tiktok-watch-src="/watch?user=saiyaara.4ever&amp;id=7669587518156705056"`));
   assert.equal(html.includes('<iframe id="watch-media-frame" class="tiktok-official-player"'), false);
   assert.doesNotMatch(html, /data-tiktok-gateway-src/);
   assert.doesNotMatch(html, /video.megasale.win/);
@@ -1982,8 +1990,8 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   assert.ok(html.includes('class="tiktok-cache-player"'));
   assert.ok(html.includes('data-tiktok-id="6718335390845095173"'));
   assert.ok(html.includes('data-video-provider="tiktok"'));
-  assert.ok(html.includes('data-tiktok-player-mode="cache-first"'));
-  assert.ok(!html.includes('data-tiktok-gateway-src='));
+  assert.ok(html.includes('data-tiktok-player-mode="cache-first-v7"'));
+  assert.ok(html.includes('data-tiktok-watch-src='));
   assert.ok(!html.includes('video.megasale.win'));
 });
 test("discovers direct TikTok URLs without server-side TikTok requests", async () => {
