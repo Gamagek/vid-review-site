@@ -233,7 +233,10 @@ test("duplicate public paths permanently redirect without losing functional para
 test("legacy query-style TikTok watch gateway is no longer intercepted by SEO edge", async () => {
   const context = createContext();
   const response = await request(context, "https://vid.best/watch?user=example&id=6718335390845095173");
-  assert.notEqual(response.status, 200);
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.doesNotMatch(html, /video\.megasale\.win/);
+  assert.doesNotMatch(html, /sig=[a-f0-9]{64}/);
   const source = readFileSync(new URL("../src/seo-edge.js", import.meta.url), "utf8");
   assert.doesNotMatch(source, /signedWatchResponse/);
   assert.doesNotMatch(source, /SIGN_SECRET/);
