@@ -3119,16 +3119,17 @@ function renderMedia(video, playbackOrigin, viewer = false) {
   if (provider === "tiktok") {
     const tiktokId = extractTikTokId(video.source_url);
     if (!tiktokId) return "";
-    const playerSrc = buildTikTokPlayerUrl(tiktokId);
+    const username = extractTikTokUsername(video.source_url);
+    const watchSrc = `/watch?user=${encodeURIComponent(username)}&id=${encodeURIComponent(tiktokId)}`;
     if (viewer) {
-      return `<iframe id="watch-media-frame" class="tiktok-official-player" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${escapeHtml(video.source_url)}" data-tiktok-player-mode="official-direct" src="${escapeHtml(playerSrc)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+      return `<iframe id="watch-media-frame" class="tiktok-official-player tiktok-gateway-player" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${escapeHtml(video.source_url)}" data-tiktok-player-mode="v7-gateway" src="${escapeHtml(watchSrc)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
     }
 
     const preview = video.tiktok_preview || {};
     const previewTitle = cleanText(preview.description || preview.title || watchDisplayTitle(video), 180, watchDisplayTitle(video));
     const previewAuthor = cleanText(preview.author_name || extractTikTokUsername(video.source_url), 90, "TikTok creator");
     const poster = `/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`;
-    return `<div class="tiktok-cache-player" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${escapeHtml(video.source_url)}" data-tiktok-player-src="${escapeHtml(playerSrc)}" data-tiktok-player-mode="cache-first">
+    return `<div class="tiktok-cache-player" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-share="${escapeHtml(video.source_url)}" data-tiktok-watch-src="${escapeHtml(watchSrc)}" data-tiktok-player-mode="cache-first-v7">
       <img class="tiktok-cache-poster" src="${escapeHtml(poster)}" alt="" loading="eager" decoding="async">
       <div class="tiktok-cache-overlay" aria-hidden="true"></div>
       <div class="tiktok-cache-copy">
