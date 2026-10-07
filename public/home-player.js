@@ -411,12 +411,21 @@ function isFacebookDirectSource(value) {
   }
 }
 
-function safeTikTokInlineEmbedUrl(payload) {
-  const value = String(payload?.embed?.url || "");
+function safeTikTokInlineEmbedUrl(payload, expectedShare = null) {
+  const id = String(payload?.video_id || payload?.embed?.video_id || expectedShare?.id || "").trim();
+  if (!/^\d{15,25}$/.test(id)) return "";
+  if (expectedShare?.id && expectedShare.id !== id) return "";
+
+  const value = String(
+    payload?.embed?.url
+      || payload?.embed_url
+      || `https://www.tiktok.com/embed/v2/${id}`,
+  );
   try {
     const url = new URL(value);
     if (url.protocol !== "https:" || url.hostname !== "www.tiktok.com") return "";
     if (!/^\/embed\/v2\/\d{15,25}\/?$/.test(url.pathname)) return "";
+    if (url.pathname.match(/(\d{15,25})/)?.[1] !== id) return "";
     return url.toString();
   } catch {
     return "";
@@ -458,10 +467,13 @@ async function activateTikTokPlayer(card) {
   if (status) status.textContent = "Loading TikTok metadata…";
 
   try {
-    const response = await fetch("/api/tiktok/embed?url=" + encodeURIComponent(share.url), {
+    const endpoint = new URL("/api/tiktok/embed", location.origin);
+    endpoint.searchParams.set("url", share.url);
+    const response = await fetch(endpoint.pathname + endpoint.search, {
       credentials: "same-origin",
       headers: { Accept: "application/json" },
       signal: controller.signal,
+      cache: "no-store",
     });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok || !payload.ok || !payload.video_id || !payload.source_url) {
@@ -469,8 +481,8 @@ async function activateTikTokPlayer(card) {
     }
     if (previewState.activeCard !== card) return;
 
-    const embedUrl = safeTikTokInlineEmbedUrl(payload);
-    if (!embedUrl) throw new Error("TikTok embed URL is unavailable.");
+    const embedUrl = safeTikTokInlineEmbedUrl(payload, share);
+    if (!embedUrl) throw new Error("TikTok embed URL could not be derived from the returned video ID.");
 
     const frame = createTikTokInlineFrame(
       card.querySelector(".tile-title")?.textContent?.trim() || "TikTok video",
