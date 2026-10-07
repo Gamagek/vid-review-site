@@ -895,178 +895,6 @@ function initializeEmbeddedMediaTools() {
   frame.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; clipboard-write");
   frame.setAttribute("allowfullscreen", "");
 
-  if (provider === "tiktok") {
-    const retry = document.createElement("button");
-    retry.type = "button";
-    retry.className = "vidbest-tiktok-retry";
-    retry.textContent = "↻ Retry";
-    retry.title = "Retry TikTok player";
-    retry.setAttribute("aria-label", "Retry TikTok player");
-    retry.hidden = true;
-
-    const recovery = document.createElement("div");
-    recovery.className = "vidbest-tiktok-recovery";
-    recovery.hidden = true;
-
-    const recoveryText = document.createElement("p");
-    recoveryText.className = "vidbest-tiktok-recovery-text";
-    recoveryText.textContent = "TikTok did not load. Vid.Best will try the cached media gateway automatically.";
-
-    const recoveryActions = document.createElement("div");
-    recoveryActions.className = "vidbest-tiktok-recovery-actions";
-    const openTikTok = document.createElement("a");
-    openTikTok.className = "button ghost";
-    openTikTok.target = "_blank";
-    openTikTok.rel = "noopener noreferrer";
-    openTikTok.textContent = "Open on TikTok";
-    const connectionHelp = document.createElement("button");
-    connectionHelp.type = "button";
-    connectionHelp.className = "button ghost";
-    connectionHelp.textContent = "Connection help";
-    recoveryActions.append(openTikTok, connectionHelp);
-    recovery.append(recoveryText, recoveryActions);
-
-    const connectionNote = document.createElement("p");
-    connectionNote.className = "vidbest-tiktok-connection-note";
-    connectionNote.hidden = true;
-    connectionNote.textContent = "A DNS change can sometimes fix a resolver/network problem, but it cannot override TikTok content or account restrictions. Android: Settings → Network & internet → Private DNS → Private DNS provider hostname → dns.google.";
-    recovery.append(connectionNote);
-
-    let ready = false;
-    let watchdog = null;
-    let gatewayTried = false;
-    const originalSrc = frame.src;
-    const gatewaySrc = frame.dataset.tiktokGatewaySrc || "";
-    const getShareUrl = () => frame.dataset.tiktokShare || "";
-
-    const showRecovery = (messageText) => {
-      retry.hidden = false;
-      recovery.hidden = false;
-      if (messageText) recoveryText.textContent = messageText;
-    };
-
-    const hideRecovery = () => {
-      recovery.hidden = true;
-      connectionNote.hidden = true;
-    };
-
-    connectionHelp.addEventListener("click", () => {
-      connectionNote.hidden = !connectionNote.hidden;
-    });
-
-    openTikTok.href = getShareUrl() || "https://www.tiktok.com/";
-
-    const armWatchdog = () => {
-      window.clearTimeout(watchdog);
-      watchdog = window.setTimeout(() => {
-        if (!ready && !gatewayTried) {
-          showRecovery("TikTok official player is taking too long to respond. Trying cached media…");
-          note.textContent = "TikTok official player timeout · trying cached media";
-          loadGatewayFallback("Loading cached media…");
-        }
-      }, 4000);
-    };
-
-    const loadGatewayFallback = (messageText = "Loading the video gateway…") => {
-      if (!gatewaySrc || !frame.isConnected) {
-        showRecovery("TikTok gateway is unavailable.");
-        return false;
-      }
-      gatewayTried = true;
-      ready = false;
-      window.clearTimeout(watchdog);
-      overlay.hidden = true;
-      frame.dataset.tiktokGatewayActive = "1";
-      retry.hidden = false;
-      retry.textContent = "↻ Reload gateway";
-      recovery.hidden = false;
-      recoveryText.textContent = messageText;
-
-      try {
-        const url = new URL(gatewaySrc);
-        url.searchParams.set("retry", String(Date.now()));
-        frame.src = url.toString();
-      } catch {
-        frame.src = gatewaySrc;
-      }
-      return true;
-    };
-
-    retry.addEventListener("click", () => {
-      if (gatewaySrc && (gatewayTried || !ready)) {
-        loadGatewayFallback(gatewayTried ? "Reloading the video gateway…" : "Loading the video gateway…");
-        return;
-      }
-
-      ready = false;
-      gatewayTried = false;
-      retry.hidden = true;
-      retry.textContent = "↻ Retry";
-      hideRecovery();
-      overlay.hidden = false;
-      try {
-        const url = new URL(originalSrc);
-        url.searchParams.set("retry", String(Date.now()));
-        frame.dataset.tiktokGatewayActive = "0";
-        frame.src = url.toString();
-      } catch {
-        frame.src = originalSrc;
-      }
-      armWatchdog();
-    });
-
-    frame.addEventListener("error", () => {
-      if (frame.dataset.tiktokGatewayActive === "1") {
-        showRecovery("The video gateway could not connect. Press Reload gateway to try again.");
-        recovery.hidden = false;
-        retry.hidden = false;
-        retry.textContent = "↻ Reload gateway";
-        return;
-      }
-      loadGatewayFallback("TikTok player failed · loading cached media…");
-      note.textContent = "TikTok official player failed · trying cached media";
-    });
-
-    frame.addEventListener("load", () => {
-      if (frame.dataset.tiktokGatewayActive === "1") {
-        retry.hidden = false;
-        retry.textContent = "↻ Reload gateway";
-        recovery.hidden = true;
-        return;
-      }
-      armWatchdog();
-    });
-
-    stage.append(retry, recovery);
-    armWatchdog();
-
-    addEventListener("message", (event) => {
-      if (event.source !== frame.contentWindow) return;
-      try {
-        const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-        if (!data?.["x-tiktok-player"]) return;
-        if (data.type === "onPlayerReady") {
-          ready = true;
-          gatewayTried = false;
-          window.clearTimeout(watchdog);
-          retry.hidden = true;
-          retry.textContent = "↻ Retry";
-          hideRecovery();
-          note.textContent = "TikTok official player ready · advanced controls active";
-        }
-        if (data.type === "onPlayerError") {
-          loadGatewayFallback("TikTok reported an error · loading cached media…");
-          note.textContent = "TikTok failed · trying cached media";
-        }
-        if (data.type === "onStateChange") state.playing = Number(data.value) === 1;
-        if (data.type === "onMute") state.muted = Boolean(data.value);
-        if (data.type === "onCurrentTime") {
-          const time = Number(data.value?.currentTime);
-          if (Number.isFinite(time)) state.currentTime = time;
-        }
-      } catch {}
-    });
-  }
   const overlay = document.createElement("div");
   overlay.className = "vidbest-embed-overlay";
   overlay.classList.toggle("vidbest-remote-controls", remote);
@@ -1518,7 +1346,7 @@ function initializeEmbeddedAudioLab() {
     if(provider==="youtube"||provider==="vimeo") {
       setStatus("Embedded "+provider+" · Master volume works; EQ/3D needs direct media access","warn");
     } else if (provider === "tiktok") {
-      setStatus("Official TikTok player · playback controls stay inside the player; EQ/3D cannot cross the iframe boundary","warn");
+      setStatus("TikTok standard embed · playback controls stay inside the embed; EQ/3D cannot cross the iframe boundary","warn");
     } else {
       setStatus("Cross-origin embed · EQ/3D cannot be applied by the parent page","warn");
     }
@@ -1537,7 +1365,7 @@ function initializeEmbeddedAudioLab() {
   style.textContent = [
     ".watch-player-stage{position:relative}",
     ".watch-player[data-provider=\"tiktok\"] .watch-player-stage{width:min(100%,540px);height:min(78vh,760px);min-height:480px;margin-inline:auto;background:#0a0d1b;overflow:hidden}",
-    ".watch-player[data-provider=\"tiktok\"] .tiktok-official-player{display:block;width:100%;height:100%;min-height:0;border:0;background:#fff}",
+    ".watch-player[data-provider=\"tiktok\"] .tiktok-standard-embed-host{display:grid;width:100%;height:100%;min-height:0;place-items:center;overflow:auto;background:#000}",
     ".watch-player.is-mini[data-provider=\"tiktok\"]{width:min(430px,calc(100vw - 36px))}",
     ".watch-player.is-mini[data-provider=\"tiktok\"] .watch-player-stage{width:100%;height:min(70vh,calc((100vw - 36px) * 1.7778));min-height:0}",
     ".watch-player.is-theater[data-provider=\"tiktok\"] .watch-player-stage{width:min(100%,720px);height:calc(100vh - 90px);min-height:0}",
