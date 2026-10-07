@@ -558,6 +558,26 @@ function buildTikTokOEmbedGatewayUrl(env, canonicalShare) {
   return endpoint.toString();
 }
 
+function unwrapTikTokOEmbedPayload(payload) {
+  const candidates = [
+    payload,
+    payload?.oembed,
+    payload?.data,
+    payload?.result,
+    payload?.payload,
+    payload?.data?.oembed,
+    payload?.result?.oembed,
+    payload?.payload?.oembed,
+    payload?.data?.data,
+  ];
+  for (const candidate of candidates) {
+    if (candidate && typeof candidate === "object" && String(candidate.type || "").toLowerCase() === "video") {
+      return candidate;
+    }
+  }
+  return null;
+}
+
 async function fetchTikTokPreview(env, share, options = {}) {
   const canonicalShare = normalizeTikTokShareUrl(share);
   if (!canonicalShare) throw new AppError(400, "Use a normal TikTok sharing link");
@@ -596,12 +616,8 @@ async function fetchTikTokPreview(env, share, options = {}) {
 
     let gatewayPayload;
     try { gatewayPayload = await response.json(); } catch { gatewayPayload = null; }
-    const metadata = gatewayPayload?.oembed?.type
-      ? gatewayPayload.oembed
-      : gatewayPayload?.data?.type
-        ? gatewayPayload.data
-        : gatewayPayload;
-    if (String(metadata?.type || "") !== "video") {
+    const metadata = unwrapTikTokOEmbedPayload(gatewayPayload);
+    if (!metadata) {
       throw new AppError(502, "TikTok oEmbed gateway did not return a video response");
     }
 
@@ -654,10 +670,13 @@ async function tikTokEmbedModel(request, env) {
   if (!share) throw new AppError(400, "Use a normal TikTok sharing link");
 
   const preview = await fetchTikTokPreview(env, share);
+  const embedUrl = `https://www.tiktok.com/embed/v2/${encodeURIComponent(preview.video_id)}`;
   return json({
     ok: true,
+    schema_version: 2,
     provider: "tiktok",
     source_url: share,
+    canonical_url: share,
     video_id: preview.video_id,
     title: preview.title,
     caption: preview.caption,
@@ -667,11 +686,12 @@ async function tikTokEmbedModel(request, env) {
     poster_url: preview.video_id
       ? `/api/tiktok/cached-poster?id=${encodeURIComponent(preview.video_id)}`
       : null,
+    embed_url: embedUrl,
     embed: {
       kind: "official-iframe",
       cite: share,
       video_id: preview.video_id,
-      url: `https://www.tiktok.com/embed/v2/${encodeURIComponent(preview.video_id)}`,
+      url: embedUrl,
     },
     cache_source: preview.cache_source,
   }, 200, {
@@ -3022,7 +3042,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
-  <script src="/watch.js?v=20261006-2" defer></script>
+  <script src="/watch.js?v=20261008-1" defer></script>
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261006-1">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261006-1" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}

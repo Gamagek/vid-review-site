@@ -53,12 +53,38 @@ function initializeWatchPage() {
 }
 
 
-function safeTikTokEmbedUrl(payload) {
-  const value = String(payload?.embed?.url || "");
+function parseTikTokSourceUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    if (host !== "tiktok.com") return null;
+    const match = url.pathname.match(/^\/@([^/]+)\/video\/(\d{15,25})\/?$/);
+    if (!match) return null;
+    return {
+      id: match[2],
+      url: `https://www.tiktok.com/@${match[1]}/video/${match[2]}`,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function safeTikTokEmbedUrl(payload, expectedSource = "") {
+  const expected = parseTikTokSourceUrl(expectedSource);
+  const id = String(payload?.video_id || payload?.embed?.video_id || expected?.id || "").trim();
+  if (!/^\d{15,25}$/.test(id)) return "";
+  if (expected?.id && expected.id !== id) return "";
+
+  const value = String(
+    payload?.embed?.url
+      || payload?.embed_url
+      || `https://www.tiktok.com/embed/v2/${id}`,
+  );
   try {
     const url = new URL(value);
     if (url.protocol !== "https:" || url.hostname !== "www.tiktok.com") return "";
     if (!/^\/embed\/v2\/\d{15,25}\/?$/.test(url.pathname)) return "";
+    if (url.pathname.match(/(\d{15,25})/)?.[1] !== id) return "";
     return url.toString();
   } catch {
     return "";
@@ -108,7 +134,8 @@ function initializeTikTokOEmbedPlayer() {
   const loadButton = shell.querySelector("[data-tiktok-load-embed]");
   const backButton = shell.querySelector("[data-tiktok-back-preview]");
   const status = shell.querySelector("[data-tiktok-embed-status]");
-  const shareUrl = shell.dataset.tiktokSource || "";
+  const parsedShare = parseTikTokSourceUrl(shell.dataset.tiktokSource || "");
+  const shareUrl = parsedShare?.url || "";
   const autoload = shell.dataset.tiktokAutoload === "1";
 
   const setStatus = (message, tone = "") => {
@@ -150,17 +177,20 @@ function initializeTikTokOEmbedPlayer() {
     }
 
     try {
-      const response = await fetch("/api/tiktok/embed?url=" + encodeURIComponent(shareUrl), {
+      const endpoint = new URL("/api/tiktok/embed", location.origin);
+      endpoint.searchParams.set("url", shareUrl);
+      const response = await fetch(endpoint.pathname + endpoint.search, {
         credentials: "same-origin",
         headers: { Accept: "application/json" },
+        cache: "no-store",
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok || !payload.ok || !payload.video_id || !payload.source_url) {
         throw new Error(payload.error || "TikTok embed metadata is unavailable.");
       }
 
-      const embedUrl = safeTikTokEmbedUrl(payload);
-      if (!embedUrl) throw new Error("TikTok embed URL is unavailable.");
+      const embedUrl = safeTikTokEmbedUrl(payload, shareUrl);
+      if (!embedUrl) throw new Error("TikTok embed URL could not be derived from the returned video ID.");
 
       const host = document.createElement("div");
       host.className = "tiktok-standard-embed-host";

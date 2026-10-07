@@ -880,6 +880,42 @@ test("caches TikTok oEmbed gateway metadata durably in D1 for 24 hours", async (
     globalThis.fetch = originalFetch;
   }
 });
+test("accepts nested TikTok oEmbed payloads from the Cloudflare gateway", async () => {
+  const context = createTestContext({
+    TIKTOK_OEMBED_GATEWAY: "https://tiktok-oembed-gateway.gkasunc.workers.dev/",
+  });
+  const share = "https://www.tiktok.com/@nested/video/7552567024304540959";
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url) => {
+    calls.push(String(url));
+    return new Response(JSON.stringify({
+      ok: true,
+      data: {
+        oembed: {
+          type: "video",
+          title: "Nested gateway payload",
+          author_name: "nested",
+          author_url: "https://www.tiktok.com/@nested",
+          description: "Nested response",
+        },
+      },
+    }), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  try {
+    const response = await send(context, "/api/tiktok/embed?url=" + encodeURIComponent(share));
+    assert.equal(response.status, 200);
+    const payload = await response.json();
+    assert.equal(payload.ok, true);
+    assert.equal(payload.video_id, "7552567024304540959");
+    assert.equal(payload.title, "Nested gateway payload");
+    assert.equal(payload.embed_url, "https://www.tiktok.com/embed/v2/7552567024304540959");
+    assert.equal(new URL(calls[0]).searchParams.get("url"), share);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("refreshes TikTok oEmbed metadata through the Cloudflare gateway when published", async () => {
   const context = createTestContext({
     TIKTOK_OEMBED_REFRESH_ON_PUBLISH: "1",
@@ -1720,8 +1756,11 @@ test("admin requires rights certification for cached video copies", () => {
 test("TikTok admin preview uses the gateway model and official iframe without embed.js", () => {
   const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
   assert.match(adminSource, /renderTikTokPreview/);
-  assert.ok(adminSource.includes("/api/tiktok/embed?url="));
+  assert.match(adminSource, /new URL\("\/api\/tiktok\/embed", location\.origin\)/);
+  assert.match(adminSource, /endpoint\.searchParams\.set\("url", parsed\.url\)/);
   assert.match(adminSource, /safeAdminTikTokEmbedUrl/);
+  assert.match(adminSource, /payload\?\.embed_url/);
+  assert.match(adminSource, /cache: "no-store"/);
   assert.match(adminSource, /className = "tiktok-official-player"/);
   assert.doesNotMatch(adminSource, /ensureTikTokAdminEmbedScript/);
   assert.doesNotMatch(adminSource, /www\.tiktok\.com\/embed\.js/);
@@ -1757,18 +1796,25 @@ test("renders the current Vid.Best TikTok oEmbed architecture with cached previe
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
   assert.match(watchSource, /initializeTikTokOEmbedPlayer/);
   assert.match(watchSource, /data-tiktok-load-embed/);
-  assert.ok(watchSource.includes("/api/tiktok/embed?url="));
+  assert.match(watchSource, /new URL\("\/api\/tiktok\/embed", location\.origin\)/);
+  assert.match(watchSource, /endpoint\.searchParams\.set\("url", shareUrl\)/);
   assert.match(watchSource, /createTikTokEmbedFrame/);
   assert.match(watchSource, /safeTikTokEmbedUrl/);
+  assert.match(watchSource, /payload\?\.embed_url/);
+  assert.match(watchSource, /https:\/\/www\.tiktok\.com\/embed\/v2\/\$\{id\}/);
+  assert.match(watchSource, /cache: "no-store"/);
   assert.doesNotMatch(watchSource, /www\.tiktok\.com\/embed\.js/);
   assert.doesNotMatch(watchSource, /v7-gateway/);
 
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /renderTikTokFacade/);
   assert.match(homeSource, /activateTikTokPlayer/);
-  assert.ok(homeSource.includes("/api/tiktok/embed?url="));
+  assert.match(homeSource, /new URL\("\/api\/tiktok\/embed", location\.origin\)/);
+  assert.match(homeSource, /endpoint\.searchParams\.set\("url", share\.url\)/);
   assert.match(homeSource, /createTikTokInlineFrame/);
   assert.match(homeSource, /safeTikTokInlineEmbedUrl/);
+  assert.match(homeSource, /payload\?\.embed_url/);
+  assert.match(homeSource, /cache: "no-store"/);
   assert.doesNotMatch(homeSource, /www\.tiktok\.com\/embed\.js/);
   assert.doesNotMatch(homeSource, /buildTikTokGatewayWatchUrl/);
   assert.doesNotMatch(homeSource, /\/watch\?user=/);
@@ -1823,7 +1869,8 @@ test("TikTok home cards defer standard embed creation until click and keep one a
   assert.match(homeSource, /if \(previewState\.activeCard === card\) return;/);
   assert.match(homeSource, /stopPreview\(\)/);
   assert.match(homeSource, /createTikTokInlineFrame/);
-  assert.ok(homeSource.includes("/api/tiktok/embed?url="));
+  assert.match(homeSource, /new URL\("\/api\/tiktok\/embed", location\.origin\)/);
+  assert.match(homeSource, /endpoint\.searchParams\.set\("url", share\.url\)/);
   assert.match(homeSource, /previewState\.activeCard = card/);
   assert.match(homeSource, /tiktok-player-ready/);
   assert.match(homeSource, /activeTikTokIsFullscreen/);
@@ -1849,7 +1896,10 @@ test("TikTok embed model is same-origin, gateway-backed, and does not expose raw
     const payload = await response.json();
     assert.equal(payload.ok, true);
     assert.equal(payload.source_url, share);
+    assert.equal(payload.canonical_url, share);
     assert.equal(payload.video_id, "7552567024304540959");
+    assert.equal(payload.schema_version, 2);
+    assert.equal(payload.embed_url, "https://www.tiktok.com/embed/v2/7552567024304540959");
     assert.equal(payload.embed.kind, "official-iframe");
     assert.equal(payload.embed.url, "https://www.tiktok.com/embed/v2/7552567024304540959");
     assert.equal("html" in payload, false);
