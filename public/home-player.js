@@ -411,25 +411,13 @@ function isFacebookDirectSource(value) {
   }
 }
 
-function buildTikTokInlinePlayerUrl(id) {
-  if (!/^\d{15,25}$/.test(String(id || ""))) return "";
+function buildTikTokGatewayWatchUrl(share) {
+  if (!share || !/^\d{15,25}$/.test(String(share.id || ""))) return "";
   const params = new URLSearchParams({
-    autoplay: "1",
-    muted: "0",
-    controls: "1",
-    progress_bar: "1",
-    play_button: "1",
-    volume_control: "1",
-    fullscreen_button: "1",
-    timestamp: "1",
-    loop: "0",
-    music_info: "0",
-    description: "0",
-    rel: "0",
-    native_context_menu: "1",
-    closed_caption: "1",
+    user: share.username || "",
+    id: share.id,
   });
-  return "https://www.tiktok.com/player/v1/" + encodeURIComponent(id) + "?" + params.toString();
+  return "/watch?" + params.toString();
 }
 
 function activateTikTokPlayer(card) {
@@ -444,7 +432,7 @@ function activateTikTokPlayer(card) {
   const surface = card.querySelector(".preview-surface");
   if (!surface) return;
 
-  const src = buildTikTokInlinePlayerUrl(share.id);
+  const src = buildTikTokGatewayWatchUrl(share);
   if (!src) return;
 
   const iframe = document.createElement("iframe");
