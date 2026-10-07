@@ -65,10 +65,9 @@ function safeTikTokEmbedUrl(payload) {
   }
 }
 
-function createTikTokEmbedFrame(embedUrl, title = "TikTok video") {
+function createTikTokEmbedFrame(title = "TikTok video") {
   const frame = document.createElement("iframe");
   frame.className = "tiktok-official-player";
-  frame.src = embedUrl;
   frame.title = title;
   frame.loading = "eager";
   frame.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
@@ -166,9 +165,10 @@ function initializeTikTokOEmbedPlayer() {
       const host = document.createElement("div");
       host.className = "tiktok-standard-embed-host";
       const frame = createTikTokEmbedFrame(
-        embedUrl,
         document.querySelector("h1")?.textContent?.trim() || "TikTok video",
       );
+      const ready = waitForTikTokFrame(frame);
+      frame.src = embedUrl;
       host.append(frame);
       shell.append(host);
 
@@ -176,7 +176,7 @@ function initializeTikTokOEmbedPlayer() {
         ? "Metadata loaded through the Cloudflare oEmbed gateway."
         : "Metadata loaded from Vid.Best cache.");
 
-      await waitForTikTokFrame(frame);
+      await ready;
 
       shell.classList.add("is-player-ready");
       shell.classList.remove("is-loading");
