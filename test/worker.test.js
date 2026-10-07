@@ -371,7 +371,7 @@ test("homepage Facebook tiles use the direct official player", () => {
   assert.doesNotMatch(source, /facebook-microlink-preview/);
 });
 
-test("signed /watch route wraps the deployed v7 gateway without exposing the secret", async () => {
+test("query-style /watch no longer exposes or depends on the legacy signed TikTok gateway", async () => {
   const context = createTestContext({
     SIGN_SECRET: secret,
     TIKTOK_GATEWAY_ORIGIN: "https://video.megasale.win",
@@ -381,16 +381,13 @@ test("signed /watch route wraps the deployed v7 gateway without exposing the sec
     context.env,
     context.ctx,
   );
-  assert.equal(response.status, 200);
-  assert.equal(response.headers.get("X-Robots-Tag"), "noindex,nofollow");
-  const html = await response.text();
-  assert.match(html, /https:\/\/video\.megasale\.win\//);
-  assert.match(html, /url=https%3A%2F%2Fwww\.tiktok\.com%2F%40umbralarchive%2Fvideo%2F7552567024304540959/);
-  assert.match(html, /exp=\d+/);
-  assert.match(html, /sig=[a-f0-9]{64}/);
-  assert.doesNotMatch(html, new RegExp(secret));
+  assert.notEqual(response.status, 200);
+  const source = readFileSync(new URL("../src/seo-edge.js", import.meta.url), "utf8");
+  assert.doesNotMatch(source, /signedWatchResponse/);
+  assert.doesNotMatch(source, /SIGN_SECRET/);
+  assert.doesNotMatch(source, /TIKTOK_GATEWAY_ORIGIN/);
+  assert.doesNotMatch(source, /video\.megasale\.win/);
 });
-
 test("TikTok watch pages keep cached oEmbed metadata and use the standard embed shell", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
@@ -1825,7 +1822,7 @@ test("TikTok home cards defer standard embed creation until click and keep one a
   assert.match(homeSource, /previewState\.activeCard = card/);
   assert.match(homeSource, /tiktok-player-ready/);
   assert.match(homeSource, /activeTikTokIsFullscreen/);
-  assert.doesNotMatch(homeSource, /document\.createElement\("iframe"\)/);
+  assert.doesNotMatch(homeSource, /buildTikTokGatewayWatchUrl/);
   assert.doesNotMatch(homeSource, /player\/v1/);
 });
 test("TikTok embed model is same-origin, gateway-backed, and does not expose raw gateway HTML", async () => {
