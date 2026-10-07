@@ -23,7 +23,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Run regression tests
-        run: npm test
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee test-output.txt
+
+      - name: Upload regression test output on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-test-output
+          path: test-output.txt
+          if-no-files-found: ignore
       - name: Check Teamwork Python syntax
         run: python -m compileall -q services/teamwork/app
       - name: Test Teamwork service
