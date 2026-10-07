@@ -3,107 +3,6 @@ import edgeWorker from "./edge.js";
 const CANONICAL_ORIGIN = "https://vid.best";
 const LEGACY_HOSTS = new Set(["home.vid.best", "www.vid.best"]);
 const MIN_INDEXABLE_CATEGORY_VIDEOS = 3;
-const DEFAULT_TIKTOK_GATEWAY_ORIGIN = "https://video.megasale.win";
-const TIKTOK_GATEWAY_TTL_SECONDS = 15 * 60;
-
-function safeTikTokGatewayOrigin(env) {
-  const raw = String(env.TIKTOK_GATEWAY_ORIGIN || DEFAULT_TIKTOK_GATEWAY_ORIGIN).trim();
-  try {
-    const url = new URL(raw);
-    if (url.protocol !== "https:") return "";
-    return url.origin;
-  } catch {
-    return "";
-  }
-}
-
-async function hmacSha256Hex(secret, value) {
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(value));
-  return [...new Uint8Array(signature)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-async function signedWatchResponse(request, env) {
-  const url = new URL(request.url);
-  const id = cleanText(url.searchParams.get("id"), 30);
-  const rawUser = cleanText(url.searchParams.get("user"), 80);
-  const user = rawUser.replace(/^@/, "");
-
-  if (!/^\d{15,25}$/.test(id)) {
-    return new Response("Invalid TikTok video id", {
-      status: 400,
-      headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex,nofollow" },
-    });
-  }
-  if (user && !/^[A-Za-z0-9_.]{1,64}$/.test(user)) {
-    return new Response("Invalid TikTok username", {
-      status: 400,
-      headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex,nofollow" },
-    });
-  }
-
-  const secret = String(env.SIGN_SECRET || "").trim();
-  if (secret.length < 32) {
-    return new Response("TikTok gateway signing is not configured", {
-      status: 503,
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "no-store",
-        "X-Robots-Tag": "noindex,nofollow",
-      },
-    });
-  }
-
-  const gatewayOrigin = safeTikTokGatewayOrigin(env);
-  if (!gatewayOrigin) {
-    return new Response("TikTok gateway origin is not configured", {
-      status: 503,
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "no-store",
-        "X-Robots-Tag": "noindex,nofollow",
-      },
-    });
-  }
-
-  const exp = String(Math.floor(Date.now() / 1000) + TIKTOK_GATEWAY_TTL_SECONDS);
-  const sig = await hmacSha256Hex(secret, id + "." + exp);
-  const sourceUrl = user
-    ? `https://www.tiktok.com/@${encodeURIComponent(user)}/video/${id}`
-    : `https://www.tiktok.com/video/${id}`;
-
-  const gateway = new URL("/", gatewayOrigin);
-  gateway.searchParams.set("url", sourceUrl);
-  gateway.searchParams.set("exp", exp);
-  gateway.searchParams.set("sig", sig);
-
-  const html = `<!doctype html><html><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
-<title>Vid.Best TikTok player</title>
-<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}iframe{display:block;border:0;width:100%;height:100%;min-width:325px;min-height:578px;background:#000}</style>
-</head><body>
-<iframe src="${escapeHtml(gateway.toString())}" title="TikTok video player" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-</body></html>`;
-
-  const headers = new Headers({
-    "Content-Type": "text/html; charset=utf-8",
-    "Cache-Control": "no-store",
-    "X-Content-Type-Options": "nosniff",
-    "X-Robots-Tag": "noindex,nofollow",
-    "Referrer-Policy": "no-referrer",
-    "Content-Security-Policy": `default-src 'none'; frame-src ${gatewayOrigin}; style-src 'unsafe-inline'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'`,
-  });
-  return new Response(html, { status: 200, headers });
-}
-
 const CATEGORY_DESCRIPTIONS = Object.freeze({
   "Entertainment, Movies & Games": "Explore movie trailers, film reviews, gameplay, esports, animation and pop culture video discoveries.",
   "Lifestyle, Health & Fitness": "Explore practical videos about fitness, food habits, mindfulness, daily life, fashion and healthy living.",
@@ -645,12 +544,6 @@ export default {
 
     if (url.pathname === "/sitemap.xml" && ["GET", "HEAD"].includes(request.method)) {
       return combinedSitemap(env);
-    }
-
-    if (url.pathname === "/watch" && ["GET", "HEAD"].includes(request.method)) {
-      const response = await signedWatchResponse(request, env);
-      if (request.method === "HEAD") return new Response(null, { status: response.status, headers: response.headers });
-      return response;
     }
 
     if (url.pathname === "/videos" && ["GET", "HEAD"].includes(request.method)) {
