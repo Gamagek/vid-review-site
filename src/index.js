@@ -2089,7 +2089,7 @@ function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
     if (!id) throw new AppError(400, "Use a full TikTok video URL containing the video ID");
     return {
       source_url: url.toString(),
-      embed_url: buildTikTokPlayerUrl(id),
+      embed_url: null,
       media_type: "tiktok",
       provider: "tiktok",
       r2_key: null,
@@ -3864,7 +3864,7 @@ async function videoSitemapResponse(request, env, page) {
     const canDescribeVideo = thumbnail && (Boolean(row.embed_url) || Boolean(row.source_published_at) || provider === "tiktok" || provider === "facebook");
     if (canDescribeVideo) {
       const playerUrl = provider === "tiktok"
-        ? buildTikTokPlayerUrl(row.source_url.match(/\/video\/(\d+)/)?.[1] || "")
+        ? ""
         : provider === "facebook"
           ? getSafeFacebookEmbedUrl(row)
           : row.embed_url
