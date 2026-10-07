@@ -62,7 +62,7 @@ function initializeTikTokCacheFirstPlayer() {
   const stage = shell.closest(".watch-player-stage");
   const loadButton = shell.querySelector("[data-tiktok-load-player]");
   const backButton = shell.querySelector("[data-tiktok-back-preview]");
-  const playerSrc = shell.dataset.tiktokPlayerSrc || "";
+  const watchSrc = shell.dataset.tiktokWatchSrc || "";
   const shareUrl = shell.dataset.tiktokShare || "";
 
   const resetEmbeddedEnhancements = () => {
@@ -86,7 +86,7 @@ function initializeTikTokCacheFirstPlayer() {
   };
 
   const loadOfficialPlayer = () => {
-    if (!playerSrc || shell.querySelector("iframe")) return;
+    if (!watchSrc || shell.querySelector("iframe")) return;
     if (loadButton) {
       loadButton.disabled = true;
       loadButton.textContent = "Loading TikTok…";
@@ -95,8 +95,8 @@ function initializeTikTokCacheFirstPlayer() {
 
     const frame = document.createElement("iframe");
     frame.id = "watch-media-frame";
-    frame.className = "tiktok-official-player";
-    frame.src = playerSrc;
+    frame.className = "tiktok-official-player tiktok-gateway-player";
+    frame.src = watchSrc;
     frame.title = document.querySelector("h1")?.textContent?.trim() || "TikTok video";
     frame.loading = "eager";
     frame.referrerPolicy = "strict-origin-when-cross-origin";
@@ -104,7 +104,7 @@ function initializeTikTokCacheFirstPlayer() {
     frame.allowFullscreen = true;
     frame.dataset.tiktokId = shell.dataset.tiktokId || "";
     frame.dataset.tiktokShare = shareUrl;
-    frame.dataset.tiktokPlayerMode = "official-after-cache";
+    frame.dataset.tiktokPlayerMode = "v7-gateway-after-cache";
 
     frame.addEventListener("load", () => {
       shell.classList.add("is-player-ready");
@@ -128,7 +128,7 @@ function initializeTikTokCacheFirstPlayer() {
       }
     }, 8000);
 
-    // Audio/embedded helpers should only initialize after the cross-origin player exists.
+    // Audio/embedded helpers initialize after the same-origin signed wrapper exists.
     queueMicrotask(() => {
       initializeEmbeddedMediaTools();
       initializeEmbeddedAudioLab();
