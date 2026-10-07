@@ -53,40 +53,49 @@ function initializeWatchPage() {
 }
 
 
-function loadTikTokEmbedScript() {
-  return new Promise((resolve, reject) => {
-    const stale = document.querySelector('script[data-vidbest-tiktok-embed="1"]');
-    if (stale) stale.remove();
-
-    const script = document.createElement("script");
-    script.src = "https://www.tiktok.com/embed.js";
-    script.async = true;
-    script.dataset.vidbestTiktokEmbed = "1";
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error("TikTok embed script could not load."));
-    document.body.append(script);
-  });
+function safeTikTokEmbedUrl(payload) {
+  const value = String(payload?.embed?.url || "");
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:" || url.hostname !== "www.tiktok.com") return "";
+    if (!/^\/embed\/v2\/\d{15,25}\/?$/.test(url.pathname)) return "";
+    return url.toString();
+  } catch {
+    return "";
+  }
 }
 
-function createTikTokEmbedBlockquote(sourceUrl, videoId) {
-  const blockquote = document.createElement("blockquote");
-  blockquote.className = "tiktok-embed";
-  blockquote.cite = sourceUrl;
-  blockquote.dataset.videoId = videoId;
-  blockquote.style.maxWidth = "605px";
-  blockquote.style.minWidth = "325px";
-  blockquote.style.width = "100%";
-  blockquote.style.margin = "0 auto";
+function createTikTokEmbedFrame(title = "TikTok video") {
+  const frame = document.createElement("iframe");
+  frame.className = "tiktok-official-player";
+  frame.title = title;
+  frame.loading = "eager";
+  frame.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
+  frame.allowFullscreen = true;
+  frame.referrerPolicy = "strict-origin-when-cross-origin";
+  return frame;
+}
 
-  const section = document.createElement("section");
-  const link = document.createElement("a");
-  link.href = sourceUrl;
-  link.target = "_blank";
-  link.rel = "noopener noreferrer nofollow";
-  link.textContent = "Open this video on TikTok";
-  section.append(link);
-  blockquote.append(section);
-  return blockquote;
+function waitForTikTokFrame(frame, timeoutMs = 12000) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = (callback, value) => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timer);
+      frame.removeEventListener("load", onLoad);
+      frame.removeEventListener("error", onError);
+      callback(value);
+    };
+    const onLoad = () => finish(resolve, frame);
+    const onError = () => finish(reject, new Error("TikTok embed could not load on this network."));
+    const timer = window.setTimeout(
+      () => finish(reject, new Error("TikTok embed timed out. You can still open the video on TikTok.")),
+      timeoutMs,
+    );
+    frame.addEventListener("load", onLoad, { once: true });
+    frame.addEventListener("error", onError, { once: true });
+  });
 }
 
 function initializeTikTokOEmbedPlayer() {
@@ -128,26 +137,6 @@ function initializeTikTokOEmbedPlayer() {
     resetEmbeddedEnhancements();
   };
 
-  const waitForIframe = (host, timeoutMs = 10000) => new Promise((resolve, reject) => {
-    const existing = host.querySelector("iframe");
-    if (existing) {
-      resolve(existing);
-      return;
-    }
-    const observer = new MutationObserver(() => {
-      const frame = host.querySelector("iframe");
-      if (!frame) return;
-      observer.disconnect();
-      window.clearTimeout(timer);
-      resolve(frame);
-    });
-    observer.observe(host, { childList: true, subtree: true });
-    const timer = window.setTimeout(() => {
-      observer.disconnect();
-      reject(new Error("TikTok embed did not become ready."));
-    }, timeoutMs);
-  });
-
   const loadEmbed = async () => {
     if (!shareUrl || shell.classList.contains("is-loading")) return;
 
@@ -170,17 +159,24 @@ function initializeTikTokOEmbedPlayer() {
         throw new Error(payload.error || "TikTok embed metadata is unavailable.");
       }
 
+      const embedUrl = safeTikTokEmbedUrl(payload);
+      if (!embedUrl) throw new Error("TikTok embed URL is unavailable.");
+
       const host = document.createElement("div");
       host.className = "tiktok-standard-embed-host";
-      host.append(createTikTokEmbedBlockquote(payload.source_url, String(payload.video_id)));
+      const frame = createTikTokEmbedFrame(
+        document.querySelector("h1")?.textContent?.trim() || "TikTok video",
+      );
+      const ready = waitForTikTokFrame(frame);
+      frame.src = embedUrl;
+      host.append(frame);
       shell.append(host);
 
       setStatus(payload.cache_source === "gateway"
-        ? "Loaded through the Cloudflare oEmbed gateway."
-        : "Loaded from Vid.Best cache.");
+        ? "Metadata loaded through the Cloudflare oEmbed gateway."
+        : "Metadata loaded from Vid.Best cache.");
 
-      await loadTikTokEmbedScript();
-      await waitForIframe(host);
+      await ready;
 
       shell.classList.add("is-player-ready");
       shell.classList.remove("is-loading");

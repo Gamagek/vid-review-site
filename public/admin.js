@@ -421,26 +421,19 @@ async function renderTikTokPreview(sourceUrl) {
       throw new Error(payload.error || "TikTok preview metadata is unavailable.");
     }
 
-    status.remove();
-    const blockquote = document.createElement("blockquote");
-    blockquote.className = "tiktok-embed";
-    blockquote.setAttribute("cite", payload.source_url);
-    blockquote.dataset.videoId = String(payload.video_id);
-    blockquote.dataset.embedFrom = "vidbest-admin-preview";
-    blockquote.style.maxWidth = "605px";
-    blockquote.style.minWidth = "0";
-    blockquote.style.width = "100%";
+    const embedUrl = safeAdminTikTokEmbedUrl(payload);
+    if (!embedUrl) throw new Error("TikTok preview URL is unavailable.");
 
-    const section = document.createElement("section");
-    const link = document.createElement("a");
-    link.href = payload.source_url;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer nofollow";
-    link.textContent = "Open on TikTok";
-    section.append(link);
-    blockquote.append(section);
-    shell.append(blockquote);
-    await ensureTikTokAdminEmbedScript();
+    status.remove();
+    const frame = document.createElement("iframe");
+    frame.className = "tiktok-official-player";
+    frame.src = embedUrl;
+    frame.title = "TikTok video preview";
+    frame.loading = "lazy";
+    frame.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
+    frame.allowFullscreen = true;
+    frame.referrerPolicy = "strict-origin-when-cross-origin";
+    shell.append(frame);
   } catch (error) {
     status.className = "form-status error";
     status.textContent = error.message || "TikTok preview is temporarily unavailable.";
@@ -458,22 +451,18 @@ function parseTikTokShareUrl(value) {
   }
 }
 
-let tiktokAdminEmbedScriptPromise = null;
-function ensureTikTokAdminEmbedScript() {
-  if (document.querySelector('script[data-vidbest-tiktok-admin-embed]')) {
-    return tiktokAdminEmbedScriptPromise || Promise.resolve();
+function safeAdminTikTokEmbedUrl(payload) {
+  const value = String(payload?.embed?.url || "");
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:" || url.hostname !== "www.tiktok.com") return "";
+    if (!/^\/embed\/v2\/\d{15,25}\/?$/.test(url.pathname)) return "";
+    return url.toString();
+  } catch {
+    return "";
   }
-  tiktokAdminEmbedScriptPromise = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.async = true;
-    script.src = "https://www.tiktok.com/embed.js";
-    script.dataset.vidbestTiktokAdminEmbed = "1";
-    script.addEventListener("load", resolve, { once: true });
-    script.addEventListener("error", () => reject(new Error("TikTok admin preview script failed to load")), { once: true });
-    document.head.append(script);
-  });
-  return tiktokAdminEmbedScriptPromise;
 }
+
 function parseEmbed(value) {
   try {
     const url = new URL(value, location.origin);

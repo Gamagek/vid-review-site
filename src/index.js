@@ -668,10 +668,10 @@ async function tikTokEmbedModel(request, env) {
       ? `/api/tiktok/cached-poster?id=${encodeURIComponent(preview.video_id)}`
       : null,
     embed: {
-      kind: "official-oembed",
+      kind: "official-iframe",
       cite: share,
       video_id: preview.video_id,
-      script_url: "https://www.tiktok.com/embed.js",
+      url: `https://www.tiktok.com/embed/v2/${encodeURIComponent(preview.video_id)}`,
     },
     cache_source: preview.cache_source,
   }, 200, {
@@ -950,7 +950,7 @@ function securityHeaders(headers, html = false, scriptNonce = "") {
     const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.tiktok.com https://www.instagram.com/embed.js https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self' https://www.tiktok.com https://*.tiktok.com https://*.tiktokcdn.com; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.instagram.com/embed.js https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
     );
   }
   return headers;
