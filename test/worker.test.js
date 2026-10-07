@@ -1717,12 +1717,14 @@ test("admin requires rights certification for cached video copies", () => {
   assert.match(script, /redistribution_certified/);
 });
 
-test("TikTok admin preview uses the same oEmbed gateway model and no direct player/v1 builder", () => {
+test("TikTok admin preview uses the gateway model and official iframe without embed.js", () => {
   const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
   assert.match(adminSource, /renderTikTokPreview/);
   assert.ok(adminSource.includes("/api/tiktok/embed?url="));
-  assert.match(adminSource, /className = "tiktok-embed"/);
-  assert.match(adminSource, /ensureTikTokAdminEmbedScript/);
+  assert.match(adminSource, /safeAdminTikTokEmbedUrl/);
+  assert.match(adminSource, /className = "tiktok-official-player"/);
+  assert.doesNotMatch(adminSource, /ensureTikTokAdminEmbedScript/);
+  assert.doesNotMatch(adminSource, /www\.tiktok\.com\/embed\.js/);
   assert.doesNotMatch(adminSource, /buildTikTokPlayerUrl/);
   assert.doesNotMatch(adminSource, /www\.tiktok\.com\/player\/v1/);
 });
@@ -1756,15 +1758,18 @@ test("renders the current Vid.Best TikTok oEmbed architecture with cached previe
   assert.match(watchSource, /initializeTikTokOEmbedPlayer/);
   assert.match(watchSource, /data-tiktok-load-embed/);
   assert.ok(watchSource.includes("/api/tiktok/embed?url="));
-  assert.ok(watchSource.includes('script.src = "https://www.tiktok.com/embed.js"'));
-  assert.match(watchSource, /createTikTokEmbedBlockquote/);
+  assert.match(watchSource, /createTikTokEmbedFrame/);
+  assert.match(watchSource, /safeTikTokEmbedUrl/);
+  assert.doesNotMatch(watchSource, /www\.tiktok\.com\/embed\.js/);
   assert.doesNotMatch(watchSource, /v7-gateway/);
 
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /renderTikTokFacade/);
   assert.match(homeSource, /activateTikTokPlayer/);
   assert.ok(homeSource.includes("/api/tiktok/embed?url="));
-  assert.match(homeSource, /createTikTokInlineEmbed/);
+  assert.match(homeSource, /createTikTokInlineFrame/);
+  assert.match(homeSource, /safeTikTokInlineEmbedUrl/);
+  assert.doesNotMatch(homeSource, /www\.tiktok\.com\/embed\.js/);
   assert.doesNotMatch(homeSource, /buildTikTokGatewayWatchUrl/);
   assert.doesNotMatch(homeSource, /\/watch\?user=/);
 
@@ -1817,7 +1822,7 @@ test("TikTok home cards defer standard embed creation until click and keep one a
   assert.match(homeSource, /event\.preventDefault\(\);[\s\S]*?activateTikTokPlayer\(card\)/);
   assert.match(homeSource, /if \(previewState\.activeCard === card\) return;/);
   assert.match(homeSource, /stopPreview\(\)/);
-  assert.match(homeSource, /createTikTokInlineEmbed/);
+  assert.match(homeSource, /createTikTokInlineFrame/);
   assert.ok(homeSource.includes("/api/tiktok/embed?url="));
   assert.match(homeSource, /previewState\.activeCard = card/);
   assert.match(homeSource, /tiktok-player-ready/);
@@ -1845,8 +1850,8 @@ test("TikTok embed model is same-origin, gateway-backed, and does not expose raw
     assert.equal(payload.ok, true);
     assert.equal(payload.source_url, share);
     assert.equal(payload.video_id, "7552567024304540959");
-    assert.equal(payload.embed.kind, "official-oembed");
-    assert.equal(payload.embed.script_url, "https://www.tiktok.com/embed.js");
+    assert.equal(payload.embed.kind, "official-iframe");
+    assert.equal(payload.embed.url, "https://www.tiktok.com/embed/v2/7552567024304540959");
     assert.equal("html" in payload, false);
     assert.equal(JSON.stringify(payload).includes("untrusted"), false);
   } finally {
