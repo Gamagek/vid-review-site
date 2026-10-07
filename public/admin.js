@@ -412,17 +412,20 @@ async function renderTikTokPreview(sourceUrl) {
   ui.preview.append(shell);
 
   try {
-    const response = await fetch("/api/tiktok/embed?url=" + encodeURIComponent(parsed.url), {
+    const endpoint = new URL("/api/tiktok/embed", location.origin);
+    endpoint.searchParams.set("url", parsed.url);
+    const response = await fetch(endpoint.pathname + endpoint.search, {
       credentials: "same-origin",
       headers: { Accept: "application/json" },
+      cache: "no-store",
     });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok || !payload.ok || !payload.video_id || !payload.source_url) {
       throw new Error(payload.error || "TikTok preview metadata is unavailable.");
     }
 
-    const embedUrl = safeAdminTikTokEmbedUrl(payload);
-    if (!embedUrl) throw new Error("TikTok preview URL is unavailable.");
+    const embedUrl = safeAdminTikTokEmbedUrl(payload, parsed);
+    if (!embedUrl) throw new Error("TikTok preview URL could not be derived from the returned video ID.");
 
     status.remove();
     const frame = document.createElement("iframe");
@@ -451,12 +454,21 @@ function parseTikTokShareUrl(value) {
   }
 }
 
-function safeAdminTikTokEmbedUrl(payload) {
-  const value = String(payload?.embed?.url || "");
+function safeAdminTikTokEmbedUrl(payload, expectedShare = null) {
+  const id = String(payload?.video_id || payload?.embed?.video_id || expectedShare?.id || "").trim();
+  if (!/^\d{15,25}$/.test(id)) return "";
+  if (expectedShare?.id && expectedShare.id !== id) return "";
+
+  const value = String(
+    payload?.embed?.url
+      || payload?.embed_url
+      || `https://www.tiktok.com/embed/v2/${id}`,
+  );
   try {
     const url = new URL(value);
     if (url.protocol !== "https:" || url.hostname !== "www.tiktok.com") return "";
     if (!/^\/embed\/v2\/\d{15,25}\/?$/.test(url.pathname)) return "";
+    if (url.pathname.match(/(\d{15,25})/)?.[1] !== id) return "";
     return url.toString();
   } catch {
     return "";
