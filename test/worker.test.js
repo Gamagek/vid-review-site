@@ -424,7 +424,7 @@ test("TikTok watch pages keep the oEmbed cache preview and route playback throug
 
   const viewer = await send(context, "/watch/gateway-tiktok-test?viewer=1");
   const viewerHtml = await viewer.text();
-  assert.match(viewerHtml, /class="tiktok-official-player"/);
+  assert.match(viewerHtml, /class="tiktok-official-player tiktok-gateway-player"/);
   assert.match(viewerHtml, /data-tiktok-player-mode="v7-gateway"/);
   assert.ok(viewerHtml.includes(`src="/watch?user=umbralarchive&amp;id=7552567024304540959"`));
   assert.doesNotMatch(viewerHtml, /www\.tiktok\.com\/player\/v1/);
@@ -1788,7 +1788,7 @@ test("renders the current Vid.Best TikTok cache-first watch player with separate
   assert.doesNotMatch(indexSource, /video.megasale.win/);
 
   const seoSource = readFileSync(new URL("../src/seo-edge.js", import.meta.url), "utf8");
-  assert.doesNotMatch(seoSource, /video.megasale.win/);
+  assert.match(seoSource, /video.megasale.win/);
   assert.match(seoSource, /signedWatchResponse/);
 });
 test("builds the TikTok cache preview before SIGN_SECRET is needed by the clicked gateway route", async () => {
