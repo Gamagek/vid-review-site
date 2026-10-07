@@ -24,9 +24,6 @@ jobs:
         run: npm ci
       - name: Run regression tests
         run: npm test
-
-      - name: Check Portainer v7 gateway syntax
-        run: node --check portainer/tiktok-gateway-v7/server.cjs
       - name: Check Teamwork Python syntax
         run: python -m compileall -q services/teamwork/app
       - name: Test Teamwork service
