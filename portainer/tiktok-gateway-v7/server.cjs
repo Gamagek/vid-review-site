@@ -186,6 +186,11 @@ function clientKey(req) {
 function allowedByRateLimit(req) {
   const now = Date.now();
   const windowMs = 60 * 1000;
+  if (rateBuckets.size > 1000) {
+    for (const [bucketKey, bucket] of rateBuckets) {
+      if (now - bucket.startedAt >= windowMs * 2) rateBuckets.delete(bucketKey);
+    }
+  }
   const key = clientKey(req);
   const existing = rateBuckets.get(key);
   if (!existing || now - existing.startedAt >= windowMs) {
