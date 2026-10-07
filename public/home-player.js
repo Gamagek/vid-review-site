@@ -423,10 +423,9 @@ function safeTikTokInlineEmbedUrl(payload) {
   }
 }
 
-function createTikTokInlineFrame(embedUrl, title = "TikTok video") {
+function createTikTokInlineFrame(title = "TikTok video") {
   const frame = document.createElement("iframe");
   frame.className = "tiktok-official-player";
-  frame.src = embedUrl;
   frame.title = title;
   frame.loading = "eager";
   frame.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
@@ -474,10 +473,8 @@ async function activateTikTokPlayer(card) {
     if (!embedUrl) throw new Error("TikTok embed URL is unavailable.");
 
     const frame = createTikTokInlineFrame(
-      embedUrl,
       card.querySelector(".tile-title")?.textContent?.trim() || "TikTok video",
     );
-    surface.replaceChildren(frame);
 
     if (status) {
       status.textContent = payload.cache_source === "gateway"
@@ -499,6 +496,8 @@ async function activateTikTokPlayer(card) {
         stopPreview(card, "TikTok embed could not load on this network");
       }
     }, { once: true });
+    frame.src = embedUrl;
+    surface.replaceChildren(frame);
 
     readyTimer = window.setTimeout(() => {
       if (previewState.activeCard !== card || card.classList.contains("tiktok-player-ready")) return;
