@@ -33,7 +33,7 @@ function initializeWatchPage() {
   enhanceNativePlayer();
   initializeHlsPlayback();
   initializePersistentPlayer();
-  initializeTikTokCacheFirstPlayer();
+  initializeTikTokOEmbedPlayer();
   initializeEmbeddedMediaTools();
   initializeAudioLab();
   initializeEmbeddedAudioLab();
@@ -53,17 +53,60 @@ function initializeWatchPage() {
 }
 
 
-function initializeTikTokCacheFirstPlayer() {
-  const shell = document.querySelector(".tiktok-cache-player");
-  if (!shell || shell.dataset.vidbestCacheFirst === "1") return;
-  shell.dataset.vidbestCacheFirst = "1";
+function loadTikTokEmbedScript() {
+  return new Promise((resolve, reject) => {
+    const stale = document.querySelector('script[data-vidbest-tiktok-embed="1"]');
+    if (stale) stale.remove();
+
+    const script = document.createElement("script");
+    script.src = "https://www.tiktok.com/embed.js";
+    script.async = true;
+    script.dataset.vidbestTiktokEmbed = "1";
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("TikTok embed script could not load."));
+    document.body.append(script);
+  });
+}
+
+function createTikTokEmbedBlockquote(sourceUrl, videoId) {
+  const blockquote = document.createElement("blockquote");
+  blockquote.className = "tiktok-embed";
+  blockquote.cite = sourceUrl;
+  blockquote.dataset.videoId = videoId;
+  blockquote.style.maxWidth = "605px";
+  blockquote.style.minWidth = "325px";
+  blockquote.style.width = "100%";
+  blockquote.style.margin = "0 auto";
+
+  const section = document.createElement("section");
+  const link = document.createElement("a");
+  link.href = sourceUrl;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer nofollow";
+  link.textContent = "Open this video on TikTok";
+  section.append(link);
+  blockquote.append(section);
+  return blockquote;
+}
+
+function initializeTikTokOEmbedPlayer() {
+  const shell = document.querySelector(".tiktok-oembed-player");
+  if (!shell || shell.dataset.vidbestOembedPlayer === "1") return;
+  shell.dataset.vidbestOembedPlayer = "1";
 
   const player = shell.closest("#watch-player");
   const stage = shell.closest(".watch-player-stage");
-  const loadButton = shell.querySelector("[data-tiktok-load-player]");
+  const loadButton = shell.querySelector("[data-tiktok-load-embed]");
   const backButton = shell.querySelector("[data-tiktok-back-preview]");
-  const watchSrc = shell.dataset.tiktokWatchSrc || "";
-  const shareUrl = shell.dataset.tiktokShare || "";
+  const status = shell.querySelector("[data-tiktok-embed-status]");
+  const shareUrl = shell.dataset.tiktokSource || "";
+  const autoload = shell.dataset.tiktokAutoload === "1";
+
+  const setStatus = (message, tone = "") => {
+    if (!status) return;
+    status.textContent = message;
+    status.dataset.tone = tone;
+  };
 
   const resetEmbeddedEnhancements = () => {
     if (player) {
@@ -74,72 +117,101 @@ function initializeTikTokCacheFirstPlayer() {
   };
 
   const showCachedPreview = () => {
-    const frame = shell.querySelector("iframe");
-    if (frame) frame.remove();
+    shell.querySelector(".tiktok-standard-embed-host")?.remove();
     shell.classList.remove("is-loading", "is-player-ready");
     if (loadButton) {
       loadButton.disabled = false;
-      loadButton.textContent = "▶ Load player";
+      loadButton.textContent = "▶ Load TikTok embed";
     }
     if (backButton) backButton.hidden = true;
+    setStatus("");
     resetEmbeddedEnhancements();
   };
 
-  const loadOfficialPlayer = () => {
-    if (!watchSrc || shell.querySelector("iframe")) return;
+  const waitForIframe = (host, timeoutMs = 10000) => new Promise((resolve, reject) => {
+    const existing = host.querySelector("iframe");
+    if (existing) {
+      resolve(existing);
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      const frame = host.querySelector("iframe");
+      if (!frame) return;
+      observer.disconnect();
+      window.clearTimeout(timer);
+      resolve(frame);
+    });
+    observer.observe(host, { childList: true, subtree: true });
+    const timer = window.setTimeout(() => {
+      observer.disconnect();
+      reject(new Error("TikTok embed did not become ready."));
+    }, timeoutMs);
+  });
+
+  const loadEmbed = async () => {
+    if (!shareUrl || shell.classList.contains("is-loading")) return;
+
+    shell.querySelector(".tiktok-standard-embed-host")?.remove();
+    shell.classList.remove("is-player-ready");
+    shell.classList.add("is-loading");
+    setStatus("Loading cached TikTok metadata…");
     if (loadButton) {
       loadButton.disabled = true;
       loadButton.textContent = "Loading TikTok…";
     }
-    shell.classList.add("is-loading");
 
-    const frame = document.createElement("iframe");
-    frame.id = "watch-media-frame";
-    frame.className = "tiktok-official-player tiktok-gateway-player";
-    frame.src = watchSrc;
-    frame.title = document.querySelector("h1")?.textContent?.trim() || "TikTok video";
-    frame.loading = "eager";
-    frame.referrerPolicy = "strict-origin-when-cross-origin";
-    frame.allow = "autoplay; fullscreen; picture-in-picture";
-    frame.allowFullscreen = true;
-    frame.dataset.tiktokId = shell.dataset.tiktokId || "";
-    frame.dataset.tiktokShare = shareUrl;
-    frame.dataset.tiktokPlayerMode = "v7-gateway-after-cache";
+    try {
+      const response = await fetch("/api/tiktok/embed?url=" + encodeURIComponent(shareUrl), {
+        credentials: "same-origin",
+        headers: { Accept: "application/json" },
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || !payload.ok || !payload.video_id || !payload.source_url) {
+        throw new Error(payload.error || "TikTok embed metadata is unavailable.");
+      }
 
-    frame.addEventListener("load", () => {
+      const host = document.createElement("div");
+      host.className = "tiktok-standard-embed-host";
+      host.append(createTikTokEmbedBlockquote(payload.source_url, String(payload.video_id)));
+      shell.append(host);
+
+      setStatus(payload.cache_source === "gateway"
+        ? "Loaded through the Cloudflare oEmbed gateway."
+        : "Loaded from Vid.Best cache.");
+
+      await loadTikTokEmbedScript();
+      await waitForIframe(host);
+
       shell.classList.add("is-player-ready");
       shell.classList.remove("is-loading");
       if (backButton) backButton.hidden = false;
       if (loadButton) {
         loadButton.disabled = false;
-        loadButton.textContent = "Reload player";
+        loadButton.textContent = "Reload TikTok embed";
       }
-    }, { once: true });
+      setStatus("");
 
-    shell.append(frame);
-    window.setTimeout(() => {
-      if (!shell.classList.contains("is-player-ready") && frame.isConnected) {
-        shell.classList.remove("is-loading");
-        if (loadButton) {
-          loadButton.disabled = false;
-          loadButton.textContent = "Retry player";
-        }
-        if (backButton) backButton.hidden = false;
+      queueMicrotask(() => {
+        initializeEmbeddedMediaTools();
+        initializeEmbeddedAudioLab();
+      });
+    } catch (error) {
+      shell.querySelector(".tiktok-standard-embed-host")?.remove();
+      shell.classList.remove("is-loading", "is-player-ready");
+      if (loadButton) {
+        loadButton.disabled = false;
+        loadButton.textContent = "Retry TikTok embed";
       }
-    }, 8000);
-
-    // Audio/embedded helpers initialize after the same-origin signed wrapper exists.
-    queueMicrotask(() => {
-      initializeEmbeddedMediaTools();
-      initializeEmbeddedAudioLab();
-    });
+      if (backButton) backButton.hidden = true;
+      setStatus(error.message || "TikTok embed is temporarily unavailable.", "error");
+    }
   };
 
-  loadButton?.addEventListener("click", loadOfficialPlayer);
+  loadButton?.addEventListener("click", () => void loadEmbed());
   backButton?.addEventListener("click", showCachedPreview);
 
-  // Keep the first render entirely same-origin: no TikTok iframe exists until this click.
-  if (stage) stage.dataset.tiktokCacheFirst = "1";
+  if (stage) stage.dataset.tiktokOembedGateway = "1";
+  if (autoload) queueMicrotask(() => void loadEmbed());
 }
 
 function initializeHlsPlayback() {
