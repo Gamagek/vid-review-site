@@ -9,8 +9,18 @@ const SITE = String(process.env.ALLOWED_SITE || "")
 const SECRET = String(process.env.SIGN_SECRET || "");
 const RETRY = String(process.env.AUTO_RETRY || "1").trim() !== "0";
 const PORT = Number(process.env.PORT || 8080);
-const WAIT_MS = 12000;
-const REVEAL_MS = 6000;
+function clampNumber(value, min, max, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.min(Math.max(number, min), max) : fallback;
+}
+
+const MAX_ATTEMPTS = Math.floor(clampNumber(process.env.PLAYER_ATTEMPTS, 1, 2, 2));
+const WAIT_MS = clampNumber(process.env.PLAYER_WAIT_MS, 8000, 30000, 15000);
+const RETRY_BASE_MS = clampNumber(process.env.RETRY_BASE_MS, 2500, 15000, 4500);
+const RETRY_JITTER_MS = clampNumber(process.env.RETRY_JITTER_MS, 0, 5000, 1200);
+const REVEAL_MS = clampNumber(process.env.FALLBACK_REVEAL_MS, 2500, 15000, 5000);
+const REQUESTS_PER_MINUTE = Math.floor(clampNumber(process.env.REQUESTS_PER_MINUTE, 5, 120, 30));
+const rateBuckets = new Map();
 
 function sign(id, exp) {
   return crypto.createHmac("sha256", SECRET).update(id + "." + exp).digest("hex");
@@ -94,7 +104,7 @@ function clientMain(cfg) {
     timer = setTimeout(function () {
       attempt += 1;
       load();
-    }, 2000 * (attempt + 1) + Math.floor(Math.random() * 800));
+    }, cfg.retryBase * (attempt + 1) + Math.floor(Math.random() * cfg.retryJitter));
   }
 
   window.addEventListener("message", function (event) {
@@ -134,12 +144,15 @@ function clientMain(cfg) {
 }
 
 function playerPage(id, user) {
-  const player = "https://www.tiktok.com/player/v1/" + id + "?music_info=1&description=1";
+  const player = "https://www.tiktok.com/player/v1/" + id;
   const embed = "https://www.tiktok.com/embed/v2/" + id;
+  const candidates = RETRY ? [player, embed] : [player];
   const cfg = {
-    urls: RETRY ? [player, player, embed] : [player],
+    urls: candidates.slice(0, MAX_ATTEMPTS),
     wait: WAIT_MS,
     reveal: REVEAL_MS,
+    retryBase: RETRY_BASE_MS,
+    retryJitter: RETRY_JITTER_MS,
   };
   const open = user ? "https://www.tiktok.com/@" + user + "/video/" + id : "";
   const bar = open
@@ -162,6 +175,32 @@ function playerPage(id, user) {
     + "</body></html>";
 }
 
+function clientKey(req) {
+  const cf = String(req.headers["cf-connecting-ip"] || "").trim();
+  if (cf) return cf.slice(0, 80);
+  const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  if (forwarded) return forwarded.slice(0, 80);
+  return String(req.socket && req.socket.remoteAddress || "unknown").slice(0, 80);
+}
+
+function allowedByRateLimit(req) {
+  const now = Date.now();
+  const windowMs = 60 * 1000;
+  if (rateBuckets.size > 1000) {
+    for (const [bucketKey, bucket] of rateBuckets) {
+      if (now - bucket.startedAt >= windowMs * 2) rateBuckets.delete(bucketKey);
+    }
+  }
+  const key = clientKey(req);
+  const existing = rateBuckets.get(key);
+  if (!existing || now - existing.startedAt >= windowMs) {
+    rateBuckets.set(key, { startedAt: now, count: 1 });
+    return true;
+  }
+  existing.count += 1;
+  return existing.count <= REQUESTS_PER_MINUTE;
+}
+
 function handle(req, res) {
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader("Content-Security-Policy", "frame-ancestors " + (SITE || "'none'"));
@@ -177,8 +216,17 @@ function handle(req, res) {
         "OK v7 secret:" + (SECRET ? "set" : "missing")
         + " secretlen:" + SECRET.length
         + " site:" + (SITE ? "set" : "missing")
-        + " retry:" + (RETRY ? "on" : "off"),
+        + " retry:" + (RETRY ? "on" : "off")
+        + " attempts:" + MAX_ATTEMPTS
+        + " rpm:" + REQUESTS_PER_MINUTE,
       );
+      return;
+    }
+
+    if (!allowedByRateLimit(req)) {
+      res.statusCode = 429;
+      res.setHeader("Retry-After", "60");
+      res.end("Too Many Requests");
       return;
     }
 
