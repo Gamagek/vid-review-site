@@ -472,8 +472,12 @@ function applyCachedTikTokPreview(card, preview) {
   // Cached metadata may arrive after Tagembed mounts. Updating the facade
   // would otherwise erase the live mini widget and leave a black tile.
   if (card.classList.contains("saiyaara-tagembed-tile")) {
-    const img = card.querySelector(".saiyaara-tagembed-poster");
-    if (img && preview.thumbnail_url) img.src = preview.thumbnail_url;
+    if (preview.thumbnail_url) {
+      const poster = card.querySelector(".saiyaara-tagembed-poster");
+      const cover = card.querySelector(".saiyaara-tile-cover-poster");
+      if (poster) poster.src = preview.thumbnail_url;
+      if (cover) cover.src = preview.thumbnail_url;
+    }
     return;
   }
   renderTikTokFacade(card);
