@@ -67,7 +67,7 @@ function decorateVideoCards() {
         if (event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         if (!parseTikTokShareUrl(card.dataset.videoSource)) return;
         event.preventDefault();
-        activateTikTokPlayer(card);
+        activateTikTokPreviewCard(card);
       });
       previewState.observer?.observe(card);
       return;
@@ -95,8 +95,8 @@ function previewAvailabilityMessage(card) {
   if (!previewsAllowed()) return "Open video · preview disabled";
   if (card.dataset.videoProvider === "tiktok") {
     return parseTikTokShareUrl(card.dataset.videoSource)
-      ? "TikTok · tap to play"
-      : "TikTok player needs a normal sharing link";
+      ? "TikTok · tap for details"
+      : "TikTok preview needs a normal sharing link";
   }
   if (card.dataset.videoProvider === "facebook") {
     return "Loading Facebook player…";
@@ -411,40 +411,24 @@ function isFacebookDirectSource(value) {
   }
 }
 
-async function activateTikTokPlayer(card) {
+async function activateTikTokPreviewCard(card) {
   const api = window.VidBestTikTok;
   if (!card?.isConnected || card.dataset.videoProvider !== "tiktok" || !api) return;
   const share = api.parse(card.dataset.videoSource);
-  if (!share || previewState.activeCard === card || Number(card.dataset.tiktokRetryAt) > Date.now()) return;
-  stopPreview(); cancelCandidate();
-  const surface = card.querySelector(".preview-surface");
+  if (!share) return;
+
+  cancelCandidate();
   const status = card.querySelector(".preview-status");
-  if (!surface) return;
-  let disposed = false, cleanup;
-  previewState.activeCard = card;
-  previewState.activeCleanup = () => { disposed = true; cleanup?.(); };
-  card.classList.add("preview-playing", "tiktok-player-active", "tiktok-player-loading");
-  if (status) status.textContent = "Loading TikTok…";
-  void api.getMetadata(share.url).catch(() => {});
-  if (disposed || previewState.activeCard !== card) return;
-  const frame = document.createElement("iframe");
-  frame.className = "tiktok-official-player";
-  frame.title = card.querySelector(".tile-title")?.textContent?.trim() || "TikTok video";
-  frame.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
-  frame.allowFullscreen = true; frame.referrerPolicy = "strict-origin-when-cross-origin";
-  cleanup = api.observe(frame, {
-    ready() {
-      card.classList.remove("tiktok-player-loading"); card.classList.add("tiktok-player-ready");
-      if (status) status.textContent = "";
-    },
-    error(message) {
-      card.dataset.tiktokRetryAt = String(Date.now() + 10000);
-      stopPreview(card, message);
-    },
-    autoplay() { if (status) status.textContent = "Tap Play in the player."; },
+  if (status) status.textContent = "Opening TikTok preview…";
+
+  await api.showPreview(share.url, {
+    title: card.dataset.tiktokCaption || card.dataset.videoTitle || "TikTok video",
+    author: card.dataset.tiktokAuthor || (share.username ? "@" + share.username : "TikTok creator"),
+    description: card.dataset.tiktokDescription || "Preview details are cached by Vid.Best.",
+    thumbnail: card.dataset.tiktokThumbnail || card.dataset.tiktokPoster || "",
   });
-  frame.src = api.playerUrl(share.id);
-  surface.replaceChildren(frame);
+
+  if (status) status.textContent = "TikTok · tap for details";
 }
 
 function buildFacebookMicrolinkImageUrl(sourceUrl) {
@@ -464,6 +448,7 @@ function applyCachedTikTokPreview(card, preview) {
   if (preview.author_name) card.dataset.tiktokAuthor = preview.author_name;
   if (preview.caption || preview.title) card.dataset.tiktokCaption = preview.caption || preview.title;
   if (preview.description) card.dataset.tiktokDescription = preview.description;
+  if (preview.thumbnail_url) card.dataset.tiktokThumbnail = preview.thumbnail_url;
   if (preview.poster_url) card.dataset.tiktokPoster = preview.poster_url;
   renderTikTokFacade(card);
 }
@@ -513,9 +498,10 @@ function renderTikTokFacade(card) {
   placeholder.className = "tiktok-microlink-placeholder";
   placeholder.textContent = "TikTok";
   imageWrap.append(placeholder);
-  if (card.dataset.tiktokPoster) {
+  const previewImage = card.dataset.tiktokThumbnail || card.dataset.tiktokPoster;
+  if (previewImage) {
     const image = document.createElement("img");
-    image.src = card.dataset.tiktokPoster;
+    image.src = previewImage;
     image.alt = "";
     image.loading = "lazy";
     image.decoding = "async";
@@ -530,8 +516,8 @@ function renderTikTokFacade(card) {
   const providerRow = document.createElement("span");
   providerRow.className = "tiktok-microlink-provider";
   providerRow.textContent = card.dataset.tiktokCacheReady === "1"
-    ? "TikTok preview · tap to play"
-    : "TikTok · tap to play";
+    ? "TikTok preview · tap for details"
+    : "TikTok · tap for details";
 
   const author = document.createElement("span");
   author.className = "tiktok-microlink-author";
@@ -543,16 +529,16 @@ function renderTikTokFacade(card) {
   caption.textContent = card.dataset.tiktokDescription
     || card.dataset.tiktokCaption
     || card.dataset.videoTitle
-    || "Play this TikTok video";
+    || "Open TikTok preview details";
 
   const play = document.createElement("span");
   play.className = "tiktok-facade-play";
   play.setAttribute("aria-hidden", "true");
-  play.textContent = "▶";
+  play.textContent = "↗";
 
   body.append(providerRow, author, caption);
   facade.append(imageWrap, play, body);
   surface.append(facade);
   card.classList.add("tiktok-facade-ready");
-  if (status) status.textContent = "TikTok · tap to play";
+  if (status) status.textContent = "TikTok · tap for details";
 }
