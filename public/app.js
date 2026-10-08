@@ -307,6 +307,7 @@ function buildVideoCard(video) {
   const card = fragment.querySelector(".video-tile");
   const pageUrl = `/watch/${encodeURIComponent(video.slug)}`;
   card.dataset.videoId = String(video.id);
+  card.dataset.videoSlug = video.slug || "";
   card.dataset.videoTitle = video.title || "Video";
   card.dataset.videoProvider = video.provider || video.media_type || "direct";
   card.dataset.videoSource = video.source_url || "";
