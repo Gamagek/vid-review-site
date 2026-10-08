@@ -388,43 +388,36 @@ test("query-style /watch no longer exposes or depends on the legacy signed TikTo
   assert.doesNotMatch(source, /TIKTOK_GATEWAY_ORIGIN/);
   assert.doesNotMatch(source, /video\.megasale\.win/);
 });
-test("TikTok watch pages keep cached oEmbed metadata and use the standard embed shell", async () => {
+test("TikTok watch pages render cached metadata cards without a TikTok player", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
        slug, title, source_url, embed_url, media_type, primary_category, subcategory, description, published
-     ) VALUES ('gateway-tiktok-test', 'Gateway TikTok test', 'https://www.tiktok.com/@umbralarchive/video/7552567024304540959', NULL, 'tiktok', 'Social Media & Trending', 'TikTok Viral Challenges', 'oEmbed player test', 1)`,
+     ) VALUES ('gateway-tiktok-test', 'Gateway TikTok test', 'https://www.tiktok.com/@umbralarchive/video/7552567024304540959', NULL, 'tiktok', 'Social Media & Trending', 'TikTok Viral Challenges', 'Metadata card test', 1)`,
   ).run();
-
   context.sqlite.prepare(
-    `INSERT INTO tiktok_oembed_cache (video_id, share_url, title, author_name, description)
-     VALUES (?, ?, ?, ?, ?)`,
+    `INSERT INTO tiktok_oembed_cache (video_id, share_url, title, author_name, description, thumbnail_url)
+     VALUES (?, ?, ?, ?, ?, ?)`,
   ).run(
     "7552567024304540959",
     "https://www.tiktok.com/@umbralarchive/video/7552567024304540959",
     "Cached TikTok title",
     "Umbral Archive",
     "Cached preview description",
+    "https://p16-common-sign.tiktokcdn-us.com/preview.jpg",
   );
 
   const page = await send(context, "/watch/gateway-tiktok-test");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /class="tiktok-oembed-player"/);
-  assert.match(html, /data-tiktok-player-mode="oembed-gateway"/);
-  assert.match(html, /data-tiktok-autoload="0"/);
-  assert.match(html, /Gateway TikTok test/);
-  assert.ok(html.includes("/api/tiktok/cached-poster?id=7552567024304540959"));
-  assert.doesNotMatch(html, /www\.tiktok\.com\/player\/v1/);
-  assert.doesNotMatch(html, /video\.megasale\.win/);
-  assert.doesNotMatch(html, /data-tiktok-watch-src/);
-
-  const viewer = await send(context, "/watch/gateway-tiktok-test?viewer=1");
-  const viewerHtml = await viewer.text();
-  assert.match(viewerHtml, /class="tiktok-oembed-player"/);
-  assert.match(viewerHtml, /data-tiktok-autoload="1"/);
-  assert.match(viewerHtml, /data-tiktok-player-mode="oembed-gateway"/);
-  assert.doesNotMatch(viewerHtml, /<iframe[^>]+tiktok/);
+  assert.match(html, /class="tiktok-preview-card"/);
+  assert.match(html, /data-tiktok-player-mode="metadata-card"/);
+  assert.match(html, /Cached TikTok title/);
+  assert.match(html, /Umbral Archive/);
+  assert.match(html, /Open on TikTok/);
+  assert.doesNotMatch(html, /<iframe[^>]+tiktok/i);
+  assert.doesNotMatch(html, /player\/v1/);
+  assert.doesNotMatch(html, /embed\.js/);
 });
 test("Facebook mini preview stays separate from the original-quality watch player", async () => {
   const context = createTestContext();
@@ -962,13 +955,13 @@ test("refreshes TikTok oEmbed metadata through the Cloudflare gateway when publi
     globalThis.fetch = originalFetch;
   }
 });
-test("stores TikTok source without a direct player URL and renders the oEmbed watch stage", async () => {
+test("stores TikTok source without a direct player URL and renders a metadata preview card", async () => {
   const context = createTestContext();
   const response = await send(context, "/api/videos", {
     method: "POST",
     headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      title: "TikTok oEmbed test",
+      title: "TikTok metadata card test",
       source_url: "https://www.tiktok.com/@example/video/6718335390845095173",
       primary_category: "Social Media & Trending",
       subcategory: "TikTok Viral Challenges",
@@ -984,11 +977,12 @@ test("stores TikTok source without a direct player URL and renders the oEmbed wa
   const page = await send(context, `/watch/${result.video.slug}`);
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /class="tiktok-oembed-player"/);
+  assert.match(html, /class="tiktok-preview-card"/);
   assert.match(html, /data-tiktok-id="6718335390845095173"/);
   assert.match(html, /data-tiktok-source=/);
-  assert.match(html, /data-tiktok-player-mode="oembed-gateway"/);
-  assert.match(html, /data-tiktok-load-embed/);
+  assert.match(html, /data-tiktok-player-mode="metadata-card"/);
+  assert.match(html, /data-tiktok-show-preview/);
+  assert.match(html, /Open on TikTok/);
   assert.doesNotMatch(html, /www\.tiktok\.com\/player\/v1/);
   assert.doesNotMatch(html, /video\.megasale\.win/);
 });
@@ -1757,19 +1751,19 @@ test("admin requires rights certification for cached video copies", () => {
   assert.match(script, /redistribution_certified/);
 });
 
-test("TikTok admin preview uses the gateway model and official iframe without embed.js", () => {
+test("TikTok admin preview uses metadata cards and never creates a TikTok iframe", () => {
   const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
   assert.match(adminSource, /renderTikTokPreview/);
   assert.match(adminSource, /VidBestTikTok\.getMetadata/);
-  assert.match(adminSource, /safeAdminTikTokEmbedUrl/);
-  assert.match(adminSource, /payload\?\.embed_url/);
-  assert.match(adminSource, /className = "tiktok-official-player"/);
-  assert.doesNotMatch(adminSource, /ensureTikTokAdminEmbedScript/);
+  assert.match(adminSource, /VidBestTikTok\?\.showPreview|VidBestTikTok\.showPreview/);
+  assert.match(adminSource, /tiktok-preview-card/);
+  assert.match(adminSource, /Open on TikTok/);
+  assert.doesNotMatch(adminSource, /safeAdminTikTokEmbedUrl/);
+  assert.doesNotMatch(adminSource, /tiktok-official-player/);
   assert.doesNotMatch(adminSource, /www\.tiktok\.com\/embed\.js/);
-  assert.doesNotMatch(adminSource, /buildTikTokPlayerUrl/);
   assert.doesNotMatch(adminSource, /www\.tiktok\.com\/player\/v1/);
 });
-test("renders the current Vid.Best TikTok oEmbed architecture with cached previews", async () => {
+test("renders the current Vid.Best TikTok gateway architecture as metadata-only cards", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
@@ -1782,43 +1776,45 @@ test("renders the current Vid.Best TikTok oEmbed architecture with cached previe
     "tiktok",
     "Social Media & Trending",
     "TikTok Trending",
-    "Official TikTok embed test",
+    "TikTok metadata test",
   );
 
   const page = await send(context, "/watch/tiktok-player-test");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /class="tiktok-oembed-player"/);
+  assert.match(html, /class="tiktok-preview-card"/);
   assert.match(html, /data-tiktok-id="7669587518156705056"/);
-  assert.match(html, /data-tiktok-player-mode="oembed-gateway"/);
-  assert.doesNotMatch(html, /data-tiktok-watch-src/);
-  assert.doesNotMatch(html, /video\.megasale\.win/);
+  assert.match(html, /data-tiktok-player-mode="metadata-card"/);
+  assert.match(html, /Open on TikTok/);
   assert.doesNotMatch(html, /player\/v1/);
+  assert.doesNotMatch(html, /tiktok-official-player/);
 
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
-  assert.match(watchSource, /initializeTikTokOEmbedPlayer/);
-  assert.match(watchSource, /data-tiktok-load-embed/);
+  assert.match(watchSource, /initializeTikTokPreviewCard/);
+  assert.match(watchSource, /data-tiktok-show-preview/);
+  assert.doesNotMatch(watchSource, /initializeTikTokOEmbedPlayer/);
   assert.doesNotMatch(watchSource, /www\.tiktok\.com\/embed\.js/);
-  assert.doesNotMatch(watchSource, /v7-gateway/);
+  assert.doesNotMatch(watchSource, /player\/v1/);
 
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /renderTikTokFacade/);
-  assert.match(homeSource, /activateTikTokPlayer/);
+  assert.match(homeSource, /activateTikTokPreviewCard/);
+  assert.doesNotMatch(homeSource, /activateTikTokPlayer/);
   assert.doesNotMatch(homeSource, /www\.tiktok\.com\/embed\.js/);
-  assert.doesNotMatch(homeSource, /buildTikTokGatewayWatchUrl/);
-  assert.doesNotMatch(homeSource, /\/watch\?user=/);
+  assert.doesNotMatch(homeSource, /player\/v1/);
 
   const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
   assert.match(indexSource, /buildTikTokOEmbedGatewayUrl/);
   assert.ok(indexSource.includes("tiktok-oembed-gateway.gkasunc.workers.dev"));
-  assert.doesNotMatch(indexSource, /buildTikTokPlayerUrl/);
+  assert.doesNotMatch(indexSource, /www\.tiktok\.com\/player\/v1/);
   assert.doesNotMatch(indexSource, /video\.megasale\.win/);
 
-  const seoSource = readFileSync(new URL("../src/seo-edge.js", import.meta.url), "utf8");
-  assert.doesNotMatch(seoSource, /signedWatchResponse/);
-  assert.doesNotMatch(seoSource, /SIGN_SECRET/);
+  const previewService = readFileSync(new URL("../public/tiktok-preview-service.js", import.meta.url), "utf8");
+  assert.doesNotMatch(previewService, /embed\.js/);
+  assert.doesNotMatch(previewService, /player\/v1/);
+  assert.doesNotMatch(previewService, /createElement\(["']iframe["']\)/);
 });
-test("TikTok oEmbed watch pages no longer require SIGN_SECRET or the old playback gateway", async () => {
+test("TikTok metadata cards no longer require SIGN_SECRET or any playback gateway", async () => {
   const context = createTestContext({ SIGN_SECRET: "" });
   context.sqlite.prepare(
     `INSERT INTO videos (
@@ -1826,19 +1822,19 @@ test("TikTok oEmbed watch pages no longer require SIGN_SECRET or the old playbac
      ) VALUES (?, ?, ?, 'tiktok', 'Social Media & Trending', 'TikTok Trending', ?, 1)`,
   ).run(
     "oembed-tiktok",
-    "Cached TikTok embed",
+    "Cached TikTok metadata",
     "https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056?_r=1&_t=tracking",
-    "oEmbed regression test",
+    "Metadata card regression test",
   );
 
   const page = await send(context, "/watch/oembed-tiktok");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.match(html, /class="tiktok-oembed-player"/);
-  assert.match(html, /data-tiktok-player-mode="oembed-gateway"/);
+  assert.match(html, /class="tiktok-preview-card"/);
+  assert.match(html, /data-tiktok-player-mode="metadata-card"/);
   assert.doesNotMatch(html, /SIGN_SECRET/);
   assert.doesNotMatch(html, /video\.megasale\.win/);
-  assert.doesNotMatch(html, /\/watch\?user=/);
+  assert.doesNotMatch(html, /player\/v1/);
 });
 test("builds a direct Facebook player without the old card facade", () => {
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
@@ -1851,50 +1847,54 @@ test("builds a direct Facebook player without the old card facade", () => {
   assert.doesNotMatch(homeSource, /facebook-mini-preview-player/);
 });
 
-test("TikTok home cards defer standard embed creation until click and keep one active card", () => {
+test("TikTok home cards open metadata details without creating a player", () => {
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /media\.addEventListener\("click"/);
-  assert.match(homeSource, /event\.preventDefault\(\);[\s\S]*?activateTikTokPlayer\(card\)/);
-  assert.match(homeSource, /previewState\.activeCard === card/);
-  assert.match(homeSource, /stopPreview\(\)/);
-  assert.match(homeSource, /previewState\.activeCard = card/);
-  assert.match(homeSource, /tiktok-player-ready/);
-  assert.match(homeSource, /activeTikTokIsFullscreen/);
-  assert.doesNotMatch(homeSource, /buildTikTokGatewayWatchUrl/);
+  assert.match(homeSource, /activateTikTokPreviewCard\(card\)/);
+  assert.match(homeSource, /api\.showPreview/);
+  assert.match(homeSource, /tiktokThumbnail/);
+  assert.doesNotMatch(homeSource, /activateTikTokPlayer/);
+  assert.doesNotMatch(homeSource, /tiktok-official-player/);
   assert.doesNotMatch(homeSource, /player\/v1/);
+  assert.doesNotMatch(homeSource, /embed\.js/);
 });
-test("TikTok embed model is same-origin, gateway-backed, and does not expose raw gateway HTML", async () => {
+test("TikTok metadata model is same-origin, gateway-backed, and strips embed HTML", async () => {
   const context = createTestContext({
     TIKTOK_OEMBED_GATEWAY: "https://tiktok-oembed-gateway.gkasunc.workers.dev/",
   });
   const share = "https://www.tiktok.com/@creator/video/7552567024304540959";
   const originalFetch = globalThis.fetch;
-  globalThis.fetch = async (url) => new Response(JSON.stringify({
+  globalThis.fetch = async () => new Response(JSON.stringify({
     type: "video",
-    title: "Gateway embed",
+    title: "Gateway metadata",
     author_name: "creator",
+    thumbnail_url: "https://p16-common-sign.tiktokcdn-us.com/gateway.jpg",
     html: "<script>untrusted()</script><blockquote class=\"tiktok-embed\"></blockquote>",
   }), { status: 200, headers: { "Content-Type": "application/json" } });
   try {
     const response = await send(context, "/api/tiktok/embed?url=" + encodeURIComponent(share));
     assert.equal(response.status, 200);
-    assert.match(response.headers.get("Cache-Control"), /max-age=300/);
+    assert.match(response.headers.get("Cache-Control"), /max-age=86400/);
     const payload = await response.json();
     assert.equal(payload.ok, true);
     assert.equal(payload.source_url, share);
     assert.equal(payload.canonical_url, share);
+    assert.equal(payload.open_url, share);
     assert.equal(payload.video_id, "7552567024304540959");
-    assert.equal(payload.schema_version, 3);
-    assert.equal(payload.embed_url, "https://www.tiktok.com/player/v1/7552567024304540959?autoplay=0&controls=1&loop=0&rel=0");
-    assert.equal(payload.embed.kind, "official-iframe");
-    assert.equal(payload.embed.url, "https://www.tiktok.com/player/v1/7552567024304540959?autoplay=0&controls=1&loop=0&rel=0");
+    assert.equal(payload.schema_version, 4);
+    assert.equal(payload.mode, "metadata-card");
+    assert.equal(payload.title, "Gateway metadata");
+    assert.equal(payload.author_name, "creator");
+    assert.equal(payload.thumbnail_url, "https://p16-common-sign.tiktokcdn-us.com/gateway.jpg");
+    assert.equal("embed_url" in payload, false);
+    assert.equal("embed" in payload, false);
     assert.equal("html" in payload, false);
     assert.equal(JSON.stringify(payload).includes("untrusted"), false);
+    assert.equal(JSON.stringify(payload).includes("player/v1"), false);
   } finally {
     globalThis.fetch = originalFetch;
   }
 });
-
 test("serves homepage TikTok preview cards from D1 without contacting TikTok", async () => {
   const context = createTestContext();
   const share = "https://www.tiktok.com/@cachedcreator/video/7622472784039415061";
@@ -1977,11 +1977,15 @@ test("backfills existing TikTok records conservatively into D1", async () => {
   }
 });
 
-test("fullscreen swipe does not warm a second TikTok standard embed", () => {
-  const source = readFileSync(new URL("../public/swipe-viewer.js", import.meta.url), "utf8");
-  assert.match(source, /const warmProviders = new Set\(\["youtube", "vimeo", "raw", "r2", "hls"\]\)/);
-  assert.doesNotMatch(source, /warmProviders = new Set\([^\n]*"tiktok"/);
-  assert.match(source, /if \(!warmProviders\.has\(card\.video\.provider\) && card !== cards\[index\]\) return;/);
+test("fullscreen swipe treats TikTok as a metadata-only non-controllable card", () => {
+  const viewerSource = readFileSync(new URL("../public/swipe-viewer.js", import.meta.url), "utf8");
+  const bridgeSource = readFileSync(new URL("../public/swipe-player-bridge.js", import.meta.url), "utf8");
+  assert.match(viewerSource, /const warmProviders = new Set\(\["youtube", "vimeo", "raw", "r2", "hls"\]\)/);
+  assert.doesNotMatch(viewerSource, /warmProviders = new Set\([^\n]*"tiktok"/);
+  assert.match(viewerSource, /if \(!warmProviders\.has\(card\.video\.provider\)\) \{ card\.ready = true; card\.controllable = false; \}/);
+  assert.match(bridgeSource, /Preview card · TikTok/);
+  assert.doesNotMatch(bridgeSource, /VidBestTikTok\.command/);
+  assert.doesNotMatch(bridgeSource, /x-tiktok-player/);
 });
 test("builds a batch TikTok preview from the Cloudflare oEmbed gateway and then D1 cache", async () => {
   const context = createTestContext({
