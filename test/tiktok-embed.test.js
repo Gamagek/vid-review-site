@@ -107,3 +107,96 @@ test("TikTok browser service mounts Player v1 rather than embed.js", () => {
   assert.match(code, /autoplay", "0"/);
   assert.match(code, /author_name/);
 });
+
+
+test("safe TikTok mode mounts only after click, removes failed frames and throttles retries", async () => {
+  const rafs = [];
+  const timers = new Map();
+  let nextTimer = 0;
+  let createdFrames = 0;
+  let dialog = null;
+  const storage = new Map();
+  const docListeners = new Map();
+  const winListeners = new Map();
+
+  function element(tag) {
+    const listeners = new Map();
+    return {
+      tagName: tag.toUpperCase(), dataset: {}, style: {}, children: [], textContent: "",
+      setAttribute(name, value) { this[name] = value; },
+      addEventListener(name, cb) { listeners.set(name, cb); },
+      remove() { this.removed = true; },
+      append(...children) { this.children.push(...children); },
+      replaceChildren(...children) { this.children = children; },
+      trigger(name, event = {}) { listeners.get(name)?.(event); },
+    };
+  }
+
+  const host = element("div");
+  const status = element("p");
+  const selectors = new Map([
+    ["[data-tiktok-embed-host]", host],
+    ["[data-tiktok-dialog-status]", status],
+    ["[data-tiktok-dialog-title]", element("strong")],
+    ["[data-tiktok-dialog-author]", element("span")],
+    ["[data-tiktok-dialog-description]", element("p")],
+    [".tiktok-preview-dialog-close", element("button")],
+    ["[data-tiktok-dialog-cancel]", element("button")],
+  ]);
+  const document = {
+    hidden: false,
+    body: { append(node) { if (node.tagName === "DIALOG") dialog = node; } },
+    querySelector(selector) { return selector === "#vidbest-tiktok-preview-dialog" ? dialog : null; },
+    addEventListener(type, fn) { docListeners.set(type, fn); },
+    createElement(tag) {
+      const el = element(tag);
+      if (tag === "iframe") createdFrames++;
+      if (tag === "dialog") {
+        el.open = false;
+        el.querySelector = (selector) => selectors.get(selector) || null;
+        el.showModal = () => { el.open = true; };
+        el.close = () => { el.open = false; el.trigger("close"); };
+      }
+      return el;
+    },
+  };
+  const window = {
+    addEventListener(type, fn) { winListeners.set(type, fn); },
+    removeEventListener(type, fn) { if (winListeners.get(type) === fn) winListeners.delete(type); },
+  };
+  const context = {
+    window, document, URL, AbortSignal, Response, Date,
+    location: { origin: "https://vid.best" },
+    requestAnimationFrame(fn) { rafs.push(fn); },
+    setTimeout(fn, delay) { timers.set(++nextTimer, { fn, delay }); return nextTimer; },
+    clearTimeout(id) { timers.delete(id); },
+    sessionStorage: {
+      getItem(key) { return storage.get(key) || null; },
+      setItem(key, value) { storage.set(key, value); },
+      removeItem(key) { storage.delete(key); },
+    },
+    fetch: async () => Response.json(payload()),
+  };
+  runInNewContext(code, context);
+  const api = window.VidBestTikTok;
+  assert.equal(createdFrames, 0, "never create iframe at page startup");
+  await api.showPreview(share, { title: "First video" });
+  assert.equal(dialog.open, true);
+  assert.equal(createdFrames, 0, "no player before dialog opens and is painted");
+  rafs.shift()();
+  assert.equal(createdFrames, 1);
+  assert.match(host.children[0].src, /^https:\/\/www\.tiktok\.com\/player\/v1\//);
+  assert.equal(timers.size, 1, "only one readiness timer");
+  const timeout = [...timers.values()][0].fn;
+  timeout();
+  assert.equal(host.children[0].className, "tiktok-player-fallback");
+  assert.match(status.textContent, /retries are paused/i);
+  assert.equal(timers.size, 0);
+  dialog.close();
+  assert.equal(host.children.length, 0, "closing the popup removes player and placeholder");
+  await api.showPreview(share, { title: "First video" });
+  rafs.shift()();
+  assert.equal(createdFrames, 1, "cooldown prevents a second TikTok request");
+  assert.match(status.textContent, /Please wait/);
+  dialog.close();
+});
