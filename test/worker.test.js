@@ -414,7 +414,7 @@ test("TikTok watch pages render cached metadata cards without a TikTok player", 
   assert.match(html, /data-tiktok-player-mode="metadata-card"/);
   assert.match(html, /Cached TikTok title/);
   assert.match(html, /Umbral Archive/);
-  assert.match(html, /Open on TikTok/);
+  assert.match(html, /Play in popup/);
   assert.doesNotMatch(html, /<iframe[^>]+tiktok/i);
   assert.doesNotMatch(html, /player\/v1/);
   assert.doesNotMatch(html, /embed\.js/);
@@ -1812,7 +1812,8 @@ test("renders the current Vid.Best TikTok gateway architecture as metadata-only 
   assert.doesNotMatch(indexSource, /video\.megasale\.win/);
 
   const previewService = readFileSync(new URL("../public/tiktok-preview-service.js", import.meta.url), "utf8");
-  assert.doesNotMatch(previewService, /embed\.js/);
+  assert.match(previewService, /embed\.js/);
+  assert.match(previewService, /injectOfficialEmbed/);
   assert.doesNotMatch(previewService, /player\/v1/);
   assert.doesNotMatch(previewService, /createElement\(["']iframe["']\)/);
 });
