@@ -1,4 +1,4 @@
-// TikTok metadata-only client. It never loads TikTok embed.js, player/v1, or an iframe.
+// TikTok metadata-only client. It only renders cached preview information and original-post links.
 (() => {
   const ORIGIN = "https://www.tiktok.com";
   const TTL = 5 * 60 * 1000;
