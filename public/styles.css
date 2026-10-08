@@ -1211,3 +1211,141 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
     min-height: 410px;
   }
 }
+
+/* Three Saiyaara surfaces: the card, the watch player, and its mini/theater
+   states. Never size a cross-origin widget beyond its parent viewport. */
+html:has(body[data-video-slug="saiyaara-a-cinematic-romance"]) { overflow-x: clip; }
+#watch-player[data-saiyaara-player="1"] {
+  min-width: 0;
+  max-width: 100%;
+}
+#watch-player[data-saiyaara-player="1"] .watch-player-stage {
+  width: min(100%, 500px) !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: min(74dvh, 780px) !important;
+  min-height: min(440px, 70dvh) !important;
+  margin-inline: auto !important;
+  overflow: hidden !important;
+  display: block !important;
+}
+#watch-player[data-saiyaara-player="1"] .saiyaara-tagembed-player,
+#watch-player[data-saiyaara-player="1"] .saiyaara-tagembed-host {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+#watch-player[data-saiyaara-player="1"] iframe.saiyaara-tagembed-frame {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: block !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  background: transparent;
+}
+#watch-player[data-saiyaara-player="1"].is-mini {
+  width: min(360px, calc(100vw - 20px)) !important;
+  right: max(8px, env(safe-area-inset-right)) !important;
+  bottom: max(8px, env(safe-area-inset-bottom)) !important;
+}
+#watch-player[data-saiyaara-player="1"].is-mini .watch-player-stage {
+  width: 100% !important;
+  height: min(50dvh, 450px) !important;
+  min-height: 0 !important;
+  max-height: calc(100dvh - 96px);
+  aspect-ratio: auto !important;
+}
+#watch-player[data-saiyaara-player="1"].is-theater {
+  inset: max(6px,env(safe-area-inset-top)) max(6px,env(safe-area-inset-right))
+         max(6px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left));
+  max-width: calc(100vw - 12px);
+  max-height: 100dvh;
+  overflow: hidden;
+}
+#watch-player[data-saiyaara-player="1"].is-theater .watch-player-stage {
+  width: min(100%, 540px) !important;
+  max-width: 100% !important;
+  min-height: 0 !important;
+  height: auto !important;
+  flex: 1 1 auto;
+  margin-inline: auto;
+  aspect-ratio: auto !important;
+}
+.saiyaara-tagembed-tile .tile-media {
+  width: 100%;
+  min-width: 0;
+  height: 230px;
+  overflow: hidden;
+}
+.saiyaara-tagembed-tile .preview-surface.saiyaara-tagembed-host {
+  inset: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+.saiyaara-tagembed-tile iframe.saiyaara-tagembed-frame {
+  inset: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+.saiyaara-tagembed-tile .saiyaara-tagembed-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.saiyaara-tagembed-tile .saiyaara-preview-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  cursor: pointer;
+  border: 0;
+  border-radius: 0;
+  color: #fff;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+.saiyaara-tagembed-tile .saiyaara-preview-cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 55%,rgba(0,0,0,.5));
+  pointer-events: none;
+}
+.saiyaara-tagembed-tile .saiyaara-preview-cover span {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 56px;
+  min-height: 56px;
+  background: rgba(10,12,25,.84);
+  border: 1px solid #ffffff6a;
+  border-radius: 50%;
+  font-size: 21px;
+  box-shadow: 0 6px 24px #0008;
+}
+.saiyaara-tagembed-tile .saiyaara-preview-cover[hidden] { display: none !important; }
+@media(max-width:640px) {
+  #watch-player[data-saiyaara-player="1"]:not(.is-mini):not(.is-theater) .watch-player-stage {
+    width: 100% !important;
+    height: min(76dvh, 730px) !important;
+    min-height: min(425px, 69dvh) !important;
+  }
+}
