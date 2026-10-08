@@ -5,6 +5,7 @@
   const first = {
     id: Number(document.body.dataset.videoId), slug: document.body.dataset.videoSlug,
     provider: document.body.dataset.videoProvider,
+    source_url: document.querySelector(".tiktok-preview-card[data-tiktok-source]")?.dataset.tiktokSource || "",
     title: document.querySelector(".watch-copy h1")?.textContent || "Video",
     description: document.querySelector(".watch-copy .lead")?.textContent || "",
     review_text: document.querySelector(".review-copy")?.innerText || "",
@@ -91,7 +92,7 @@
     card.loadToken = null; card.host.replaceChildren(); card.frame = null; card.ready = false; card.bridge = false;
     card.loading = null; card.suspended = null; card.playing = false; card.actualMuted = true; card.soundBlocked = false;
     card.seconds = 0; card.duration = 0;
-    card.el.classList.remove("is-playing", "is-interactive", "is-saiyaara-widget");
+    card.el.classList.remove("is-playing", "is-interactive", "is-saiyaara-widget", "is-tiktok-gateway");
     card.el.querySelector("[data-controls]").setAttribute("aria-expanded", "false");
     card.el.querySelector(".swipe-mini-controls").hidden = true;
     card.el.querySelector("[data-original]").setAttribute("aria-pressed", "false");
@@ -99,6 +100,58 @@
   }
   async function prepareCard(card) {
     if (card.frame || card.loading || !opened) return;
+    // Production TikTok cards use the Cloudflare-signed Portainer watch URL.
+    // Saiyaara preserves its separate Tagembed fallback below.
+    if (card.video.provider === "tiktok" && !isSaiyaara(card)) {
+      if (!desired(card)) return;
+      // Recommendations normally include source_url. Older cache rows may
+      // omit it; read the canonical watch document without mounting its player.
+      let source = card.video.source_url || "";
+      if (!window.VidBestTikTok?.parse(source)) {
+        try {
+          const html = await prepareMarkup(card.video);
+          if (!desired(card)) return;
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          source = doc.querySelector(".tiktok-preview-card[data-tiktok-source]")?.getAttribute("data-tiktok-source") || "";
+        } catch {
+          message(card, "Could not locate a valid TikTok share URL for gateway playback.");
+          return;
+        }
+      }
+      if (!desired(card)) return;
+      const target = window.VidBestTikTok?.gatewayWatchUrl(source);
+      if (!target) {
+        message(card, "This TikTok sharing URL is invalid or gateway playback is unavailable.");
+        return;
+      }
+      const iframe = document.createElement("iframe");
+      iframe.className = "swipe-tiktok-gateway";
+      iframe.title = card.video.title || "TikTok gateway player";
+      iframe.loading = "eager";
+      iframe.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
+      iframe.referrerPolicy = "no-referrer";
+      iframe.setAttribute("allowfullscreen", "");
+      card.frame = iframe;
+      card.ready = false;
+      card.controllable = false;
+      card.el.classList.add("is-interactive", "is-tiktok-gateway");
+      card.host.replaceChildren(iframe);
+      updateHint(card);
+      message(card, "Loading the signed Vid.Best gateway. Tap the video for sound.");
+      iframe.addEventListener("load", () => {
+        if (card.frame !== iframe) return;
+        // A load event may contain a gateway 403/503; not playback success.
+        card.ready = true;
+        message(card, "Gateway page loaded. Tap inside the player; upstream playback is not guaranteed.");
+        if (desired(card)) scheduleCount(card);
+        updatePreparation();
+      }, { once: true });
+      iframe.addEventListener("error", () => {
+        if (card.frame === iframe) message(card, "The video gateway could not load. No automatic retry.");
+      }, { once: true });
+      iframe.src = target;
+      return;
+    }
     if (isSaiyaara(card)) {
       // A neighboring card must never pre-load a second provider iframe.
       // The original watch-stage iframe is suspended by pauseOriginal().
@@ -170,7 +223,9 @@
     return card.loading;
   }
   function updateHint(card) {
-    card.el.querySelector(".swipe-play-hint").textContent = isSaiyaara(card)
+    card.el.querySelector(".swipe-play-hint").textContent = card.el.classList.contains("is-tiktok-gateway")
+      ? "Tap the gateway video · ↑/↓ for next"
+      : isSaiyaara(card)
       ? "Use Tagembed video controls · ↑/↓ for next"
       : card.controllable
       ? "Tap to play · Swipe for next"
@@ -323,10 +378,10 @@
   function setOriginalControls(card, interactive) {
     // Always expose the Saiyaara frame; a full-screen transparent gesture
     // button on top of it previously prevented direct video interaction.
-    card.el.classList.toggle("is-interactive", isSaiyaara(card) || interactive);
-    card.el.querySelector("[data-original]").setAttribute("aria-pressed", String(isSaiyaara(card) || interactive));
-    card.el.querySelector(".swipe-controls-help").textContent = isSaiyaara(card)
-      ? "Tap the embedded video to play or enable sound. Swipe using the review area or navigation arrows."
+    card.el.classList.toggle("is-interactive", isSaiyaara(card) || card.el.classList.contains("is-tiktok-gateway") || interactive);
+    card.el.querySelector("[data-original]").setAttribute("aria-pressed", String(isSaiyaara(card) || card.el.classList.contains("is-tiktok-gateway") || interactive));
+    card.el.querySelector(".swipe-controls-help").textContent = isSaiyaara(card) || card.el.classList.contains("is-tiktok-gateway")
+      ? "Tap inside the embedded video for controls and sound. Swipe on the details or use arrows."
       : interactive ? "Original controls enabled. Swipe on the details below for next." : "Swipe on the video for next. Original controls include captions and settings.";
   }
   viewer.addEventListener("click", async (event) => {

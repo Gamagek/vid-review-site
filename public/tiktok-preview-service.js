@@ -1,4 +1,4 @@
-// TikTok cached-metadata client and on-demand official Player v1 popup.
+// TikTok cached-metadata client and on-demand signed Portainer gateway popup.
 (() => {
   const ORIGIN = "https://www.tiktok.com";
   const TTL = 5 * 60 * 1000;
@@ -84,36 +84,41 @@
     return task;
   }
 
-  // Official TikTok Player v1: only user action mounts a single iframe.
-  // This avoids embed.js entirely; TikTok can still restrict iframe playback.
-  const PLAYER_ORIGIN = "https://www.tiktok.com";
-  const PLAYER_READY_TIMEOUT = 10000;
-  // Avoid repeated provider requests after an error. These are safeguards, not
-  // a workaround for TikTok/Akamai restrictions.
+  // Standard TikTok videos use the Cloudflare signer -> signed Portainer
+  // gateway. The browser never receives SIGN_SECRET and never uses TikTok's
+  // blocked official embed.js/Player v1 path.
+  const GATEWAY_WATCH = "https://tiktok-oembed-gateway.gkasunc.workers.dev/watch";
+  const PLAYER_TIMEOUT = 14000;
   const MIN_PLAYER_REQUEST_INTERVAL = 30000;
   const FAILED_VIDEO_COOLDOWN = 15 * 60 * 1000;
   const FAILED_SITE_COOLDOWN = 2 * 60 * 1000;
-  const REQUEST_GATE_KEY = "vidbest:tiktok:player:last-request:v1";
-  const FAILURE_GATE_KEY = "vidbest:tiktok:player:site-cooldown:v1";
-  const VIDEO_FAILURE_PREFIX = "vidbest:tiktok:player:video-cooldown:v1:";
+  const REQUEST_GATE_KEY = "vidbest:tiktok:gateway:last-request:v2";
+  const FAILURE_GATE_KEY = "vidbest:tiktok:gateway:site-cooldown:v2";
+  const VIDEO_FAILURE_PREFIX = "vidbest:tiktok:gateway:video-cooldown:v2:";
   let activePreview = 0;
   let activeFrame = null;
   let readyTimer = null;
-  let playerMessageListener = null;
 
-  function nextAllowedAt(share) {
-    const last = read(REQUEST_GATE_KEY)?.until || 0;
-    const site = read(FAILURE_GATE_KEY)?.until || 0;
-    const video = read(VIDEO_FAILURE_PREFIX + share.id)?.until || 0;
-    return Math.max(last, site, video);
+  function gatewayWatchUrl(value) {
+    const share = parse(value);
+    if (!share) return null;
+    const target = new URL(GATEWAY_WATCH);
+    target.searchParams.set("url", share.url);
+    return target.href;
   }
 
+  function nextAllowedAt(share) {
+    return Math.max(
+      read(REQUEST_GATE_KEY)?.until || 0,
+      read(FAILURE_GATE_KEY)?.until || 0,
+      read(VIDEO_FAILURE_PREFIX + share.id)?.until || 0,
+    );
+  }
   function markProviderUnavailable(share) {
     const now = Date.now();
     write(FAILURE_GATE_KEY, { until: now + FAILED_SITE_COOLDOWN });
     write(VIDEO_FAILURE_PREFIX + share.id, { until: now + FAILED_VIDEO_COOLDOWN });
   }
-
   function renderUnavailable(dialog, message) {
     const host = dialog.querySelector("[data-tiktok-embed-host]");
     if (!host) return;
@@ -126,22 +131,15 @@
     fallback.append(title, note);
     host.replaceChildren(fallback);
   }
-
   function cleanupEmbed(dialog) {
     if (readyTimer !== null) {
       clearTimeout(readyTimer);
       readyTimer = null;
     }
-    if (playerMessageListener) {
-      window.removeEventListener("message", playerMessageListener);
-      playerMessageListener = null;
-    }
     const host = dialog.querySelector("[data-tiktok-embed-host]");
-    // Detaching the iframe ends the embedded playback on modal close.
     if (host) host.replaceChildren();
     activeFrame = null;
   }
-
   function ensureDialog() {
     let dialog = document.querySelector("#vidbest-tiktok-preview-dialog");
     if (dialog) return dialog;
@@ -153,7 +151,7 @@
       '  <button type="button" class="tiktok-preview-dialog-close" aria-label="Close TikTok player">×</button>',
       '  <div class="tiktok-preview-dialog-media" data-tiktok-embed-host></div>',
       '  <div class="tiktok-preview-dialog-copy">',
-      '    <span class="tiktok-preview-dialog-kicker">TikTok · Vid.Best player</span>',
+      '    <span class="tiktok-preview-dialog-kicker">TikTok · Vid.Best gateway player</span>',
       '    <strong data-tiktok-dialog-title>TikTok video</strong>',
       '    <span data-tiktok-dialog-author>TikTok creator</span>',
       '    <p data-tiktok-dialog-description>Loading cached TikTok details…</p>',
@@ -164,7 +162,6 @@
       '  </div>',
       '</div>',
     ].join("");
-
     const close = () => {
       if (dialog.open && typeof dialog.close === "function") dialog.close();
       else {
@@ -178,116 +175,76 @@
     dialog.addEventListener("click", (event) => {
       if (event.target === dialog) close();
     });
-    dialog.addEventListener("close", () => {
-      ++activePreview;
-      cleanupEmbed(dialog);
-    });
-    window.addEventListener("pagehide", () => {
-      ++activePreview;
-      cleanupEmbed(dialog);
-    });
+    dialog.addEventListener("close", () => { ++activePreview; cleanupEmbed(dialog); });
+    window.addEventListener("pagehide", () => { ++activePreview; cleanupEmbed(dialog); });
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden || !dialog.open || !activeFrame) return;
       ++activePreview;
       cleanupEmbed(dialog);
-      renderUnavailable(dialog, "The player was stopped because this tab is in the background.");
-      dialog.querySelector("[data-tiktok-dialog-status]").textContent =
-        "TikTok is not loaded while this tab is inactive.";
+      renderUnavailable(dialog, "The player was stopped while the tab is in the background.");
     });
     document.body.append(dialog);
     return dialog;
   }
 
-  function mountOfficialPlayer(dialog, share, token) {
-    if (!dialog.open || activePreview !== token) return;
-
+  function mountGatewayPlayer(dialog, share, token) {
+    if (!dialog.open || token !== activePreview) return;
     cleanupEmbed(dialog);
     const host = dialog.querySelector("[data-tiktok-embed-host]");
     const status = dialog.querySelector("[data-tiktok-dialog-status]");
     const remaining = nextAllowedAt(share) - Date.now();
     if (remaining > 0) {
-      renderUnavailable(dialog, "Playback was not requested again to avoid repeated blocked loads.");
-      status.textContent = "Please wait " + Math.ceil(remaining / 1000) +
-        " seconds before making another TikTok playback request.";
+      renderUnavailable(dialog, "Playback was not requested again to avoid repeated loads.");
+      status.textContent = "Please wait " + Math.ceil(remaining / 1000) + " seconds before trying again.";
       return;
     }
     if (document.hidden) {
-      renderUnavailable(dialog, "The TikTok player only loads when the tab is visible.");
-      status.textContent = "Switch back to this tab before opening the player.";
+      renderUnavailable(dialog, "Return to this tab to load the gateway player.");
+      status.textContent = "The tab is inactive.";
       return;
     }
-    // This is the only place the TikTok playback request begins.
-    // Metadata previews, recommendations and offscreen cards do not mount it.
+    const target = gatewayWatchUrl(share.url);
+    if (!target) return;
     write(REQUEST_GATE_KEY, { until: Date.now() + MIN_PLAYER_REQUEST_INTERVAL });
-    const iframe = document.createElement("iframe");
-    iframe.className = "tiktok-official-player-v1";
-    iframe.title = "TikTok video by @" + share.username;
-    iframe.loading = "eager";
-    iframe.referrerPolicy = "strict-origin-when-cross-origin";
-    iframe.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
-    iframe.allowFullscreen = true;
-    // Only the numeric ID from an already validated TikTok URL reaches src.
-    const playerUrl = new URL("/player/v1/" + share.id, PLAYER_ORIGIN);
-    playerUrl.searchParams.set("autoplay", "0");
-    playerUrl.searchParams.set("controls", "1");
-    playerUrl.searchParams.set("description", "0");
-    playerUrl.searchParams.set("music_info", "0");
-
-    const active = () => dialog.open && activePreview === token && activeFrame === iframe;
-    const stopTimer = () => {
+    const frame = document.createElement("iframe");
+    frame.className = "tiktok-official-player-v1";
+    frame.title = "TikTok gateway video by @" + share.username;
+    frame.loading = "eager";
+    frame.referrerPolicy = "no-referrer";
+    frame.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
+    frame.allowFullscreen = true;
+    const active = () => dialog.open && token === activePreview && activeFrame === frame;
+    const failed = (text) => {
+      if (!active()) return;
+      markProviderUnavailable(share);
+      cleanupEmbed(dialog);
+      renderUnavailable(dialog, text);
+      status.textContent = text;
+    };
+    frame.addEventListener("load", () => {
+      if (!active()) return;
       if (readyTimer !== null) {
         clearTimeout(readyTimer);
         readyTimer = null;
       }
-    };
-    const failed = (message) => {
-      if (!active()) return;
-      markProviderUnavailable(share);
-      cleanupEmbed(dialog); // Do not leave an Akamai error page occupying the modal.
-      renderUnavailable(dialog, "TikTok did not provide a playable embedded video.");
-      status.textContent = message;
-    };
-    playerMessageListener = (event) => {
-      if (!active() || event.origin !== PLAYER_ORIGIN || event.source !== iframe.contentWindow) return;
-      const data = event.data;
-      if (!data || typeof data !== "object" || data["x-tiktok-player"] !== true) return;
-      if (data.type === "onPlayerReady") {
-        stopTimer();
-        status.textContent = "Player ready · tap Play inside the video.";
-      } else if (data.type === "onStateChange" && data.value === 1) {
-        stopTimer();
-        status.textContent = "Playing on Vid.Best.";
-      } else if (data.type === "onPlayerError") {
-        stopTimer();
-        const errorCode = Number(data.value?.errorCode);
-        if (errorCode === 3002) {
-          status.textContent = "Autoplay was blocked. Tap the player's Play button.";
-        } else {
-          failed(errorCode === 1001
-            ? "TikTok says this video is unavailable. Automatic retries are disabled."
-            : "TikTok rejected or could not play this embed. Requests are paused temporarily.");
-        }
-      }
-    };
-    window.addEventListener("message", playerMessageListener);
-    iframe.addEventListener("error", () => {
-      failed("TikTok's player failed to load. Automatic retries are disabled for this session.");
-    });
-    // A normal iframe 'load' event is NOT proof of playback readiness. A 429
-    // or WAF error page can also trigger load; wait for TikTok's ready message.
-    status.textContent = "Connecting to the official TikTok player…";
-    activeFrame = iframe;
-    host.replaceChildren(iframe);
-    iframe.src = playerUrl.href;
+      // Browser load includes error pages; it is not playback confirmation.
+      status.textContent = "Gateway page loaded. Tap the embedded video to play; playback may still be blocked upstream.";
+    }, { once: true });
+    frame.addEventListener("error", () => {
+      failed("The signed gateway could not load. No automatic retry was made.");
+    }, { once: true });
+    status.textContent = "Requesting the signed Vid.Best video gateway…";
+    activeFrame = frame;
+    host.replaceChildren(frame);
+    frame.src = target;
     readyTimer = setTimeout(() => {
-      failed("TikTok did not confirm player readiness. The embed was removed and retries are paused.");
-    }, PLAYER_READY_TIMEOUT);
+      failed("The video gateway did not respond in time; further requests are paused.");
+    }, PLAYER_TIMEOUT);
   }
 
   async function showPreview(value, seed = {}) {
     const share = parse(value);
     if (!share) return false;
-
     const dialog = ensureDialog();
     ++activePreview;
     cleanupEmbed(dialog);
@@ -297,24 +254,19 @@
     const description = dialog.querySelector("[data-tiktok-dialog-description]");
     title.textContent = seed.title || "TikTok video";
     author.textContent = seed.author || (share.username ? "@" + share.username : "TikTok creator");
-    description.textContent = seed.description || "TikTok playback stays in this Vid.Best popup.";
-
+    description.textContent = seed.description || "Vid.Best signed gateway video preview.";
     if (!dialog.open) {
       if (typeof dialog.showModal === "function") dialog.showModal();
       else dialog.setAttribute("open", "");
     }
-
-    // The iframe is not present until after the popup is visibly opened.
     requestAnimationFrame(() => {
-      if (dialog.open && activePreview === token) mountOfficialPlayer(dialog, share, token);
+      if (dialog.open && activePreview === token) mountGatewayPlayer(dialog, share, token);
     });
-
-    // Metadata refresh cannot prevent an attempted, user-initiated player load.
     void getMetadata(share.url).then((payload) => {
       if (!dialog.open || activePreview !== token) return;
       title.textContent = payload.title || payload.caption || seed.title || "TikTok video";
       author.textContent = payload.author_name || seed.author || (share.username ? "@" + share.username : "TikTok creator");
-      description.textContent = payload.description || seed.description || "TikTok playback stays inside this popup.";
+      description.textContent = payload.description || seed.description || "Vid.Best signed video gateway.";
     }).catch(() => {
       if (dialog.open && activePreview === token) {
         description.textContent = seed.description || "Cached video details are temporarily unavailable.";
@@ -323,5 +275,5 @@
     return true;
   }
 
-  window.VidBestTikTok = Object.freeze({ parse, getMetadata, showPreview });
+  window.VidBestTikTok = Object.freeze({ parse, getMetadata, gatewayWatchUrl, showPreview });
 })();

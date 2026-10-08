@@ -386,7 +386,7 @@ test("query-style /watch no longer exposes or depends on the legacy signed TikTo
   assert.doesNotMatch(source, /signedWatchResponse/);
   assert.doesNotMatch(source, /SIGN_SECRET/);
   assert.doesNotMatch(source, /TIKTOK_GATEWAY_ORIGIN/);
-  assert.doesNotMatch(source, /video\.megasale\.win/);
+  assert.match(source, /frame-src[^;]*video\.megasale\.win/);
 });
 test("TikTok watch pages render cached metadata cards without a TikTok player", async () => {
   const context = createTestContext();
@@ -414,6 +414,9 @@ test("TikTok watch pages render cached metadata cards without a TikTok player", 
   assert.match(policy, /frame-src[^;]*https:\/\/www\.tiktok\.com/);
   assert.match(policy, /media-src[^;]*https:\/\/www\.tiktok\.com/);
   const html = await page.text();
+  const csp = page.headers.get("Content-Security-Policy") || "";
+  assert.match(csp, /frame-src[^;]*https:\/\/tiktok-oembed-gateway\.gkasunc\.workers\.dev/);
+  assert.match(csp, /frame-src[^;]*https:\/\/video\.megasale\.win/);
   assert.match(html, /class="tiktok-preview-card"/);
   assert.match(html, /data-tiktok-player-mode="metadata-card"/);
   assert.match(html, /Cached TikTok title/);
@@ -1813,15 +1816,16 @@ test("renders the current Vid.Best TikTok gateway architecture as metadata-only 
   assert.match(indexSource, /buildTikTokOEmbedGatewayUrl/);
   assert.ok(indexSource.includes("tiktok-oembed-gateway.gkasunc.workers.dev"));
   assert.doesNotMatch(indexSource, /www\.tiktok\.com\/player\/v1/);
-  assert.doesNotMatch(indexSource, /video\.megasale\.win/);
+  assert.match(indexSource, /video\.megasale\.win/);
 
   const previewService = readFileSync(new URL("../public/tiktok-preview-service.js", import.meta.url), "utf8");
   assert.doesNotMatch(previewService, /www\.tiktok\.com\/embed\.js/);
-  assert.match(previewService, /player\/v1/);
-  assert.match(previewService, /onPlayerReady/);
+  assert.doesNotMatch(previewService, /\/player\/v1\//);
+  assert.match(previewService, /gatewayWatchUrl/);
+  assert.match(previewService, /tiktok-oembed-gateway\.gkasunc\.workers\.dev\/watch/);
   assert.match(previewService, /createElement\(["']iframe["']\)/);
 });
-test("TikTok metadata cards no longer require SIGN_SECRET or any playback gateway", async () => {
+test("TikTok metadata cards render without playback signatures in the frontend Worker", async () => {
   const context = createTestContext({ SIGN_SECRET: "" });
   context.sqlite.prepare(
     `INSERT INTO videos (
@@ -2100,8 +2104,8 @@ test("canonical Saiyaara renders direct iframe URL but swipe remains metadata-on
   const html = await page.text();
   assert.match(html, /saiyaara-tagembed-player/);
   assert.ok(html.includes('data-saiyaara-player="1"'));
-  assert.ok(html.includes("/swipe-viewer.js?v=20261008-4"));
-  assert.ok(html.includes("/swipe-viewer.css?v=20261008-saiyaara-fit4"));
+  assert.ok(html.includes("/swipe-viewer.js?v=20261008-gateway1"));
+  assert.ok(html.includes("/swipe-viewer.css?v=20261008-gateway1"));
   assert.ok(html.includes('class="saiyaara-tagembed-frame"'));
   assert.ok(html.includes('src="https://widget.tagembed.com/2236794?postId=5592899&amp;caption=1&amp;header=1"'));
   assert.ok(html.includes('allow="autoplay; fullscreen; picture-in-picture; encrypted-media"'));
