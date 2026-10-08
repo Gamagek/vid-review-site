@@ -49,6 +49,14 @@ The public browser calls Vid.Best's same-origin `/api/tiktok/embed` endpoint. Th
 
 The gateway repository `Gamagek/tiktok-oembed-gateway` adds a global Durable Object cache, bounded upstream concurrency and persisted refresh limits/cooldowns. Deploy its `OEMBED_CACHE` binding and SQLite migration with the supplied `wrangler.toml`. Edge caches alone are local to each Cloudflare location and cannot coordinate global request bursts. Neither cache stores video bytes.
 
+### Signed TikTok playback via Cloudflare + Portainer (standard videos)
+
+**Production standard TikTok video playback** no longer uses TikTok's `embed.js` or `player/v1` in the preview-popup and fullscreen viewer. Home cards remain lightweight metadata/poster facades; clicking a normal TikTok card opens an iframe pointing to `https://tiktok-oembed-gateway.gkasunc.workers.dev/watch?url=CANONICAL_TIKTOK_SHARE_URL`. The watch page uses the same click-to-play popup. The fullscreen/swipe viewer mounts that iframe **only for the active non-Saiyaara TikTok video**, never for offscreen neighbors, and destroys it on swipe/close. The Cloudflare gateway signs and redirects its **iframe** to `https://video.megasale.win/watch?id=...&url=...&exp=...&sig=...`; Vid.Best top-level navigation remains on `vid.best`.
+
+The signing secret is **not shipped to this repository's frontend**. The `tiktok-oembed-gateway` Worker requires a secret named `SIGN_SECRET` with exactly the same value as the Node gateway's deployed HMAC key (`SECRET` in some Portainer gateway versions). Verify this separately; the exact Portainer server configuration is not stored in the frontend repo. The Node service must also permit iframe embedding by Vid.Best and respond through its Cloudflare Tunnel, and `SIGN_SECRET` must be present in the Cloudflare Worker environment. A misconfigured key causes a local HTTP 403, whereas upstream TikTok 403/429 is a different issue. Signatures expire 30 minutes after generation and are requested just-in-time, not cached.
+
+The permanent Saiyaara test video remains on its direct Tagembed fallback (including fullscreen swipe). Cached metadata/OEmbed behavior, CF D1 and R2, Cloudflare KV (if separately configured), and third-party videos from other providers are not changed. Signed navigation does not guarantee playback; TikTok may still apply its rate limits, privacy controls or WAF, and unauthorized video redistribution is not enabled by this change.
+
 ### Saiyaara direct Tagembed iframe (owner-provided embed)
 
 Only the canonical `/watch/saiyaara-a-cinematic-romance` watch stage and its homepage mini tile use the specific iframe supplied by the site owner:
