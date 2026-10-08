@@ -2081,6 +2081,52 @@ test("discovers direct TikTok URLs without server-side TikTok requests", async (
   }
 });
 
+test("canonical Saiyaara uses the owner-provided Tagembed widget only in full watch mode", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(
+    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, description, published)
+     VALUES (?, ?, ?, 'tiktok', 'Social Media & Trending', 'TikTok Trending', ?, 1)`,
+  ).run(
+    "saiyaara-a-cinematic-romance",
+    "Saiyaara; A Cinematic Romance",
+    "https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056",
+    "Saiyaara Tagembed watch-page test",
+  );
+
+  const page = await send(context, "/watch/saiyaara-a-cinematic-romance");
+  assert.equal(page.status, 200);
+  const csp = page.headers.get("Content-Security-Policy") || "";
+  assert.ok(csp.includes("https://widget.tagembed.com"));
+  assert.ok(csp.includes("frame-src") && csp.includes("https://*.tagembed.com"));
+  assert.ok(csp.includes("connect-src") && csp.includes("https://*.tagembed.com"));
+  const html = await page.text();
+  assert.match(html, /saiyaara-tagembed-player/);
+  assert.match(html, /class="tagembed-widget"/);
+  assert.match(html, /data-widget-id="2236794"/);
+  assert.match(html, /data-post-id="5592899"/);
+  assert.match(html, /data-caption="1"/);
+  assert.match(html, /data-header="1"/);
+  assert.ok(html.includes("saiyaara-tagembed.js"));
+  assert.doesNotMatch(html, /class="tiktok-preview-card"/);
+
+  const viewerPage = await send(context, "/watch/saiyaara-a-cinematic-romance?viewer=1");
+  assert.equal(viewerPage.status, 200);
+  const viewerHtml = await viewerPage.text();
+  assert.doesNotMatch(viewerHtml, /data-widget-id="2236794"/);
+  assert.match(viewerHtml, /class="tiktok-preview-card"/);
+
+  const home = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
+  const homeScript = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
+  const appScript = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
+  const loader = readFileSync(new URL("../public/saiyaara-tagembed.js", import.meta.url), "utf8");
+  assert.ok(home.includes("saiyaara-tagembed.js"));
+  assert.ok(homeScript.includes("dataset.videoSlug"));
+  assert.ok(homeScript.includes("VidBestSaiyaaraTagembed.mount"));
+  assert.ok(appScript.includes("dataset.videoSlug"));
+  assert.match(loader, /rootMargin: "300px 0px"/);
+  assert.ok(loader.includes("widget.tagembed.com/embed.min.js"));
+});
+
 test("redirects the legacy Saiyaara slug to the permanent SEO slug", async () => {
   const context = createTestContext();
   const response = await send(context, "/watch/fyppppppppppppppppppppppp-fyp-ahaanpanday-aneetpadda-saiyaara");

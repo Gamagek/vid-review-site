@@ -1011,7 +1011,7 @@ function securityHeaders(headers, html = false, scriptNonce = "") {
     const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.instagram.com/embed.js https://www.tiktok.com https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: https://www.tiktok.com blob:; connect-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com https://www.tiktok.com https://www.tiktokcdn.com https://www.tiktokv.com; upgrade-insecure-requests`,
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.instagram.com/embed.js https://widget.tagembed.com https://www.tiktok.com https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: https://www.tiktok.com blob:; connect-src 'self' https://*.tagembed.com; frame-src 'self' https://*.tagembed.com https://www.youtube-nocookie.com https://www.youtube.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com https://www.tiktok.com https://www.tiktokcdn.com https://www.tiktokv.com; upgrade-insecure-requests`,
     );
   }
   return headers;
@@ -2976,6 +2976,8 @@ async function watchPage(request, env, ctx, slugInput) {
 
 function renderWatchHtml(video, request, env, scriptNonce) {
   const viewer = new URL(request.url).searchParams.get("viewer") === "1";
+  const saiyaaraWidget = video.provider === "tiktok" &&
+    video.slug === "saiyaara-a-cinematic-romance" && !viewer;
   const baseUrl = getBaseUrl(request, env);
   const playbackOrigin = new URL(request.url).origin;
   const canonical = `${baseUrl}/watch/${encodeURIComponent(video.slug)}`;
@@ -3084,6 +3086,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   ${video.provider === "tiktok" ? '<script src="/tiktok-preview-service.js?v=20261008-6" defer></script>' : ""}
+  ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-1" defer></script>' : ""}
   <script src="/watch.js?v=20261008-2" defer></script>
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261006-1">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-2" defer></script>
@@ -3216,6 +3219,13 @@ function renderMedia(video, playbackOrigin, viewer = false) {
   }
 
   if (provider === "tiktok") {
+    // Only the canonical Saiyaara watch page opts into the owner-supplied
+    // Tagembed widget. The swipe preparation document remains metadata-only.
+    if (video.slug === "saiyaara-a-cinematic-romance" && !viewer) {
+      return `<div class="saiyaara-tagembed-player" data-saiyaara-tagembed-host data-saiyaara-player="watch">
+        <div class="tagembed-widget" style="width:100%;height:100%;overflow:auto;" data-widget-id="2236794" data-caption="1" data-header="1" data-post-id="5592899"></div>
+      </div>`;
+    }
     const tiktokId = extractTikTokId(video.source_url);
     if (!tiktokId) return "";
     const preview = video.tiktok_preview || {};

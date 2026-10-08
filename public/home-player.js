@@ -62,6 +62,22 @@ function decorateVideoCards() {
     }
 
     if (card.dataset.videoProvider === "tiktok") {
+      // Tagembed is opt-in for the canonical Saiyaara item only. Unlike
+      // regular TikTok cards, this home tile hosts an interactive mini widget.
+      if (card.dataset.videoSlug === "saiyaara-a-cinematic-romance" && window.VidBestSaiyaaraTagembed) {
+        const replacement = document.createElement("div");
+        replacement.className = media.className;
+        while (media.firstChild) replacement.append(media.firstChild);
+        media.replaceWith(replacement);
+        const oldSurface = replacement.querySelector(".preview-surface");
+        const surface = document.createElement("div");
+        surface.className = oldSurface.className;
+        surface.setAttribute("aria-label", "Saiyaara TikTok Tagembed mini preview");
+        oldSurface.replaceWith(surface);
+        card.classList.add("saiyaara-tagembed-tile");
+        window.VidBestSaiyaaraTagembed.mount(surface, "tile");
+        return;
+      }
       renderTikTokFacade(card);
       media.addEventListener("click", (event) => {
         if (event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
