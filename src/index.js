@@ -1011,7 +1011,7 @@ function securityHeaders(headers, html = false, scriptNonce = "") {
     const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.instagram.com/embed.js https://widget.tagembed.com https://www.tiktok.com https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: https://www.tiktok.com blob:; connect-src 'self' https://*.tagembed.com; frame-src 'self' https://*.tagembed.com https://www.youtube-nocookie.com https://www.youtube.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com https://www.tiktok.com https://www.tiktokcdn.com https://www.tiktokv.com; upgrade-insecure-requests`,
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.instagram.com/embed.js https://widget.tagembed.com https://www.tiktok.com https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: https://www.tiktok.com blob:; connect-src 'self' https://*.tagembed.com; frame-src 'self' https://tiktok-oembed-gateway.gkasunc.workers.dev https://video.megasale.win https://*.tagembed.com https://www.youtube-nocookie.com https://www.youtube.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com https://www.tiktok.com https://www.tiktokcdn.com https://www.tiktokv.com; upgrade-insecure-requests`,
     );
   }
   return headers;
@@ -3085,13 +3085,13 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css?v=20261008-saiyaara-fit4">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
-  ${video.provider === "tiktok" ? '<script src="/tiktok-preview-service.js?v=20261008-6" defer></script>' : ""}
+  ${video.provider === "tiktok" ? '<script src="/tiktok-preview-service.js?v=20261008-gateway1" defer></script>' : ""}
   ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>' : ""}
   <script src="/watch.js?v=20261008-2" defer></script>
-  <link rel="stylesheet" href="/swipe-viewer.css?v=20261008-saiyaara-fit4">
-  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-4" defer></script>
+  <link rel="stylesheet" href="/swipe-viewer.css?v=20261008-gateway1">
+  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-gateway1" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
-  ${video.provider === "tiktok" ? '<!-- TikTok watch pages start with cached oEmbed metadata; the standard TikTok embed is created only after user action. -->' : ""}
+  ${video.provider === "tiktok" ? '<!-- Standard TikTok player requests use the Cloudflare-signed Portainer gateway after a user action. -->' : ""}
 </head>
 <body class="watch-page" data-viewer-embed="${viewer ? "1" : "0"}" data-video-slug="${escapeHtml(video.slug)}" data-site-views="${Number(video.views) + (viewer ? 0 : 1)}" data-video-id="${Number(video.id)}" data-video-provider="${escapeHtml(video.provider)}">
   <header class="site-header compact">
@@ -3249,7 +3249,7 @@ function renderMedia(video, playbackOrigin, viewer = false) {
     const previewDescription = cleanText(
       preview.description,
       260,
-      "Preview details are cached by Vid.Best. Open the original TikTok post to watch the video.",
+      "Preview details are cached by Vid.Best. Use the signed gateway to play on Vid.Best.",
     );
     const imageUrl = preview.thumbnail_url || `/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`;
     return `<article class="tiktok-preview-card" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-source="${escapeHtml(video.source_url)}" data-tiktok-player-mode="metadata-card">
@@ -3265,7 +3265,7 @@ function renderMedia(video, playbackOrigin, viewer = false) {
         <div class="tiktok-preview-card-actions">
           <button type="button" class="button primary" data-tiktok-show-preview>Play in popup</button>
         </div>
-        <p class="tiktok-preview-card-note">The TikTok embed loads only after you choose Play.</p>
+        <p class="tiktok-preview-card-note">The signed Vid.Best gateway loads only after you choose Play.</p>
       </div>
     </article>`;
   }
