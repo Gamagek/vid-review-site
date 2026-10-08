@@ -79,7 +79,7 @@ function standardHeaders(contentType, cacheControl = "public, max-age=60") {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
-    "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; connect-src 'self'"
+    "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' https://www.tiktok.com; frame-src 'self' https://www.tiktok.com; media-src 'self' https: https://www.tiktok.com blob:; connect-src 'self'"
   });
 }
 
