@@ -93,18 +93,19 @@ test("rejects mismatched metadata and unsafe TikTok URLs", async () => {
   }
 });
 
-test("TikTok browser service mounts Player v1 rather than embed.js", () => {
-  assert.match(code, /https:\/\/www\.tiktok\.com/);
-  assert.match(code, /\/player\/v1\//);
-  assert.doesNotMatch(code, /www\.tiktok\.com\/embed\.js/);
+test("TikTok browser service uses the signed Cloudflare/Portainer watch route", () => {
+  const h = harness();
+  const link = h.api.gatewayWatchUrl(share + "?utm_source=demo");
+  assert.equal(new URL(link).origin, "https://tiktok-oembed-gateway.gkasunc.workers.dev");
+  assert.equal(new URL(link).pathname, "/watch");
+  assert.equal(new URL(link).searchParams.get("url"), share);
+  assert.equal(h.api.gatewayWatchUrl("https://evil.test/" + share), null);
+  assert.match(code, /gatewayWatchUrl/);
   assert.match(code, /createElement\(["']iframe["']\)/);
-  assert.match(code, /onPlayerReady/);
-  assert.match(code, /onPlayerError/);
-  assert.match(code, /event\.source !== iframe\.contentWindow/);
-  assert.match(code, /event\.origin !== PLAYER_ORIGIN/);
+  assert.doesNotMatch(code, /\/player\/v1\//);
+  assert.doesNotMatch(code, /https:\/\/www\.tiktok\.com\/embed\.js/);
   assert.match(code, /requestAnimationFrame/);
   assert.match(code, /cleanupEmbed/);
-  assert.match(code, /autoplay", "0"/);
   assert.match(code, /author_name/);
 });
 
@@ -185,12 +186,12 @@ test("safe TikTok mode mounts only after click, removes failed frames and thrott
   assert.equal(createdFrames, 0, "no player before dialog opens and is painted");
   rafs.shift()();
   assert.equal(createdFrames, 1);
-  assert.match(host.children[0].src, /^https:\/\/www\.tiktok\.com\/player\/v1\//);
+  assert.match(host.children[0].src, /^https:\/\/tiktok-oembed-gateway\.gkasunc\.workers\.dev\/watch\?/);
   assert.equal(timers.size, 1, "only one readiness timer");
   const timeout = [...timers.values()][0].fn;
   timeout();
   assert.equal(host.children[0].className, "tiktok-player-fallback");
-  assert.match(status.textContent, /retries are paused/i);
+  assert.match(status.textContent, /further requests are paused/i);
   assert.equal(timers.size, 0);
   dialog.close();
   assert.equal(host.children.length, 0, "closing the popup removes player and placeholder");
