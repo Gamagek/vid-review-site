@@ -111,7 +111,8 @@
       </div>`;
 
     const close = () => {
-      if (dialog.open) dialog.close();
+      if (dialog.open && typeof dialog.close === "function") dialog.close();
+      else dialog.removeAttribute("open");
     };
     dialog.querySelector(".tiktok-preview-dialog-close").addEventListener("click", close);
     dialog.querySelector("[data-tiktok-dialog-cancel]").addEventListener("click", close);
