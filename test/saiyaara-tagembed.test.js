@@ -57,6 +57,8 @@ test("Saiyaara mini tile creates iframe only when it approaches viewport", () =>
       return {
         dataset: {}, className: "", textContent: "", hidden: false,
         setAttribute() {},
+        append() {},
+        addEventListener() {},
       };
     },
   };
