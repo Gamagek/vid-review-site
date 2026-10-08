@@ -412,31 +412,29 @@ async function renderTikTokPreview(sourceUrl) {
   ui.preview.append(shell);
 
   try {
-    const endpoint = new URL("/api/tiktok/embed", location.origin);
-    endpoint.searchParams.set("url", parsed.url);
-    const response = await fetch(endpoint.pathname + endpoint.search, {
-      credentials: "same-origin",
-      headers: { Accept: "application/json" },
-      cache: "no-store",
-    });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok || !payload.ok || !payload.video_id || !payload.source_url) {
-      throw new Error(payload.error || "TikTok preview metadata is unavailable.");
-    }
+    const payload = await window.VidBestTikTok.getMetadata(parsed.url);
+    if (!shell.isConnected) return;
 
     const embedUrl = safeAdminTikTokEmbedUrl(payload, parsed);
     if (!embedUrl) throw new Error("TikTok preview URL could not be derived from the returned video ID.");
 
-    status.remove();
     const frame = document.createElement("iframe");
     frame.className = "tiktok-official-player";
-    frame.src = embedUrl;
     frame.title = "TikTok video preview";
-    frame.loading = "lazy";
+    frame.loading = "eager";
     frame.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
     frame.allowFullscreen = true;
     frame.referrerPolicy = "strict-origin-when-cross-origin";
+    frame.style.visibility = "hidden";
+    const cleanup = window.VidBestTikTok.observe(frame, {
+      ready() { if (shell.isConnected) { status.hidden = true; frame.style.visibility = "visible"; } },
+      autoplay() { status.hidden = false; status.textContent = "Tap Play in the preview."; },
+      error(message) { cleanup(); frame.remove(); status.hidden = false; status.textContent = message; },
+    });
+    frame.src = embedUrl;
     shell.append(frame);
+    const removed = new MutationObserver(() => { if (!shell.isConnected) { cleanup(); removed.disconnect(); } });
+    removed.observe(ui.preview, { childList: true });
   } catch (error) {
     status.className = "form-status error";
     status.textContent = error.message || "TikTok preview is temporarily unavailable.";
@@ -462,12 +460,12 @@ function safeAdminTikTokEmbedUrl(payload, expectedShare = null) {
   const value = String(
     payload?.embed?.url
       || payload?.embed_url
-      || `https://www.tiktok.com/embed/v2/${id}`,
+      || window.VidBestTikTok.playerUrl(id),
   );
   try {
     const url = new URL(value);
     if (url.protocol !== "https:" || url.hostname !== "www.tiktok.com") return "";
-    if (!/^\/embed\/v2\/\d{15,25}\/?$/.test(url.pathname)) return "";
+    if (!/^\/player\/v1\/\d{15,25}\/?$/.test(url.pathname)) return "";
     if (url.pathname.match(/(\d{15,25})/)?.[1] !== id) return "";
     return url.toString();
   } catch {

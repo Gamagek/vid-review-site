@@ -201,3 +201,26 @@ test('YouTube uses the official controls, retries blocked sound once, and suppli
   events.onStateChange({ data: 1 });
   assert.ok(pauses >= 2);
 });
+
+test('TikTok swipe waits for official readiness, reports its timeline, and pauses hidden playback', () => {
+  const listeners = new Map(), stageHandlers = new Map(), messages = [], commands = [];
+  const parent = { postMessage: data => messages.push(data) }, frame = { contentWindow: {} };
+  const stage = { querySelector: () => null, querySelectorAll: () => [], addEventListener: (name,fn) => stageHandlers.set(name,fn) };
+  const window = { addEventListener(name,fn) { if(!listeners.has(name)) listeners.set(name,[]);listeners.get(name).push(fn); },
+    VidBestTikTok: { command: (frame,type,value) => commands.push({type,value}) } };
+  runInNewContext(source, { document:{body:{dataset:{viewerEmbed:'1',videoProvider:'tiktok'}},baseURI:'https://example.com/watch/test',querySelector:()=>stage},
+    parent,window,URL,navigator:{},MutationObserver:class{observe(){}} });
+  assert.equal(messages.some(m=>m.type==='ready'),false);
+  window.vidbestPlayback({channel:'vidbest-viewer',type:'playback',active:true,muted:false});
+  stageHandlers.get('vidbest:tiktok-ready')({detail:{frame}});
+  assert.equal(messages.some(m=>m.type==='ready'&&m.controllable),true);assert.equal(commands.at(-1).type,'play');
+  const emit=data=>listeners.get('message').forEach(fn=>fn({origin:'https://www.tiktok.com',source:frame.contentWindow,data:{'x-tiktok-player':true,...data}}));
+  emit({type:'onCurrentTime',value:{currentTime:12,duration:34}});
+  assert.equal(messages.findLast(m=>m.type==='progress').duration,34);
+  window.vidbestPlayback({channel:'vidbest-viewer',type:'playback',active:false,paused:true,muted:false});
+  assert.equal(commands.at(-2).type,'mute');assert.equal(commands.at(-1).type,'pause');
+  emit({type:'onStateChange',value:1});assert.equal(commands.at(-1).type,'pause');
+  stageHandlers.get('vidbest:tiktok-reset')();
+  window.vidbestPlayback({channel:'vidbest-viewer',type:'playback',active:true});
+  assert.equal(commands.at(-1).type,'pause');
+});

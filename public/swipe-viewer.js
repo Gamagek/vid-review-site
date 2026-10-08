@@ -114,7 +114,7 @@
         frame.addEventListener("load", () => {
           if (card.frame !== frame) return;
           command(card);
-          if (!warmProviders.has(card.video.provider)) { card.ready = true; card.controllable = false; }
+          if (!warmProviders.has(card.video.provider) && card.video.provider !== "tiktok") { card.ready = true; card.controllable = false; }
           if (desired(card)) { scheduleCount(card); updateHint(card); }
           updatePreparation();
         });
@@ -332,6 +332,7 @@
     const data = event.data;
     if (data.type === "bridge") { card.bridge = true; command(card); }
     if (data.type === "ready") {
+      if (card.video.provider === "tiktok") delete card.el.dataset.feedback;
       card.ready = true; card.controllable = data.controllable === true; updateHint(card); command(card);
       if (desired(card)) scheduleCount(card); updatePreparation();
     }
@@ -344,7 +345,10 @@
     if (data.type === "quality") card.el.querySelector("[data-quality]").textContent = data.label;
     if (data.type === "soundblocked" && desired(card)) { card.soundBlocked = true; message(card, "Tap Sound to enable audio · Swipe for next"); refreshPlayback(card); }
     if (data.type === "blocked" && desired(card)) message(card, "Tap Play to start · Swipe up for next");
-    if (data.type === "error") { card.el.dataset.feedback = "1"; message(card, data.message); }
+    if (data.type === "error") {
+      card.el.dataset.feedback = "1"; message(card, data.message);
+      if (card.video.provider === "tiktok") { card.ready = false; card.el.classList.add("is-interactive"); }
+    }
     if (data.type === "ended" && desired(card)) void move(1);
   });
   function pauseOriginal() {

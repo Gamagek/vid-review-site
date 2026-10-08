@@ -411,116 +411,40 @@ function isFacebookDirectSource(value) {
   }
 }
 
-function safeTikTokInlineEmbedUrl(payload, expectedShare = null) {
-  const id = String(payload?.video_id || payload?.embed?.video_id || expectedShare?.id || "").trim();
-  if (!/^\d{15,25}$/.test(id)) return "";
-  if (expectedShare?.id && expectedShare.id !== id) return "";
-
-  const value = String(
-    payload?.embed?.url
-      || payload?.embed_url
-      || `https://www.tiktok.com/embed/v2/${id}`,
-  );
-  try {
-    const url = new URL(value);
-    if (url.protocol !== "https:" || url.hostname !== "www.tiktok.com") return "";
-    if (!/^\/embed\/v2\/\d{15,25}\/?$/.test(url.pathname)) return "";
-    if (url.pathname.match(/(\d{15,25})/)?.[1] !== id) return "";
-    return url.toString();
-  } catch {
-    return "";
-  }
-}
-
-function createTikTokInlineFrame(title = "TikTok video") {
-  const frame = document.createElement("iframe");
-  frame.className = "tiktok-official-player";
-  frame.title = title;
-  frame.loading = "eager";
-  frame.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
-  frame.allowFullscreen = true;
-  frame.referrerPolicy = "strict-origin-when-cross-origin";
-  return frame;
-}
-
 async function activateTikTokPlayer(card) {
-  if (!card?.isConnected || card.dataset.videoProvider !== "tiktok") return;
-  const share = parseTikTokShareUrl(card.dataset.videoSource);
-  if (!share) return;
-
-  if (previewState.activeCard === card) return;
-  stopPreview();
-  cancelCandidate();
-
+  const api = window.VidBestTikTok;
+  if (!card?.isConnected || card.dataset.videoProvider !== "tiktok" || !api) return;
+  const share = api.parse(card.dataset.videoSource);
+  if (!share || previewState.activeCard === card || Number(card.dataset.tiktokRetryAt) > Date.now()) return;
+  stopPreview(); cancelCandidate();
   const surface = card.querySelector(".preview-surface");
   const status = card.querySelector(".preview-status");
   if (!surface) return;
-
-  const controller = new AbortController();
-  let readyTimer = null;
+  let disposed = false, cleanup;
   previewState.activeCard = card;
-  previewState.activeCleanup = () => {
-    controller.abort();
-    if (readyTimer) window.clearTimeout(readyTimer);
-  };
+  previewState.activeCleanup = () => { disposed = true; cleanup?.(); };
   card.classList.add("preview-playing", "tiktok-player-active", "tiktok-player-loading");
-  if (status) status.textContent = "Loading TikTok metadata…";
-
-  try {
-    const endpoint = new URL("/api/tiktok/embed", location.origin);
-    endpoint.searchParams.set("url", share.url);
-    const response = await fetch(endpoint.pathname + endpoint.search, {
-      credentials: "same-origin",
-      headers: { Accept: "application/json" },
-      signal: controller.signal,
-      cache: "no-store",
-    });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok || !payload.ok || !payload.video_id || !payload.source_url) {
-      throw new Error(payload.error || "TikTok embed metadata is unavailable.");
-    }
-    if (previewState.activeCard !== card) return;
-
-    const embedUrl = safeTikTokInlineEmbedUrl(payload, share);
-    if (!embedUrl) throw new Error("TikTok embed URL could not be derived from the returned video ID.");
-
-    const frame = createTikTokInlineFrame(
-      card.querySelector(".tile-title")?.textContent?.trim() || "TikTok video",
-    );
-
-    if (status) {
-      status.textContent = payload.cache_source === "gateway"
-        ? "TikTok · gateway metadata loaded"
-        : "TikTok · cached metadata";
-    }
-
-    const markReady = () => {
-      if (previewState.activeCard !== card) return;
-      if (readyTimer) window.clearTimeout(readyTimer);
-      card.classList.remove("tiktok-player-loading");
-      card.classList.add("tiktok-player-ready");
+  if (status) status.textContent = "Loading TikTok…";
+  void api.getMetadata(share.url).catch(() => {});
+  if (disposed || previewState.activeCard !== card) return;
+  const frame = document.createElement("iframe");
+  frame.className = "tiktok-official-player";
+  frame.title = card.querySelector(".tile-title")?.textContent?.trim() || "TikTok video";
+  frame.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
+  frame.allowFullscreen = true; frame.referrerPolicy = "strict-origin-when-cross-origin";
+  cleanup = api.observe(frame, {
+    ready() {
+      card.classList.remove("tiktok-player-loading"); card.classList.add("tiktok-player-ready");
       if (status) status.textContent = "";
-    };
-
-    frame.addEventListener("load", markReady, { once: true });
-    frame.addEventListener("error", () => {
-      if (previewState.activeCard === card) {
-        stopPreview(card, "TikTok embed could not load on this network");
-      }
-    }, { once: true });
-    frame.src = embedUrl;
-    surface.replaceChildren(frame);
-
-    readyTimer = window.setTimeout(() => {
-      if (previewState.activeCard !== card || card.classList.contains("tiktok-player-ready")) return;
-      stopPreview(card, "TikTok embed timed out. Open the video on TikTok to continue.");
-    }, 12000);
-  } catch (error) {
-    if (error?.name === "AbortError") return;
-    if (previewState.activeCard === card) {
-      stopPreview(card, error.message || "TikTok embed is temporarily unavailable");
-    }
-  }
+    },
+    error(message) {
+      card.dataset.tiktokRetryAt = String(Date.now() + 10000);
+      stopPreview(card, message);
+    },
+    autoplay() { if (status) status.textContent = "Tap Play in the player."; },
+  });
+  frame.src = api.playerUrl(share.id);
+  surface.replaceChildren(frame);
 }
 
 function buildFacebookMicrolinkImageUrl(sourceUrl) {

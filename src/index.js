@@ -481,7 +481,7 @@ async function writeTikTokOEmbedCache(env, share, preview) {
   await env.DB.prepare(
     `INSERT INTO tiktok_oembed_cache (
        video_id, share_url, title, author_name, author_url, description, thumbnail_url, fetched_at, updated_at
-     ) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now'), strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now'))
      ON CONFLICT(video_id) DO UPDATE SET
        share_url = excluded.share_url,
        title = excluded.title,
@@ -499,6 +499,7 @@ async function writeTikTokOEmbedCache(env, share, preview) {
     preview.author_url || null,
     preview.description || null,
     preview.thumbnail_url || null,
+    preview.fetched_at || new Date().toISOString(),
   ).run();
 }
 
@@ -517,7 +518,9 @@ async function readTikTokEdgeCache(videoId) {
     const response = await cache.match(tikTokEdgeCacheKey(videoId));
     if (!response) return null;
     const payload = await response.json();
-    return payload?.video_id ? { ...payload, cache_source: "edge" } : null;
+    const fetchedAt = Date.parse(payload?.fetched_at || "");
+    if (!payload?.video_id || !Number.isFinite(fetchedAt) || fetchedAt + 7 * 86400000 <= Date.now()) return null;
+    return { ...payload, cache_source: fetchedAt + 86400000 <= Date.now() ? "edge-stale" : "edge" };
   } catch {
     return null;
   }
@@ -530,7 +533,7 @@ async function writeTikTokEdgeCache(preview) {
     status: 200,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "public, max-age=86400, stale-while-revalidate=3600",
+      "Cache-Control": `public, max-age=${preview.cache_source.includes("stale") ? 30 : Math.max(1, Math.min(86400, Math.floor((Date.parse(preview.fetched_at) + 86400000 - Date.now()) / 1000) || 300))}`,
     },
   });
   try { await cache.put(tikTokEdgeCacheKey(preview.video_id), response); } catch {}
@@ -551,7 +554,7 @@ function buildTikTokOEmbedGatewayUrl(env, canonicalShare) {
   } catch {
     throw new AppError(503, "TikTok oEmbed gateway URL is invalid");
   }
-  if (endpoint.protocol !== "https:") {
+  if (endpoint.protocol !== "https:" || endpoint.username || endpoint.password || endpoint.port) {
     throw new AppError(503, "TikTok oEmbed gateway must use HTTPS");
   }
   endpoint.searchParams.set("url", canonicalShare);
@@ -578,7 +581,19 @@ function unwrapTikTokOEmbedPayload(payload) {
   return null;
 }
 
+const tikTokMetadataRequests = new WeakMap();
 async function fetchTikTokPreview(env, share, options = {}) {
+  const canonical = normalizeTikTokShareUrl(share);
+  if (!canonical) throw new AppError(400, "Use a normal TikTok sharing link");
+  const owner = env.DB || env;
+  let requests = tikTokMetadataRequests.get(owner);
+  if (!requests) { requests = new Map(); tikTokMetadataRequests.set(owner, requests); }
+  const id = canonical.match(/\/video\/(\d+)/)[1];
+  if (!requests.has(id)) requests.set(id, fetchTikTokPreviewOnce(env, canonical, options).finally(() => requests.delete(id)));
+  return requests.get(id);
+}
+
+async function fetchTikTokPreviewOnce(env, share, options = {}) {
   const canonicalShare = normalizeTikTokShareUrl(share);
   if (!canonicalShare) throw new AppError(400, "Use a normal TikTok sharing link");
   const videoId = canonicalShare.match(/\/video\/(\d+)\/?$/)?.[1] || "";
@@ -597,8 +612,17 @@ async function fetchTikTokPreview(env, share, options = {}) {
   }
 
   try {
+    const cooldown = await env.DB?.prepare("SELECT setting_value FROM app_settings WHERE setting_key = ?")
+      .bind("tiktok_metadata_cooldown").first();
+    const remaining = Math.ceil((Number(cooldown?.setting_value || 0) - Date.now()) / 1000);
+    if (remaining > 0) {
+      const error = new AppError(503, "TikTok preview is cooling down. Please try later.", null, { "Retry-After": String(remaining) });
+      error.cooldown = true;
+      throw error;
+    }
     const gatewayUrl = buildTikTokOEmbedGatewayUrl(env, canonicalShare);
     const response = await fetch(gatewayUrl, {
+      redirect: "manual",
       headers: {
         Accept: "application/json",
         "User-Agent": "VidBest-oEmbed-Gateway/1.0",
@@ -606,7 +630,13 @@ async function fetchTikTokPreview(env, share, options = {}) {
       signal: AbortSignal.timeout(7000),
     });
     if (!response.ok) {
-      throw new AppError(502, `TikTok oEmbed gateway returned HTTP ${response.status}`);
+      const header = response.headers.get("Retry-After");
+      const seconds = /^\d+$/.test(header || "") ? Number(header) : Math.ceil((Date.parse(header) - Date.now()) / 1000);
+      const retry = Math.max(response.status === 429 ? 60 : 30, Number.isFinite(seconds) ? seconds : 0);
+      await response.body?.cancel();
+      const error = new AppError(response.status === 429 ? 429 : 503, "TikTok preview is temporarily unavailable. Please try later.", null, { "Retry-After": String(retry) });
+      error.upstreamStatus = response.status;
+      throw error;
     }
 
     const contentType = (response.headers.get("Content-Type") || "").toLowerCase();
@@ -620,6 +650,10 @@ async function fetchTikTokPreview(env, share, options = {}) {
     if (!metadata) {
       throw new AppError(502, "TikTok oEmbed gateway did not return a video response");
     }
+    if (metadata.video_id && String(metadata.video_id) !== videoId) throw new AppError(502, "TikTok gateway returned a different video");
+    const fetchedAt = Date.parse(gatewayPayload?.fetched_at || "");
+    const stale = gatewayPayload?.stale === true;
+    if (stale && (!Number.isFinite(fetchedAt) || fetchedAt + 7 * 86400000 <= Date.now())) throw new AppError(503, "Cached TikTok details have expired");
 
     const preview = {
       video_id: videoId,
@@ -629,19 +663,30 @@ async function fetchTikTokPreview(env, share, options = {}) {
       author_url: normalizeTikTokAuthorUrl(metadata?.author_url),
       description: cleanText(metadata?.description || metadata?.video_description || metadata?.text, 260),
       thumbnail_url: normalizeTikTokThumbnailUrl(metadata?.thumbnail_url),
-      cache_source: "gateway",
-      fetched_at: new Date().toISOString(),
+      cache_source: stale ? "gateway-stale" : "gateway",
+      fetched_at: Number.isFinite(fetchedAt) && fetchedAt <= Date.now() ? new Date(fetchedAt).toISOString() : new Date().toISOString(),
     };
 
     await writeTikTokOEmbedCache(env, canonicalShare, preview);
     await writeTikTokEdgeCache(preview);
     return preview;
   } catch (error) {
-    if (durable) {
+    const retry = Math.max(30, Number(error.headers?.["Retry-After"]) || 30);
+    if ([404,410].includes(error.upstreamStatus)) {
+      await env.DB?.prepare("DELETE FROM tiktok_oembed_cache WHERE video_id = ?").bind(videoId).run();
+      try { await tikTokEdgeCache()?.delete(tikTokEdgeCacheKey(videoId)); } catch {}
+    }
+    if (!error.cooldown && ![404,410].includes(error.upstreamStatus)) {
+      await env.DB?.prepare(`INSERT INTO app_settings (setting_key, setting_value) VALUES (?, ?)
+        ON CONFLICT(setting_key) DO UPDATE SET setting_value = excluded.setting_value`)
+        .bind("tiktok_metadata_cooldown", String(Date.now() + retry * 1000)).run();
+    }
+    if (durable && ![404,410].includes(error.upstreamStatus) && Date.parse(durable.fetched_at) + 7 * 86400000 > Date.now()) {
       const stale = tikTokPreviewFromRow(durable, "d1-stale");
       await writeTikTokEdgeCache(stale);
       return stale;
     }
+    if (!error.headers?.["Retry-After"]) throw new AppError(503, "TikTok preview is temporarily unavailable. Please try later.", null, { "Retry-After": String(retry) });
     throw error;
   }
 }
@@ -670,10 +715,10 @@ async function tikTokEmbedModel(request, env) {
   if (!share) throw new AppError(400, "Use a normal TikTok sharing link");
 
   const preview = await fetchTikTokPreview(env, share);
-  const embedUrl = `https://www.tiktok.com/embed/v2/${encodeURIComponent(preview.video_id)}`;
+  const embedUrl = `https://www.tiktok.com/player/v1/${encodeURIComponent(preview.video_id)}?autoplay=0&controls=1&loop=0&rel=0`;
   return json({
     ok: true,
-    schema_version: 2,
+    schema_version: 3,
     provider: "tiktok",
     source_url: share,
     canonical_url: share,
@@ -695,7 +740,7 @@ async function tikTokEmbedModel(request, env) {
     },
     cache_source: preview.cache_source,
   }, 200, {
-    "Cache-Control": "public, max-age=86400, stale-while-revalidate=3600, stale-if-error=86400",
+    "Cache-Control": `public, max-age=${preview.cache_source.includes("stale") ? 30 : 300}`,
   });
 }
 
@@ -3042,9 +3087,10 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
-  <script src="/watch.js?v=20261008-1" defer></script>
+  ${video.provider === "tiktok" ? '<script src="/tiktok-embed.js?v=20261008-2" defer></script>' : ""}
+  <script src="/watch.js?v=20261008-2" defer></script>
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261006-1">
-  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261006-1" defer></script>
+  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-2" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
   ${video.provider === "tiktok" ? '<!-- TikTok watch pages start with cached oEmbed metadata; the standard TikTok embed is created only after user action. -->' : ""}
 </head>
@@ -3178,7 +3224,7 @@ function renderMedia(video, playbackOrigin, viewer = false) {
     if (!tiktokId) return "";
     const preview = video.tiktok_preview || {};
     const previewTitle = cleanText(
-      preview.description || preview.title || watchDisplayTitle(video),
+      watchDisplayTitle(video) || preview.description || preview.title,
       180,
       watchDisplayTitle(video),
     );
@@ -3195,12 +3241,13 @@ function renderMedia(video, playbackOrigin, viewer = false) {
         <span class="tiktok-oembed-kicker">Cached TikTok preview</span>
         <strong>${escapeHtml(previewTitle)}</strong>
         <span class="tiktok-oembed-author">${escapeHtml(previewAuthor)}</span>
-        <small>Metadata is served from Vid.Best cache and the Cloudflare oEmbed gateway.</small>
+        <small>Watch here with the official TikTok player.</small>
       </div>
       <div class="tiktok-oembed-actions">
-        <button type="button" class="button primary tiktok-oembed-load" data-tiktok-load-embed>▶ Load TikTok embed</button>
-        <a class="button ghost" href="${escapeHtml(video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open on TikTok</a>
+        <button type="button" class="button primary tiktok-oembed-load" data-tiktok-load-embed>▶ Load TikTok player</button>
+        <button type="button" class="button ghost" data-tiktok-help-toggle aria-expanded="false">Connection help</button>
       </div>
+      <div class="tiktok-connection-help" data-tiktok-help hidden><p>If TikTok does not respond, wait before retrying. Check another connection if available.</p><p>Android: Settings → Connections → More connection settings → Private DNS. Google Public DNS uses <code>dns.google</code>. Keep your previous setting so you can restore it.</p><p>DNS may help a connection problem; it cannot guarantee video availability. Vid.Best cannot change this setting for you.</p></div>
       <button type="button" class="tiktok-oembed-back" data-tiktok-back-preview hidden>← Cached preview</button>
       <div class="tiktok-oembed-status" data-tiktok-embed-status role="status"></div>
     </div>`;

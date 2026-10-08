@@ -24,6 +24,7 @@ const watchPlayerState = {
 document.addEventListener("DOMContentLoaded", initializeWatchPage);
 
 function initializeWatchPage() {
+  initializeTikTokOEmbedPlayer();
   if (document.body.dataset.viewerEmbed === "1") {
     initializeHlsPlayback();
     repairNativePlayerControls();
@@ -33,7 +34,6 @@ function initializeWatchPage() {
   enhanceNativePlayer();
   initializeHlsPlayback();
   initializePersistentPlayer();
-  initializeTikTokOEmbedPlayer();
   initializeEmbeddedMediaTools();
   initializeAudioLab();
   initializeEmbeddedAudioLab();
@@ -53,191 +53,83 @@ function initializeWatchPage() {
 }
 
 
-function parseTikTokSourceUrl(value) {
-  try {
-    const url = new URL(String(value || ""));
-    const host = url.hostname.toLowerCase().replace(/^www\./, "");
-    if (host !== "tiktok.com") return null;
-    const match = url.pathname.match(/^\/@([^/]+)\/video\/(\d{15,25})\/?$/);
-    if (!match) return null;
-    return {
-      id: match[2],
-      url: `https://www.tiktok.com/@${match[1]}/video/${match[2]}`,
-    };
-  } catch {
-    return null;
-  }
-}
-
-function safeTikTokEmbedUrl(payload, expectedSource = "") {
-  const expected = parseTikTokSourceUrl(expectedSource);
-  const id = String(payload?.video_id || payload?.embed?.video_id || expected?.id || "").trim();
-  if (!/^\d{15,25}$/.test(id)) return "";
-  if (expected?.id && expected.id !== id) return "";
-
-  const value = String(
-    payload?.embed?.url
-      || payload?.embed_url
-      || `https://www.tiktok.com/embed/v2/${id}`,
-  );
-  try {
-    const url = new URL(value);
-    if (url.protocol !== "https:" || url.hostname !== "www.tiktok.com") return "";
-    if (!/^\/embed\/v2\/\d{15,25}\/?$/.test(url.pathname)) return "";
-    if (url.pathname.match(/(\d{15,25})/)?.[1] !== id) return "";
-    return url.toString();
-  } catch {
-    return "";
-  }
-}
-
-function createTikTokEmbedFrame(title = "TikTok video") {
-  const frame = document.createElement("iframe");
-  frame.className = "tiktok-official-player";
-  frame.title = title;
-  frame.loading = "eager";
-  frame.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
-  frame.allowFullscreen = true;
-  frame.referrerPolicy = "strict-origin-when-cross-origin";
-  return frame;
-}
-
-function waitForTikTokFrame(frame, timeoutMs = 12000) {
-  return new Promise((resolve, reject) => {
-    let settled = false;
-    const finish = (callback, value) => {
-      if (settled) return;
-      settled = true;
-      window.clearTimeout(timer);
-      frame.removeEventListener("load", onLoad);
-      frame.removeEventListener("error", onError);
-      callback(value);
-    };
-    const onLoad = () => finish(resolve, frame);
-    const onError = () => finish(reject, new Error("TikTok embed could not load on this network."));
-    const timer = window.setTimeout(
-      () => finish(reject, new Error("TikTok embed timed out. You can still open the video on TikTok.")),
-      timeoutMs,
-    );
-    frame.addEventListener("load", onLoad, { once: true });
-    frame.addEventListener("error", onError, { once: true });
-  });
-}
-
 function initializeTikTokOEmbedPlayer() {
   const shell = document.querySelector(".tiktok-oembed-player");
-  if (!shell || shell.dataset.vidbestOembedPlayer === "1") return;
+  const api = window.VidBestTikTok;
+  if (!shell || !api || shell.dataset.vidbestOembedPlayer === "1") return;
   shell.dataset.vidbestOembedPlayer = "1";
-
-  const player = shell.closest("#watch-player");
+  const share = api.parse(shell.dataset.tiktokSource);
   const stage = shell.closest(".watch-player-stage");
   const loadButton = shell.querySelector("[data-tiktok-load-embed]");
   const backButton = shell.querySelector("[data-tiktok-back-preview]");
   const status = shell.querySelector("[data-tiktok-embed-status]");
-  const parsedShare = parseTikTokSourceUrl(shell.dataset.tiktokSource || "");
-  const shareUrl = parsedShare?.url || "";
-  const autoload = shell.dataset.tiktokAutoload === "1";
-
-  const setStatus = (message, tone = "") => {
-    if (!status) return;
-    status.textContent = message;
-    status.dataset.tone = tone;
-  };
-
-  const resetEmbeddedEnhancements = () => {
-    if (player) {
-      delete player.dataset.vidbestEmbeddedTools;
-      delete player.dataset.vidbestEmbeddedAudio;
-    }
-    document.querySelector(".vidbest-embedded-audio-lab")?.remove();
-  };
-
-  const showCachedPreview = () => {
+  const help = shell.querySelector("[data-tiktok-help]");
+  let revision = 0, dispose = null, cooldown = 0, retryTimer;
+  function setStatus(message) { status.textContent = message; }
+  function reset() {
+    revision++;
+    dispose?.(); dispose = null;
+    window.clearTimeout(retryTimer);
     shell.querySelector(".tiktok-standard-embed-host")?.remove();
     shell.classList.remove("is-loading", "is-player-ready");
-    if (loadButton) {
-      loadButton.disabled = false;
-      loadButton.textContent = "▶ Load TikTok embed";
-    }
-    if (backButton) backButton.hidden = true;
-    setStatus("");
-    resetEmbeddedEnhancements();
-  };
-
-  const loadEmbed = async () => {
-    if (!shareUrl || shell.classList.contains("is-loading")) return;
-
-    shell.querySelector(".tiktok-standard-embed-host")?.remove();
-    shell.classList.remove("is-player-ready");
+    loadButton.disabled = false;
+    backButton.hidden = true;
+    stage?.dispatchEvent(new CustomEvent("vidbest:tiktok-reset"));
+  }
+  function failure(message, attempt) {
+    if (attempt !== revision) return;
+    reset();
+    cooldown = Date.now() + 10000;
+    loadButton.disabled = true; loadButton.textContent = "Please wait…";
+    setStatus(message);
+    const current = revision;
+    retryTimer = window.setTimeout(() => {
+      if (current !== revision) return;
+      loadButton.disabled = false; loadButton.textContent = "Retry TikTok player";
+    }, 10000);
+    stage?.dispatchEvent(new CustomEvent("vidbest:tiktok-error", { detail: { message } }));
+  }
+  async function loadEmbed() {
+    if (!share || Date.now() < cooldown || shell.classList.contains("is-loading")) return;
+    reset(); const attempt = revision;
     shell.classList.add("is-loading");
-    setStatus("Loading cached TikTok metadata…");
-    if (loadButton) {
-      loadButton.disabled = true;
-      loadButton.textContent = "Loading TikTok…";
-    }
-
-    try {
-      const endpoint = new URL("/api/tiktok/embed", location.origin);
-      endpoint.searchParams.set("url", shareUrl);
-      const response = await fetch(endpoint.pathname + endpoint.search, {
-        credentials: "same-origin",
-        headers: { Accept: "application/json" },
-        cache: "no-store",
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok || !payload.ok || !payload.video_id || !payload.source_url) {
-        throw new Error(payload.error || "TikTok embed metadata is unavailable.");
-      }
-
-      const embedUrl = safeTikTokEmbedUrl(payload, shareUrl);
-      if (!embedUrl) throw new Error("TikTok embed URL could not be derived from the returned video ID.");
-
-      const host = document.createElement("div");
-      host.className = "tiktok-standard-embed-host";
-      const frame = createTikTokEmbedFrame(
-        document.querySelector("h1")?.textContent?.trim() || "TikTok video",
-      );
-      const ready = waitForTikTokFrame(frame);
-      frame.src = embedUrl;
-      host.append(frame);
-      shell.append(host);
-
-      setStatus(payload.cache_source === "gateway"
-        ? "Metadata loaded through the Cloudflare oEmbed gateway."
-        : "Metadata loaded from Vid.Best cache.");
-
-      await ready;
-
-      shell.classList.add("is-player-ready");
-      shell.classList.remove("is-loading");
-      if (backButton) backButton.hidden = false;
-      if (loadButton) {
-        loadButton.disabled = false;
-        loadButton.textContent = "Reload TikTok embed";
-      }
-      setStatus("");
-
-      queueMicrotask(() => {
-        initializeEmbeddedMediaTools();
-        initializeEmbeddedAudioLab();
-      });
-    } catch (error) {
-      shell.querySelector(".tiktok-standard-embed-host")?.remove();
-      shell.classList.remove("is-loading", "is-player-ready");
-      if (loadButton) {
-        loadButton.disabled = false;
-        loadButton.textContent = "Retry TikTok embed";
-      }
-      if (backButton) backButton.hidden = true;
-      setStatus(error.message || "TikTok embed is temporarily unavailable.", "error");
-    }
-  };
-
-  loadButton?.addEventListener("click", () => void loadEmbed());
-  backButton?.addEventListener("click", showCachedPreview);
-
-  if (stage) stage.dataset.tiktokOembedGateway = "1";
-  if (autoload) queueMicrotask(() => void loadEmbed());
+    loadButton.disabled = true; loadButton.textContent = "Loading TikTok…";
+    backButton.hidden = false;
+    setStatus("Loading video details…");
+    // Details are useful, but their availability must not gate a valid official player.
+    void api.getMetadata(share.url).catch(() => {});
+    if (attempt !== revision) return;
+    setStatus("Connecting to TikTok…");
+    const host = document.createElement("div"); host.className = "tiktok-standard-embed-host";
+    const frame = document.createElement("iframe");
+    frame.id = "watch-media-frame"; frame.className = "tiktok-official-player";
+    frame.title = document.querySelector("h1")?.textContent?.trim() || "TikTok video";
+    frame.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
+    frame.allowFullscreen = true; frame.referrerPolicy = "strict-origin-when-cross-origin";
+    dispose = api.observe(frame, {
+      ready() {
+        if (attempt !== revision) return;
+        shell.classList.remove("is-loading"); shell.classList.add("is-player-ready");
+        loadButton.disabled = false; loadButton.textContent = "Reload TikTok player";
+        setStatus("");
+        if (document.body.dataset.viewerEmbed !== "1" && !document.hidden) {
+          api.command(frame, "unMute"); api.command(frame, "play");
+        }
+        stage?.dispatchEvent(new CustomEvent("vidbest:tiktok-ready", { detail: { frame } }));
+      },
+      autoplay() { setStatus("Tap Play in the player to start."); },
+      error(message) { failure(message, attempt); },
+    });
+    frame.src = api.playerUrl(share.id);
+    host.append(frame); shell.append(host);
+  }
+  loadButton.addEventListener("click", () => void loadEmbed());
+  backButton.addEventListener("click", () => { reset(); cooldown = 0; setStatus(""); loadButton.textContent = "▶ Load TikTok player"; });
+  shell.querySelector("[data-tiktok-help-toggle]")?.addEventListener("click", event => {
+    help.hidden = !help.hidden; event.currentTarget.setAttribute("aria-expanded", String(!help.hidden));
+  });
+  window.addEventListener("pagehide", reset);
+  if (shell.dataset.tiktokAutoload === "1") void loadEmbed();
 }
 
 function initializeHlsPlayback() {
