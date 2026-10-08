@@ -75,6 +75,9 @@ function decorateVideoCards() {
         surface.setAttribute("aria-label", "Saiyaara TikTok Tagembed mini preview");
         oldSurface.replaceWith(surface);
         card.classList.add("saiyaara-tagembed-tile");
+        const share = parseTikTokShareUrl(card.dataset.videoSource);
+        surface.dataset.saiyaaraPoster = card.dataset.videoThumbnail ||
+          (share ? "/api/tiktok/cached-poster?id=" + encodeURIComponent(share.id) : "");
         window.VidBestSaiyaaraTagembed.mount(surface, "tile");
         return;
       }
@@ -466,6 +469,13 @@ function applyCachedTikTokPreview(card, preview) {
   if (preview.description) card.dataset.tiktokDescription = preview.description;
   if (preview.thumbnail_url) card.dataset.tiktokThumbnail = preview.thumbnail_url;
   if (preview.poster_url) card.dataset.tiktokPoster = preview.poster_url;
+  // Cached metadata may arrive after Tagembed mounts. Updating the facade
+  // would otherwise erase the live mini widget and leave a black tile.
+  if (card.classList.contains("saiyaara-tagembed-tile")) {
+    const img = card.querySelector(".saiyaara-tagembed-poster");
+    if (img && preview.thumbnail_url) img.src = preview.thumbnail_url;
+    return;
+  }
   renderTikTokFacade(card);
 }
 
