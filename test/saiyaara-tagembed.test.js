@@ -97,7 +97,7 @@ test("all three Saiyaara viewing surfaces use contained, touch-accessible embeds
   assert.match(viewer, /if \(!desired\(card\)\) return/);
   assert.match(viewer, /card\.el\.classList\.add\("is-interactive", "is-saiyaara-widget"\)/);
   assert.match(viewer, /iframe\.src = SAIYAARA_TAGEMBED_URL/);
-  assert.match(viewer, /card\.el\.classList\.remove\("is-playing", "is-interactive", "is-saiyaara-widget"\)/);
+  assert.match(viewer, /card\.el\.classList\.remove\("is-playing", "is-interactive", "is-saiyaara-widget", "is-tiktok-gateway"\)/);
   assert.match(viewerCss, /\.swipe-card\.is-saiyaara-widget \.swipe-gesture \{ display: none !important; \}/);
   assert.match(viewerCss, /\.swipe-card\.is-saiyaara-widget \.swipe-frame-host > iframe\.swipe-saiyaara-tagembed/);
   assert.match(styles, /#watch-player\[data-saiyaara-player="1"\]\.is-mini \.watch-player-stage/);
