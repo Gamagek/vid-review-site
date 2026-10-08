@@ -93,14 +93,16 @@ test("rejects mismatched metadata and unsafe TikTok URLs", async () => {
   }
 });
 
-test("TikTok browser service is metadata-only and contains no player architecture", () => {
-  assert.doesNotMatch(code, /www\.tiktok\.com\/embed\.js/);
+test("TikTok browser service lazy-loads the official modal SDK without player/v1", () => {
+  assert.match(code, /www\.tiktok\.com\/embed\.js/);
   assert.doesNotMatch(code, /player\/v1/);
   assert.doesNotMatch(code, /createElement\(["']iframe["']\)/);
   assert.doesNotMatch(code, /x-tiktok-player/);
   assert.doesNotMatch(code, /\.command\(/);
   assert.match(code, /showPreview/);
-  assert.match(code, /Open on TikTok/);
+  assert.match(code, /injectOfficialEmbed/);
+  assert.match(code, /cleanupEmbed/);
+  assert.match(code, /requestAnimationFrame/);
   assert.match(code, /thumbnail_url/);
   assert.match(code, /author_name/);
 });
