@@ -89,6 +89,7 @@
     sendCommand(card, { type: "playback", active: desired(card), paused: card.paused, muted }, gesture);
   }
   function destroyPlayer(card) {
+    card.stopGatewayObserver?.(); card.stopGatewayObserver = null;
     card.loadToken = null; card.host.replaceChildren(); card.frame = null; card.ready = false; card.bridge = false;
     card.loading = null; card.suspended = null; card.playing = false; card.actualMuted = true; card.soundBlocked = false;
     card.seconds = 0; card.duration = 0;
@@ -100,7 +101,7 @@
   }
   async function prepareCard(card) {
     if (card.frame || card.loading || !opened) return;
-    // Production TikTok cards use the Cloudflare-signed Portainer watch URL.
+    // Production TikTok cards use the Cloudflare player with explicit cache status.
     // Saiyaara preserves its separate Tagembed fallback below.
     if (card.video.provider === "tiktok" && !isSaiyaara(card)) {
       if (!desired(card)) return;
@@ -138,12 +139,20 @@
       card.host.replaceChildren(iframe);
       updateHint(card);
       message(card, "Loading the signed Vid.Best gateway. Tap the video for sound.");
+      card.stopGatewayObserver = window.VidBestTikTok.observeGateway(iframe, source, (data) => {
+        if (card.frame !== iframe) return;
+        message(card, data.message);
+        card.playing = data.state === "playing";
+        if (data.state === "playing") {
+          card.ready = true;
+          if (desired(card)) scheduleCount(card);
+        } else if (data.state === "error") { card.ready = false; }
+        if (!card.playing && desired(card)) clearTimeout(timer);
+        refreshPlayback(card); updatePreparation();
+      });
       iframe.addEventListener("load", () => {
         if (card.frame !== iframe) return;
-        // A load event may contain a gateway 403/503; not playback success.
-        card.ready = true;
-        message(card, "Gateway page loaded. Tap inside the player; upstream playback is not guaranteed.");
-        if (desired(card)) scheduleCount(card);
+        // Loading a document or error page is never a played view.
         updatePreparation();
       }, { once: true });
       iframe.addEventListener("error", () => {
@@ -327,9 +336,10 @@
   }
   function scheduleCount(card) {
     clearTimeout(timer);
+    if (card.el.classList.contains("is-tiktok-gateway") && !card.playing) return;
     if (!desired(card) || !card.ready || counted.has(card.video.id) || counting.has(card.video.id)) return;
     timer = setTimeout(async () => {
-      if (!desired(card) || !card.ready) return;
+      if (!desired(card) || !card.ready || (card.el.classList.contains("is-tiktok-gateway") && !card.playing)) return;
       counting.add(card.video.id);
       try {
         const result = await api(`/api/videos/${card.video.id}/view`);

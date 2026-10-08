@@ -110,7 +110,7 @@ test("TikTok browser service uses the signed Cloudflare/Portainer watch route", 
 });
 
 
-test("safe TikTok mode mounts only after click, removes failed frames and throttles retries", async () => {
+test("a slow gateway stays interactive without the false 15-minute lock, and cleanup removes the observer", async () => {
   const rafs = [];
   const timers = new Map();
   let nextTimer = 0;
@@ -123,7 +123,7 @@ test("safe TikTok mode mounts only after click, removes failed frames and thrott
   function element(tag) {
     const listeners = new Map();
     return {
-      tagName: tag.toUpperCase(), dataset: {}, style: {}, children: [], textContent: "",
+      tagName: tag.toUpperCase(), dataset: {}, style: {}, children: [], textContent: "", contentWindow: {},
       setAttribute(name, value) { this[name] = value; },
       addEventListener(name, cb) { listeners.set(name, cb); },
       remove() { this.removed = true; },
@@ -189,15 +189,25 @@ test("safe TikTok mode mounts only after click, removes failed frames and thrott
   assert.match(host.children[0].src, /^https:\/\/tiktok-oembed-gateway\.gkasunc\.workers\.dev\/watch\?/);
   assert.equal(timers.size, 1, "only one readiness timer");
   const timeout = [...timers.values()][0].fn;
+  timers.clear();
   timeout();
-  assert.equal(host.children[0].className, "tiktok-player-fallback");
-  assert.match(status.textContent, /further requests are paused/i);
+  assert.equal(host.children[0].tagName, "IFRAME", "slow loading must not destroy the player");
+  assert.match(status.textContent, /longer to load/i);
   assert.equal(timers.size, 0);
+  const frame = host.children[0];
+  const event = { source: frame.contentWindow, origin: "https://tiktok-oembed-gateway.gkasunc.workers.dev", data: { channel: "vidbest-gateway", video_id: "6718335390845095173", state: "error", message: "Source could not be prepared." } };
+  winListeners.get("message")({ ...event, origin: "https://evil.test" });
+  assert.match(status.textContent, /longer to load/i);
+  winListeners.get("message")({ ...event, source: {} });
+  assert.match(status.textContent, /longer to load/i);
+  winListeners.get("message")(event);
+  assert.equal(status.textContent, "Source could not be prepared.");
+  assert.equal(host.children[0], frame, "gateway keeps its own retry controls");
   dialog.close();
+  assert.equal(winListeners.has("message"), false);
   assert.equal(host.children.length, 0, "closing the popup removes player and placeholder");
   await api.showPreview(share, { title: "First video" });
   rafs.shift()();
-  assert.equal(createdFrames, 1, "cooldown prevents a second TikTok request");
-  assert.match(status.textContent, /Please wait/);
+  assert.equal(createdFrames, 2, "manual reopen is not blocked by an invented cooldown");
   dialog.close();
 });
