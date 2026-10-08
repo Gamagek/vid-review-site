@@ -1791,7 +1791,7 @@ test("renders the current Vid.Best TikTok gateway architecture as metadata-only 
   assert.match(html, /class="tiktok-preview-card"/);
   assert.match(html, /data-tiktok-id="7669587518156705056"/);
   assert.match(html, /data-tiktok-player-mode="metadata-card"/);
-  assert.match(html, /Open on TikTok/);
+  assert.match(html, /Play in popup/);
   assert.doesNotMatch(html, /player\/v1/);
   assert.doesNotMatch(html, /tiktok-official-player/);
 
