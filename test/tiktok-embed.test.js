@@ -93,14 +93,17 @@ test("rejects mismatched metadata and unsafe TikTok URLs", async () => {
   }
 });
 
-test("TikTok browser service is metadata-only and contains no player architecture", () => {
+test("TikTok browser service mounts Player v1 rather than embed.js", () => {
+  assert.match(code, /https:\/\/www\.tiktok\.com/);
+  assert.match(code, /\/player\/v1\//);
   assert.doesNotMatch(code, /www\.tiktok\.com\/embed\.js/);
-  assert.doesNotMatch(code, /player\/v1/);
-  assert.doesNotMatch(code, /createElement\(["']iframe["']\)/);
-  assert.doesNotMatch(code, /x-tiktok-player/);
-  assert.doesNotMatch(code, /\.command\(/);
-  assert.match(code, /showPreview/);
-  assert.match(code, /Open on TikTok/);
-  assert.match(code, /thumbnail_url/);
+  assert.match(code, /createElement\(["']iframe["']\)/);
+  assert.match(code, /onPlayerReady/);
+  assert.match(code, /onPlayerError/);
+  assert.match(code, /event\.source !== iframe\.contentWindow/);
+  assert.match(code, /event\.origin !== PLAYER_ORIGIN/);
+  assert.match(code, /requestAnimationFrame/);
+  assert.match(code, /cleanupEmbed/);
+  assert.match(code, /autoplay", "0"/);
   assert.match(code, /author_name/);
 });

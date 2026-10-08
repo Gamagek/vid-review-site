@@ -1011,7 +1011,7 @@ function securityHeaders(headers, html = false, scriptNonce = "") {
     const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.instagram.com/embed.js https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.instagram.com/embed.js https://www.tiktok.com https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: https://www.tiktok.com blob:; connect-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com https://www.tiktok.com https://www.tiktokcdn.com https://www.tiktokv.com; upgrade-insecure-requests`,
     );
   }
   return headers;
@@ -3083,7 +3083,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
-  ${video.provider === "tiktok" ? '<script src="/tiktok-preview-service.js?v=20261008-3" defer></script>' : ""}
+  ${video.provider === "tiktok" ? '<script src="/tiktok-preview-service.js?v=20261008-5" defer></script>' : ""}
   <script src="/watch.js?v=20261008-2" defer></script>
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261006-1">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-2" defer></script>
@@ -3236,9 +3236,9 @@ function renderMedia(video, playbackOrigin, viewer = false) {
     );
     const imageUrl = preview.thumbnail_url || `/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`;
     return `<article class="tiktok-preview-card" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-source="${escapeHtml(video.source_url)}" data-tiktok-player-mode="metadata-card">
-      <button type="button" class="tiktok-preview-card-media" data-tiktok-show-preview aria-label="View TikTok preview details">
+      <button type="button" class="tiktok-preview-card-media" data-tiktok-show-preview aria-label="Play TikTok video in popup">
         <img class="tiktok-preview-card-image" src="${escapeHtml(imageUrl)}" data-tiktok-fallback="/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}" alt="" loading="eager" decoding="async">
-        <span class="tiktok-preview-card-play" aria-hidden="true">↗</span>
+        <span class="tiktok-preview-card-play" aria-hidden="true">▶</span>
       </button>
       <div class="tiktok-preview-card-body">
         <span class="tiktok-preview-card-kicker">TikTok preview</span>
@@ -3246,10 +3246,9 @@ function renderMedia(video, playbackOrigin, viewer = false) {
         <span class="tiktok-preview-card-author" data-tiktok-card-author>${escapeHtml(previewAuthor)}</span>
         <p data-tiktok-card-description>${escapeHtml(previewDescription)}</p>
         <div class="tiktok-preview-card-actions">
-          <button type="button" class="button primary" data-tiktok-show-preview>View details</button>
-          <a class="button ghost" href="${escapeHtml(video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open on TikTok</a>
+          <button type="button" class="button primary" data-tiktok-show-preview>Play in popup</button>
         </div>
-        <p class="tiktok-preview-card-note">No TikTok player or embed script is loaded on Vid.Best.</p>
+        <p class="tiktok-preview-card-note">The TikTok embed loads only after you choose Play.</p>
       </div>
     </article>`;
   }

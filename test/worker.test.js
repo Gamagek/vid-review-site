@@ -409,12 +409,16 @@ test("TikTok watch pages render cached metadata cards without a TikTok player", 
 
   const page = await send(context, "/watch/gateway-tiktok-test");
   assert.equal(page.status, 200);
+  const policy = page.headers.get("Content-Security-Policy") || "";
+  assert.match(policy, /script-src[^;]*https:\/\/www\.tiktok\.com/);
+  assert.match(policy, /frame-src[^;]*https:\/\/www\.tiktok\.com/);
+  assert.match(policy, /media-src[^;]*https:\/\/www\.tiktok\.com/);
   const html = await page.text();
   assert.match(html, /class="tiktok-preview-card"/);
   assert.match(html, /data-tiktok-player-mode="metadata-card"/);
   assert.match(html, /Cached TikTok title/);
   assert.match(html, /Umbral Archive/);
-  assert.match(html, /Open on TikTok/);
+  assert.match(html, /Play in popup/);
   assert.doesNotMatch(html, /<iframe[^>]+tiktok/i);
   assert.doesNotMatch(html, /player\/v1/);
   assert.doesNotMatch(html, /embed\.js/);
@@ -984,7 +988,7 @@ test("stores TikTok source without a direct player URL and renders a metadata pr
   assert.match(html, /data-tiktok-source=/);
   assert.match(html, /data-tiktok-player-mode="metadata-card"/);
   assert.match(html, /data-tiktok-show-preview/);
-  assert.match(html, /Open on TikTok/);
+  assert.match(html, /Play in popup/);
   assert.doesNotMatch(html, /www\.tiktok\.com\/player\/v1/);
   assert.doesNotMatch(html, /video\.megasale\.win/);
 });
@@ -1787,7 +1791,7 @@ test("renders the current Vid.Best TikTok gateway architecture as metadata-only 
   assert.match(html, /class="tiktok-preview-card"/);
   assert.match(html, /data-tiktok-id="7669587518156705056"/);
   assert.match(html, /data-tiktok-player-mode="metadata-card"/);
-  assert.match(html, /Open on TikTok/);
+  assert.match(html, /Play in popup/);
   assert.doesNotMatch(html, /player\/v1/);
   assert.doesNotMatch(html, /tiktok-official-player/);
 
@@ -1812,9 +1816,10 @@ test("renders the current Vid.Best TikTok gateway architecture as metadata-only 
   assert.doesNotMatch(indexSource, /video\.megasale\.win/);
 
   const previewService = readFileSync(new URL("../public/tiktok-preview-service.js", import.meta.url), "utf8");
-  assert.doesNotMatch(previewService, /embed\.js/);
-  assert.doesNotMatch(previewService, /player\/v1/);
-  assert.doesNotMatch(previewService, /createElement\(["']iframe["']\)/);
+  assert.doesNotMatch(previewService, /www\.tiktok\.com\/embed\.js/);
+  assert.match(previewService, /player\/v1/);
+  assert.match(previewService, /onPlayerReady/);
+  assert.match(previewService, /createElement\(["']iframe["']\)/);
 });
 test("TikTok metadata cards no longer require SIGN_SECRET or any playback gateway", async () => {
   const context = createTestContext({ SIGN_SECRET: "" });
