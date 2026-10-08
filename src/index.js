@@ -410,8 +410,9 @@ async function tikTokPreflight(request, env) {
       author_url: preview.author_url,
       description: preview.description,
       thumbnail_url: preview.thumbnail_url,
-      official_embed: true,
-      standard_embed: true,
+      preview_card: true,
+      client_embed: false,
+      open_url: share,
       cached: preview.cache_source !== "gateway",
       cache_source: preview.cache_source,
     }, 200, {
@@ -715,32 +716,27 @@ async function tikTokEmbedModel(request, env) {
   if (!share) throw new AppError(400, "Use a normal TikTok sharing link");
 
   const preview = await fetchTikTokPreview(env, share);
-  const embedUrl = `https://www.tiktok.com/player/v1/${encodeURIComponent(preview.video_id)}?autoplay=0&controls=1&loop=0&rel=0`;
   return json({
     ok: true,
-    schema_version: 3,
+    schema_version: 4,
     provider: "tiktok",
+    mode: "metadata-card",
     source_url: share,
     canonical_url: share,
+    open_url: share,
     video_id: preview.video_id,
     title: preview.title,
     caption: preview.caption,
     author_name: preview.author_name,
     author_url: preview.author_url,
     description: preview.description,
+    thumbnail_url: preview.thumbnail_url,
     poster_url: preview.video_id
       ? `/api/tiktok/cached-poster?id=${encodeURIComponent(preview.video_id)}`
       : null,
-    embed_url: embedUrl,
-    embed: {
-      kind: "official-iframe",
-      cite: share,
-      video_id: preview.video_id,
-      url: embedUrl,
-    },
     cache_source: preview.cache_source,
   }, 200, {
-    "Cache-Control": `public, max-age=${preview.cache_source.includes("stale") ? 30 : 300}`,
+    "Cache-Control": `public, max-age=${preview.cache_source.includes("stale") ? 30 : 86400}, stale-while-revalidate=3600`,
   });
 }
 
@@ -765,7 +761,7 @@ async function tikTokCachedPreviewBatch(request, env) {
       author_name: preview?.author_name || null,
       author_url: preview?.author_url || null,
       description: preview?.description || null,
-      thumbnail_url: null,
+      thumbnail_url: preview?.thumbnail_url || null,
       poster_url: videoId ? `/api/tiktok/cached-poster?id=${encodeURIComponent(videoId)}` : null,
       cache_source: preview ? "d1" : "missing",
     });
@@ -1015,7 +1011,7 @@ function securityHeaders(headers, html = false, scriptNonce = "") {
     const nonceSource = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
     headers.set(
       "Content-Security-Policy",
-      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.instagram.com/embed.js https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://www.tiktok.com https://*.tiktok.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
+      `default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; script-src 'self'${nonceSource} https://www.instagram.com/embed.js https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https: blob:; connect-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://www.facebook.com https://player.vimeo.com https://www.dailymotion.com https://player.twitch.tv https://clips.twitch.tv https://www.instagram.com; upgrade-insecure-requests`,
     );
   }
   return headers;
@@ -3087,7 +3083,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
-  ${video.provider === "tiktok" ? '<script src="/tiktok-embed.js?v=20261008-2" defer></script>' : ""}
+  ${video.provider === "tiktok" ? '<script src="/tiktok-preview-service.js?v=20261008-3" defer></script>' : ""}
   <script src="/watch.js?v=20261008-2" defer></script>
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261006-1">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-2" defer></script>
@@ -3224,7 +3220,7 @@ function renderMedia(video, playbackOrigin, viewer = false) {
     if (!tiktokId) return "";
     const preview = video.tiktok_preview || {};
     const previewTitle = cleanText(
-      watchDisplayTitle(video) || preview.description || preview.title,
+      preview.title || preview.caption || watchDisplayTitle(video),
       180,
       watchDisplayTitle(video),
     );
@@ -3233,24 +3229,29 @@ function renderMedia(video, playbackOrigin, viewer = false) {
       90,
       "TikTok creator",
     );
-    const poster = `/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`;
-    return `<div class="tiktok-oembed-player" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-source="${escapeHtml(video.source_url)}" data-tiktok-autoload="${viewer ? "1" : "0"}" data-tiktok-player-mode="oembed-gateway">
-      <img class="tiktok-oembed-poster" src="${escapeHtml(poster)}" alt="" loading="eager" decoding="async">
-      <div class="tiktok-oembed-overlay" aria-hidden="true"></div>
-      <div class="tiktok-oembed-copy">
-        <span class="tiktok-oembed-kicker">Cached TikTok preview</span>
-        <strong>${escapeHtml(previewTitle)}</strong>
-        <span class="tiktok-oembed-author">${escapeHtml(previewAuthor)}</span>
-        <small>Watch here with the official TikTok player.</small>
+    const previewDescription = cleanText(
+      preview.description,
+      260,
+      "Preview details are cached by Vid.Best. Open the original TikTok post to watch the video.",
+    );
+    const imageUrl = preview.thumbnail_url || `/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`;
+    return `<article class="tiktok-preview-card" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-source="${escapeHtml(video.source_url)}" data-tiktok-player-mode="metadata-card">
+      <button type="button" class="tiktok-preview-card-media" data-tiktok-show-preview aria-label="View TikTok preview details">
+        <img class="tiktok-preview-card-image" src="${escapeHtml(imageUrl)}" data-tiktok-fallback="/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}" alt="" loading="eager" decoding="async">
+        <span class="tiktok-preview-card-play" aria-hidden="true">↗</span>
+      </button>
+      <div class="tiktok-preview-card-body">
+        <span class="tiktok-preview-card-kicker">TikTok preview</span>
+        <strong data-tiktok-card-title>${escapeHtml(previewTitle)}</strong>
+        <span class="tiktok-preview-card-author" data-tiktok-card-author>${escapeHtml(previewAuthor)}</span>
+        <p data-tiktok-card-description>${escapeHtml(previewDescription)}</p>
+        <div class="tiktok-preview-card-actions">
+          <button type="button" class="button primary" data-tiktok-show-preview>View details</button>
+          <a class="button ghost" href="${escapeHtml(video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open on TikTok</a>
+        </div>
+        <p class="tiktok-preview-card-note">No TikTok player or embed script is loaded on Vid.Best.</p>
       </div>
-      <div class="tiktok-oembed-actions">
-        <button type="button" class="button primary tiktok-oembed-load" data-tiktok-load-embed>▶ Load TikTok player</button>
-        <button type="button" class="button ghost" data-tiktok-help-toggle aria-expanded="false">Connection help</button>
-      </div>
-      <div class="tiktok-connection-help" data-tiktok-help hidden><p>If TikTok does not respond, wait before retrying. Check another connection if available.</p><p>Android: Settings → Connections → More connection settings → Private DNS. Google Public DNS uses <code>dns.google</code>. Keep your previous setting so you can restore it.</p><p>DNS may help a connection problem; it cannot guarantee video availability. Vid.Best cannot change this setting for you.</p></div>
-      <button type="button" class="tiktok-oembed-back" data-tiktok-back-preview hidden>← Cached preview</button>
-      <div class="tiktok-oembed-status" data-tiktok-embed-status role="status"></div>
-    </div>`;
+    </article>`;
   }
   if (provider === "facebook") {
     const facebookEmbed = getSafeFacebookEmbedUrl(video);

@@ -24,7 +24,7 @@ const watchPlayerState = {
 document.addEventListener("DOMContentLoaded", initializeWatchPage);
 
 function initializeWatchPage() {
-  initializeTikTokOEmbedPlayer();
+  initializeTikTokPreviewCard();
   if (document.body.dataset.viewerEmbed === "1") {
     initializeHlsPlayback();
     repairNativePlayerControls();
@@ -53,83 +53,50 @@ function initializeWatchPage() {
 }
 
 
-function initializeTikTokOEmbedPlayer() {
-  const shell = document.querySelector(".tiktok-oembed-player");
+function initializeTikTokPreviewCard() {
+  const card = document.querySelector(".tiktok-preview-card");
   const api = window.VidBestTikTok;
-  if (!shell || !api || shell.dataset.vidbestOembedPlayer === "1") return;
-  shell.dataset.vidbestOembedPlayer = "1";
-  const share = api.parse(shell.dataset.tiktokSource);
-  const stage = shell.closest(".watch-player-stage");
-  const loadButton = shell.querySelector("[data-tiktok-load-embed]");
-  const backButton = shell.querySelector("[data-tiktok-back-preview]");
-  const status = shell.querySelector("[data-tiktok-embed-status]");
-  const help = shell.querySelector("[data-tiktok-help]");
-  let revision = 0, dispose = null, cooldown = 0, retryTimer;
-  function setStatus(message) { status.textContent = message; }
-  function reset() {
-    revision++;
-    dispose?.(); dispose = null;
-    window.clearTimeout(retryTimer);
-    shell.querySelector(".tiktok-standard-embed-host")?.remove();
-    shell.classList.remove("is-loading", "is-player-ready");
-    loadButton.disabled = false;
-    backButton.hidden = true;
-    stage?.dispatchEvent(new CustomEvent("vidbest:tiktok-reset"));
-  }
-  function failure(message, attempt) {
-    if (attempt !== revision) return;
-    reset();
-    cooldown = Date.now() + 10000;
-    loadButton.disabled = true; loadButton.textContent = "Please wait…";
-    setStatus(message);
-    const current = revision;
-    retryTimer = window.setTimeout(() => {
-      if (current !== revision) return;
-      loadButton.disabled = false; loadButton.textContent = "Retry TikTok player";
-    }, 10000);
-    stage?.dispatchEvent(new CustomEvent("vidbest:tiktok-error", { detail: { message } }));
-  }
-  async function loadEmbed() {
-    if (!share || Date.now() < cooldown || shell.classList.contains("is-loading")) return;
-    reset(); const attempt = revision;
-    shell.classList.add("is-loading");
-    loadButton.disabled = true; loadButton.textContent = "Loading TikTok…";
-    backButton.hidden = false;
-    setStatus("Loading video details…");
-    // Details are useful, but their availability must not gate a valid official player.
-    void api.getMetadata(share.url).catch(() => {});
-    if (attempt !== revision) return;
-    setStatus("Connecting to TikTok…");
-    const host = document.createElement("div"); host.className = "tiktok-standard-embed-host";
-    const frame = document.createElement("iframe");
-    frame.id = "watch-media-frame"; frame.className = "tiktok-official-player";
-    frame.title = document.querySelector("h1")?.textContent?.trim() || "TikTok video";
-    frame.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
-    frame.allowFullscreen = true; frame.referrerPolicy = "strict-origin-when-cross-origin";
-    dispose = api.observe(frame, {
-      ready() {
-        if (attempt !== revision) return;
-        shell.classList.remove("is-loading"); shell.classList.add("is-player-ready");
-        loadButton.disabled = false; loadButton.textContent = "Reload TikTok player";
-        setStatus("");
-        if (document.body.dataset.viewerEmbed !== "1" && !document.hidden) {
-          api.command(frame, "unMute"); api.command(frame, "play");
-        }
-        stage?.dispatchEvent(new CustomEvent("vidbest:tiktok-ready", { detail: { frame } }));
-      },
-      autoplay() { setStatus("Tap Play in the player to start."); },
-      error(message) { failure(message, attempt); },
+  if (!card || !api || card.dataset.vidbestPreviewCard === "1") return;
+  card.dataset.vidbestPreviewCard = "1";
+
+  const share = api.parse(card.dataset.tiktokSource);
+  if (!share) return;
+
+  const image = card.querySelector(".tiktok-preview-card-image");
+  const title = card.querySelector("[data-tiktok-card-title]");
+  const author = card.querySelector("[data-tiktok-card-author]");
+  const description = card.querySelector("[data-tiktok-card-description]");
+
+  if (image) {
+    image.addEventListener("error", () => {
+      const fallback = image.dataset.tiktokFallback || "";
+      if (fallback && image.src !== new URL(fallback, location.origin).href) image.src = fallback;
     });
-    frame.src = api.playerUrl(share.id);
-    host.append(frame); shell.append(host);
   }
-  loadButton.addEventListener("click", () => void loadEmbed());
-  backButton.addEventListener("click", () => { reset(); cooldown = 0; setStatus(""); loadButton.textContent = "▶ Load TikTok player"; });
-  shell.querySelector("[data-tiktok-help-toggle]")?.addEventListener("click", event => {
-    help.hidden = !help.hidden; event.currentTarget.setAttribute("aria-expanded", String(!help.hidden));
+
+  const seed = () => ({
+    title: title?.textContent?.trim() || document.querySelector("h1")?.textContent?.trim() || "TikTok video",
+    author: author?.textContent?.trim() || "",
+    description: description?.textContent?.trim() || "",
+    thumbnail: image?.src || "",
   });
-  window.addEventListener("pagehide", reset);
-  if (shell.dataset.tiktokAutoload === "1") void loadEmbed();
+
+  card.querySelectorAll("[data-tiktok-show-preview]").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      void api.showPreview(share.url, seed());
+    });
+  });
+
+  void api.getMetadata(share.url).then((payload) => {
+    if (!card.isConnected) return;
+    if (title && payload.title) title.textContent = payload.title;
+    if (author && payload.author_name) author.textContent = payload.author_name;
+    if (description && payload.description) description.textContent = payload.description;
+    if (image && payload.thumbnail_url) image.src = payload.thumbnail_url;
+  }).catch(() => {
+    // The server-rendered cached card remains fully usable if metadata refresh fails.
+  });
 }
 
 function initializeHlsPlayback() {

@@ -860,182 +860,202 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
   background: #000;
   overflow: hidden;
 }
-.watch-player[data-provider="tiktok"] .tiktok-official-player,
-.admin-tiktok-preview .tiktok-official-player {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  border: 0;
-  background: #000;
-}
 .watch-player[data-provider="tiktok"] .watch-player-stage {
   position: relative;
 }
 
-.tiktok-oembed-player {
-  position: relative;
+.tiktok-preview-card {
   width: 100%;
   height: 100%;
   min-height: inherit;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
   overflow: hidden;
+  border-radius: inherit;
   background: #0a0d1b;
   color: #fff;
-  isolation: isolate;
+  border: 1px solid rgba(255,255,255,.08);
+  box-sizing: border-box;
 }
 
-.tiktok-oembed-poster {
+.tiktok-preview-card-media {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background:
+    radial-gradient(circle at 70% 18%, rgba(37,244,238,.2), transparent 42%),
+    linear-gradient(145deg, #11152b, #242846 55%, #11131f);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.tiktok-preview-card-image {
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  object-fit: cover;
+  display: block;
+}
+
+.tiktok-preview-card-media::after {
+  content: "";
   position: absolute;
   inset: 0;
-  z-index: 1;
+  background: linear-gradient(180deg, rgba(0,0,0,.03) 35%, rgba(5,7,16,.72) 100%);
+  pointer-events: none;
+}
+
+.tiktok-preview-card-play {
+  position: absolute;
+  z-index: 2;
+  inset: 50% auto auto 50%;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.28);
+  background: rgba(7,9,20,.7);
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 800;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 16px 38px rgba(0,0,0,.35);
+}
+
+.tiktok-preview-card-body {
+  display: grid;
+  gap: 9px;
+  padding: 18px 20px 20px;
+  background: linear-gradient(180deg, rgba(10,13,27,.96), rgba(7,9,18,.99));
+}
+
+.tiktok-preview-card-kicker,
+.tiktok-preview-dialog-kicker {
+  color: #7ceaf0;
+  font-size: .68rem;
+  font-weight: 850;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.tiktok-preview-card-body strong {
+  font-size: clamp(1.2rem, 3vw, 1.85rem);
+  line-height: 1.08;
+  letter-spacing: -.02em;
+  overflow-wrap: anywhere;
+}
+
+.tiktok-preview-card-author {
+  color: #e3e7f5;
+  font-weight: 750;
+}
+
+.tiktok-preview-card-body p {
+  margin: 0;
+  color: #aab3cf;
+  line-height: 1.5;
+}
+
+.tiktok-preview-card-actions,
+.tiktok-preview-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  align-items: center;
+}
+
+.tiktok-preview-card-note {
+  font-size: .68rem;
+  color: #7782a4 !important;
+}
+
+.tiktok-preview-dialog {
+  width: min(92vw, 520px);
+  max-width: 520px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 22px;
+  background: #0b0e1c;
+  color: #fff;
+  box-shadow: 0 28px 90px rgba(0,0,0,.55);
+}
+
+.tiktok-preview-dialog::backdrop {
+  background: rgba(3,5,12,.78);
+  backdrop-filter: blur(5px);
+}
+
+.tiktok-preview-dialog-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(260px, 54vh) auto;
+  overflow: hidden;
+  border-radius: 22px;
+}
+
+.tiktok-preview-dialog-media {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 70% 18%, rgba(37,244,238,.22), transparent 42%),
+    linear-gradient(145deg, #11152b, #242846 55%, #11131f);
+}
+
+.tiktok-preview-dialog-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.tiktok-oembed-overlay {
+.tiktok-preview-dialog-placeholder {
   position: absolute;
   inset: 0;
-  z-index: 2;
-  background: linear-gradient(180deg, rgba(5,7,16,.12) 20%, rgba(5,7,16,.84) 75%, rgba(5,7,16,.97) 100%);
-}
-
-.tiktok-oembed-copy {
-  position: absolute;
-  z-index: 3;
-  left: 24px;
-  right: 24px;
-  bottom: 112px;
-  display: grid;
-  gap: 8px;
-  text-align: left;
-}
-
-.tiktok-oembed-kicker {
-  color: #7ceaf0;
-  font-size: .7rem;
-  font-weight: 850;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-}
-
-.tiktok-oembed-copy strong {
-  font-size: clamp(1.25rem, 3vw, 2rem);
-  line-height: 1.08;
-  letter-spacing: -.025em;
-  overflow-wrap: anywhere;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.tiktok-oembed-author {
-  color: #e3e7f5;
-  font-weight: 700;
-}
-
-.tiktok-oembed-copy small {
-  color: #aab3cf;
-}
-
-.tiktok-oembed-actions {
-  position: absolute;
-  z-index: 4;
-  left: 24px;
-  right: 24px;
-  bottom: 28px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
-}
-
-.tiktok-standard-embed-host {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
   display: grid;
   place-items: center;
-  overflow: hidden;
-  padding: 0;
-  box-sizing: border-box;
-  background: #000;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .16s ease;
+  color: rgba(255,255,255,.82);
+  font-size: 2.4rem;
+  font-weight: 850;
 }
 
-.tiktok-oembed-player.is-player-ready .tiktok-standard-embed-host {
-  opacity: 1;
-  pointer-events: auto;
+.tiktok-preview-dialog-copy {
+  display: grid;
+  gap: 10px;
+  padding: 18px 20px 20px;
 }
 
-.tiktok-oembed-player.is-player-ready .tiktok-oembed-poster,
-.tiktok-oembed-player.is-player-ready .tiktok-oembed-overlay,
-.tiktok-oembed-player.is-player-ready .tiktok-oembed-copy,
-.tiktok-oembed-player.is-player-ready .tiktok-oembed-actions {
-  visibility: hidden;
+.tiktok-preview-dialog-copy strong {
+  font-size: clamp(1.25rem, 4vw, 1.8rem);
+  line-height: 1.08;
 }
 
-.tiktok-standard-embed-host .tiktok-embed {
-  width: min(100%, 605px) !important;
-  min-width: min(325px, 100%) !important;
-  margin: 0 auto !important;
+.tiktok-preview-dialog-copy p {
+  margin: 0;
+  color: #aab3cf;
+  line-height: 1.5;
 }
 
-.tiktok-standard-embed-host iframe {
-  display: block;
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  min-height: 0;
-  height: 100% !important;
-  border: 0;
-  background: #000;
-}
-
-.tiktok-oembed-back {
+.tiktok-preview-dialog-close {
   position: absolute;
-  z-index: 22;
+  z-index: 4;
   top: 12px;
-  left: 12px;
-  min-height: 34px;
-  padding: 6px 10px;
-  border: 1px solid rgba(255,255,255,.25);
-  border-radius: 999px;
-  background: rgba(7,9,18,.88);
+  right: 12px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(6,8,17,.78);
   color: #fff;
-  font-weight: 750;
+  font-size: 1.3rem;
   cursor: pointer;
+  backdrop-filter: blur(10px);
 }
 
-.tiktok-oembed-back[hidden] {
-  display: none !important;
-}
-
-.tiktok-oembed-player.is-loading .tiktok-oembed-load {
-  opacity: .7;
-}
-
-.tiktok-oembed-status {
-  position: absolute;
-  z-index: 23;
-  left: 24px;
-  right: 24px;
-  bottom: 6px;
-  min-height: 16px;
-  color: #bac4dd;
-  font-size: .68rem;
-}
-.tiktok-connection-help { position:absolute; z-index:24; inset:60px 16px 108px; overflow:auto; padding:18px; border:1px solid #56627e; border-radius:16px; background:#101729; font-size:14px; line-height:1.6; }
-.tiktok-connection-help[hidden] { display:none; }
-.tiktok-connection-help p { margin:0 0 12px; }
-.tiktok-oembed-player.is-player-ready .tiktok-connection-help { display:none; }
-
-.tiktok-oembed-status[data-tone="error"] {
-  color: #ffb7c7;
-}
 
 .watch-player[data-provider="tiktok"].is-mini {
   width: min(430px, calc(100vw - 36px));
@@ -1086,21 +1106,8 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
   max-width: none !important;
   border: 0 !important;
 }
-.tile-media .preview-surface .tiktok-embed {
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
 .video-tile[data-video-provider="tiktok"] .preview-surface {
   z-index: 4;
-}
-.video-tile[data-video-provider="tiktok"].tiktok-player-active .preview-surface {
-  pointer-events: auto;
-}
-.video-tile[data-video-provider="tiktok"].tiktok-player-active .preview-surface iframe {
-  pointer-events: auto;
 }
 .video-tile[data-video-provider="tiktok"].preview-playing .play-orb,
 .video-tile[data-video-provider="tiktok"].preview-playing .media-fallback,

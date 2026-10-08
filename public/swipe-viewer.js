@@ -114,7 +114,7 @@
         frame.addEventListener("load", () => {
           if (card.frame !== frame) return;
           command(card);
-          if (!warmProviders.has(card.video.provider) && card.video.provider !== "tiktok") { card.ready = true; card.controllable = false; }
+          if (!warmProviders.has(card.video.provider)) { card.ready = true; card.controllable = false; }
           if (desired(card)) { scheduleCount(card); updateHint(card); }
           updatePreparation();
         });
@@ -130,7 +130,11 @@
     return card.loading;
   }
   function updateHint(card) {
-    card.el.querySelector(".swipe-play-hint").textContent = card.controllable ? "Tap to play · Swipe for next" : "Tap for player controls · Swipe for next";
+    card.el.querySelector(".swipe-play-hint").textContent = card.controllable
+      ? "Tap to play · Swipe for next"
+      : card.video.provider === "tiktok"
+        ? "Tap preview details · Swipe for next"
+        : "Tap for player controls · Swipe for next";
     card.el.querySelector(".swipe-player-actions [data-play]").disabled = !card.controllable;
     card.el.querySelector("[data-sound]").disabled = !card.controllable;
     card.el.querySelector(".swipe-timeline").hidden = !card.controllable;
@@ -332,7 +336,6 @@
     const data = event.data;
     if (data.type === "bridge") { card.bridge = true; command(card); }
     if (data.type === "ready") {
-      if (card.video.provider === "tiktok") delete card.el.dataset.feedback;
       card.ready = true; card.controllable = data.controllable === true; updateHint(card); command(card);
       if (desired(card)) scheduleCount(card); updatePreparation();
     }
@@ -347,7 +350,6 @@
     if (data.type === "blocked" && desired(card)) message(card, "Tap Play to start · Swipe up for next");
     if (data.type === "error") {
       card.el.dataset.feedback = "1"; message(card, data.message);
-      if (card.video.provider === "tiktok") { card.ready = false; card.el.classList.add("is-interactive"); }
     }
     if (data.type === "ended" && desired(card)) void move(1);
   });
