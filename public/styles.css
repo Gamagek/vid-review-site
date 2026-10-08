@@ -924,6 +924,11 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
   font-size: clamp(1.25rem, 3vw, 2rem);
   line-height: 1.08;
   letter-spacing: -.025em;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .tiktok-oembed-author {
@@ -952,16 +957,18 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
   z-index: 10;
   display: grid;
   place-items: center;
-  overflow: auto;
-  padding: 8px;
+  overflow: hidden;
+  padding: 0;
   box-sizing: border-box;
   background: #000;
   opacity: 0;
+  pointer-events: none;
   transition: opacity .16s ease;
 }
 
 .tiktok-oembed-player.is-player-ready .tiktok-standard-embed-host {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .tiktok-oembed-player.is-player-ready .tiktok-oembed-poster,
@@ -980,9 +987,10 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
 .tiktok-standard-embed-host iframe {
   display: block;
   width: 100% !important;
-  max-width: 605px !important;
+  max-width: 100% !important;
   min-width: 0 !important;
-  min-height: 578px;
+  min-height: 0;
+  height: 100% !important;
   border: 0;
   background: #000;
 }
@@ -1012,7 +1020,7 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
 
 .tiktok-oembed-status {
   position: absolute;
-  z-index: 5;
+  z-index: 23;
   left: 24px;
   right: 24px;
   bottom: 6px;
@@ -1020,6 +1028,10 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
   color: #bac4dd;
   font-size: .68rem;
 }
+.tiktok-connection-help { position:absolute; z-index:24; inset:60px 16px 108px; overflow:auto; padding:18px; border:1px solid #56627e; border-radius:16px; background:#101729; font-size:14px; line-height:1.6; }
+.tiktok-connection-help[hidden] { display:none; }
+.tiktok-connection-help p { margin:0 0 12px; }
+.tiktok-oembed-player.is-player-ready .tiktok-connection-help { display:none; }
 
 .tiktok-oembed-status[data-tone="error"] {
   color: #ffb7c7;

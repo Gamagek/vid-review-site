@@ -413,7 +413,7 @@ test("TikTok watch pages keep cached oEmbed metadata and use the standard embed 
   assert.match(html, /class="tiktok-oembed-player"/);
   assert.match(html, /data-tiktok-player-mode="oembed-gateway"/);
   assert.match(html, /data-tiktok-autoload="0"/);
-  assert.match(html, /Cached preview description/);
+  assert.match(html, /Gateway TikTok test/);
   assert.ok(html.includes("/api/tiktok/cached-poster?id=7552567024304540959"));
   assert.doesNotMatch(html, /www\.tiktok\.com\/player\/v1/);
   assert.doesNotMatch(html, /video\.megasale\.win/);
@@ -471,7 +471,9 @@ test("resolves a Facebook share URL into the official plugin player", async () =
   }
 });
 
-test("renders Facebook Reel records through the official responsive plugin URL", async () => {
+test("renders Facebook Reel records through the official responsive plugin URL", async (t) => {
+  // Rendering assertions must not depend on a live provider's network availability.
+  t.mock.method(globalThis, "fetch", async () => new Response("", { status: 503 }));
   const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
@@ -909,7 +911,7 @@ test("accepts nested TikTok oEmbed payloads from the Cloudflare gateway", async 
     assert.equal(payload.ok, true);
     assert.equal(payload.video_id, "7552567024304540959");
     assert.equal(payload.title, "Nested gateway payload");
-    assert.equal(payload.embed_url, "https://www.tiktok.com/embed/v2/7552567024304540959");
+    assert.equal(payload.embed_url, "https://www.tiktok.com/player/v1/7552567024304540959?autoplay=0&controls=1&loop=0&rel=0");
     assert.equal(new URL(calls[0]).searchParams.get("url"), share);
   } finally {
     globalThis.fetch = originalFetch;
@@ -1698,7 +1700,9 @@ test("enriches Facebook share links with a Microlink-style thumbnail and officia
   }
 });
 
-test("renders existing Facebook share and Reel URLs with the official video plugin", async () => {
+test("renders existing Facebook share and Reel URLs with the official video plugin", async (t) => {
+  // This rendering regression does not require a live Facebook server.
+  t.mock.method(globalThis, "fetch", async () => new Response("", { status: 503 }));
   const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
@@ -1756,11 +1760,9 @@ test("admin requires rights certification for cached video copies", () => {
 test("TikTok admin preview uses the gateway model and official iframe without embed.js", () => {
   const adminSource = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
   assert.match(adminSource, /renderTikTokPreview/);
-  assert.match(adminSource, /new URL\("\/api\/tiktok\/embed", location\.origin\)/);
-  assert.match(adminSource, /endpoint\.searchParams\.set\("url", parsed\.url\)/);
+  assert.match(adminSource, /VidBestTikTok\.getMetadata/);
   assert.match(adminSource, /safeAdminTikTokEmbedUrl/);
   assert.match(adminSource, /payload\?\.embed_url/);
-  assert.match(adminSource, /cache: "no-store"/);
   assert.match(adminSource, /className = "tiktok-official-player"/);
   assert.doesNotMatch(adminSource, /ensureTikTokAdminEmbedScript/);
   assert.doesNotMatch(adminSource, /www\.tiktok\.com\/embed\.js/);
@@ -1796,25 +1798,12 @@ test("renders the current Vid.Best TikTok oEmbed architecture with cached previe
   const watchSource = readFileSync(new URL("../public/watch.js", import.meta.url), "utf8");
   assert.match(watchSource, /initializeTikTokOEmbedPlayer/);
   assert.match(watchSource, /data-tiktok-load-embed/);
-  assert.match(watchSource, /new URL\("\/api\/tiktok\/embed", location\.origin\)/);
-  assert.match(watchSource, /endpoint\.searchParams\.set\("url", shareUrl\)/);
-  assert.match(watchSource, /createTikTokEmbedFrame/);
-  assert.match(watchSource, /safeTikTokEmbedUrl/);
-  assert.match(watchSource, /payload\?\.embed_url/);
-  assert.match(watchSource, /https:\/\/www\.tiktok\.com\/embed\/v2\/\$\{id\}/);
-  assert.match(watchSource, /cache: "no-store"/);
   assert.doesNotMatch(watchSource, /www\.tiktok\.com\/embed\.js/);
   assert.doesNotMatch(watchSource, /v7-gateway/);
 
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /renderTikTokFacade/);
   assert.match(homeSource, /activateTikTokPlayer/);
-  assert.match(homeSource, /new URL\("\/api\/tiktok\/embed", location\.origin\)/);
-  assert.match(homeSource, /endpoint\.searchParams\.set\("url", share\.url\)/);
-  assert.match(homeSource, /createTikTokInlineFrame/);
-  assert.match(homeSource, /safeTikTokInlineEmbedUrl/);
-  assert.match(homeSource, /payload\?\.embed_url/);
-  assert.match(homeSource, /cache: "no-store"/);
   assert.doesNotMatch(homeSource, /www\.tiktok\.com\/embed\.js/);
   assert.doesNotMatch(homeSource, /buildTikTokGatewayWatchUrl/);
   assert.doesNotMatch(homeSource, /\/watch\?user=/);
@@ -1866,11 +1855,8 @@ test("TikTok home cards defer standard embed creation until click and keep one a
   const homeSource = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
   assert.match(homeSource, /media\.addEventListener\("click"/);
   assert.match(homeSource, /event\.preventDefault\(\);[\s\S]*?activateTikTokPlayer\(card\)/);
-  assert.match(homeSource, /if \(previewState\.activeCard === card\) return;/);
+  assert.match(homeSource, /previewState\.activeCard === card/);
   assert.match(homeSource, /stopPreview\(\)/);
-  assert.match(homeSource, /createTikTokInlineFrame/);
-  assert.match(homeSource, /new URL\("\/api\/tiktok\/embed", location\.origin\)/);
-  assert.match(homeSource, /endpoint\.searchParams\.set\("url", share\.url\)/);
   assert.match(homeSource, /previewState\.activeCard = card/);
   assert.match(homeSource, /tiktok-player-ready/);
   assert.match(homeSource, /activeTikTokIsFullscreen/);
@@ -1892,16 +1878,16 @@ test("TikTok embed model is same-origin, gateway-backed, and does not expose raw
   try {
     const response = await send(context, "/api/tiktok/embed?url=" + encodeURIComponent(share));
     assert.equal(response.status, 200);
-    assert.match(response.headers.get("Cache-Control"), /max-age=86400/);
+    assert.match(response.headers.get("Cache-Control"), /max-age=300/);
     const payload = await response.json();
     assert.equal(payload.ok, true);
     assert.equal(payload.source_url, share);
     assert.equal(payload.canonical_url, share);
     assert.equal(payload.video_id, "7552567024304540959");
-    assert.equal(payload.schema_version, 2);
-    assert.equal(payload.embed_url, "https://www.tiktok.com/embed/v2/7552567024304540959");
+    assert.equal(payload.schema_version, 3);
+    assert.equal(payload.embed_url, "https://www.tiktok.com/player/v1/7552567024304540959?autoplay=0&controls=1&loop=0&rel=0");
     assert.equal(payload.embed.kind, "official-iframe");
-    assert.equal(payload.embed.url, "https://www.tiktok.com/embed/v2/7552567024304540959");
+    assert.equal(payload.embed.url, "https://www.tiktok.com/player/v1/7552567024304540959?autoplay=0&controls=1&loop=0&rel=0");
     assert.equal("html" in payload, false);
     assert.equal(JSON.stringify(payload).includes("untrusted"), false);
   } finally {
@@ -2125,4 +2111,77 @@ test("swipe views count on Vid.Best, deduplicate visits, and reject cross-origin
   context.sqlite.exec('UPDATE videos SET published = 0 WHERE id = 1');
   assert.equal((await send(context, '/api/videos/1/view', { method: 'POST', headers })).status, 404);
   assert.equal(context.sqlite.prepare('SELECT views FROM videos WHERE id = 1').get().views, 1);
+});
+
+test("concurrent TikTok cache misses make one gateway call and retain canonical source", async () => {
+  const context = createTestContext(), original = globalThis.fetch;
+  let calls = 0, finish;
+  const share = 'https://www.tiktok.com/@creator/video/6718335390845095173';
+  globalThis.fetch = async url => { calls++; assert.equal(new URL(url).searchParams.get('url'), share); await new Promise(r => { finish = r; }); return Response.json({ type:'video', title:'Cached' }); };
+  try {
+    const jobs = Array.from({length:20}, () => send(context, '/api/tiktok/embed?url=' + encodeURIComponent(share+'?x=1&y=2')));
+    await new Promise(setImmediate); assert.equal(calls,1); finish();
+    const responses = await Promise.all(jobs); assert.ok(responses.every(r=>r.status===200));
+  } finally { globalThis.fetch = original; }
+});
+test("TikTok gateway cooldown survives repeated requests without extending and serves bounded stale data", async () => {
+  const context=createTestContext(), original=globalThis.fetch;
+  const share='https://www.tiktok.com/@creator/video/6718335390845095173'; let calls=0;
+  context.sqlite.prepare('INSERT INTO tiktok_oembed_cache (video_id,share_url,title,fetched_at) VALUES (?,?,?,?)')
+    .run('6718335390845095173',share,'Saved preview',new Date(Date.now()-2*86400000).toISOString());
+  globalThis.fetch=async()=>{calls++;return new Response('Overload-protect triggered',{status:429,headers:{'Retry-After':'120'}});};
+  try {
+    const first=await send(context,'/api/tiktok/embed?url='+encodeURIComponent(share));
+    assert.equal(first.status,200);assert.equal((await first.json()).cache_source,'d1-stale');
+    const deadline=context.sqlite.prepare("SELECT setting_value FROM app_settings WHERE setting_key='tiktok_metadata_cooldown'").get().setting_value;
+    const second=await send(context,'/api/tiktok/embed?url='+encodeURIComponent(share.replace('6718335390845095173','7552567024304540959')));
+    assert.equal(second.status,503);assert.ok(Number(second.headers.get('Retry-After'))>0);assert.equal(calls,1);
+    assert.equal(context.sqlite.prepare("SELECT setting_value FROM app_settings WHERE setting_key='tiktok_metadata_cooldown'").get().setting_value,deadline);
+  } finally {globalThis.fetch=original;}
+});
+test("gateway stale data keeps its age in D1 rather than becoming freshly cached", async()=>{
+ const context=createTestContext(),original=globalThis.fetch;
+ const date=new Date(Date.now()-2*86400000).toISOString();
+ globalThis.fetch=async()=>Response.json({type:'video',title:'Old title',stale:true,fetched_at:date});
+ try {
+  const r=await send(context,'/api/tiktok/embed?url='+encodeURIComponent('https://www.tiktok.com/@creator/video/6718335390845095173'));
+  assert.equal(r.status,200);assert.equal((await r.json()).cache_source,'gateway-stale');
+  assert.equal(context.sqlite.prepare('SELECT fetched_at FROM tiktok_oembed_cache').get().fetched_at,date);
+ } finally {globalThis.fetch=original;}
+});
+
+test('TikTok removals invalidate D1 metadata before a later outage', async t => {
+  const context = createTestContext();
+  const share = 'https://www.tiktok.com/@creator/video/6718335390845095173';
+  context.sqlite.prepare('INSERT INTO tiktok_oembed_cache(video_id,share_url,title,fetched_at) VALUES(?,?,?,?)')
+    .run('6718335390845095173', share, 'Removed video', new Date(Date.now() - 2 * 86400000).toISOString());
+  t.mock.method(globalThis, 'fetch', async () => new Response('', {status:404}));
+  const endpoint = '/api/tiktok/embed?url=' + encodeURIComponent(share);
+  assert.notEqual((await send(context, endpoint)).status, 200);
+  assert.equal(context.sqlite.prepare('SELECT COUNT(*) AS n FROM tiktok_oembed_cache').get().n, 0);
+  t.mock.method(globalThis, 'fetch', async () => new Response('', {status:503}));
+  assert.notEqual((await send(context, endpoint)).status, 200);
+});
+
+test('TikTok edge hits preserve stale status and reject metadata older than seven days', async t => {
+  const context = createTestContext();
+  const share = 'https://www.tiktok.com/@creator/video/6718335390845095173';
+  const oldCaches = globalThis.caches;
+  let age = 2;
+  globalThis.caches = {default:{
+    match: async () => Response.json({video_id:'6718335390845095173',title:'Old preview',fetched_at:new Date(Date.now()-age*86400000).toISOString()}),
+    put: async () => {},
+  }};
+  t.mock.method(globalThis, 'fetch', async () => new Response('', {status:503}));
+  try {
+    const endpoint = '/api/tiktok/embed?url=' + encodeURIComponent(share);
+    const response = await send(context, endpoint);
+    assert.equal((await response.json()).cache_source, 'edge-stale');
+    assert.match(response.headers.get('Cache-Control'), /max-age=30/);
+    age = 8;
+    assert.equal((await send(context, endpoint)).status, 503);
+  } finally {
+    if (oldCaches === undefined) delete globalThis.caches;
+    else globalThis.caches = oldCaches;
+  }
 });

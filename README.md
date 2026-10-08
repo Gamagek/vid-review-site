@@ -45,7 +45,9 @@ TikTok metadata requests are centralized in `src/index.js`. The configured Worke
 
 `TIKTOK_OEMBED_GATEWAY=https://tiktok-oembed-gateway.gkasunc.workers.dev/`
 
-The public browser never calls that gateway directly. Browser code calls Vid.Best's same-origin endpoints such as `/api/tiktok/embed`, while the Worker handles the upstream gateway request. Normalized oEmbed metadata is cached in D1 and Cloudflare Cache API for 24 hours. Raw upstream HTML is not returned to the frontend; the frontend builds the minimal official TikTok blockquote from the validated canonical URL and video ID.
+The public browser calls Vid.Best's same-origin `/api/tiktok/embed` endpoint. The Worker requests the gateway with a validated full HTTPS sharing URL using `URLSearchParams`. Normalized metadata is fresh for 24 hours in D1 and Cloudflare Cache API; stale metadata is retained for at most seven days without resetting its original age. Concurrent requests for the same ID share one request. A persistent D1 cooldown honors upstream `Retry-After`; removed videos do not use stale metadata. The shared browser client adds a five-minute session cache, request coalescing and failure cooldowns.
+
+The gateway repository `Gamagek/tiktok-oembed-gateway` adds a global Durable Object cache, bounded upstream concurrency and persisted refresh limits/cooldowns. Deploy its `OEMBED_CACHE` binding and SQLite migration with the supplied `wrangler.toml`. Edge caches alone are local to each Cloudflare location and cannot coordinate global request bursts. Neither cache stores video bytes.
 
 ### Video SEO correctness
 
@@ -70,7 +72,9 @@ this wrapper. Its own embed may send viewers to Instagram to watch; iframe load
 is not treated as proof of playback. Generic playback and Audio Lab controls are
 excluded from Instagram pages. Other providers keep their existing player paths.
 
-TikTok now uses a metadata-first oEmbed architecture. Vid.Best never calls TikTok's oEmbed endpoint directly: the Worker fetches metadata through `https://tiktok-oembed-gateway.gkasunc.workers.dev/?url=...`, validates the JSON response, stores normalized metadata in D1 for 24 hours, and also uses the Cloudflare Cache API for a 24-hour edge cache. Watch pages and homepage cards render a same-origin cached preview first. On user action, Vid.Best requests a same-origin `/api/tiktok/embed` model and mounts TikTok's standard embed markup/script. If the oEmbed gateway is temporarily unavailable, stale D1 metadata remains the fallback. The old signed Portainer player gateway, direct `player/v1` construction, and TikTok-specific R2 player scripts have been removed.
+TikTok watch pages and homepage cards start with a cached preview. `public/tiktok-embed.js` supplies URL validation, metadata caching and the documented official `https://www.tiktok.com/player/v1/ID` player. It does not inject upstream HTML or load `embed.js`, so repeated script parsing cannot create duplicate players. Only an explicit click or the active swipe card mounts a player; adjacent TikTok cards are not preloaded. Metadata failures do not prevent trying a valid official player URL.
+
+An iframe `load` event is not playback readiness: 429 and access-denied pages also fire it. The UI waits for a source/origin-validated `onPlayerReady` message, returns to a usable preview after an eight-second readiness timeout or player error, and never automatically retries. A ready player waiting for Play is healthy. Autoplay denial (`3002`) leaves a working player available for a user tap. Swipe controls use the official messaging API and teardown removes inactive frames/listeners. The provider iframe still connects directly to TikTok; successful cached metadata cannot guarantee playback on a restricted network. Connection help is informational and changes no browser/device settings. Other providers retain their existing player paths.
 
 Self-hosted/raw video uses the browser's native player plus Vid.Best controls for play/pause, 10-second rewind/forward, playback speed, zoom, fullscreen and picture-in-picture when the browser supports it. Other trusted provider links keep their existing provider-owned embed paths for YouTube, Vimeo, Dailymotion, Twitch, Instagram and Facebook. Arbitrary iframe HTML is never accepted.
 
