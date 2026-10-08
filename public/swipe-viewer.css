@@ -112,3 +112,13 @@ body[data-viewer-embed="1"] .watch-player-stage { background:#000!important; }
     overflow-y: auto;
   }
 }
+
+/* The active signed TikTok gateway iframe is sized like the Saiyaara media
+   frame, with its own controls reachable (no transparent gesture shield). */
+.swipe-card.is-tiktok-gateway .swipe-media { min-width: 0; overflow: hidden; display: flex; justify-content: center; }
+.swipe-card.is-tiktok-gateway .swipe-frame-host { min-width:0; width:min(100%,540px); height:100%; overflow:hidden; margin-inline:auto; }
+.swipe-card.is-tiktok-gateway .swipe-frame-host > iframe.swipe-tiktok-gateway { display:block; width:100%!important; height:100%!important; min-width:0!important; max-width:100%!important; border:0!important; background:#090b16; }
+.swipe-card.is-tiktok-gateway .swipe-gesture { display:none!important; }
+.swipe-card.is-tiktok-gateway .swipe-player-actions [data-play],
+.swipe-card.is-tiktok-gateway .swipe-player-actions [data-sound] { display:none!important; }
+.swipe-card.is-tiktok-gateway .swipe-status { white-space:normal; overflow-wrap:anywhere; }
