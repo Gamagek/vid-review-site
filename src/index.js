@@ -3238,18 +3238,15 @@ function renderMedia(video, playbackOrigin, viewer = false) {
       <img class="tiktok-oembed-poster" src="${escapeHtml(poster)}" alt="" loading="eager" decoding="async">
       <div class="tiktok-oembed-overlay" aria-hidden="true"></div>
       <div class="tiktok-oembed-copy">
-        <span class="tiktok-oembed-kicker">Cached TikTok preview</span>
-        <strong>${escapeHtml(previewTitle)}</strong>
-        <span class="tiktok-oembed-author">${escapeHtml(previewAuthor)}</span>
-        <small>Watch here with the official TikTok player.</small>
+        <span class="tiktok-oembed-kicker">TikTok video preview</span>
+        <strong data-tiktok-title>${escapeHtml(previewTitle)}</strong>
+        <span class="tiktok-oembed-author" data-tiktok-author>${escapeHtml(previewAuthor)}</span>
+        <small>Video preview details are cached by Vid.Best.</small>
       </div>
       <div class="tiktok-oembed-actions">
-        <button type="button" class="button primary tiktok-oembed-load" data-tiktok-load-embed>▶ Load TikTok player</button>
-        <button type="button" class="button ghost" data-tiktok-help-toggle aria-expanded="false">Connection help</button>
+        <a class="button primary tiktok-oembed-load" data-tiktok-open href="${escapeHtml(video.source_url)}" target="_blank" rel="noopener noreferrer">▶ Open on TikTok</a>
       </div>
-      <div class="tiktok-connection-help" data-tiktok-help hidden><p>If TikTok does not respond, wait before retrying. Check another connection if available.</p><p>Android: Settings → Connections → More connection settings → Private DNS. Google Public DNS uses <code>dns.google</code>. Keep your previous setting so you can restore it.</p><p>DNS may help a connection problem; it cannot guarantee video availability. Vid.Best cannot change this setting for you.</p></div>
-      <button type="button" class="tiktok-oembed-back" data-tiktok-back-preview hidden>← Cached preview</button>
-      <div class="tiktok-oembed-status" data-tiktok-embed-status role="status"></div>
+      <div class="tiktok-oembed-status" data-tiktok-embed-status role="status">Open the original video on TikTok to watch.</div>
     </div>`;
   }
   if (provider === "facebook") {
