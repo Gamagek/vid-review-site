@@ -49,6 +49,12 @@ The public browser calls Vid.Best's same-origin `/api/tiktok/embed` endpoint. Th
 
 The gateway repository `Gamagek/tiktok-oembed-gateway` adds a global Durable Object cache, bounded upstream concurrency and persisted refresh limits/cooldowns. Deploy its `OEMBED_CACHE` binding and SQLite migration with the supplied `wrangler.toml`. Edge caches alone are local to each Cloudflare location and cannot coordinate global request bursts. Neither cache stores video bytes.
 
+### Saiyaara Tagembed experiment (owner-provided embed)
+
+Only the permanent `/watch/saiyaara-a-cinematic-romance` page and its corresponding homepage mini tile use the supplied Tagembed widget (`data-widget-id="2236794"`, `data-post-id="5592899"`, `data-caption="1"`, `data-header="1"`). The main watch stage renders the widget container immediately; the widget script `https://widget.tagembed.com/embed.min.js` loads once after the DOM is ready. On the homepage, only the Saiyaara mini tile initializes when it comes within about 300px of view, keeping other TikTok cards on the existing metadata/Player v1 path and avoiding page-wide widget requests. The main player remains inside the existing persistent mini/theater controls, while the homepage mini tile remains interactive rather than navigating to TikTok.
+
+The external script and its frame/connect requests are permitted by the narrowly scoped Tagembed CSP host allowlist. Loading the JavaScript is *not* evidence that TikTok media is playable; the vendor may show a feed, request consent, delay playback, or return access errors. The supplied Tagembed widget/post IDs have not been independently verified to contain the intended video. Embedded playback timing is determined by Tagembed, the original provider, and the visitor's connection; instant autoplay is not guaranteed. The swipe viewer's offscreen preparation stays metadata-only and does not mount extra Tagembed widgets.
+
 ### Video SEO correctness
 
 The watch page includes canonical, Open Graph and X/Twitter metadata. `VideoObject` JSON-LD is emitted conservatively:
