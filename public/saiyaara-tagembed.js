@@ -46,6 +46,36 @@
 
   function prepareHost(host, mode) {
     host.classList.add("saiyaara-tagembed-host", "saiyaara-tagembed-" + mode);
+    // Mini tiles have only ~230px of vertical room for a tall social post.
+    // Show a correctly fitted poster until the visitor reveals the embedded
+    // player. A tap provides a genuine gesture, but cross-origin sound still
+    // depends on the browser/provider controls.
+    if (mode === "tile" && !host.querySelector(".saiyaara-preview-cover")) {
+      const cover = document.createElement("button");
+      cover.type = "button";
+      cover.className = "saiyaara-preview-cover";
+      cover.setAttribute("aria-label", "Show Saiyaara video player and sound controls");
+      if (host.dataset.saiyaaraPoster) {
+        const img = document.createElement("img");
+        img.className = "saiyaara-tile-cover-poster";
+        img.src = host.dataset.saiyaaraPoster;
+        img.alt = "";
+        img.loading = "lazy";
+        cover.append(img);
+      }
+      const icon = document.createElement("span");
+      icon.textContent = "▶";
+      icon.setAttribute("aria-hidden", "true");
+      cover.append(icon);
+      cover.addEventListener("click", () => {
+        cover.hidden = true;
+        const iframe = host.querySelector(".saiyaara-tagembed-frame");
+        // Browsers do not expose a third-party video's audio controls to us.
+        // The visitor can now tap the embedded player's controls directly.
+        iframe?.focus();
+      });
+      host.append(cover);
+    }
     if (!host.querySelector(".saiyaara-tagembed-poster") && host.dataset.saiyaaraPoster) {
       const poster = document.createElement("img");
       poster.className = "saiyaara-tagembed-poster";

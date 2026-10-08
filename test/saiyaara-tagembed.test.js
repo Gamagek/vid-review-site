@@ -57,6 +57,8 @@ test("Saiyaara mini tile creates iframe only when it approaches viewport", () =>
       return {
         dataset: {}, className: "", textContent: "", hidden: false,
         setAttribute() {},
+        append() {},
+        addEventListener() {},
       };
     },
   };
@@ -84,4 +86,29 @@ test("Saiyaara mini tile creates iframe only when it approaches viewport", () =>
   assert.equal(iframe.src, api.iframeUrl);
   api.mount(host, "tile");
   assert.equal(createCount, 1, "repeated tile setup should not add another iframe");
+});
+
+
+test("all three Saiyaara viewing surfaces use contained, touch-accessible embeds", () => {
+  const viewer = readFileSync(new URL("../public/swipe-viewer.js", import.meta.url), "utf8");
+  const viewerCss = readFileSync(new URL("../public/swipe-viewer.css", import.meta.url), "utf8");
+  assert.match(viewer, /SAIYAARA_SLUG = "saiyaara-a-cinematic-romance"/);
+  assert.match(viewer, /SAIYAARA_TAGEMBED_URL/);
+  assert.match(viewer, /if \(!desired\(card\)\) return/);
+  assert.match(viewer, /card\.el\.classList\.add\("is-interactive", "is-saiyaara-widget"\)/);
+  assert.match(viewer, /iframe\.src = SAIYAARA_TAGEMBED_URL/);
+  assert.match(viewer, /card\.el\.classList\.remove\("is-playing", "is-interactive", "is-saiyaara-widget"\)/);
+  assert.match(viewerCss, /\.swipe-card\.is-saiyaara-widget \.swipe-gesture \{ display: none !important; \}/);
+  assert.match(viewerCss, /\.swipe-card\.is-saiyaara-widget \.swipe-frame-host > iframe\.swipe-saiyaara-tagembed/);
+  assert.match(styles, /#watch-player\[data-saiyaara-player="1"\]\.is-mini \.watch-player-stage/);
+  assert.match(styles, /#watch-player\[data-saiyaara-player="1"\]\.is-theater \.watch-player-stage/);
+});
+
+test("homepage mini tile holds a poster until tapped without claiming auto sound", () => {
+  assert.match(loader, /saiyaara-preview-cover/);
+  assert.match(loader, /Show Saiyaara video player and sound controls/);
+  assert.match(loader, /cover\.addEventListener\("click"/);
+  assert.match(loader, /cover\.hidden = true/);
+  assert.match(home, /const cover = card\.querySelector\("\.saiyaara-tile-cover-poster"\)/);
+  assert.match(styles, /\.saiyaara-preview-cover:focus-visible/);
 });

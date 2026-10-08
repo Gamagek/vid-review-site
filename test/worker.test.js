@@ -2099,6 +2099,9 @@ test("canonical Saiyaara renders direct iframe URL but swipe remains metadata-on
   assert.ok(csp.includes("frame-src") && csp.includes("https://*.tagembed.com"));
   const html = await page.text();
   assert.match(html, /saiyaara-tagembed-player/);
+  assert.ok(html.includes('data-saiyaara-player="1"'));
+  assert.ok(html.includes("/swipe-viewer.js?v=20261008-4"));
+  assert.ok(html.includes("/swipe-viewer.css?v=20261008-saiyaara-fit4"));
   assert.ok(html.includes('class="saiyaara-tagembed-frame"'));
   assert.ok(html.includes('src="https://widget.tagembed.com/2236794?postId=5592899&amp;caption=1&amp;header=1"'));
   assert.ok(html.includes('allow="autoplay; fullscreen; picture-in-picture; encrypted-media"'));

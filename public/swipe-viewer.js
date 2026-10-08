@@ -13,6 +13,12 @@
   };
   const queue = [first], cards = [], pages = new Map(), counted = new Set([first.id]), counting = new Set();
   const warmProviders = new Set(["youtube", "vimeo", "raw", "r2", "hls"]);
+  // Keep the owner-supplied Saiyaara widget on a single direct frame in each
+  // active context, rather than creating a TikTok popup inside the swipe viewer.
+  const SAIYAARA_SLUG = "saiyaara-a-cinematic-romance";
+  const SAIYAARA_TAGEMBED_URL = "https://widget.tagembed.com/2236794?postId=5592899&caption=1&header=1";
+  const isSaiyaara = (card) => card?.video?.provider === "tiktok" &&
+    card.video.slug === SAIYAARA_SLUG;
   const symbols = { like: "👍", love: "♥", useful: "💡" };
   let index = 0, opened = false, muted = false, focusReturn, overflow, suspension, savedInert = [];
   let timer, scrollTask = 0, suggesting = null, recommendationVersion = 0, catalogOffset = 0, catalogEnded = false;
@@ -84,7 +90,8 @@
   function destroyPlayer(card) {
     card.loadToken = null; card.host.replaceChildren(); card.frame = null; card.ready = false; card.bridge = false;
     card.loading = null; card.suspended = null; card.playing = false; card.actualMuted = true; card.soundBlocked = false;
-    card.seconds = 0; card.duration = 0; card.el.classList.remove("is-playing", "is-interactive");
+    card.seconds = 0; card.duration = 0;
+    card.el.classList.remove("is-playing", "is-interactive", "is-saiyaara-widget");
     card.el.querySelector("[data-controls]").setAttribute("aria-expanded", "false");
     card.el.querySelector(".swipe-mini-controls").hidden = true;
     card.el.querySelector("[data-original]").setAttribute("aria-pressed", "false");
@@ -92,6 +99,39 @@
   }
   async function prepareCard(card) {
     if (card.frame || card.loading || !opened) return;
+    if (isSaiyaara(card)) {
+      // A neighboring card must never pre-load a second provider iframe.
+      // The original watch-stage iframe is suspended by pauseOriginal().
+      if (!desired(card)) return;
+      const iframe = document.createElement("iframe");
+      iframe.title = "Saiyaara video on Tagembed";
+      iframe.className = "swipe-saiyaara-tagembed";
+      iframe.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
+      iframe.loading = "eager";
+      iframe.referrerPolicy = "strict-origin-when-cross-origin";
+      iframe.setAttribute("allowfullscreen", "");
+      card.frame = iframe;
+      card.ready = false;
+      card.controllable = false; // No supported remote play/mute protocol.
+      card.el.classList.add("is-interactive", "is-saiyaara-widget");
+      card.host.replaceChildren(iframe);
+      updateHint(card);
+      message(card, "Loading Tagembed · tap inside the video for playback and sound.");
+      iframe.addEventListener("load", () => {
+        if (card.frame !== iframe) return;
+        card.ready = true;
+        message(card, "Tap inside the embedded video to play or enable sound. Use ↑/↓ to change videos.");
+        if (desired(card)) scheduleCount(card);
+        updatePreparation();
+      }, { once: true });
+      iframe.addEventListener("error", () => {
+        if (card.frame !== iframe) return;
+        message(card, "Tagembed could not load. The source may not permit embedding on this connection.");
+      }, { once: true });
+      // Start just one request for the selected card; stop it on swipe/close.
+      iframe.src = SAIYAARA_TAGEMBED_URL;
+      return;
+    }
     const token = {}; card.loadToken = token;
     card.loading = (async () => {
       try {
@@ -130,7 +170,9 @@
     return card.loading;
   }
   function updateHint(card) {
-    card.el.querySelector(".swipe-play-hint").textContent = card.controllable
+    card.el.querySelector(".swipe-play-hint").textContent = isSaiyaara(card)
+      ? "Use Tagembed video controls · ↑/↓ for next"
+      : card.controllable
       ? "Tap to play · Swipe for next"
       : card.video.provider === "tiktok"
         ? "Tap preview details · Swipe for next"
@@ -279,9 +321,13 @@
     if (panel.hidden || !card.controllable) setOriginalControls(card, !panel.hidden && !card.controllable);
   }
   function setOriginalControls(card, interactive) {
-    card.el.classList.toggle("is-interactive", interactive);
-    card.el.querySelector("[data-original]").setAttribute("aria-pressed", String(interactive));
-    card.el.querySelector(".swipe-controls-help").textContent = interactive ? "Original controls enabled. Swipe on the details below for next." : "Swipe on the video for next. Original controls include captions and settings.";
+    // Always expose the Saiyaara frame; a full-screen transparent gesture
+    // button on top of it previously prevented direct video interaction.
+    card.el.classList.toggle("is-interactive", isSaiyaara(card) || interactive);
+    card.el.querySelector("[data-original]").setAttribute("aria-pressed", String(isSaiyaara(card) || interactive));
+    card.el.querySelector(".swipe-controls-help").textContent = isSaiyaara(card)
+      ? "Tap the embedded video to play or enable sound. Swipe using the review area or navigation arrows."
+      : interactive ? "Original controls enabled. Swipe on the details below for next." : "Swipe on the video for next. Original controls include captions and settings.";
   }
   viewer.addEventListener("click", async (event) => {
     const button = event.target.closest("button"); if (!button) return;
