@@ -59,79 +59,32 @@ function initializeTikTokOEmbedPlayer() {
   if (!shell || !api || shell.dataset.vidbestOembedPlayer === "1") return;
   shell.dataset.vidbestOembedPlayer = "1";
   const share = api.parse(shell.dataset.tiktokSource);
-  const stage = shell.closest(".watch-player-stage");
-  const loadButton = shell.querySelector("[data-tiktok-load-embed]");
-  const backButton = shell.querySelector("[data-tiktok-back-preview]");
+  const openLink = shell.querySelector("[data-tiktok-open]");
+  const poster = shell.querySelector(".tiktok-oembed-poster");
+  const title = shell.querySelector("[data-tiktok-title]");
+  const author = shell.querySelector("[data-tiktok-author]");
   const status = shell.querySelector("[data-tiktok-embed-status]");
-  const help = shell.querySelector("[data-tiktok-help]");
-  let revision = 0, dispose = null, cooldown = 0, retryTimer;
-  function setStatus(message) { status.textContent = message; }
-  function reset() {
-    revision++;
-    dispose?.(); dispose = null;
-    window.clearTimeout(retryTimer);
-    shell.querySelector(".tiktok-standard-embed-host")?.remove();
-    shell.classList.remove("is-loading", "is-player-ready");
-    loadButton.disabled = false;
-    backButton.hidden = true;
-    stage?.dispatchEvent(new CustomEvent("vidbest:tiktok-reset"));
-  }
-  function failure(message, attempt) {
-    if (attempt !== revision) return;
-    reset();
-    cooldown = Date.now() + 10000;
-    loadButton.disabled = true; loadButton.textContent = "Please wait…";
-    setStatus(message);
-    const current = revision;
-    retryTimer = window.setTimeout(() => {
-      if (current !== revision) return;
-      loadButton.disabled = false; loadButton.textContent = "Retry TikTok player";
-    }, 10000);
-    stage?.dispatchEvent(new CustomEvent("vidbest:tiktok-error", { detail: { message } }));
-  }
-  async function loadEmbed() {
-    if (!share || Date.now() < cooldown || shell.classList.contains("is-loading")) return;
-    reset(); const attempt = revision;
-    shell.classList.add("is-loading");
-    loadButton.disabled = true; loadButton.textContent = "Loading TikTok…";
-    backButton.hidden = false;
-    setStatus("Loading video details…");
-    // Details are useful, but their availability must not gate a valid official player.
-    void api.getMetadata(share.url).catch(() => {});
-    if (attempt !== revision) return;
-    setStatus("Connecting to TikTok…");
-    const host = document.createElement("div"); host.className = "tiktok-standard-embed-host";
-    const frame = document.createElement("iframe");
-    frame.id = "watch-media-frame"; frame.className = "tiktok-official-player";
-    frame.title = document.querySelector("h1")?.textContent?.trim() || "TikTok video";
-    frame.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
-    frame.allowFullscreen = true; frame.referrerPolicy = "strict-origin-when-cross-origin";
-    dispose = api.observe(frame, {
-      ready() {
-        if (attempt !== revision) return;
-        shell.classList.remove("is-loading"); shell.classList.add("is-player-ready");
-        loadButton.disabled = false; loadButton.textContent = "Reload TikTok player";
-        setStatus("");
-        if (document.body.dataset.viewerEmbed !== "1" && !document.hidden) {
-          api.command(frame, "unMute"); api.command(frame, "play");
-        }
-        stage?.dispatchEvent(new CustomEvent("vidbest:tiktok-ready", { detail: { frame } }));
-      },
-      autoplay() { setStatus("Tap Play in the player to start."); },
-      error(message) { failure(message, attempt); },
-    });
-    frame.src = api.playerUrl(share.id);
-    host.append(frame); shell.append(host);
-  }
-  loadButton.addEventListener("click", () => void loadEmbed());
-  backButton.addEventListener("click", () => { reset(); cooldown = 0; setStatus(""); loadButton.textContent = "▶ Load TikTok player"; });
-  shell.querySelector("[data-tiktok-help-toggle]")?.addEventListener("click", event => {
-    help.hidden = !help.hidden; event.currentTarget.setAttribute("aria-expanded", String(!help.hidden));
+  if (!share || !openLink) { if (status) status.textContent = "This TikTok link is unavailable."; return; }
+  openLink.href = share.url; openLink.target = "_blank"; openLink.rel = "noopener noreferrer";
+  void api.getMetadata(share.url).then((metadata) => {
+    if (!shell.isConnected || String(metadata.video_id) !== share.id) return;
+    if (title) title.textContent = metadata.title || metadata.description || "TikTok video";
+    if (author) author.textContent = metadata.author_name || "TikTok creator";
+    const thumbnail = safeTikTokCardThumbnail(metadata.thumbnail_url);
+    if (thumbnail && poster) { poster.src = thumbnail; poster.hidden = false; }
+    if (status) status.textContent = "Preview details loaded · open the original video on TikTok.";
+  }).catch(() => {
+    if (shell.isConnected && status) status.textContent = "Showing the saved preview. Open TikTok to watch the original video.";
   });
-  window.addEventListener("pagehide", reset);
-  if (shell.dataset.tiktokAutoload === "1") void loadEmbed();
 }
 
+function safeTikTokCardThumbnail(value) {
+  try {
+    const url = new URL(String(value || "")); const host = url.hostname.toLowerCase();
+    const allowed = /^([a-z0-9-]+\.)*tiktokcdn(?:-[a-z0-9-]+)?\.com$/.test(host) || host === "muscdn.com" || host.endsWith(".muscdn.com");
+    return url.protocol === "https:" && allowed ? url.href : "";
+  } catch { return ""; }
+}
 function initializeHlsPlayback() {
   const video = document.querySelector("#watch-media-video[data-hls='1']");
   if (!video) return;
