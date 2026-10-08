@@ -79,16 +79,12 @@
         }).catch(() => {});
         return (play ? player.play() : player.pause()).catch((error) => blocked(error, attempt));
       });
-    } else if (ready && provider === "tiktok") {
-      window.VidBestTikTok.command(frame, shouldMute() ? "mute" : "unMute");
-      window.VidBestTikTok.command(frame, play ? "play" : "pause");
     }
   }
   function seek(seconds) {
     if (!active || !ready || !Number.isFinite(seconds)) return;
     if (native && Number.isFinite(native.duration)) native.currentTime = Math.min(Math.max(0, seconds), native.duration);
     else if (provider === "youtube") player.seekTo(Math.min(Math.max(0, seconds), player.getDuration()), true);
-    else if (provider === "tiktok") window.VidBestTikTok.command(frame, "seekTo", Math.max(0, seconds));
     else if (provider === "vimeo") player.getDuration().then((duration) => {
       if (active) return player.setCurrentTime(Math.min(Math.max(0, seconds), duration));
     }).catch(() => {});
@@ -111,24 +107,9 @@
   // Embedded providers still enforce their own autoplay policies.
   window.vidbestPlayback = receive;
   if (provider === "tiktok") {
-    stage?.addEventListener("vidbest:tiktok-ready", event => {
-      frame = event.detail.frame; ready = true;
-      send("ready", { controllable: true }); send("quality", { label: "Auto quality · TikTok" }); apply();
-    });
-    stage?.addEventListener("vidbest:tiktok-reset", () => { ready = false; frame = null; state(false); });
-    stage?.addEventListener("vidbest:tiktok-error", event => send("error", { message: event.detail.message }));
-    window.addEventListener("message", event => {
-      if (!frame || event.source !== frame.contentWindow || event.origin !== "https://www.tiktok.com" || event.data?.["x-tiktok-player"] !== true) return;
-      const data = event.data;
-      if (data.type === "onStateChange") {
-        if (data.value === 1 && !wanted()) { window.VidBestTikTok.command(frame, "pause"); return; }
-        if ([0,1,2].includes(data.value)) state(data.value === 1);
-        if (data.value === 0 && active) send("ended");
-      }
-      if (data.type === "onMute") { actualMuted = data.value === true; state(); }
-      if (data.type === "onCurrentTime") progress(data.value?.currentTime, data.value?.duration);
-      if (data.type === "onPlayerError" && Number(data.value?.errorCode) === 3002) blocked(null, revision);
-    });
+    ready = true;
+    send("ready", { controllable: false });
+    send("quality", { label: "Preview card · TikTok" });
   }
   function watchVideo(video) {
     if (video.dataset.swipeManaged) return;
