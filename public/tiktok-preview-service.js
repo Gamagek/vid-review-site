@@ -1,4 +1,4 @@
-// TikTok metadata-only client. It only renders cached preview information and original-post links.
+// TikTok cached-metadata client and on-demand official Player v1 popup.
 (() => {
   const ORIGIN = "https://www.tiktok.com";
   const TTL = 5 * 60 * 1000;
