@@ -34,10 +34,15 @@
       status(host, "The Saiyaara widget is already open on this page.");
       return;
     }
+    // A previously removed grid card must not retain the active widget slot.
+    if (activeHost && !activeHost.isConnected) {
+      activeScript?.remove();
+      activeScript = null;
+    }
     activeHost = host;
     host.dataset.tagembedLoading = "1";
 
-    const widget = document.createElement("div");
+    const widget = host.querySelector(".tagembed-widget") || document.createElement("div");
     widget.className = "tagembed-widget";
     widget.style.width = "100%";
     widget.style.height = "100%";
@@ -46,7 +51,7 @@
     widget.dataset.caption = "1";
     widget.dataset.header = "1";
     widget.dataset.postId = POST_ID;
-    host.prepend(widget);
+    if (!widget.isConnected) host.prepend(widget);
     status(host, "Loading Saiyaara from Tagembed…");
 
     // The official vendor runtime scans .tagembed-widget elements on execution.
