@@ -904,7 +904,9 @@ test("accepts nested TikTok oEmbed payloads from the Cloudflare gateway", async 
     assert.equal(payload.ok, true);
     assert.equal(payload.video_id, "7552567024304540959");
     assert.equal(payload.title, "Nested gateway payload");
-    assert.equal(payload.embed_url, "https://www.tiktok.com/player/v1/7552567024304540959?autoplay=0&controls=1&loop=0&rel=0");
+    assert.equal(payload.mode, "metadata-card");
+    assert.equal(payload.open_url, share);
+    assert.equal("embed_url" in payload, false);
     assert.equal(new URL(calls[0]).searchParams.get("url"), share);
   } finally {
     globalThis.fetch = originalFetch;
@@ -1921,7 +1923,7 @@ test("serves homepage TikTok preview cards from D1 without contacting TikTok", a
     assert.equal(payload.previews[0].cache_source, "d1");
     assert.equal(payload.previews[0].author_name, "Cached Creator");
     assert.equal(payload.previews[0].description, "Fast cached card");
-    assert.equal(payload.previews[0].thumbnail_url, null);
+    assert.equal(payload.previews[0].thumbnail_url, "https://p16-common-sign.tiktokcdn-us.com/cached.jpg");
     assert.equal(payload.previews[0].poster_url, "/api/tiktok/cached-poster?id=7622472784039415061");
 
     const poster = await send(context, payload.previews[0].poster_url);
@@ -2043,10 +2045,10 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   const html = await page.text();
   assert.ok(html.includes("<title>Saiyaara; A Cinematic Romance | Vid.Best</title>"));
   assert.ok(html.includes("<h1>Saiyaara; A Cinematic Romance</h1>"));
-  assert.ok(html.includes('class="tiktok-oembed-player"'));
+  assert.ok(html.includes('class="tiktok-preview-card"'));
   assert.ok(html.includes('data-tiktok-id="6718335390845095173"'));
   assert.ok(html.includes('data-video-provider="tiktok"'));
-  assert.ok(html.includes('data-tiktok-player-mode="oembed-gateway"'));
+  assert.ok(html.includes('data-tiktok-player-mode="metadata-card"'));
   assert.ok(!html.includes('data-tiktok-watch-src='));
   assert.ok(!html.includes('video.megasale.win'));
 });
