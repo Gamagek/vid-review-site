@@ -44,10 +44,32 @@
     // The iframe itself stays clickable and no poster overlay blocks it.
   }
 
+  function prepareHost(host, mode) {
+    host.classList.add("saiyaara-tagembed-host", "saiyaara-tagembed-" + mode);
+    if (!host.querySelector(".saiyaara-tagembed-poster") && host.dataset.saiyaaraPoster) {
+      const poster = document.createElement("img");
+      poster.className = "saiyaara-tagembed-poster";
+      poster.src = host.dataset.saiyaaraPoster;
+      poster.alt = "";
+      poster.decoding = "async";
+      poster.loading = mode === "watch" ? "eager" : "lazy";
+      host.prepend(poster);
+    }
+    if (!host.querySelector("[data-saiyaara-tagembed-status]")) {
+      const label = document.createElement("span");
+      label.className = "saiyaara-tagembed-status";
+      label.dataset.saiyaaraTagembedStatus = "1";
+      label.setAttribute("role", "status");
+      label.textContent = "";
+      label.hidden = true;
+      host.append(label);
+    }
+  }
+
   function mount(host, mode = "watch") {
     if (!host || host.dataset.saiyaaraTagembedMounted === "1") return false;
     host.dataset.saiyaaraTagembedMounted = "1";
-    host.classList.add("saiyaara-tagembed-host", "saiyaara-tagembed-" + mode);
+    prepareHost(host, mode);
 
     const iframe = host.querySelector("iframe.saiyaara-tagembed-frame") ||
       document.createElement("iframe");
@@ -56,7 +78,7 @@
     iframe.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media");
     iframe.setAttribute("allowfullscreen", "");
     iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
-    iframe.setAttribute("loading", mode === "watch" ? "eager" : "eager");
+    iframe.setAttribute("loading", "eager");
     iframe.style.width = "100%";
     iframe.style.height = "100%";
     iframe.style.overflow = "auto";
@@ -79,6 +101,7 @@
 
   function mountTileWhenVisible(host) {
     if (!host || host.dataset.saiyaaraTagembedMounted === "1") return;
+    prepareHost(host, "tile");
     if (!("IntersectionObserver" in window)) {
       mount(host, "tile");
       return;
