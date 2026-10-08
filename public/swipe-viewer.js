@@ -5,6 +5,7 @@
   const first = {
     id: Number(document.body.dataset.videoId), slug: document.body.dataset.videoSlug,
     provider: document.body.dataset.videoProvider,
+    source_url: document.querySelector(".tiktok-preview-card[data-tiktok-source]")?.dataset.tiktokSource || "",
     title: document.querySelector(".watch-copy h1")?.textContent || "Video",
     description: document.querySelector(".watch-copy .lead")?.textContent || "",
     review_text: document.querySelector(".review-copy")?.innerText || "",
@@ -103,7 +104,21 @@
     // Saiyaara preserves its separate Tagembed fallback below.
     if (card.video.provider === "tiktok" && !isSaiyaara(card)) {
       if (!desired(card)) return;
-      const source = card.video.source_url;
+      // Recommendations normally include source_url. Older cache rows may
+      // omit it; read the canonical watch document without mounting its player.
+      let source = card.video.source_url || "";
+      if (!window.VidBestTikTok?.parse(source)) {
+        try {
+          const html = await prepareMarkup(card.video);
+          if (!desired(card)) return;
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          source = doc.querySelector(".tiktok-preview-card[data-tiktok-source]")?.getAttribute("data-tiktok-source") || "";
+        } catch {
+          message(card, "Could not locate a valid TikTok share URL for gateway playback.");
+          return;
+        }
+      }
+      if (!desired(card)) return;
       const target = window.VidBestTikTok?.gatewayWatchUrl(source);
       if (!target) {
         message(card, "This TikTok sharing URL is invalid or gateway playback is unavailable.");
