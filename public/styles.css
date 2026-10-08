@@ -1125,3 +1125,12 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
 .facebook-microlink-provider{color:#9fefff;font-size:.61rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
 .facebook-microlink-author{font-size:.72rem;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .facebook-microlink-caption{color:var(--muted);font-size:.68rem;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* Deliberate, single-instance official TikTok playback inside the dialog. */
+.tiktok-preview-dialog { width: min(94vw, 560px); max-width: 560px; max-height: min(94dvh, 950px); overflow-y: auto; }
+.tiktok-preview-dialog-card { grid-template-rows: minmax(340px, min(72dvh, 710px)) auto; }
+.tiktok-preview-dialog-media { overflow-y: auto; display: grid; place-items: center; padding: 8px; background: #000; }
+.tiktok-preview-dialog-media .tiktok-embed { width: 100%; margin: 0 auto; }
+.tiktok-preview-dialog-media iframe { max-width: 100%; }
+.tiktok-preview-dialog-status { font-size: .78rem; color: #9aa8c9; }
+@media (max-width: 640px) { .tiktok-preview-dialog-card { grid-template-rows: minmax(340px, 68dvh) auto; } }
