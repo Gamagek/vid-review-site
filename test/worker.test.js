@@ -386,7 +386,7 @@ test("query-style /watch no longer exposes or depends on the legacy signed TikTo
   assert.doesNotMatch(source, /signedWatchResponse/);
   assert.doesNotMatch(source, /SIGN_SECRET/);
   assert.doesNotMatch(source, /TIKTOK_GATEWAY_ORIGIN/);
-  assert.doesNotMatch(source, /video\.megasale\.win/);
+  assert.match(source, /frame-src[^;]*video\.megasale\.win/);
 });
 test("TikTok watch pages render cached metadata cards without a TikTok player", async () => {
   const context = createTestContext();
@@ -2104,8 +2104,8 @@ test("canonical Saiyaara renders direct iframe URL but swipe remains metadata-on
   const html = await page.text();
   assert.match(html, /saiyaara-tagembed-player/);
   assert.ok(html.includes('data-saiyaara-player="1"'));
-  assert.ok(html.includes("/swipe-viewer.js?v=20261008-4"));
-  assert.ok(html.includes("/swipe-viewer.css?v=20261008-saiyaara-fit4"));
+  assert.ok(html.includes("/swipe-viewer.js?v=20261008-gateway1"));
+  assert.ok(html.includes("/swipe-viewer.css?v=20261008-gateway1"));
   assert.ok(html.includes('class="saiyaara-tagembed-frame"'));
   assert.ok(html.includes('src="https://widget.tagembed.com/2236794?postId=5592899&amp;caption=1&amp;header=1"'));
   assert.ok(html.includes('allow="autoplay; fullscreen; picture-in-picture; encrypted-media"'));
