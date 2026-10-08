@@ -3083,10 +3083,10 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <meta name="twitter:description" content="${escapeHtml(description)}">
   <meta name="twitter:image" content="${escapeHtml(thumbnail)}">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/styles.css?v=20261008-saiyaara-2">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   ${video.provider === "tiktok" ? '<script src="/tiktok-preview-service.js?v=20261008-6" defer></script>' : ""}
-  ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-1" defer></script>' : ""}
+  ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-2" defer></script>' : ""}
   <script src="/watch.js?v=20261008-2" defer></script>
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261006-1">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-2" defer></script>
@@ -3222,7 +3222,9 @@ function renderMedia(video, playbackOrigin, viewer = false) {
     // Only the canonical Saiyaara watch page opts into the owner-supplied
     // Tagembed widget. The swipe preparation document remains metadata-only.
     if (video.slug === "saiyaara-a-cinematic-romance" && !viewer) {
-      return `<div class="saiyaara-tagembed-player" data-saiyaara-tagembed-host data-saiyaara-player="watch">
+      const poster = video.tiktok_preview?.thumbnail_url || video.thumbnail_url ||
+        `/api/tiktok/cached-poster?id=${encodeURIComponent(extractTikTokId(video.source_url))}`;
+      return `<div class="saiyaara-tagembed-player" data-saiyaara-tagembed-host data-saiyaara-player="watch" data-saiyaara-poster="${escapeHtml(poster)}">
         <div class="tagembed-widget" style="width:100%;height:100%;overflow:auto;" data-widget-id="2236794" data-caption="1" data-header="1" data-post-id="5592899"></div>
       </div>`;
     }
