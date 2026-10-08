@@ -1205,3 +1205,60 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
 .saiyaara-tagembed-host .tagembed-widget iframe {
   max-width: 100%;
 }
+
+/* Saiyaara media preview stays visible until an actual widget UI is supplied.
+   Third-party iframe autoplay with sound is subject to browser policy. */
+.saiyaara-tagembed-host .saiyaara-tagembed-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 45%, #272946, #080b16 70%);
+}
+.saiyaara-tagembed-host .saiyaara-tagembed-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.saiyaara-tagembed-host .saiyaara-tagembed-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(3,4,12,.06), rgba(3,4,12,.48));
+  pointer-events: none;
+}
+.saiyaara-tagembed-host .saiyaara-tagembed-play {
+  z-index: 1;
+  border: 1px solid rgba(255,255,255,.45);
+  background: rgba(9,11,24,.9);
+  color: #fff;
+  padding: 12px 19px;
+  border-radius: 999px;
+  font: 700 14px/1.2 system-ui, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(0,0,0,.35);
+}
+.saiyaara-tagembed-host .saiyaara-tagembed-play:disabled {
+  cursor: default;
+  opacity: .78;
+}
+.saiyaara-tagembed-host.saiyaara-tagembed-revealed .saiyaara-tagembed-overlay {
+  display: none;
+}
+.saiyaara-tagembed-host .saiyaara-tagembed-status {
+  z-index: 8;
+  bottom: 8px;
+  background: rgba(5,7,17,.89);
+}
+.saiyaara-tagembed-host.saiyaara-tagembed-revealed .saiyaara-tagembed-status {
+  pointer-events: none;
+}
+.saiyaara-tagembed-tile .saiyaara-tagembed-play {
+  font-size: 12px;
+  padding: 9px 13px;
+}
