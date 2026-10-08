@@ -414,6 +414,9 @@ test("TikTok watch pages render cached metadata cards without a TikTok player", 
   assert.match(policy, /frame-src[^;]*https:\/\/www\.tiktok\.com/);
   assert.match(policy, /media-src[^;]*https:\/\/www\.tiktok\.com/);
   const html = await page.text();
+  const csp = page.headers.get("Content-Security-Policy") || "";
+  assert.match(csp, /frame-src[^;]*https:\/\/tiktok-oembed-gateway\.gkasunc\.workers\.dev/);
+  assert.match(csp, /frame-src[^;]*https:\/\/video\.megasale\.win/);
   assert.match(html, /class="tiktok-preview-card"/);
   assert.match(html, /data-tiktok-player-mode="metadata-card"/);
   assert.match(html, /Cached TikTok title/);
@@ -1813,15 +1816,16 @@ test("renders the current Vid.Best TikTok gateway architecture as metadata-only 
   assert.match(indexSource, /buildTikTokOEmbedGatewayUrl/);
   assert.ok(indexSource.includes("tiktok-oembed-gateway.gkasunc.workers.dev"));
   assert.doesNotMatch(indexSource, /www\.tiktok\.com\/player\/v1/);
-  assert.doesNotMatch(indexSource, /video\.megasale\.win/);
+  assert.match(indexSource, /video\.megasale\.win/);
 
   const previewService = readFileSync(new URL("../public/tiktok-preview-service.js", import.meta.url), "utf8");
   assert.doesNotMatch(previewService, /www\.tiktok\.com\/embed\.js/);
-  assert.match(previewService, /player\/v1/);
-  assert.match(previewService, /onPlayerReady/);
+  assert.doesNotMatch(previewService, /\/player\/v1\//);
+  assert.match(previewService, /gatewayWatchUrl/);
+  assert.match(previewService, /tiktok-oembed-gateway\.gkasunc\.workers\.dev\/watch/);
   assert.match(previewService, /createElement\(["']iframe["']\)/);
 });
-test("TikTok metadata cards no longer require SIGN_SECRET or any playback gateway", async () => {
+test("TikTok metadata cards render without playback signatures in the frontend Worker", async () => {
   const context = createTestContext({ SIGN_SECRET: "" });
   context.sqlite.prepare(
     `INSERT INTO videos (
