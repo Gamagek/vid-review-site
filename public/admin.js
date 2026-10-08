@@ -391,8 +391,8 @@ async function renderFacebookPreview(sourceUrl, fallbackEmbed) {
 }
 
 async function renderTikTokPreview(sourceUrl) {
-  const shell = document.createElement("div");
-  shell.className = "admin-tiktok-preview";
+  const shell = document.createElement("article");
+  shell.className = "admin-tiktok-preview tiktok-preview-card";
   shell.dataset.tiktokPreview = "1";
 
   const parsed = parseTikTokShareUrl(sourceUrl);
@@ -405,39 +405,62 @@ async function renderTikTokPreview(sourceUrl) {
     return;
   }
 
-  const status = document.createElement("p");
-  status.className = "form-status";
-  status.textContent = "Loading TikTok metadata from the Vid.Best cache…";
-  shell.append(status);
+  const media = document.createElement("button");
+  media.type = "button";
+  media.className = "tiktok-preview-card-media";
+  media.setAttribute("aria-label", "Open TikTok preview details");
+
+  const image = document.createElement("img");
+  image.className = "tiktok-preview-card-image";
+  image.alt = "";
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.src = "/api/tiktok/cached-poster?id=" + encodeURIComponent(parsed.id);
+  media.append(image);
+
+  const body = document.createElement("div");
+  body.className = "tiktok-preview-card-body";
+  const kicker = document.createElement("span");
+  kicker.className = "tiktok-preview-card-kicker";
+  kicker.textContent = "TikTok metadata preview";
+  const title = document.createElement("strong");
+  title.textContent = "Loading cached TikTok details…";
+  const author = document.createElement("span");
+  author.className = "tiktok-preview-card-author";
+  author.textContent = "TikTok creator";
+  const description = document.createElement("p");
+  description.textContent = "No TikTok player or embed script is loaded in the admin preview.";
+  const actions = document.createElement("div");
+  actions.className = "tiktok-preview-card-actions";
+  const open = document.createElement("a");
+  open.className = "button primary";
+  open.href = parsed.url;
+  open.target = "_blank";
+  open.rel = "noopener noreferrer";
+  open.textContent = "Open on TikTok";
+  actions.append(open);
+  body.append(kicker, title, author, description, actions);
+  shell.append(media, body);
   ui.preview.append(shell);
+
+  const showModal = () => window.VidBestTikTok?.showPreview(parsed.url, {
+    title: title.textContent,
+    author: author.textContent,
+    description: description.textContent,
+    thumbnail: image.src,
+  });
+  media.addEventListener("click", () => void showModal());
 
   try {
     const payload = await window.VidBestTikTok.getMetadata(parsed.url);
     if (!shell.isConnected) return;
-
-    const embedUrl = safeAdminTikTokEmbedUrl(payload, parsed);
-    if (!embedUrl) throw new Error("TikTok preview URL could not be derived from the returned video ID.");
-
-    const frame = document.createElement("iframe");
-    frame.className = "tiktok-official-player";
-    frame.title = "TikTok video preview";
-    frame.loading = "eager";
-    frame.allow = "autoplay; fullscreen; encrypted-media; picture-in-picture";
-    frame.allowFullscreen = true;
-    frame.referrerPolicy = "strict-origin-when-cross-origin";
-    frame.style.visibility = "hidden";
-    const cleanup = window.VidBestTikTok.observe(frame, {
-      ready() { if (shell.isConnected) { status.hidden = true; frame.style.visibility = "visible"; } },
-      autoplay() { status.hidden = false; status.textContent = "Tap Play in the preview."; },
-      error(message) { cleanup(); frame.remove(); status.hidden = false; status.textContent = message; },
-    });
-    frame.src = embedUrl;
-    shell.append(frame);
-    const removed = new MutationObserver(() => { if (!shell.isConnected) { cleanup(); removed.disconnect(); } });
-    removed.observe(ui.preview, { childList: true });
+    title.textContent = payload.title || payload.caption || "TikTok video";
+    author.textContent = payload.author_name || "TikTok creator";
+    description.textContent = payload.description || "Open the original TikTok post to watch the video.";
+    if (payload.thumbnail_url) image.src = payload.thumbnail_url;
+    open.href = payload.open_url || payload.source_url || parsed.url;
   } catch (error) {
-    status.className = "form-status error";
-    status.textContent = error.message || "TikTok preview is temporarily unavailable.";
+    description.textContent = "Cached metadata is temporarily unavailable. The original TikTok link is still available.";
   }
 }
 
@@ -449,27 +472,6 @@ function parseTikTokShareUrl(value) {
     return match ? { url: url.toString(), id: match[1] } : null;
   } catch {
     return null;
-  }
-}
-
-function safeAdminTikTokEmbedUrl(payload, expectedShare = null) {
-  const id = String(payload?.video_id || payload?.embed?.video_id || expectedShare?.id || "").trim();
-  if (!/^\d{15,25}$/.test(id)) return "";
-  if (expectedShare?.id && expectedShare.id !== id) return "";
-
-  const value = String(
-    payload?.embed?.url
-      || payload?.embed_url
-      || window.VidBestTikTok.playerUrl(id),
-  );
-  try {
-    const url = new URL(value);
-    if (url.protocol !== "https:" || url.hostname !== "www.tiktok.com") return "";
-    if (!/^\/player\/v1\/\d{15,25}\/?$/.test(url.pathname)) return "";
-    if (url.pathname.match(/(\d{15,25})/)?.[1] !== id) return "";
-    return url.toString();
-  } catch {
-    return "";
   }
 }
 
