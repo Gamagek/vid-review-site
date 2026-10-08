@@ -49,11 +49,20 @@ The public browser calls Vid.Best's same-origin `/api/tiktok/embed` endpoint. Th
 
 The gateway repository `Gamagek/tiktok-oembed-gateway` adds a global Durable Object cache, bounded upstream concurrency and persisted refresh limits/cooldowns. Deploy its `OEMBED_CACHE` binding and SQLite migration with the supplied `wrangler.toml`. Edge caches alone are local to each Cloudflare location and cannot coordinate global request bursts. Neither cache stores video bytes.
 
-### Saiyaara Tagembed experiment (owner-provided embed)
+### Saiyaara direct Tagembed iframe (owner-provided embed)
 
-Only the permanent `/watch/saiyaara-a-cinematic-romance` page and its corresponding homepage mini tile use the supplied Tagembed widget (`data-widget-id="2236794"`, `data-post-id="5592899"`, `data-caption="1"`, `data-header="1"`). The main watch stage renders the widget container immediately; the widget script `https://widget.tagembed.com/embed.min.js` loads once after the DOM is ready. On the homepage, only the Saiyaara mini tile initializes when it comes within about 300px of view, keeping other TikTok cards on the existing metadata/Player v1 path and avoiding page-wide widget requests. The main player remains inside the existing persistent mini/theater controls, while the homepage mini tile remains interactive rather than navigating to TikTok.
+Only the canonical `/watch/saiyaara-a-cinematic-romance` watch stage and its homepage mini tile use the specific iframe supplied by the site owner:
 
-The user-visible Saiyaara stage displays the cached TikTok poster immediately while Tagembed requests content, and its near-viewport mini tile uses the same responsive preview. A 12-second wait detects a widget that never supplies media; the poster remains visible with a useful message instead of an unexplained black rectangle. When the vendor does supply a media element or iframe, visitors can tap **Play with sound** to reveal its controls. Native HTML5 media tries muted inline autoplay where permitted and requests sound only after a tap; Tagembed/TikTok cross-origin iframes cannot be forced to start or unmute by Vid.Best. The external script and its frame/connect requests are permitted by the narrowly scoped Tagembed CSP host allowlist. Loading the JavaScript is *not* evidence that TikTok media is playable; the vendor may show a feed, request consent, delay playback, or return access errors. The supplied Tagembed widget/post IDs have not been independently verified to contain the intended video. Embedded playback timing is determined by Tagembed, the original provider, and the visitor's connection; instant autoplay is not guaranteed. The swipe viewer's offscreen preparation stays metadata-only and does not mount extra Tagembed widgets.
+```html
+<iframe src="https://widget.tagembed.com/2236794?postId=5592899&amp;caption=1&amp;header=1"
+        allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+        style="width:100%;height:100%;overflow:auto;border:none;"
+        allowfullscreen></iframe>
+```
+
+The full watch page includes this **direct iframe in HTML**, so it begins loading immediately. The home page shows the cached Saiyaara poster, then mounts **only that mini-tile iframe** when it is within 300px of the viewport; other TikTok players remain unmounted. The player stays within Vid.Best, including the existing watch-stage mini/theater modes. No `embed.min.js` script or `.tagembed-widget` scanner is used, and the separate `?viewer=1` swipe preparation stays metadata-only to avoid unnecessary requests. The existing worker CSP permits the `widget.tagembed.com` frame.
+
+An iframe `load` event only confirms a document loaded; it does not prove the hosted video is playable. The 14-second timeout displays a loading warning without automatic reloads or destroying the iframe. The user can interact directly with the embedded controls. The parent cannot directly play or unmute a cross-origin Tagembed/TikTok frame, and mobile browsers usually require a tap before playing with sound. Widget `2236794` and post `5592899` must exist and permit playback on Tagembed; this cannot be guaranteed by Vid.Best.
 
 ### Video SEO correctness
 
