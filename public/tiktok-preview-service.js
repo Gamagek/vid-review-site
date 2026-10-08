@@ -1,4 +1,4 @@
-// TikTok cached-metadata client and on-demand official Player v1 popup.
+// TikTok cached-metadata client and on-demand signed Portainer gateway popup.
 (() => {
   const ORIGIN = "https://www.tiktok.com";
   const TTL = 5 * 60 * 1000;
@@ -92,9 +92,9 @@
   const MIN_PLAYER_REQUEST_INTERVAL = 30000;
   const FAILED_VIDEO_COOLDOWN = 15 * 60 * 1000;
   const FAILED_SITE_COOLDOWN = 2 * 60 * 1000;
-  const REQUEST_GATE_KEY = "vidbest:tiktok:player:last-request:v1";
-  const FAILURE_GATE_KEY = "vidbest:tiktok:player:site-cooldown:v1";
-  const VIDEO_FAILURE_PREFIX = "vidbest:tiktok:player:video-cooldown:v1:";
+  const REQUEST_GATE_KEY = "vidbest:tiktok:gateway:last-request:v2";
+  const FAILURE_GATE_KEY = "vidbest:tiktok:gateway:site-cooldown:v2";
+  const VIDEO_FAILURE_PREFIX = "vidbest:tiktok:gateway:video-cooldown:v2:";
   let activePreview = 0;
   let activeFrame = null;
   let readyTimer = null;
