@@ -3083,13 +3083,13 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <meta name="twitter:description" content="${escapeHtml(description)}">
   <meta name="twitter:image" content="${escapeHtml(thumbnail)}">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/styles.css?v=20261008-saiyaara-3">
+  <link rel="stylesheet" href="/styles.css?v=20261008-saiyaara-fit4">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   ${video.provider === "tiktok" ? '<script src="/tiktok-preview-service.js?v=20261008-6" defer></script>' : ""}
-  ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-3" defer></script>' : ""}
+  ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>' : ""}
   <script src="/watch.js?v=20261008-2" defer></script>
-  <link rel="stylesheet" href="/swipe-viewer.css?v=20261006-1">
-  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-2" defer></script>
+  <link rel="stylesheet" href="/swipe-viewer.css?v=20261008-saiyaara-fit4">
+  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-4" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
   ${video.provider === "tiktok" ? '<!-- TikTok watch pages start with cached oEmbed metadata; the standard TikTok embed is created only after user action. -->' : ""}
 </head>
@@ -3105,7 +3105,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   </header>
   <main class="watch-shell">
     <div id="watch-player-anchor" class="watch-player-anchor" aria-hidden="true"></div>
-    <section id="watch-player" class="watch-player glass-panel" data-provider="${escapeHtml(video.provider)}" aria-label="Video player">
+    <section id="watch-player" class="watch-player glass-panel" data-provider="${escapeHtml(video.provider)}" ${saiyaaraWidget ? 'data-saiyaara-player="1"' : ""} aria-label="Video player">
       <div class="persistent-player-bar">
         <strong>Now playing</strong>
         <button type="button" data-swipe-open>⛶ Fullscreen / Swipe</button>
