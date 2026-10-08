@@ -1,5 +1,5 @@
 // Saiyaara-only direct Tagembed iframe. The user's iframe URL is the source
-// of truth; no embed.min.js scanner, TikTok/player/v1, or video-file proxy.
+// of truth; this integration does not require a vendor SDK or proxy.
 // External video playback, autoplay and sound are controlled by the provider
 // and the visitor's browser.
 (() => {
