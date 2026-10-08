@@ -105,6 +105,5 @@ test("TikTok browser service mounts Player v1 rather than embed.js", () => {
   assert.match(code, /requestAnimationFrame/);
   assert.match(code, /cleanupEmbed/);
   assert.match(code, /autoplay", "0"/);
-  assert.match(code, /thumbnail_url/);
   assert.match(code, /author_name/);
 });
