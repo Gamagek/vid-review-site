@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { maybeQueueAdminTikTokCache, retryAdminTikTokCache } from "../src/admin-tiktok-cache.js";
+import { maybeQueueAdminTikTokCache, retryAdminTikTokCache } from "../src/tiktok-cache-jobs.js";
 
 const valid = {
   id: 81, redistribution_certified: 1, media_type: "tiktok",

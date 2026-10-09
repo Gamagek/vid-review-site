@@ -1,5 +1,7 @@
 import { parseInstagramUrl } from "../public/instagram-utils.js";
-import { maybeQueueAdminTikTokCache, retryAdminTikTokCache } from "./admin-tiktok-cache.js";
+import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStatus } from "./tiktok-cache-jobs.js";
+import { tikTokCacheCandidate } from "./admin-tiktok-cache.js";
+import { isCachedTikTokThumbnail, thumbnailKey } from "./tiktok-thumbnail-cache.js";
 import {
   requestMemberLogin,
   verifyMemberLogin,
@@ -368,8 +370,9 @@ async function route(request, env, ctx) {
   }
 
   match = path.match(/^\/api\/admin\/videos\/(\d+)\/cache-tiktok$/);
-  if (match && request.method === "POST") {
+  if (match && ["GET", "POST"].includes(request.method)) {
     await requireAdmin(request, env);
+    if (request.method === "GET") return adminTikTokCacheStatus(env, Number(match[1]));
     return retryAdminTikTokCache(env, Number(match[1]));
   }
 
@@ -448,13 +451,14 @@ function normalizeTikTokAuthorUrl(value) {
 }
 
 function normalizeTikTokThumbnailUrl(value) {
+  if (isCachedTikTokThumbnail(value)) return value;
   try {
     const url = new URL(String(value || ""));
     const host = url.hostname.toLowerCase();
     const allowed = /^([a-z0-9-]+\.)*tiktokcdn(?:-[a-z0-9-]+)?\.com$/.test(host)
       || host === "muscdn.com"
       || host.endsWith(".muscdn.com");
-    return url.protocol === "https:" && allowed ? url.toString() : null;
+    return url.protocol === "https:" && !url.username && !url.password && !url.port && allowed ? url.toString() : null;
   } catch {
     return null;
   }
@@ -496,7 +500,8 @@ async function writeTikTokOEmbedCache(env, share, preview) {
        author_name = excluded.author_name,
        author_url = excluded.author_url,
        description = excluded.description,
-       thumbnail_url = excluded.thumbnail_url,
+       thumbnail_url = CASE WHEN tiktok_oembed_cache.thumbnail_url LIKE 'https://vid.best/media/uploads/tiktok-thumbnails/%'
+         THEN tiktok_oembed_cache.thumbnail_url ELSE excluded.thumbnail_url END,
        fetched_at = excluded.fetched_at,
        updated_at = excluded.updated_at`,
   ).bind(
@@ -670,7 +675,8 @@ async function fetchTikTokPreviewOnce(env, share, options = {}) {
       author_name: cleanText(metadata?.author_name, 120),
       author_url: normalizeTikTokAuthorUrl(metadata?.author_url),
       description: cleanText(metadata?.description || metadata?.video_description || metadata?.text, 260),
-      thumbnail_url: normalizeTikTokThumbnailUrl(metadata?.thumbnail_url),
+      thumbnail_url: isCachedTikTokThumbnail(durable?.thumbnail_url)
+        ? durable.thumbnail_url : normalizeTikTokThumbnailUrl(metadata?.thumbnail_url),
       cache_source: stale ? "gateway-stale" : "gateway",
       fetched_at: Number.isFinite(fetchedAt) && fetchedAt <= Date.now() ? new Date(fetchedAt).toISOString() : new Date().toISOString(),
     };
@@ -804,6 +810,14 @@ function splitPosterLines(value, maxChars = 25, maxLines = 4) {
 async function tikTokCachedPoster(request, env) {
   const videoId = cleanText(new URL(request.url).searchParams.get("id"), 30);
   if (!/^\d{15,25}$/.test(videoId)) throw new AppError(400, "TikTok video ID is invalid");
+
+  let image;
+  try { image = await env.BUCKET?.get(thumbnailKey(videoId)); } catch { /* Keep the cached text poster available during an R2 outage. */ }
+  if (image) {
+    const headers = new Headers({ 'Cache-Control': 'public, max-age=86400', 'X-Content-Type-Options': 'nosniff' });
+    image.writeHttpMetadata(headers);
+    return new Response(image.body, { headers });
+  }
 
   const row = await readTikTokOEmbedCache(env, videoId);
   const title = cleanText(row?.description || row?.title, 180, "TikTok video");
@@ -2071,11 +2085,14 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
   const cacheSourceChanged = Boolean(existing) && cacheSourceUrl !== (existing?.cache_source_url || null);
   const shouldQueueAutoCache = Boolean(cacheSourceUrl && redistributionCertified && !media.r2_key)
     && (!existing || cacheSourceChanged || existing.cache_status !== "complete");
+  const tikTokCache = tikTokCacheCandidate({ ...media, redistribution_certified: redistributionCertified, cache_source_url: cacheSourceUrl });
+  const sameTikTokJob = tikTokCache && existing?.source_url === media.source_url && Number(existing.redistribution_certified) === 1;
   const cacheStatus = media.r2_key
     ? (existing?.cached_at ? "complete" : "none")
     : shouldQueueAutoCache
       ? "pending"
-      : (cacheSourceUrl ? cleanText(existing?.cache_status, 20, "pending") : "none");
+      : tikTokCache ? (sameTikTokJob ? existing.cache_status : "pending")
+        : (cacheSourceUrl ? cleanText(existing?.cache_status, 20, "pending") : "none");
 
   return {
     title,
@@ -2088,10 +2105,10 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
     redistribution_certified_at: redistributionCertifiedAt,
     cache_source_url: cacheSourceUrl,
     cache_status: cacheStatus,
-    cache_error: shouldQueueAutoCache ? null : (existing?.cache_error || null),
-    cache_attempts: shouldQueueAutoCache ? 0 : Number(existing?.cache_attempts || 0),
-    cache_next_attempt_at: shouldQueueAutoCache ? null : (existing?.cache_next_attempt_at || null),
-    cached_at: media.r2_key ? (existing?.cached_at || null) : null,
+    cache_error: shouldQueueAutoCache || (tikTokCache && !sameTikTokJob) ? null : (existing?.cache_error || null),
+    cache_attempts: shouldQueueAutoCache || (tikTokCache && !sameTikTokJob) ? 0 : Number(existing?.cache_attempts || 0),
+    cache_next_attempt_at: shouldQueueAutoCache || (tikTokCache && !sameTikTokJob) ? null : (existing?.cache_next_attempt_at || null),
+    cached_at: media.r2_key || sameTikTokJob ? (existing?.cached_at || null) : null,
     primary_category: category,
     subcategory,
     description: cleanLongText(body.description, 2400, existing?.description || ""),
@@ -2510,7 +2527,7 @@ async function callTeamwork(env, pathname, options = {}) {
   try {
     response = await fetch(`${base}${pathname}`, {
       ...options,
-      redirect: "error",
+      redirect: "manual",
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${secret}`,
@@ -2521,6 +2538,10 @@ async function callTeamwork(env, pathname, options = {}) {
   } catch (error) {
     if (error?.name === "TimeoutError" || error?.name === "AbortError") throw new AppError(504, "Teamwork API timed out");
     throw new AppError(502, "Teamwork API is unavailable");
+  }
+  if (response.status >= 300 && response.status < 400) {
+    await response.body?.cancel();
+    throw new AppError(502, "Teamwork API redirected the authenticated request; check TEAMWORK_API_URL");
   }
   return readTeamworkResponse(response);
 }

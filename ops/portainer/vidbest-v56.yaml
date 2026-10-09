@@ -1,0 +1,1226 @@
+# Vid.Best v56 — admin-confirmed automatic TikTok cache + manual retry + manual R2 upload.
+# RapidAPI cache requests require a signed Worker webhook for a rights-certified, specific video ID.
+# Saiyaara (7669587518156705056) and Summer (7332342275151760642) excluded from new fallback.
+# Keep the old v53 YAML for an easy rollback; backup your Portainer stack before updating.
+# Update the EXISTING video-site Portainer stack, not a second copy of the same tunnel.
+# Existing Cloudflare tunnel public hostname MUST route video.megasale.win -> http://app:8080.
+# Existing gateway R2, SIGN_SECRET and tunnel variables are needed to RESTORE the removed services.
+# RapidAPI Tester still does not store MP4s. On certified IDs only, app may call private /resolve and upload the watermarked MP4 to R2.
+# All testing + cache-resolution requests share TESTER_MAX_MONTHLY and tester-state usage.json.
+# Uses shell heredocs instead of Compose configs.content (better Portainer compatibility).
+services:
+  app:
+    image: node:22-alpine
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      APP_VERSION: "56-R2-ADMIN-APPROVED-RAPIDAPI-CACHE"
+      PORT: "8080"
+      R2_ENDPOINT: "https://de9e41200f6bdfab80553c8eb08f9b16.r2.cloudflarestorage.com"
+      R2_BUCKET_NAME: "vid-assets"
+      R2_ACCESS_KEY: "${R2_ACCESS_KEY}"
+      R2_SECRET_KEY: "${R2_SECRET_KEY}"
+      SIGN_SECRET: "${SIGN_SECRET}"
+      AUTHORIZED_MP4_BASE_URL: "${AUTHORIZED_MP4_BASE_URL:-}"
+      # Only signed per-video admin webhook grants may use RapidAPI; protected Summer/Saiyaara never changed.
+      RAPIDAPI_CACHE_ENABLED: "${RAPIDAPI_CACHE_ENABLED:-true}"
+      TESTER_TOKEN: "${TESTER_TOKEN}"
+      R2_HEAD_TIMEOUT_MS: "4000"
+      DOWNLOAD_TIMEOUT_MS: "120000"
+      MAX_AUTHORIZED_MP4_BYTES: "104857600"
+      CACHE_HOOK_SECRET: "${CACHE_HOOK_SECRET}"
+    expose:
+    - "8080"
+    volumes:
+    - gateway-state:/app/state
+    depends_on:
+    - rapidapi-tester
+    command:
+    - /bin/sh
+    - -ec
+    - |
+      cat > /app/server.js <<'VIDBEST_GATEWAY_JS'
+      const http = require("http");
+      const crypto = require("crypto");
+      const fs = require("fs");
+      const { spawn } = require("child_process");
+      const { Readable, Transform } = require("stream");
+      const { pipeline } = require("stream/promises");
+      const {
+        S3Client,
+        HeadObjectCommand,
+        GetObjectCommand,
+        PutObjectCommand,
+        DeleteObjectCommand
+      } = require("@aws-sdk/client-s3");
+
+      const PORT = Number(process.env.PORT || 8080);
+      const VERSION = String(process.env.APP_VERSION || "56-R2-ADMIN-APPROVED-RAPIDAPI-CACHE");
+      const SECRET = String(process.env.SIGN_SECRET || "");
+      const BUCKET = String(process.env.R2_BUCKET_NAME || "vid-assets");
+      const ENDPOINT = String(process.env.R2_ENDPOINT || "");
+      const ACCESS_KEY = String(process.env.R2_ACCESS_KEY || "");
+      const SECRET_KEY = String(process.env.R2_SECRET_KEY || "");
+      const MIRROR_BASE = String(process.env.AUTHORIZED_MP4_BASE_URL || "").trim();
+      const RAPIDAPI_ENABLED = String(process.env.RAPIDAPI_CACHE_ENABLED || "false").toLowerCase() === "true";
+      const PRIVATE_RESOLVER_TOKEN = String(process.env.TESTER_TOKEN || "");
+      // No static video allowlist: Admin Panel authorizes one specific ID at a time via signed, short-lived webhook.
+      const CACHE_HOOK_SECRET = String(process.env.CACHE_HOOK_SECRET || "");
+      const PROTECTED_VIDEO_IDS = new Set(["7332342275151760642", "7669587518156705056"]);
+      const authorizedGrants = new Map();
+      const usedHookNonces = new Map();
+      function mayUseRapidAPIForCache(id) {
+        return RAPIDAPI_ENABLED && Boolean(PRIVATE_RESOLVER_TOKEN) &&
+          !PROTECTED_VIDEO_IDS.has(String(id)) && Number(authorizedGrants.get(String(id)) || 0) > Date.now();
+      }
+      const MAX_AUTHORIZED_MP4_BYTES = Math.max(32768, Math.min(104857600, Number(process.env.MAX_AUTHORIZED_MP4_BYTES || 104857600)));
+      const STATE_FILE = "/app/state/tiktok-circuit.json";
+
+      const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+      const CACHE_CONTROL = "public, max-age=2592000, immutable";
+      const STREAM_CACHE_CONTROL = "private, no-store";
+      const R2_HEAD_TIMEOUT_MS = Math.min(8000, Math.max(1500, Number(process.env.R2_HEAD_TIMEOUT_MS || 4000)));
+      const DOWNLOAD_TIMEOUT_MS = Math.min(180000, Math.max(30000, Number(process.env.DOWNLOAD_TIMEOUT_MS || 120000)));
+      const COOLDOWN_429_MS = 6 * 60 * 60 * 1000;
+      const COOLDOWN_403_MS = 24 * 60 * 60 * 1000;
+      const COOLDOWN_OTHER_MS = 30 * 60 * 1000;
+
+      const jobs = new Map();
+      const jobPromises = new Map();
+      const cooldowns = new Map();
+      let queueTail = Promise.resolve();
+      let lastStatus = "Gateway started.";
+      let globalCooldownState = { until: 0, kind: "", reason: "" };
+      try {
+        const parsed = JSON.parse(fs.readFileSync(STATE_FILE, "utf8"));
+        if (Number.isFinite(parsed.until) && parsed.until > Date.now()) globalCooldownState = parsed;
+      } catch {}
+
+      function globalCooldown() {
+        return globalCooldownState.until > Date.now() ? globalCooldownState : null;
+      }
+      function setGlobalCooldown(kind) {
+        const ms = kind === "429" ? COOLDOWN_429_MS : kind === "403" ? COOLDOWN_403_MS :
+          kind === "restricted" ? 60 * 60 * 1000 : 0;
+        if (!ms) return;
+        const until = Date.now() + ms;
+        if (until <= globalCooldownState.until) return;
+        globalCooldownState = { until, kind, reason: "TikTok access was refused or failed upstream." };
+        try {
+          fs.mkdirSync("/app/state", { recursive: true });
+          const temporary = STATE_FILE + ".tmp";
+          fs.writeFileSync(temporary, JSON.stringify(globalCooldownState), { mode: 0o600 });
+          fs.renameSync(temporary, STATE_FILE);
+        } catch (error) { console.warn("[provider-cooldown-persistence]", error.message); }
+        console.warn("[provider-cooldown]", kind, new Date(until).toISOString());
+      }
+
+      const s3 = new S3Client({
+        region: "auto",
+        endpoint: ENDPOINT,
+        forcePathStyle: true,
+        credentials: {
+          accessKeyId: ACCESS_KEY,
+          secretAccessKey: SECRET_KEY
+        }
+      });
+
+      function cors(extra) {
+        return Object.assign({
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+          "Access-Control-Allow-Headers": "Range, Content-Type",
+          "Cross-Origin-Resource-Policy": "cross-origin"
+        }, extra || {});
+      }
+
+      function json(res, code, body, extra) {
+        res.writeHead(code, cors(Object.assign({
+          "Content-Type": "application/json; charset=utf-8",
+          "Cache-Control": "no-store"
+        }, extra || {})));
+        res.end(JSON.stringify(body));
+      }
+
+      function text(res, code, body, extra) {
+        res.writeHead(code, cors(Object.assign({
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "no-store"
+        }, extra || {})));
+        res.end(String(body));
+      }
+
+      function sign(id, exp) {
+        return crypto
+          .createHmac("sha256", SECRET)
+          .update(String(id) + "." + String(exp))
+          .digest("hex");
+      }
+
+      function safeEqual(a, b) {
+        const x = Buffer.from(String(a));
+        const y = Buffer.from(String(b));
+        if (x.length !== y.length) return false;
+        return crypto.timingSafeEqual(x, y);
+      }
+
+      function validSignature(id, exp, sig) {
+        if (!SECRET) return false;
+        if (!/^\d{15,25}$/.test(String(id || ""))) return false;
+        if (!/^\d+$/.test(String(exp || ""))) return false;
+        const expires = Number(exp);
+        if (!Number.isFinite(expires)) return false;
+        if (expires < Math.floor(Date.now() / 1000)) return false;
+        return safeEqual(String(sig || ""), sign(id, exp));
+      }
+
+      function validateTikTokSource(id, value) {
+        try {
+          const url = new URL(String(value || ""));
+          const host = url.hostname.toLowerCase().replace(/^www\./, "");
+          if (url.protocol !== "https:") return null;
+          if (host !== "tiktok.com" || url.username || url.password || url.port) return null;
+          const match = url.pathname.match(/^\/@([A-Za-z0-9_.]{1,32})\/video\/(\d{15,25})\/?$/);
+          if (!match) return null;
+          if (match[2] !== String(id)) return null;
+          url.search = "";
+          url.hash = "";
+          return url.toString();
+        } catch {
+          return null;
+        }
+      }
+
+      function cacheKeys(id) {
+        return [
+          String(id) + ".mp4",
+          "uploads/tiktok/" + String(id) + ".mp4",
+          "uploads/" + String(id) + ".mp4"
+        ];
+      }
+
+      function isR2NotFound(error) {
+        return Number(error?.$$metadata?.httpStatusCode || 0) === 404 ||
+          ["NotFound", "NoSuchKey", "NoSuchObject"].includes(String(error?.name || ""));
+      }
+
+      async function headCached(key) {
+        try {
+          return await s3.send(new HeadObjectCommand({ Bucket: BUCKET, Key: key }), {
+            abortSignal: AbortSignal.timeout(R2_HEAD_TIMEOUT_MS)
+          });
+        } catch (error) {
+          if (isR2NotFound(error)) return null;
+          throw error;
+        }
+      }
+
+      // Check the three supported keys CONCURRENTLY. Previously three serial
+      // R2 HEAD calls could exceed the Worker 10s /status timeout on a miss.
+      async function findCachedVideo(id) {
+        const keys = cacheKeys(id);
+        const results = await Promise.allSettled(keys.map(headCached));
+        let firstError = null;
+        for (let i = 0; i < keys.length; i++) {
+          const item = results[i];
+          if (item.status === "rejected") {
+            if (!firstError) firstError = item.reason;
+            continue;
+          }
+          const head = item.value;
+          if (!head || !Number(head.ContentLength || 0)) continue;
+          const modified = head.LastModified ? new Date(head.LastModified).getTime() : Date.now();
+          const ageMs = Math.max(0, Date.now() - modified);
+          if (ageMs > CACHE_TTL_MS) {
+            lastStatus = "Expired cache object: " + keys[i];
+            // Never silently delete user-uploaded or legacy R2 files here.
+            // Expired files are simply excluded from playback.
+            continue;
+          }
+          return {
+            key: keys[i],
+            size: Number(head.ContentLength || 0),
+            ageMs,
+            lastModified: head.LastModified ? new Date(head.LastModified).toISOString() : null
+          };
+        }
+        if (firstError) {
+          const name = String(firstError?.name || "R2Error");
+          const status = Number(firstError?.$$metadata?.httpStatusCode || 0);
+          throw new Error("R2 HEAD failed (" + name + ", HTTP " + status + ")");
+        }
+        return null;
+      }
+
+      function enqueue(task) {
+        const next = queueTail.then(task, task);
+        queueTail = next.catch(() => {});
+        return next;
+      }
+
+      function setCooldown(id, kind, message) {
+        let delay = COOLDOWN_OTHER_MS;
+        if (kind === "429") delay = COOLDOWN_429_MS;
+        if (kind === "403") delay = COOLDOWN_403_MS;
+        const until = Date.now() + delay;
+        cooldowns.set(String(id), { until, kind, message: String(message || "Source unavailable") });
+        jobs.set(String(id), {
+          status: "cooldown",
+          cooldownUntil: new Date(until).toISOString(),
+          error: String(message || "Source unavailable")
+        });
+      }
+
+      function getCooldown(id) {
+        const current = cooldowns.get(String(id));
+        if (!current) return null;
+        if (Date.now() >= current.until) {
+          cooldowns.delete(String(id));
+          return null;
+        }
+        return current;
+      }
+
+      function runProcess(command, args, timeoutMs = DOWNLOAD_TIMEOUT_MS) {
+        return new Promise((resolve) => {
+          const child = spawn(command, args, { stdio: ["ignore", "ignore", "pipe"] });
+          let stderr = "";
+          let finished = false;
+          const settle = result => {
+            if (finished) return;
+            finished = true;
+            clearTimeout(timer);
+            resolve(result);
+          };
+          const timer = setTimeout(() => {
+            child.kill("SIGKILL");
+            settle({ ok: false, code: -2, stderr: "Extraction process timed out." });
+          }, timeoutMs);
+          timer.unref();
+          child.stderr.on("data", chunk => {
+            stderr += chunk.toString();
+            if (stderr.length > 12000) stderr = stderr.slice(-12000);
+          });
+          child.on("error", error => settle({ ok: false, code: -1, stderr: error.message }));
+          child.on("close", code => settle({ ok: code === 0, code: Number(code), stderr: stderr.trim() }));
+        });
+      }
+
+      async function validateMp4(filepath) {
+        if (!fs.existsSync(filepath)) return false;
+        const stat = fs.statSync(filepath);
+        if (!stat.isFile() || stat.size < 32768) return false;
+
+        const result = await runProcess("ffprobe", [
+          "-v", "error",
+          "-select_streams", "v:0",
+          "-show_entries", "stream=codec_type",
+          "-of", "default=noprint_wrappers=1:nokey=1",
+          filepath
+        ]);
+
+        return result.ok;
+      }
+
+      async function downloadOneJob(id, sourceUrl, filepath) {
+        const args = [
+          "--no-playlist",
+          "--no-warnings",
+          "--no-progress",
+          "--retries", "0",
+          "--fragment-retries", "0",
+          "--extractor-retries", "0",
+          "--concurrent-fragments", "1",
+          "--socket-timeout", "25",
+          "-f", "best[ext=mp4]/best",
+          "--merge-output-format", "mp4",
+          "-o", filepath,
+          sourceUrl
+        ];
+
+        lastStatus = "Starting one yt-dlp extraction job for " + id;
+        return runProcess("/usr/local/bin/yt-dlp", args);
+      }
+
+      // Optional BACKUP: a trusted HTTPS origin operated by the Vid.Best owner
+      // can serve licensed MP4 files as <video-id>.mp4. This source is never
+      // derived from an arbitrary viewer URL and redirects are disallowed.
+      async function tryAuthorizedMirror(id, filepath) {
+        if (!MIRROR_BASE) return false;
+        let target;
+        try {
+          const base = new URL(MIRROR_BASE);
+          if (base.protocol !== "https:" || base.username || base.password || base.search || base.hash || base.port) {
+            console.warn("[authorized-mirror] Invalid configured base URL");
+            return false;
+          }
+          if (!base.pathname.endsWith("/")) base.pathname += "/";
+          target = new URL(encodeURIComponent(id) + ".mp4", base);
+          if (target.origin !== base.origin || !target.pathname.startsWith(base.pathname)) return false;
+        } catch { return false; }
+        try {
+          const response = await fetch(target.href, {
+            redirect: "error",
+            headers: { "Accept": "video/mp4" },
+            signal: AbortSignal.timeout(25000)
+          });
+          if (!response.ok || !response.body) return false;
+          const contentType = (response.headers.get("content-type") || "").toLowerCase().split(";")[0].trim();
+          if (!["video/mp4", "application/octet-stream"].includes(contentType)) {
+            await response.body.cancel(); return false;
+          }
+          const sizeHeader = Number(response.headers.get("content-length") || 0);
+          if (sizeHeader > MAX_AUTHORIZED_MP4_BYTES) { await response.body.cancel(); return false; }
+          let transferred = 0;
+          const guard = new Transform({ transform(chunk, encoding, cb) {
+            transferred += chunk.length;
+            cb(transferred <= MAX_AUTHORIZED_MP4_BYTES ? null : new Error("Authorized MP4 too large"), chunk);
+          } });
+          await pipeline(Readable.fromWeb(response.body), guard, fs.createWriteStream(filepath, { flags: "wx" }));
+          if (transferred < 32768) return false;
+          const valid = await validateMp4(filepath);
+          if (valid) console.info("[authorized-mirror-ready]", id, transferred);
+          return valid;
+        } catch (error) {
+          console.warn("[authorized-mirror-miss]", id, String(error?.message || error).slice(0,160));
+          return false;
+        } finally {
+          // Caller removes unvalidated and partial data before primary extraction.
+        }
+      }
+
+      // Browser users cannot access /resolve: public app reverse-proxies only GET /tester/config and /tester/compare.
+      // Tester keeps the API key and accounts for cache requests in its 20/month budget.
+      async function resolveWatermarkedVideoInternally(sourceUrl) {
+        if (!PRIVATE_RESOLVER_TOKEN) return null;
+        const payload = JSON.stringify({ url: sourceUrl });
+        return new Promise((resolve) => {
+          const request = http.request({
+            hostname: "rapidapi-tester", port: 8000, path: "/resolve", method: "POST", timeout: 39000,
+            headers: { "x-test-token": PRIVATE_RESOLVER_TOKEN, "content-type": "application/json",
+              "content-length": Buffer.byteLength(payload) }
+          }, (response) => {
+            let answer = "";
+            response.on("data", (chunk) => {
+              answer += chunk.toString("utf8");
+              if (answer.length > 8192) response.destroy();
+            });
+            response.on("end", () => {
+              if (response.statusCode !== 200) { resolve(null); return; }
+              try { resolve(JSON.parse(answer)); } catch { resolve(null); }
+            });
+          });
+          request.once("timeout", () => request.destroy(new Error("resolver_timeout")));
+          request.once("error", () => resolve(null));
+          request.end(payload);
+        });
+      }
+
+      // Accept only TikTok video CDN origins; no arbitrary API-supplied internal/third-party URL fetching.
+      function validatedMediaCdnUrl(raw) {
+        try {
+          const u = new URL(String(raw || ""));
+          const h = u.hostname.toLowerCase().replace(/\.$/, "");
+          const allowed = ["akamaized.net", "tiktokcdn.com", "tiktokcdn-us.com", "tiktokv.com"];
+          if (u.protocol !== "https:" || u.username || u.password || u.port ||
+              !allowed.some(suffix => h !== suffix && h.endsWith("." + suffix))) return null;
+          return u;
+        } catch { return null; }
+      }
+
+      async function fetchAllowedCdnMp4(mediaUrl) {
+        let current = String(mediaUrl);
+        for (let hops = 0; hops < 3; hops++) {
+          if (!validatedMediaCdnUrl(current)) throw new Error("RapidAPI returned a nonapproved CDN host");
+          const response = await fetch(current, {
+            method: "GET", redirect: "manual",
+            headers: { Accept: "video/mp4,application/octet-stream" },
+            signal: AbortSignal.timeout(30000)
+          });
+          if ([301, 302, 303, 307, 308].includes(response.status)) {
+            const destination = response.headers.get("location");
+            if (!destination) throw new Error("Missing CDN redirect location");
+            current = new URL(destination, current).toString();
+            await response.body?.cancel();
+            continue;
+          }
+          if (!response.ok || !response.body) throw new Error("Watermarked CDN media unavailable (HTTP " + response.status + ")");
+          const type = String(response.headers.get("content-type") || "").toLowerCase().split(";")[0].trim();
+          if (!["video/mp4", "application/octet-stream"].includes(type)) {
+            await response.body.cancel(); throw new Error("CDN response was not MP4");
+          }
+          const lenText = response.headers.get("content-length");
+          if (lenText && Number(lenText) > MAX_AUTHORIZED_MP4_BYTES) {
+            await response.body.cancel(); throw new Error("Watermarked MP4 is over size limit");
+          }
+          return response;
+        }
+        throw new Error("Excessive CDN redirect chain");
+      }
+
+      async function tryRapidApiForCertifiedVideo(id, sourceUrl, filepath) {
+        if (!mayUseRapidAPIForCache(id)) return false;
+        try {
+          jobs.set(String(id), { status: "preparing", provider: "rapidapi" });
+          const resolved = await resolveWatermarkedVideoInternally(sourceUrl);
+          if (!resolved || resolved.id !== String(id) || !validatedMediaCdnUrl(resolved.media_url)) {
+            console.warn("[rapidapi-cache] No validated watermarked CDN URL for", id);
+            return false;
+          }
+          const response = await fetchAllowedCdnMp4(resolved.media_url);
+          let bytes = 0;
+          const guard = new Transform({ transform(chunk, encoding, cb) {
+            bytes += chunk.length;
+            cb(bytes <= MAX_AUTHORIZED_MP4_BYTES ? null : new Error("Watermarked MP4 exceeds size limit"), chunk);
+          } });
+          await pipeline(Readable.fromWeb(response.body), guard, fs.createWriteStream(filepath, { flags: "wx" }));
+          if (bytes < 32768) throw new Error("Watermarked MP4 too small");
+          const fd = fs.openSync(filepath, "r");
+          const probe = Buffer.alloc(12);
+          try { fs.readSync(fd, probe, 0, 12, 0); } finally { fs.closeSync(fd); }
+          if (probe.toString("ascii", 4, 8) !== "ftyp") throw new Error("Invalid MP4 header");
+          if (!await validateMp4(filepath)) throw new Error("Watermarked MP4 failed ffprobe validation");
+          console.info("[rapidapi-cache-ready]", id, resolved.provider, bytes);
+          return true;
+        } catch (error) {
+          console.warn("[rapidapi-cache-failed]", id, String(error?.message || error).slice(0,150));
+          try { if (fs.existsSync(filepath)) fs.unlinkSync(filepath); } catch {}
+          return false;
+        }
+      }
+
+      function classifyFailure(stderr) {
+        const value = String(stderr || "").toLowerCase();
+        if (value.includes("429") || value.includes("too many requests")) return "429";
+        if (value.includes("403") || value.includes("forbidden") || value.includes("access denied")) return "403";
+        if (value.includes("unexpected response from webpage request")) return "restricted";
+        return "other";
+      }
+
+      async function performCacheJob(id, originalUrl) {
+        const sourceUrl = validateTikTokSource(id, originalUrl);
+        if (!sourceUrl) {
+          jobs.set(String(id), { status: "error", error: "Invalid TikTok source URL." });
+          lastStatus = "Invalid TikTok source URL for " + id;
+          return false;
+        }
+
+        const cached = await findCachedVideo(id);
+        if (cached) {
+          jobs.set(String(id), { status: "cached", key: cached.key, size: cached.size });
+          lastStatus = "R2 cache hit: " + cached.key;
+          return true;
+        }
+
+        const cooldown = getCooldown(id);
+        const providerBlock = globalCooldown();
+        const filepath = "/tmp/" + String(id) + ".mp4";
+        const objectKey = "uploads/tiktok/" + String(id) + ".mp4";
+
+        try { if (fs.existsSync(filepath)) fs.unlinkSync(filepath); } catch {}
+
+        // Prefer the owner's licensed HTTPS media mirror when configured.
+        // This saves upstream TikTok requests, works during a provider cooldown,
+        // and does not proxy blocked TikTok pages or require a headless browser.
+        jobs.set(String(id), { status: "preparing", startedAt: new Date().toISOString() });
+        let preparedBy = "authorized-mirror";
+        let mirrorReady = await tryAuthorizedMirror(id, filepath);
+        if (!mirrorReady) {
+          try { if (fs.existsSync(filepath)) fs.unlinkSync(filepath); } catch {}
+          // R2-first and owner-mirror-first remain unchanged. Only explicitly certified IDs
+          // may use RapidAPI; it runs before the old yt-dlp global cooldown check.
+          const rapidApiReady = await tryRapidApiForCertifiedVideo(id, sourceUrl, filepath);
+          if (rapidApiReady) {
+            preparedBy = "rapidapi-watermarked";
+          } else {
+          const activeBlock = providerBlock || globalCooldown();
+          if (activeBlock || cooldown) {
+            const until = activeBlock?.until || cooldown.until;
+            const message = activeBlock ? "Provider access temporarily paused after upstream block." : cooldown.message;
+            jobs.set(String(id), { status: "cooldown", cooldownUntil: new Date(until).toISOString(), error: message });
+            lastStatus = "Cooldown active for " + id;
+            return false;
+          }
+          preparedBy = "yt-dlp";
+          jobs.set(String(id), { status: "scraping", startedAt: new Date().toISOString() });
+          lastStatus = "Attempting public source extraction for " + id;
+          const result = await downloadOneJob(id, sourceUrl, filepath);
+          if (!result.ok) {
+            const kind = classifyFailure(result.stderr);
+            const message = "yt-dlp failed with code " + String(result.code) + (result.stderr ? ": " + result.stderr.slice(-1000) : "");
+            console.warn("[extraction-failed]", id, "kind=" + kind, String(result.stderr || "").slice(-500));
+            setCooldown(id, kind, message);
+            setGlobalCooldown(kind);
+            lastStatus = message;
+            try { if (fs.existsSync(filepath)) fs.unlinkSync(filepath); } catch {}
+            return false;
+          }
+          if (!await validateMp4(filepath)) {
+            const message = "Downloaded file failed MP4 validation.";
+            setCooldown(id, "other", message);
+            lastStatus = message;
+            try { if (fs.existsSync(filepath)) fs.unlinkSync(filepath); } catch {}
+            return false;
+          }
+          } // End legacy cooldown/yt-dlp path when RapidAPI did not prepare the file.
+        }
+
+        const stat = fs.statSync(filepath);
+        jobs.set(String(id), { status: "uploading", size: stat.size });
+        lastStatus = "Uploading " + id + " to R2 as " + objectKey + " (" + stat.size + " bytes).";
+
+        await s3.send(new PutObjectCommand({
+          Bucket: BUCKET,
+          Key: objectKey,
+          Body: fs.createReadStream(filepath),
+          ContentLength: stat.size,
+          ContentType: "video/mp4",
+          CacheControl: CACHE_CONTROL,
+          Metadata: {
+            source: "vidbest-tiktok-gateway",
+            video_id: String(id),
+            gateway_version: VERSION,
+            media_origin: preparedBy
+          }
+        }));
+
+        const uploaded = await findCachedVideo(id);
+        if (!uploaded) throw new Error("R2 upload completed but verification failed.");
+        console.info("[cache-ready]", id, uploaded.key, uploaded.size);
+
+        cooldowns.delete(String(id));
+        jobs.set(String(id), { status: "cached", key: uploaded.key, size: uploaded.size });
+        lastStatus = "R2 cache ready: " + uploaded.key;
+        return true;
+      }
+
+      function startCacheJob(id, originalUrl) {
+        const key = String(id);
+        if (jobPromises.has(key)) return jobPromises.get(key);
+
+        const promise = enqueue(async () => {
+          try {
+            return await performCacheJob(key, originalUrl);
+          } catch (error) {
+            const message = "Cache job error: " + String(error && error.message ? error.message : error);
+            jobs.set(key, { status: "error", error: message });
+            lastStatus = message;
+            return false;
+          } finally {
+            jobPromises.delete(key);
+            const filepath = "/tmp/" + key + ".mp4";
+            try { if (fs.existsSync(filepath)) fs.unlinkSync(filepath); } catch {}
+          }
+        });
+
+        jobPromises.set(key, promise);
+        return promise;
+      }
+
+      async function streamVideo(req, res, objectInfo) {
+        try {
+          const params = { Bucket: BUCKET, Key: objectInfo.key };
+          if (req.headers.range) params.Range = req.headers.range;
+
+          const data = await s3.send(new GetObjectCommand(params));
+          const headers = cors({
+            "Content-Type": data.ContentType || "video/mp4",
+            "Accept-Ranges": "bytes",
+            "Cache-Control": STREAM_CACHE_CONTROL,
+          "X-Content-Type-Options": "nosniff"
+          });
+
+          if (data.ContentLength !== undefined) headers["Content-Length"] = String(data.ContentLength);
+          if (data.ContentRange) headers["Content-Range"] = String(data.ContentRange);
+
+          res.writeHead(data.ContentRange ? 206 : 200, headers);
+
+          if (req.method === "HEAD") {
+            res.end();
+            return;
+          }
+
+          if (data.Body && typeof data.Body.pipe === "function") {
+            data.Body.pipe(res);
+          } else {
+            res.end();
+          }
+        } catch (error) {
+          lastStatus = "Stream error: " + String(error && error.message ? error.message : error);
+          if (!res.headersSent) text(res, 404, "Video stream error");
+          else res.end();
+        }
+      }
+
+      function debugJobs() {
+        const output = {};
+        for (const entry of jobs.entries()) output[entry[0]] = entry[1];
+        return output;
+      }
+
+      async function handle(req, res) {
+        try {
+          const url = new URL(req.url || "/", "http://" + (req.headers.host || "localhost"));
+
+          // Public web UI, but provider calls require the user-supplied secret tester token.
+          if (url.pathname === "/tester" || url.pathname === "/tester/") {
+            if (req.method !== "GET") { text(res, 405, "Method Not Allowed"); return; }
+            const page = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vid.Best API Tester</title><style>
+            body{font-family:system-ui,sans-serif;max-width:720px;margin:25px auto;padding:0 16px;color:#1a1a1a;background:#f8fafc}
+            main{background:white;border-radius:15px;padding:22px;box-shadow:0 2px 16px #0001}
+            label{display:block;margin:16px 0 6px;font-weight:600}input,select,button{box-sizing:border-box;width:100%;font:inherit;border-radius:9px;padding:12px}
+            input,select{border:1px solid #b8c2d0}button{margin-top:16px;border:none;background:#1155cc;color:white;font-weight:700;cursor:pointer}
+            pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#eef2f8;border-radius:9px;padding:16px;font-size:12px;min-height:60px}
+            .note{color:#526073;font-size:14px}</style></head><body><main><h2>Vid.Best RapidAPI Tester</h2>
+            <p class="note">Tests metadata from ibbmm, TikWM and Snaptik. Never downloads a video. Shared monthly request budget covers both manual tests and rights-certified private cache resolutions.</p>
+            <label for="token">Private Tester Token</label><input id="token" type="password" autocomplete="off" placeholder="Enter your TESTER_TOKEN">
+            <label for="video">TikTok Video URL</label><input id="video" type="url" value="https://www.tiktok.com/@looooooooch/video/7332342275151760642" spellcheck="false">
+            <label for="provider">API Provider</label><select id="provider"><option value="all">Compare all 3 (3 requests)</option><option value="ibbmm">ibbmm (1 request)</option><option value="tikwm">TikWM (1 request)</option><option value="snaptik">Snaptik Fit (1 request)</option></select>
+            <button id="run">Run API Test</button><button id="config" type="button">Show Usage &amp; Config</button>
+            <pre id="output" role="status" aria-live="polite">Ready. Each provider call counts against the monthly tester budget.</pre></main><script>
+            const out=document.getElementById('output');
+            async function check(config){const token=document.getElementById('token').value;const video=document.getElementById('video').value;
+              if(!token){out.textContent='Enter your TESTER_TOKEN first.';return;}
+              const provider=document.getElementById('provider').value;
+              const url=config?'/tester/config':'/tester/compare?url='+encodeURIComponent(video)+'&provider='+encodeURIComponent(provider);
+              out.textContent='Requesting... (allow up to 60 seconds when testing all 3 providers)';
+              try{const r=await fetch(url,{headers:{'x-test-token':token},cache:'no-store'});const body=await r.json();out.textContent=JSON.stringify(body,null,2);}
+              catch(e){out.textContent='Request failed: '+String(e.message||e);}}
+            document.getElementById('run').addEventListener('click',()=>check(false));
+            document.getElementById('config').addEventListener('click',()=>check(true));
+            </script></body></html>`;
+            res.writeHead(200, {
+              "Content-Type": "text/html; charset=utf-8",
+              "Cache-Control": "no-store",
+              "X-Content-Type-Options": "nosniff",
+              "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+            });
+            res.end(page);
+            return;
+          }
+
+          // Keep legacy gateway /status, /stream and /watch unchanged.
+          // Existing Cloudflare Tunnel still routes video.megasale.win -> http://app:8080.
+          // Proxy only known tester endpoints; the tester itself validates x-test-token.
+          if (["/tester/health", "/tester/config", "/tester/compare"].includes(url.pathname)) {
+            if (req.method !== "GET") { text(res, 405, "Method Not Allowed"); return; }
+            if (url.search.length > 4096) { text(res, 414, "URL Too Long"); return; }
+            const target = "http://rapidapi-tester:8000" + url.pathname.slice("/tester".length) + url.search;
+            const headers = {};
+            if (typeof req.headers["x-test-token"] === "string") headers["x-test-token"] = req.headers["x-test-token"];
+            const proxy = http.get(target, { headers, timeout: 65000 }, (upstream) => {
+              res.writeHead(upstream.statusCode || 502, {
+                "Content-Type": "application/json; charset=utf-8",
+                "Cache-Control": "no-store",
+                "X-Content-Type-Options": "nosniff"
+              });
+              upstream.pipe(res);
+            });
+            proxy.on("timeout", () => proxy.destroy(new Error("Tester timeout")));
+            proxy.on("error", () => {
+              if (!res.headersSent) json(res, 502, { error: "Tester temporarily unavailable" });
+              else res.end();
+            });
+            return;
+          }
+
+          if (req.method === "OPTIONS") {
+            res.writeHead(204, cors());
+            res.end();
+            return;
+          }
+
+          if (url.pathname === "/") {
+            json(res, 200, {
+              success: true,
+              service: "Vid.Best TikTok R2 gateway",
+              version: VERSION,
+              health: "/health",
+              debug: "/debug"
+            });
+            return;
+          }
+
+          if (url.pathname === "/health") {
+            text(res, 200, "OK " + VERSION);
+            return;
+          }
+
+          if (url.pathname === "/debug") {
+            json(res, 200, {
+              success: true,
+              version: VERSION,
+              bucket: BUCKET,
+              endpointConfigured: Boolean(ENDPOINT),
+              accessKeyConfigured: Boolean(ACCESS_KEY),
+              secretKeyConfigured: Boolean(SECRET_KEY),
+              signSecretConfigured: Boolean(SECRET),
+              activeJobs: jobPromises.size,
+              r2HeadTimeoutMs: R2_HEAD_TIMEOUT_MS,
+              authorizedMirrorConfigured: Boolean(MIRROR_BASE),
+              rapidApiCacheEnabled: RAPIDAPI_ENABLED,
+              rapidApiCurrentAuthorizedGrants: [...authorizedGrants.values()].filter(until => until > Date.now()).length,
+              adminCacheWebhookConfigured: Boolean(CACHE_HOOK_SECRET),
+              providerCooldownUntil: globalCooldown() ? new Date(globalCooldown().until).toISOString() : null,
+              jobs: debugJobs(),
+              status: lastStatus
+            });
+            return;
+          }
+
+          // Cloudflare Vid.Best Worker sends this only after the authenticated admin saves
+          // redistribution_certified=true in D1. This endpoint is HMAC-protected; browsers
+          // and ordinary signed playback /status requests cannot grant caching rights.
+          if (url.pathname === "/cache/authorized") {
+            if (req.method !== "POST") { text(res, 405, "Method Not Allowed"); return; }
+            if (!RAPIDAPI_ENABLED || !CACHE_HOOK_SECRET || !PRIVATE_RESOLVER_TOKEN) {
+              json(res, 503, { status: "disabled", error: "Authorized cache webhook is not configured" }); return;
+            }
+            const timestamp = String(req.headers["x-vidbest-cache-timestamp"] || "");
+            const nonce = String(req.headers["x-vidbest-cache-nonce"] || "");
+            const signature = String(req.headers["x-vidbest-cache-signature"] || "");
+            if (!/^\d{10}$/.test(timestamp) || !/^[a-f0-9-]{36}$/.test(nonce) ||
+                !/^[a-f0-9]{64}$/.test(signature) ||
+                Math.abs(Math.floor(Date.now() / 1000) - Number(timestamp)) > 300) {
+              json(res, 403, { status: "forbidden" }); return;
+            }
+            // Bound request size; do not trust content-length or permit arbitrary JSON floods.
+            let raw = "";
+            try {
+              for await (const chunk of req) {
+                raw += chunk.toString("utf8");
+                if (Buffer.byteLength(raw) > 4096) { json(res, 413, { error: "Payload too large" }); return; }
+              }
+            } catch { json(res, 400, { error: "Invalid request body" }); return; }
+            let submitted;
+            try { submitted = JSON.parse(raw); } catch { json(res, 400, { error: "Invalid JSON" }); return; }
+            const videoId = String(submitted?.id || "");
+            const videoUrl = String(submitted?.url || "");
+            if (!/^\d{15,25}$/.test(videoId) || PROTECTED_VIDEO_IDS.has(videoId) ||
+                !validateTikTokSource(videoId, videoUrl)) {
+              json(res, 400, { status: "invalid_video" }); return;
+            }
+            const message = timestamp + "\n" + nonce + "\n" + videoId + "\n" + videoUrl;
+            const expected = crypto.createHmac("sha256", CACHE_HOOK_SECRET).update(message).digest("hex");
+            if (!safeEqual(signature, expected)) { json(res, 403, { status: "forbidden" }); return; }
+            const now = Date.now();
+            for (const [n, until] of usedHookNonces) if (until <= now) usedHookNonces.delete(n);
+            if (usedHookNonces.has(nonce)) { json(res, 409, { status: "replayed" }); return; }
+            usedHookNonces.set(nonce, now + 360000);
+            authorizedGrants.set(videoId, now + 3600000); // one-hour permission to finish queued job
+            void startCacheJob(videoId, videoUrl);
+            json(res, 202, { status: "queued", video_id: videoId });
+            return;
+          }
+
+          const id = url.searchParams.get("id") || "";
+          const exp = url.searchParams.get("exp") || "";
+          const sig = url.searchParams.get("sig") || "";
+          const sourceUrl = url.searchParams.get("url") || "";
+
+          if (url.pathname === "/status") {
+            if (!validSignature(id, exp, sig)) {
+              json(res, 403, { status: "forbidden", error: "Invalid or expired signature." });
+              return;
+            }
+
+            let cached;
+            try {
+              cached = await findCachedVideo(id);
+            } catch (error) {
+              console.warn("[r2-status-error]", id, error.message);
+              json(res, 503, { status: "error", code: "r2_lookup_failed", error: "R2 cache lookup unavailable." }, { "Retry-After": "15" });
+              return;
+            }
+            if (cached) {
+              jobs.set(String(id), { status: "cached", key: cached.key, size: cached.size });
+              const stream = "/stream?id=" + encodeURIComponent(id) + "&exp=" + encodeURIComponent(exp) + "&sig=" + encodeURIComponent(sig);
+              json(res, 200, { status: "cached", stream, key: cached.key, size: cached.size });
+              return;
+            }
+
+            const validSource = validateTikTokSource(id, sourceUrl);
+            if (!validSource) {
+              json(res, 400, { status: "error", error: "Invalid TikTok source URL." });
+              return;
+            }
+
+            const cooldown = getCooldown(id);
+            if (cooldown && !mayUseRapidAPIForCache(id)) {
+              json(res, 200, {
+                status: "error",
+                error: "TikTok source is in cooldown. Automatic retry is paused.",
+                retryAfter: new Date(cooldown.until).toISOString()
+              });
+              return;
+            }
+
+            void startCacheJob(id, validSource);
+            const state = jobs.get(String(id)) || { status: "scraping" };
+            json(res, 200, {
+              status: state.status === "uploading" ? "scraping" : (state.status || "scraping")
+            });
+            return;
+          }
+
+          if (url.pathname === "/stream") {
+            if (!validSignature(id, exp, sig)) {
+              text(res, 403, "Forbidden");
+              return;
+            }
+
+            const objectInfo = await findCachedVideo(id);
+            if (!objectInfo) {
+              text(res, 425, "Preparing", { "Retry-After": "3" });
+              return;
+            }
+
+            await streamVideo(req, res, objectInfo);
+            return;
+          }
+
+          if (url.pathname === "/watch") {
+            const match = sourceUrl.match(/\/video\/(\d+)/);
+            if (!match || !validSignature(match[1], exp, sig)) {
+              text(res, 403, "Forbidden or Invalid Link");
+              return;
+            }
+
+            const videoId = match[1];
+            void startCacheJob(videoId, sourceUrl);
+
+            const streamUrl = "/stream?id=" + encodeURIComponent(videoId) + "&exp=" + encodeURIComponent(exp) + "&sig=" + encodeURIComponent(sig);
+            const statusUrl = "/status?id=" + encodeURIComponent(videoId) + "&exp=" + encodeURIComponent(exp) + "&sig=" + encodeURIComponent(sig) + "&url=" + encodeURIComponent(sourceUrl);
+
+            const html =
+              "<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>" +
+              "<title>Vid.Best Player</title><style>" +
+              "html,body{margin:0;width:100%;height:100%;background:#000;overflow:hidden}" +
+              "body{display:flex;align-items:center;justify-content:center}" +
+              ".player{width:min(100vw,430px);height:100vh;background:#000;position:relative}" +
+              "video{width:100%;height:100%;object-fit:contain;background:#000}" +
+              ".loading{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;color:#fff;background:#000;font-family:Arial,sans-serif;text-align:center;padding:24px}" +
+              ".spinner{width:42px;height:42px;border:4px solid #333;border-top-color:#fff;border-radius:50%;animation:s .8s linear infinite}" +
+              "@keyframes s{to{transform:rotate(360deg)}}" +
+              "</style></head><body><div class='player'>" +
+              "<div id='loading' class='loading'><div class='spinner'></div><strong>Preparing video...</strong><span id='state'>Checking cache</span></div>" +
+              "<video id='video' controls playsinline crossorigin='anonymous' preload='auto'></video></div><script>" +
+              "const v=document.getElementById('video');const l=document.getElementById('loading');const s=document.getElementById('state');" +
+              "const streamUrl=" + JSON.stringify(streamUrl) + ";const statusUrl=" + JSON.stringify(statusUrl) + ";let attempts=0;const maxAttempts=15;" +
+              "async function poll(){try{const r=await fetch(statusUrl,{cache:'no-store'});const d=await r.json();" +
+              "if(d.status==='cached'){v.src=streamUrl;v.load();l.style.display='none';v.play().catch(()=>{});return;}" +
+              "if(d.status==='error'){s.textContent=d.error||'Video could not be prepared.';return;}" +
+              "attempts++;s.textContent='Preparing cached copy '+attempts+'/'+maxAttempts;" +
+              "if(attempts>=maxAttempts){s.textContent='Video is taking longer than expected.';return;}setTimeout(poll,3000);}" +
+              "catch(e){attempts++;s.textContent='Connection retry '+attempts+'/'+maxAttempts;if(attempts<maxAttempts)setTimeout(poll,3000);}}poll();" +
+              "</script></body></html>";
+
+            res.writeHead(200, cors({
+              "Content-Type": "text/html; charset=utf-8",
+              "Cache-Control": "no-store"
+            }));
+            res.end(html);
+            return;
+          }
+
+          text(res, 404, "Not Found");
+        } catch (error) {
+          lastStatus = "Gateway handler error: " + String(error && error.message ? error.message : error);
+          if (!res.headersSent) text(res, 500, "Gateway Error");
+          else res.end();
+        }
+      }
+
+      http.createServer(handle).listen(PORT, "0.0.0.0", () => {
+        console.log("Vid.Best Gateway " + VERSION + " running on port " + PORT);
+      });
+      VIDBEST_GATEWAY_JS
+      node --check /app/server.js
+      # Required SDK for the existing R2 signed-stream gateway.
+      npm init -y >/dev/null 2>&1
+      npm install --no-audit --no-fund --silent @aws-sdk/client-s3
+      # Optional downloader dependencies used only for authorized cache-miss sources.
+      # Failure here must not block R2 cached playback or the Tunnel.
+      if apk add --no-cache python3 ffmpeg curl >/dev/null 2>&1; then
+        if curl -fLsS --connect-timeout 10 --max-time 30 https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp; then
+          chmod a+rx /usr/local/bin/yt-dlp
+        else
+          echo "Optional yt-dlp unavailable; R2 cached streams and API Tester still work"
+        fi
+      else
+        echo "Optional download tools unavailable; R2 cached streams and API Tester still work"
+      fi
+      exec node /app/server.js
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 180s
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: "${TUNNEL_TOKEN}"
+    depends_on:
+    - app
+
+  rapidapi-tester:
+    image: node:22-alpine
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      RAPIDAPI_KEY: "${RAPIDAPI_KEY}"
+      TESTER_TOKEN: "${TESTER_TOKEN}"
+      TESTER_MAX_MONTHLY: "${TESTER_MAX_MONTHLY:-20}"
+      TESTER_TIMEOUT_MS: "15000"
+      TESTER_PORT: "8000"
+      IBBMM_HOST: "tiktok-download5.p.rapidapi.com"
+      IBBMM_PATH: "/getVideo"
+      TIKWM_HOST: "tiktok-scraper7.p.rapidapi.com"
+      TIKWM_PATH: "/"
+      SNAPTIK_HOST: "snaptik-fit.p.rapidapi.com"
+      SNAPTIK_PATH: "/tiktok"
+    expose:
+    - "8000"
+    volumes:
+    - rapidapi-tester-state:/app/state
+    command:
+    - /bin/sh
+    - -ec
+    - |
+      mkdir -p /app/state
+      cat > /app/tester.js <<'VIDBEST_TESTER_JS'
+      "use strict";
+      // Vid.Best isolated three-provider API tester.
+      // Tests VIDEO METADATA responses only; does not download/copy MP4s or modify R2, KV, D1 or production gateway.
+      const http = require("node:http");
+      const crypto = require("node:crypto");
+      const fs = require("node:fs");
+
+      const PORT = Number(process.env.TESTER_PORT || 8000);
+      const API_KEY = process.env.RAPIDAPI_KEY || "";
+      const TOKEN = process.env.TESTER_TOKEN || "";
+      const STATE_PATH = process.env.TESTER_STATE_PATH || "/app/state/usage.json";
+      const MONTHLY_BUDGET = Math.max(1, Math.min(300, Number(process.env.TESTER_MAX_MONTHLY || 20) || 20));
+      const TIMEOUT_MS = Math.max(5000, Math.min(30000, Number(process.env.TESTER_TIMEOUT_MS || 15000) || 15000));
+      const MIN_GAP_MS = 30000;
+      const providers = {
+        ibbmm: {
+          host: process.env.IBBMM_HOST || "tiktok-download5.p.rapidapi.com",
+          path: process.env.IBBMM_PATH || "/getVideo",
+          method: "GET", parameter: "url", hdParameter: "hd", hd: "1"
+        },
+        tikwm: {
+          host: process.env.TIKWM_HOST || "tiktok-scraper7.p.rapidapi.com",
+          path: process.env.TIKWM_PATH || "/",
+          method: "GET", parameter: "url", hdParameter: "hd", hd: "1"
+        },
+        snaptik: {
+          host: process.env.SNAPTIK_HOST || "snaptik-fit.p.rapidapi.com",
+          path: process.env.SNAPTIK_PATH || "/tiktok",
+          method: "POST", parameter: "url"
+        }
+      };
+
+      function emptyUsage(month = "") {
+        return { month, total: 0, byProvider: {}, lastCall: {}, cooldown: {} };
+      }
+      function readUsage() {
+        try {
+          const result = JSON.parse(fs.readFileSync(STATE_PATH, "utf8"));
+          return result && typeof result === "object" ? result : emptyUsage();
+        } catch { return emptyUsage(); }
+      }
+      let usage = readUsage();
+      function saveUsage() {
+        fs.mkdirSync(require("node:path").dirname(STATE_PATH), { recursive: true });
+        const tmp = STATE_PATH + ".tmp";
+        fs.writeFileSync(tmp, JSON.stringify(usage), { mode: 0o600 });
+        fs.renameSync(tmp, STATE_PATH);
+      }
+      function refreshMonth() {
+        const month = new Date().toISOString().slice(0, 7);
+        if (usage.month !== month) { usage = emptyUsage(month); saveUsage(); }
+      }
+      function respond(res, status, payload) {
+        res.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" });
+        res.end(JSON.stringify(payload));
+      }
+      function authorized(req) {
+        const provided = req.headers["x-test-token"];
+        if (!TOKEN || typeof provided !== "string") return false;
+        const a = Buffer.from(provided);
+        const b = Buffer.from(TOKEN);
+        return a.length === b.length && crypto.timingSafeEqual(a, b);
+      }
+      function validVideo(value) {
+        try {
+          const uri = new URL(value);
+          if (uri.protocol !== "https:" || uri.username || uri.password || uri.port) return null;
+          if (uri.hostname.toLowerCase().replace(/^www\./, "") !== "tiktok.com") return null;
+          const match = /^\/@([a-zA-Z0-9_.]{1,32})\/video\/(\d{15,25})\/?$$/.exec(uri.pathname);
+          if (!match) return null;
+          return { url: `https://www.tiktok.com/@$${match[1]}/video/$${match[2]}`, id: match[2] };
+        } catch { return null; }
+      }
+      function validProvider(c) {
+        return /^[a-z0-9-]+\.p\.rapidapi\.com$$/.test(c.host) &&
+          c.path.startsWith("/") && !c.path.startsWith("//") && !/[?#\\\s]/.test(c.path);
+      }
+      function looksLikeUrl(v) { return typeof v === "string" && /^https:\/\//.test(v); }
+      function summarizeResponse(body, expectedId) {
+        const data = body?.data && typeof body.data === "object" ? body.data : body;
+        const media = data?.download_link || body?.download_link || {};
+        const foundId = data?.id || data?.video_id || body?.video_id || "";
+        return {
+          response_code: body?.code ?? null,
+          response_status: typeof body?.status === "string" ? body.status.slice(0, 40) : null,
+          has_video_title: Boolean(data?.title || data?.desc || data?.description),
+          has_cover: looksLikeUrl(data?.cover || data?.origin_cover || data?.thumbnail_url),
+          has_duration: Number.isFinite(Number(data?.duration)) && Number(data?.duration) > 0,
+          has_watermarked_video_link: Boolean(privateWatermarkedMedia(body, expectedId)),
+          has_watermarked_hd_link: looksLikeUrl(media?.watermark_hd),
+          has_other_video_link: looksLikeUrl(data?.play) || looksLikeUrl(data?.hdplay) || looksLikeUrl(media?.no_watermark),
+          video_id_matches: foundId ? String(foundId) === expectedId : null
+        };
+      }
+      // The tester and private cache resolver must agree on both provider response shapes.
+      // A matching ID and watermarked URL are required; never substitute unwatermarked links.
+      function privateWatermarkedMedia(body, expectedId) {
+        const data = body?.data && typeof body.data === "object" ? body.data : body;
+        const media = data?.download_link || body?.download_link || {};
+        const foundId = data?.id || data?.video_id || body?.video_id || "";
+        if (String(foundId) !== String(expectedId)) return null;
+        return [data?.wmplay, media?.watermark, media?.watermark_hd].find(looksLikeUrl) || null;
+      }
+      function failReason(httpStatus, data) {
+        if (httpStatus < 200 || httpStatus >= 300) return "http_error";
+        if (typeof data !== "object" || !data) return "invalid_json";
+        if (typeof data.code === "number" && data.code !== 0) return "provider_error";
+        if (typeof data.error === "string" && data.error) return "provider_error";
+        return null;
+      }
+      async function callProvider(name, video, privateMedia = false) {
+        const cfg = providers[name];
+        if (!validProvider(cfg)) return { provider: name, status: "invalid_provider_config" };
+        refreshMonth();
+        const now = Date.now();
+        if (usage.total >= MONTHLY_BUDGET) return { provider: name, status: "monthly_budget_exhausted" };
+        if (now - Number(usage.lastCall[name] || 0) < MIN_GAP_MS) return { provider: name, status: "local_rate_limit", retry_after_seconds: 30 };
+        if (now < Number(usage.cooldown[name] || 0)) return { provider: name, status: "provider_cooldown" };
+        const requestUrl = new URL(`https://$${cfg.host}$${cfg.path}`);
+        const headers = { "x-rapidapi-host": cfg.host, "x-rapidapi-key": API_KEY, "accept": "application/json" };
+        let body;
+        if (cfg.method === "GET") {
+          requestUrl.searchParams.set(cfg.parameter, video.url);
+          if (cfg.hdParameter) requestUrl.searchParams.set(cfg.hdParameter, cfg.hd);
+        } else {
+          headers["content-type"] = "application/json";
+          body = JSON.stringify({ [cfg.parameter]: video.url });
+        }
+        // Reserve the budget BEFORE contacting upstream. Usage persists across container restarts.
+        usage.total += 1;
+        usage.byProvider[name] = Number(usage.byProvider[name] || 0) + 1;
+        usage.lastCall[name] = now;
+        saveUsage();
+        const start = performance.now();
+        try {
+          const upstream = await fetch(requestUrl, {
+            method: cfg.method, headers, body, redirect: "error", signal: AbortSignal.timeout(TIMEOUT_MS)
+          });
+          if ([401, 402, 403, 429].includes(upstream.status)) {
+            usage.cooldown[name] = Date.now() + 3600000;
+            saveUsage();
+          }
+          const size = Number(upstream.headers.get("content-length") || 0);
+          if (size > 100000) { await upstream.body?.cancel(); return { provider: name, status: "response_too_large", http: upstream.status }; }
+          const raw = await upstream.text();
+          if (raw.length > 100000) return { provider: name, status: "response_too_large", http: upstream.status };
+          let data;
+          try { data = JSON.parse(raw); } catch { data = null; }
+          const problem = failReason(upstream.status, data);
+          return {
+            provider: name, status: problem || "response_received", http: upstream.status,
+            latency_ms: Math.round(performance.now() - start),
+            ...(problem ? {} : summarizeResponse(data, video.id)),
+            ...(privateMedia && !problem && privateWatermarkedMedia(data, video.id)
+              ? { private_watermarked_url: privateWatermarkedMedia(data, video.id) } : {}),
+            // Never forward upstream media URLs, original JSON or API key to public compare callers.
+            note: "API response only. Does not confirm CDN playback, rights, or a 30-day MP4 cache."
+          };
+        } catch (error) {
+          return { provider: name, status: error?.name === "TimeoutError" ? "timeout" : "network_error",
+            latency_ms: Math.round(performance.now() - start) };
+        }
+      }
+
+      http.createServer(async (req, res) => {
+        try {
+          const uri = new URL(req.url || "/", "http://localhost");
+          if (uri.pathname === "/health") return respond(res, 200, { ok: true, service: "vidbest-three-rapidapi-metadata-tester" });
+          if (!authorized(req)) return respond(res, 403, { error: "Invalid testing token" });
+          if (uri.pathname === "/config" && req.method === "GET") {
+            refreshMonth();
+            return respond(res, 200, {
+              api_key_configured: Boolean(API_KEY), monthly_budget: MONTHLY_BUDGET, used_this_month: usage.total,
+              providers: Object.fromEntries(Object.entries(providers).map(([name, cfg]) => [name,
+                { host: cfg.host, path: cfg.path, method: cfg.method, configured: validProvider(cfg) }]))
+            });
+          }
+          // Private app-to-tester endpoint; NOT included in the gateway public reverse proxy.
+          // Tested providers share the SAME persistent monthly budget as manual tests.
+          if (uri.pathname === "/resolve" && req.method === "POST") {
+            if (!API_KEY) return respond(res, 503, { error: "API key not configured" });
+            let payload = "";
+            for await (const chunk of req) {
+              payload += chunk.toString("utf8");
+              if (payload.length > 4096) return respond(res, 413, { error: "Body too large" });
+            }
+            let input;
+            try { input = JSON.parse(payload); } catch { return respond(res, 400, { error: "Invalid JSON" }); }
+            const video = validVideo(input?.url || "");
+            if (!video) return respond(res, 400, { error: "Invalid TikTok URL" });
+            for (const name of ["ibbmm", "tikwm"]) {
+              const result = await callProvider(name, video, true);
+              if (result.status === "response_received" && result.video_id_matches === true &&
+                  result.has_watermarked_video_link && result.private_watermarked_url) {
+                return respond(res, 200, { id: video.id, provider: name, media_url: result.private_watermarked_url });
+              }
+            }
+            return respond(res, 404, { id: video.id, error: "No watermarked media from allowed providers" });
+          }
+          if (uri.pathname === "/compare" && req.method === "GET") {
+            if (!API_KEY) return respond(res, 503, { error: "RAPIDAPI_KEY not configured" });
+            const video = validVideo(uri.searchParams.get("url") || "");
+            if (!video) return respond(res, 400, { error: "Provide a full HTTPS TikTok URL like https://www.tiktok.com/@creator/video/123..." });
+            const selected = uri.searchParams.get("provider") || "all";
+            const names = selected === "all" ? Object.keys(providers) : [selected];
+            if (names.some(name => !providers[name])) return respond(res, 400, { error: "Provider must be ibbmm, tikwm, snaptik, or all." });
+            const results = [];
+            for (const name of names) results.push(await callProvider(name, video));
+            return respond(res, 200, { video_id: video.id, results, used_this_month: usage.total, monthly_budget: MONTHLY_BUDGET });
+          }
+          return respond(res, 404, { error: "Not found" });
+        } catch (err) {
+          console.error("tester-handler-error", err?.message || "unknown");
+          return respond(res, 500, { error: "Internal tester error" });
+        }
+      }).listen(PORT, "0.0.0.0", () => {
+        console.log(`Vid.Best RapidAPI metadata tester ready on :$${PORT}. Production gateway unchanged.`);
+      });
+      VIDBEST_TESTER_JS
+      node --check /app/tester.js
+      exec node /app/tester.js
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8000/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  gateway-state:
+  rapidapi-tester-state:
