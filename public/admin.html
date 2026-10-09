@@ -82,7 +82,9 @@
               </div>
               <div class="media-rights-options">
                 <label class="switch-label rights-confirmation"><input id="media-rights-confirmed" type="checkbox"><span></span>I certify that I own this media or have permission to redistribute and cache it on Vid.Best</label>
-                <p class="field-help">Required for uploaded video/HLS copies and automatic cache URLs. Checking this box records your certification; it does not itself grant redistribution rights.</p>
+                <p class="field-help">Required for R2 copies. Checking this box records your certification; it does not itself grant redistribution rights. For a TikTok link, Save automatically requests an authorized MP4 cache when rights are newly confirmed. The original TikTok page remains attributed, and Summer/Saiyaara are excluded.</p>
+                <button type="button" class="button ghost" id="cache-tiktok-now">Retry authorized TikTok cache now</button>
+                <p id="cache-tiktok-status" class="form-status" role="status"></p>
               </div>
                             <div id="media-preview" class="admin-preview"><span>Secure media preview appears here</span></div>
             </div>
