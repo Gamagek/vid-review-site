@@ -18,8 +18,8 @@ function candidate(row) {
 export async function dispatchAdminTikTokCache(env, row) {
   const source = candidate(row);
   if (!source) throw new Error("Video must have saved redistribution rights and a valid, uncached TikTok URL");
-  const secret = String(env.VIDBEST_CACHE_HOOK_SECRET || "");
-  if (secret.length < 32) throw new Error("VIDBEST_CACHE_HOOK_SECRET not configured");
+  const secret = String(env.CACHE_HOOK_SECRET || env.VIDBEST_CACHE_HOOK_SECRET || "");
+  if (secret.length < 32) throw new Error("CACHE_HOOK_SECRET not configured");
   const ts = String(Math.floor(Date.now() / 1000));
   const nonce = crypto.randomUUID();
   const message = ts + "\n" + nonce + "\n" + source.id + "\n" + source.url;
