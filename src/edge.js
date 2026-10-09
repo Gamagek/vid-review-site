@@ -1,4 +1,6 @@
 import app, { processAuthorizedCacheJobs, processTikTokOEmbedBackfill, resolveReactionSalt } from "./index.js";
+import { processAdminTikTokCacheJobs } from "./tiktok-cache-jobs.js";
+import { processTikTokThumbnailJobs } from "./tiktok-thumbnail-cache.js";
 
 const CRAWLER_PATTERN = /\b(?:bot|crawler|spider|slurp|bingpreview|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|pinterestbot|duckduckbot|baiduspider|yandexbot)\b/i;
 const EXTERNAL_VIDEO_HOSTS = new Set([
@@ -616,6 +618,10 @@ async function fetchHandler(request, env, ctx) {
 }
 
 async function scheduledHandler(controller, env, ctx) {
+  ctx.waitUntil(processAdminTikTokCacheJobs(env, { limit: 2 })
+    .catch(error => console.error('Scheduled TikTok cache failed', error.message)));
+  ctx.waitUntil(processTikTokThumbnailJobs(env, { limit: 3 })
+    .catch(error => console.error('Scheduled TikTok thumbnail cache failed', error.message)));
   ctx.waitUntil(
     processAuthorizedCacheJobs(env, { limit: 2 })
       .catch((error) => console.error("Scheduled authorized auto-cache failed", error?.message || error)),

@@ -51,6 +51,37 @@ The gateway repository `Gamagek/tiktok-oembed-gateway` adds a global Durable Obj
 
 ### TikTok playback and video-cache diagnosis
 
+Admin-approved TikTok downloads use a durable D1 job in `src/tiktok-cache-jobs.js`.
+Save a rights-confirmed TikTok record to queue it, or use its explicit retry button.
+The existing 15-minute cron resumes eligible jobs after failures or restarts, with
+at most three webhook attempts, persistent backoff, and a conditional D1 lease
+that prevents simultaneous Save/Retry/cron requests from duplicating work. The
+authenticated `GET /api/admin/videos/:id/cache-tiktok` only checks R2; it never
+calls a scraper. The admin shows queued, failed, or verified complete status.
+An accepted webhook is not a completed upload. Existing Summer/Saiyaara paths and
+records without saved redistribution rights are excluded.
+
+The webhook uses `redirect: "manual"` and rejects redirects explicitly. Its
+`CACHE_HOOK_SECRET` must match the Portainer value (32+ characters); the older
+`VIDBEST_CACHE_HOOK_SECRET` alias remains supported. `SIGN_SECRET` is independent.
+HTTP 502, auth failure, malformed acknowledgments, and storage failure produce
+different actionable status messages. No secrets or raw provider responses are
+sent to the browser. `VIDBEST_AUTO_CACHE_TIKTOK=0` pauses automatic video jobs.
+
+The same cron copies validated oEmbed thumbnails directly from their allowlisted
+image CDN to `vid-assets/uploads/tiktok-thumbnails/`. This does not depend on
+Oracle or Portainer. Copies are capped at 2 MB, validated by type and signature,
+and failed image fetches get a persistent 24-hour retry cooldown. Custom admin
+thumbnails are preserved. The cached-poster endpoint uses the R2 image when it
+exists and retains the text poster if storage is unavailable. D1 holds metadata;
+the gateway already has its separate `TIKTOK_OEMBED_KV` and Durable Object cache.
+
+The owner-supplied Portainer v55 stack also had a response mismatch: its tester
+recognized `download_link.watermark`, but its private resolver only returned
+`data.wmplay`. The compatible [v56 stack and deployment notes](ops/portainer/README.md)
+fix that mismatch without changing credentials, rights checks, protected videos,
+or the shared monthly provider budget.
+
 Standard TikTok cards open one on-demand Cloudflare player at `https://tiktok-oembed-gateway.gkasunc.workers.dev/watch?url=...`. No TikTok `embed.js`, blockquote injection, or official player iframe is mounted. The gateway checks the private `vid-assets` R2 bucket first and serves signed, byte-range MP4 responses directly from Cloudflare when a valid copy exists. Cached playback does not depend on Oracle or its tunnel.
 
 On a cache miss the gateway signs a request to the existing Node/Portainer `/status` endpoint at `video.megasale.win`. Only that Node service can prepare and upload a missing copy. The Worker distinguishes preparation, storage failures, gateway authorization failures, unreachable services and source failures. It never equates cached oEmbed JSON or an iframe `load` event with video availability. The controlled player polls preparation at three-second intervals, at most 15 times, honors real backend cooldowns, and offers a deliberate retry. It does not automatically retry a terminal error or circumvent a provider block.

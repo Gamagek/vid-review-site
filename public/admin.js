@@ -6,6 +6,7 @@ const adminState = {
   analysisDraft: null,
   analysisSource: "",
   analysisPollTimer: null,
+  cachePollTimer: null,
 };
 
 const ui = {
@@ -163,6 +164,7 @@ async function unlockAdmin() {
 }
 
 async function lockAdmin() {
+  clearTimeout(adminState.cachePollTimer);
   try { await adminApi("/api/admin/session", { method: "DELETE" }); } catch { /* Clear the local UI even if logout fails. */ }
   ui.workspace.hidden = true;
   ui.loginPanel.hidden = false;
@@ -874,14 +876,38 @@ async function requestAuthorizedTikTokCacheNow() {
   setStatus(ui.cacheTikTokStatus, "Requesting authorized video cache...");
   try {
     const result = await adminApi("/api/admin/videos/" + id + "/cache-tiktok", { method: "POST" });
-    setStatus(ui.cacheTikTokStatus,
-      result.status === "queued" ? "Gateway accepted the cache job. This is not yet an MP4 upload confirmation." : "Request received.",
-      "success");
+    showTikTokCacheStatus(result);
+    if (result.status === "queued") scheduleTikTokCacheStatus(id);
   } catch (error) {
     setStatus(ui.cacheTikTokStatus, String(error.message || error), "error");
   } finally {
     ui.cacheTikTokNow.disabled = false;
   }
+}
+
+function showTikTokCacheStatus(result) {
+  const message = result.status === 'complete' ? 'Verified: the playable MP4 is stored in R2.'
+    : result.error || (result.status === 'queued'
+      ? 'Gateway accepted the job. Waiting for the MP4 to appear in R2…'
+      : 'No video cache has been confirmed yet.');
+  setStatus(ui.cacheTikTokStatus, message + (result.next_attempt_at ? ` Next automatic check: ${result.next_attempt_at} UTC.` : ''),
+    result.error ? 'error' : result.status === 'complete' ? 'success' : '');
+}
+
+function scheduleTikTokCacheStatus(id, remaining = 8) {
+  clearTimeout(adminState.cachePollTimer);
+  if (!remaining) return;
+  adminState.cachePollTimer = setTimeout(async () => {
+    if (document.hidden || Number(ui.editingId.value) !== id) return;
+    try {
+      // Read-only R2 checks; never repeat the signed cache POST while polling.
+      const result = await adminApi(`/api/admin/videos/${id}/cache-tiktok`);
+      if (Number(ui.editingId.value) !== id) return;
+      showTikTokCacheStatus(result);
+      if (['queued', 'pending'].includes(result.status)) scheduleTikTokCacheStatus(id, remaining - 1);
+      if (result.status === 'complete') void loadAdminVideos();
+    } catch (error) { setStatus(ui.cacheTikTokStatus, error.message, 'error'); }
+  }, 15000);
 }
 
 async function saveVideo(event) {
@@ -942,7 +968,7 @@ async function saveVideo(event) {
       : result.video.cache_status === "failed"
         ? ` Auto-cache needs attention: ${result.video.cache_error || "retry pending"}.`
         : "";
-    setStatus(ui.saveStatus, `Saved: \${result.video.title}.\${cacheMessage}\${queueWarning}\${analysisWarning}`, queueWarning || analysisWarning ? "error" : "success");
+    setStatus(ui.saveStatus, `Saved: ${result.video.title}.${cacheMessage}${queueWarning}${analysisWarning}`, queueWarning || analysisWarning ? "error" : "success");
     resetEditor(false);
     await Promise.all([loadAdminVideos(), loadDiscoveryRequests()]);
   } catch (error) {
@@ -1004,6 +1030,13 @@ function renderAdminVideo(video) {
 }
 
 async function editVideo(video) {
+  clearTimeout(adminState.cachePollTimer);
+  setStatus(ui.cacheTikTokStatus, '');
+  if (video.media_type === 'tiktok' && video.redistribution_certified) {
+    showTikTokCacheStatus({ status: video.cache_status === 'running' ? 'queued' : video.cache_status,
+      error: video.cache_error, next_attempt_at: video.cache_next_attempt_at });
+    scheduleTikTokCacheStatus(Number(video.id));
+  }
   adminState.activeDiscoveryRequestId = null;
   ui.activeDiscoveryRequest.value = "";
   ui.editingId.value = video.id;
@@ -1190,6 +1223,7 @@ async function moderateComment(id, status) {
 }
 
 function resetEditor(clearStatus = true) {
+  clearTimeout(adminState.cachePollTimer);
   clearAnalysisDraft();
   ui.videoForm.reset();
   ui.editingId.value = "";
