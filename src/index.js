@@ -1,4 +1,5 @@
 import { parseInstagramUrl } from "../public/instagram-utils.js";
+import { maybeQueueAdminTikTokCache, retryAdminTikTokCache } from "./admin-tiktok-cache.js";
 import {
   requestMemberLogin,
   verifyMemberLogin,
@@ -364,6 +365,12 @@ async function route(request, env, ctx) {
   if (match && request.method === "GET") {
     await requireAdmin(request, env);
     return getMediaAnalysis(env, match[1]);
+  }
+
+  match = path.match(/^\/api\/admin\/videos\/(\d+)\/cache-tiktok$/);
+  if (match && request.method === "POST") {
+    await requireAdmin(request, env);
+    return retryAdminTikTokCache(env, Number(match[1]));
   }
 
   match = path.match(/^\/api\/admin\/videos\/(\d+)\/analysis$/);
@@ -1887,6 +1894,7 @@ async function createVideo(request, env, ctx) {
   if (row?.cache_status === "pending") {
     ctx?.waitUntil?.(processAuthorizedCacheJobs(env, { videoId: Number(row.id), limit: 1 }));
   }
+  maybeQueueAdminTikTokCache(env, ctx, row);
   return json({ success: true, video: serializeVideo(row) }, 201);
 }
 
@@ -1962,6 +1970,10 @@ async function updateVideo(request, env, id, ctx) {
   }
   if (row?.cache_status === "pending") {
     ctx?.waitUntil?.(processAuthorizedCacheJobs(env, { videoId: Number(row.id), limit: 1 }));
+  }
+  // Trigger only for newly confirmed rights or a changed original URL; not every SEO edit.
+  if (!Number(existing.redistribution_certified) || existing.source_url !== row.source_url) {
+    maybeQueueAdminTikTokCache(env, ctx, row);
   }
   return json({ success: true, video: serializeVideo(row) });
 }

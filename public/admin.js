@@ -34,6 +34,8 @@ const ui = {
   hlsFolderInput: document.querySelector("#hls-folder-input"),
   uploadHlsButton: document.querySelector("#upload-hls-button"),
   mediaRightsConfirmed: document.querySelector("#media-rights-confirmed"),
+  cacheTikTokNow: document.querySelector("#cache-tiktok-now"),
+  cacheTikTokStatus: document.querySelector("#cache-tiktok-status"),
   uploadProgress: document.querySelector("#upload-progress"),
   uploadStatus: document.querySelector("#upload-status"),
   preview: document.querySelector("#media-preview"),
@@ -121,6 +123,7 @@ function bindAdminEvents() {
   ui.aiButton.addEventListener("click", generateCopy);
   ui.scanMedia.addEventListener("click", startMediaAnalysis);
   ui.videoForm.addEventListener("submit", saveVideo);
+  ui.cacheTikTokNow.addEventListener("click", requestAuthorizedTikTokCacheNow);
   ui.reset.addEventListener("click", resetEditor);
   ui.refreshVideos.addEventListener("click", loadAdminVideos);
   ui.refreshComments.addEventListener("click", loadPendingComments);
@@ -859,6 +862,26 @@ async function saveAnalysis(video) {
       warnings: draft.warnings || [],
     }),
   });
+}
+
+async function requestAuthorizedTikTokCacheNow() {
+  const id = Number(ui.editingId.value || 0);
+  if (!id) { setStatus(ui.cacheTikTokStatus, "Save the TikTok record first, then retry its cache.", "error"); return; }
+  if (!ui.mediaRightsConfirmed.checked) {
+    setStatus(ui.cacheTikTokStatus, "Confirm redistribution rights, then Save before caching.", "error"); return;
+  }
+  ui.cacheTikTokNow.disabled = true;
+  setStatus(ui.cacheTikTokStatus, "Requesting authorized video cache...");
+  try {
+    const result = await adminApi("/api/admin/videos/" + id + "/cache-tiktok", { method: "POST" });
+    setStatus(ui.cacheTikTokStatus,
+      result.status === "queued" ? "Gateway accepted the cache job. This is not yet an MP4 upload confirmation." : "Request received.",
+      "success");
+  } catch (error) {
+    setStatus(ui.cacheTikTokStatus, String(error.message || error), "error");
+  } finally {
+    ui.cacheTikTokNow.disabled = false;
+  }
 }
 
 async function saveVideo(event) {
