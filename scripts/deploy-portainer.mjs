@@ -63,6 +63,8 @@ async function api(path, { method = "GET", body, timeout = 30000 } = {}) {
   const options = {
     method,
     headers: { "X-API-Key": apiKey, "Accept": "application/json" },
+    // Do not follow an HTML login redirect and mistake the final 200 for JSON.
+    redirect: "manual",
     signal: AbortSignal.timeout(timeout)
   };
   if (cfAccessId) {
@@ -74,15 +76,30 @@ async function api(path, { method = "GET", body, timeout = 30000 } = {}) {
     options.body = JSON.stringify(body);
   }
   const response = await fetch(url, options);
-  const raw = await response.text();
-  if (!response.ok) {
-    // Do not print response bodies: some API failures echo secret environment values.
-    throw new Error("Portainer " + method + " " + url.pathname +
-      " returned HTTP " + response.status);
+  // Never print responses or redirect query strings. Those can contain credentials.
+  // Only report the status, MIME type, and a fixed classification of a login page.
+  const mime = (response.headers.get("content-type") || "").split(";")[0].toLowerCase();
+  const location = response.headers.get("location") || "";
+  if (response.status >= 300 && response.status < 400) {
+    const loginRedirect = location.includes("/cdn-cgi/access/") ||
+      location.includes("cloudflareaccess.com");
+    throw new Error("Portainer API returned HTTP " + response.status +
+      (loginRedirect ? " (Cloudflare Access login redirect; check Service Auth token)" :
+      " (unexpected redirect)") + " at " + url.pathname);
   }
+  if (!response.ok) {
+    throw new Error("Portainer " + method + " " + url.pathname +
+      " returned HTTP " + response.status + " (" + (mime || "unknown content type") + ")");
+  }
+  if (mime && mime !== "application/json" && !mime.endsWith("+json")) {
+    throw new Error("Portainer API returned HTTP " + response.status + " " + mime +
+      " at " + url.pathname + "; expected JSON (possible Access login or proxy rewrite)");
+  }
+  const raw = await response.text();
   if (!raw) return {};
   try { return JSON.parse(raw); }
-  catch { throw new Error("Unexpected non-JSON Portainer response from " + url.pathname); }
+  catch { throw new Error("Portainer API returned HTTP " + response.status +
+    " with malformed JSON at " + url.pathname); }
 }
 
 const updatePath = "api/stacks/" + stackId + "?endpointId=" + endpointId;
