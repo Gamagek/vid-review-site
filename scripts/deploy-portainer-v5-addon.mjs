@@ -111,6 +111,24 @@ try{
   console.log("V5 ADDON DEPLOYED: PostgreSQL, Redis, metadata gateway and internal Nginx healthy; original tunnel preserved");
 }catch(error){
   console.error("Optional v5 deployment verification failed: "+error.message);
+  // Cloudflare 524 / transport timeout is ambiguous: Portainer can keep
+  // applying the first update even though the client connection has ended.
+  // Blindly sending a second stack PUT for rollback can race and damage it.
+  if(error.code===524 || error.name==="TimeoutError" || error.name==="AbortError") {
+    console.error("AMBIGUOUS UPDATE: Cloudflare timeout; do NOT send a second PUT.");
+    try {
+      const status=await fetchPortainer("api/stacks/27");
+      const currentFile=await fetchPortainer("api/stacks/27/file");
+      const isOriginal=currentFile.StackFileContent===oldYaml && isDeepStrictEqual(status.Env,oldEnv);
+      const isCandidate=currentFile.StackFileContent===candidateYaml && isDeepStrictEqual(status.Env,newEnv);
+      console.error("READ-ONLY RECOVERY SNAPSHOT: stack active="+(Number(status.Status)===1)+
+        "; original-config="+isOriginal+"; addon-config="+isCandidate);
+    } catch {
+      console.error("READ-ONLY RECOVERY SNAPSHOT unavailable. Manual audit required.");
+    }
+    process.exitCode=1;
+    process.exit();
+  }
   if(attempted){
     try{
       await fetchPortainer("api/stacks/27?endpointId=3","PUT",payload(oldYaml,oldEnv),180000);
