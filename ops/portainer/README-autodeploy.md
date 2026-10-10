@@ -47,10 +47,12 @@ Secrets. A public GitHub repo should **not** execute a privileged self-hosted
 runner on the production VPS. Use GitHub-hosted `ubuntu-latest` with an HTTPS
 protected endpoint instead.
 
-Cloudflare Access, if configured, requires the separate `CF-Access-Client-Id`
-and `CF-Access-Client-Secret` service token headers; this draft workflow does
-**not** yet include them. Do not enable deployment until the hostname and auth
-path are reachable, otherwise runs will fail without modifying the stack.
+If Cloudflare Access is enabled for the protected Portainer hostname,
+create one service-token policy scoped to the deployment application and add
+`CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET` as **repository secrets**.
+The workflow automatically sends both service-token headers when configured.
+Do not enable deployment until the hostname and auth path are reachable,
+otherwise runs will fail before altering the Stack.
 
 Rollback is best-effort, not a transactional restore of external mutable state.
 Always keep an independent Portainer backup of your current stack and env.
