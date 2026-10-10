@@ -102,6 +102,48 @@ function redirectToCanonical(request) {
   });
 }
 
+
+// Historical PR #53-style signed viewer, opt-in only. The normal R2-first watch route is untouched.
+async function signedLegacyWatch(request, env) {
+  const params = new URL(request.url).searchParams;
+  const user = String(params.get("user") || "").replace(/^@/, "");
+  const id = String(params.get("id") || "");
+  if (!/^[A-Za-z0-9_.]{1,32}$/.test(user) || !/^\\d{15,25}$/.test(id)) {
+    return new Response("Invalid TikTok video link", { status: 400, headers: { "Cache-Control": "no-store" } });
+  }
+  const secret = String(env.SIGN_SECRET || "");
+  if (secret.length < 16) {
+    return new Response("Legacy player signing is not configured", { status: 503, headers: { "Cache-Control": "no-store" } });
+  }
+  const exp = String(Math.floor(Date.now() / 1000) + 900);
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const signed = new Uint8Array(await crypto.subtle.sign("HMAC", key,
+    new TextEncoder().encode(id + "." + exp)));
+  const sig = Array.from(signed, x => x.toString(16).padStart(2, "0")).join("");
+  const gateway = new URL("https://video.megasale.win/legacy/watch");
+  gateway.searchParams.set("url", "https://www.tiktok.com/@" + user + "/video/" + id);
+  gateway.searchParams.set("exp", exp);
+  gateway.searchParams.set("sig", sig);
+  const html = '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<meta name="robots" content="noindex,nofollow"><title>Vid.Best classic TikTok player</title>' +
+    '<style>html,body{margin:0;width:100%;height:100%;background:#000;overflow:hidden}' +
+    'iframe{border:0;width:100%;height:100%;display:block}</style></head><body>' +
+    '<iframe src="' + escapeHtml(gateway.href) +
+    '" title="Classic TikTok player" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>' +
+    '</body></html>';
+  const headers = {
+    "Content-Type": "text/html; charset=utf-8",
+    "Cache-Control": "private, no-store",
+    "X-Robots-Tag": "noindex,nofollow",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "no-referrer",
+    "Content-Security-Policy": "default-src 'none'; frame-src https://video.megasale.win; style-src 'unsafe-inline'; frame-ancestors 'self'"
+  };
+  return new Response(request.method === "HEAD" ? null : html, { status: 200, headers });
+}
+
 function resolveCategory(pathname) {
   const match = pathname.match(/^\/category\/([^/]+)\/?$/);
   if (!match) return null;
@@ -527,6 +569,10 @@ export default {
         url.pathname = normalizedPath;
         return Response.redirect(url.toString(), 301);
       }
+    }
+
+    if (url.pathname === "/watch-legacy" && ["GET", "HEAD"].includes(request.method)) {
+      return signedLegacyWatch(request, env);
     }
 
     const category = resolveCategory(url.pathname);
