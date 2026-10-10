@@ -30,7 +30,7 @@ test("the optional v7 Portainer stack preserves production services without a se
   assert.match(yaml, /"http:\/\/legacy-v7:8080\/watch"/);
   assert.ok(yaml.includes('if (url.pathname === "/watch")'), "Existing R2-first player must remain");
   assert.ok(yaml.includes('if (url.pathname === "/status")'), "Existing polling endpoint must remain");
-  assert.ok(yaml.includes('if (url.pathname === "/cache/authorized")'), "Admin-only cache webhook must remain");
+  assert.ok(yaml.includes('if (url.pathname === "/cache/authorized"'), "Admin-only cache webhook must remain");
 });
 
 test("embedded historical v7 player parses and only embeds official TikTok playback", () => {
