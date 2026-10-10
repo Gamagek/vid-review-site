@@ -1,159 +1,138 @@
-// Saiyaara-only direct Tagembed iframe. The user's iframe URL is the source
-// of truth; this integration does not require a vendor SDK or proxy.
-// External video playback, autoplay and sound are controlled by the provider
-// and the visitor's browser.
+// One click-loaded Tagembed post, with a first-party poster on every surface.
 (() => {
   const SLUG = "saiyaara-a-cinematic-romance";
-  const IFRAME_URL = "https://widget.tagembed.com/2236794?postId=5592899&caption=1&header=1";
-  const LOAD_TIMEOUT = 14000;
-  let observer = null;
+  const IFRAME_URL = "https://widget.tagembed.com/2236794?postId=5592899&caption=0&header=0";
+  const POSTER_URL = "/api/tiktok/cached-poster?id=7669587518156705056&v=2";
+  // The provider's portrait media (716 x 1166) plus its 52px action row.
+  // A stable viewport avoids the provider cropping a tall post into a wide tile.
+  const WIDTH = 360, HEIGHT = 650;
+  const instances = new WeakMap();
+  let active = null;
 
-  function state(host, kind, message) {
-    if (!host?.isConnected) return;
-    host.dataset.tagembedState = kind;
-    const label = host.querySelector("[data-saiyaara-tagembed-status]");
-    if (label) {
-      label.textContent = message || "";
-      label.hidden = !message;
-    }
+  function fit(item) {
+    const { width, height } = item.viewport.getBoundingClientRect();
+    const scale = Math.max(0, Math.min(width / WIDTH, height / HEIGHT));
+    item.canvas.style.transform = `translate(-50%, -50%) scale(${scale})`;
   }
-
-  function connect(host, iframe) {
-    if (!iframe || iframe.dataset.tagembedTracked === "1") return;
-    iframe.dataset.tagembedTracked = "1";
-    let loaded = false;
-    const timeout = window.setTimeout(() => {
-      if (loaded || !host.isConnected) return;
-      // Do not tear down a potentially slow player or auto-retry the provider.
-      state(host, "slow", "Tagembed has not finished loading. Its video may be unavailable.");
-    }, LOAD_TIMEOUT);
-
-    iframe.addEventListener("load", () => {
-      loaded = true;
-      window.clearTimeout(timeout);
-      // An iframe load can also be an upstream access-error page. Do not
-      // report playback success merely because this event fired.
-      state(host, "frame-loaded", "");
+  function state(item, value, message = "") {
+    item.host.dataset.tagembedState = value;
+    item.label.textContent = message;
+    item.label.hidden = !message;
+  }
+  function stop(host) {
+    const item = instances.get(host);
+    if (!item) return;
+    item.frame?.remove(); item.frame = null;
+    item.canvas.hidden = true; item.cover.hidden = false; item.cover.disabled = false;
+    item.cover.textContent = "▶ Load video";
+    item.back.hidden = true;
+    state(item, "preview");
+    if (active === item) active = null;
+    item.options.onStop?.();
+  }
+  function start(item) {
+    if (item.frame || !item.host.isConnected) return;
+    if (active && active !== item) stop(active.host);
+    active = item;
+    const frame = document.createElement("iframe");
+    frame.className = "saiyaara-tagembed-frame";
+    frame.title = "Saiyaara video via Tagembed";
+    frame.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media");
+    frame.setAttribute("allowfullscreen", "");
+    frame.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+    frame.setAttribute("loading", "eager");
+    item.frame = frame;
+    item.cover.disabled = true;
+    item.cover.textContent = "Loading video…";
+    item.back.hidden = false;
+    state(item, "loading");
+    // Register before src/attachment. Never infer failure from elapsed time or
+    // claim the video is playing from a cross-origin document's load event.
+    frame.addEventListener("load", () => {
+      if (item.frame !== frame) return;
+      item.canvas.hidden = false; item.cover.hidden = true;
+      state(item, "frame-loaded");
+      fit(item); item.options.onLoad?.(frame);
     }, { once: true });
-    iframe.addEventListener("error", () => {
-      loaded = true;
-      window.clearTimeout(timeout);
-      state(host, "failed", "Tagembed could not load the video on this connection.");
+    frame.addEventListener("error", () => {
+      if (item.frame !== frame) return;
+      stop(item.host);
+      state(item, "failed", "The player could not load. Your preview is still available.");
     }, { once: true });
-    // For main watch-page iframe, src is present from the server markup.
-    // The iframe itself stays clickable and no poster overlay blocks it.
+    frame.src = IFRAME_URL;
+    item.canvas.append(frame);
+    item.options.onFrame?.(frame);
   }
-
-  function prepareHost(host, mode) {
-    host.classList.add("saiyaara-tagembed-host", "saiyaara-tagembed-" + mode);
-    // Mini tiles have only ~230px of vertical room for a tall social post.
-    // Show a correctly fitted poster until the visitor reveals the embedded
-    // player. A tap provides a genuine gesture, but cross-origin sound still
-    // depends on the browser/provider controls.
-    if (mode === "tile" && !host.querySelector(".saiyaara-preview-cover")) {
-      const cover = document.createElement("button");
-      cover.type = "button";
-      cover.className = "saiyaara-preview-cover";
-      cover.setAttribute("aria-label", "Show Saiyaara video player and sound controls");
-      if (host.dataset.saiyaaraPoster) {
-        const img = document.createElement("img");
-        img.className = "saiyaara-tile-cover-poster";
-        img.src = host.dataset.saiyaaraPoster;
-        img.alt = "";
-        img.loading = "lazy";
-        cover.append(img);
-      }
-      const icon = document.createElement("span");
-      icon.textContent = "▶";
-      icon.setAttribute("aria-hidden", "true");
-      cover.append(icon);
-      cover.addEventListener("click", () => {
-        cover.hidden = true;
-        const iframe = host.querySelector(".saiyaara-tagembed-frame");
-        // Browsers do not expose a third-party video's audio controls to us.
-        // The visitor can now tap the embedded player's controls directly.
-        iframe?.focus();
-      });
-      host.append(cover);
+  function mount(host, mode = "watch", options = {}) {
+    if (!host) return null;
+    const existing = instances.get(host);
+    if (existing) { existing.options = options; return existing; }
+    host.classList.add("saiyaara-tagembed-host");
+    host.dataset.saiyaaraMode = mode;
+    // SSR supplies a small poster immediately. All JS surfaces use the same
+    // URL, so browser/R2 caching coalesces grid, watch, popup and swipe previews.
+    const panel = document.createElement("div"); panel.className = "saiyaara-player-panel";
+    const viewport = document.createElement("div"); viewport.className = "saiyaara-player-viewport";
+    const poster = host.querySelector(".saiyaara-tagembed-poster") || document.createElement("img");
+    poster.className = "saiyaara-tagembed-poster"; poster.alt = "";
+    poster.decoding = "async"; poster.loading = mode === "tile" ? "lazy" : "eager";
+    poster.src = POSTER_URL;
+    poster.addEventListener("error", () => { poster.hidden = true; }, { once: true });
+    const canvas = document.createElement("div"); canvas.className = "saiyaara-tagembed-canvas"; canvas.hidden = true;
+    const cover = document.createElement("button"); cover.type = "button";
+    cover.className = "saiyaara-preview-cover"; cover.textContent = "▶ Load video";
+    cover.setAttribute("aria-label", "Load Saiyaara video");
+    const bar = document.createElement("div"); bar.className = "saiyaara-player-note";
+    const credit = document.createElement("span"); credit.textContent = "saiyaara · TikTok via Tagembed";
+    const help = document.createElement("span"); help.textContent = "Sound is controlled by Tagembed.";
+    const back = document.createElement("button"); back.type = "button";
+    back.textContent = "Close video"; back.hidden = true;
+    const label = document.createElement("span"); label.className = "saiyaara-tagembed-status";
+    label.setAttribute("role", "status"); label.hidden = true;
+    viewport.append(poster, canvas, cover, label); bar.append(credit, help, back); panel.append(viewport, bar);
+    host.replaceChildren(panel);
+    const item = { host, panel, viewport, canvas, cover, back, label, options, frame: null, observer: null };
+    instances.set(host, item);
+    cover.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); start(item); });
+    back.addEventListener("click", () => stop(item.host));
+    if ("ResizeObserver" in window) {
+      item.observer = new ResizeObserver(() => fit(item));
+      item.observer.observe(viewport);
     }
-    if (!host.querySelector(".saiyaara-tagembed-poster") && host.dataset.saiyaaraPoster) {
-      const poster = document.createElement("img");
-      poster.className = "saiyaara-tagembed-poster";
-      poster.src = host.dataset.saiyaaraPoster;
-      poster.alt = "";
-      poster.decoding = "async";
-      poster.loading = mode === "watch" ? "eager" : "lazy";
-      host.prepend(poster);
-    }
-    if (!host.querySelector("[data-saiyaara-tagembed-status]")) {
-      const label = document.createElement("span");
-      label.className = "saiyaara-tagembed-status";
-      label.dataset.saiyaaraTagembedStatus = "1";
-      label.setAttribute("role", "status");
-      label.textContent = "";
-      label.hidden = true;
-      host.append(label);
-    }
+    state(item, "preview"); fit(item);
+    return item;
   }
-
-  function mount(host, mode = "watch") {
-    if (!host || host.dataset.saiyaaraTagembedMounted === "1") return false;
-    host.dataset.saiyaaraTagembedMounted = "1";
-    prepareHost(host, mode);
-
-    const iframe = host.querySelector("iframe.saiyaara-tagembed-frame") ||
-      document.createElement("iframe");
-    iframe.className = "saiyaara-tagembed-frame";
-    iframe.title = "Saiyaara video via Tagembed";
-    iframe.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media");
-    iframe.setAttribute("allowfullscreen", "");
-    iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
-    iframe.setAttribute("loading", "eager");
-    iframe.style.width = "100%";
-    iframe.style.height = "100%";
-    iframe.style.overflow = "auto";
-    iframe.style.border = "none";
-
-    // Always attach lifecycle monitoring before adding src on dynamically
-    // mounted tiles. The watch iframe may already have started loading.
-    if (!iframe.isConnected) host.append(iframe);
-    connect(host, iframe);
-    const current = iframe.getAttribute("src");
-    if (!current) iframe.setAttribute("src", IFRAME_URL);
+  function unmount(host) {
+    const item = instances.get(host);
+    if (!item) return;
+    stop(host); item.observer?.disconnect(); instances.delete(host);
+    host.replaceChildren(); host.classList.remove("saiyaara-tagembed-host");
+    delete host.dataset.saiyaaraMode; delete host.dataset.tagembedState;
+  }
+  function transfer(from, to, mode, options = {}) {
+    const item = instances.get(from);
+    if (!item?.frame || !to?.isConnected) return false;
+    // appendChild would reload the iframe. Older browsers return to the cached
+    // poster instead, requiring an intentional tap before another paid load.
+    if (typeof to.moveBefore !== "function") { stop(from); return false; }
+    unmount(to);
+    try { to.moveBefore(item.panel, null); } catch { stop(from); return false; }
+    instances.delete(from); instances.set(to, item);
+    to.classList.add("saiyaara-tagembed-host"); to.dataset.saiyaaraMode = mode;
+    to.dataset.tagembedState = from.dataset.tagembedState;
+    item.host = to; item.options = options;
+    mount(from, from.dataset.saiyaaraMode || "watch");
+    fit(item); options.onFrame?.(item.frame);
+    if (to.dataset.tagembedState === "frame-loaded") options.onLoad?.(item.frame);
     return true;
   }
-
   function initWatch() {
     if (document.body?.dataset.viewerEmbed === "1") return;
-    document.querySelectorAll("[data-saiyaara-tagembed-host]").forEach(
-      (host) => mount(host, "watch"));
+    document.querySelectorAll("[data-saiyaara-tagembed-host]").forEach(host => mount(host));
   }
-
-  function mountTileWhenVisible(host) {
-    if (!host || host.dataset.saiyaaraTagembedMounted === "1") return;
-    prepareHost(host, "tile");
-    if (!("IntersectionObserver" in window)) {
-      mount(host, "tile");
-      return;
-    }
-    const localObserver = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      localObserver.disconnect();
-      mount(host, "tile");
-    }, { rootMargin: "300px 0px", threshold: 0 });
-    // Each tile owns its observer; no other TikTok tiles are scanned.
-    localObserver.observe(host);
-    observer = localObserver;
-  }
-
-  window.VidBestSaiyaaraTagembed = Object.freeze({
-    slug: SLUG, iframeUrl: IFRAME_URL,
-    mount: (host, mode = "watch") => mode === "tile"
-      ? mountTileWhenVisible(host)
-      : mount(host, mode),
-  });
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initWatch, { once: true });
-  } else initWatch();
-  window.addEventListener("pagehide", () => observer?.disconnect());
+  window.VidBestSaiyaaraTagembed = Object.freeze({ slug: SLUG, iframeUrl: IFRAME_URL,
+    posterUrl: POSTER_URL, mount, stop, unmount, transfer });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initWatch, { once: true });
+  else initWatch();
+  window.addEventListener("pagehide", () => { if (active) stop(active.host); });
 })();

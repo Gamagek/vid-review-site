@@ -1,7 +1,7 @@
 import { parseInstagramUrl } from "../public/instagram-utils.js";
 import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStatus } from "./tiktok-cache-jobs.js";
 import { tikTokCacheCandidate } from "./admin-tiktok-cache.js";
-import { isCachedTikTokThumbnail, thumbnailKey } from "./tiktok-thumbnail-cache.js";
+import { isCachedTikTokThumbnail, thumbnailKey, SAIYAARA_ID, warmSaiyaaraPoster } from "./tiktok-thumbnail-cache.js";
 import {
   requestMemberLogin,
   verifyMemberLogin,
@@ -212,7 +212,7 @@ async function route(request, env, ctx) {
     return tikTokCachedPreviewBatch(request, env);
   }
   if (path === "/api/tiktok/cached-poster" && request.method === "GET") {
-    return tikTokCachedPoster(request, env);
+    return tikTokCachedPoster(request, env, ctx);
   }
 
   if (path === "/api/instagram/previews" && request.method === "GET") {
@@ -807,7 +807,7 @@ function splitPosterLines(value, maxChars = 25, maxLines = 4) {
   return lines.slice(0, maxLines);
 }
 
-async function tikTokCachedPoster(request, env) {
+async function tikTokCachedPoster(request, env, ctx) {
   const videoId = cleanText(new URL(request.url).searchParams.get("id"), 30);
   if (!/^\d{15,25}$/.test(videoId)) throw new AppError(400, "TikTok video ID is invalid");
 
@@ -818,6 +818,9 @@ async function tikTokCachedPoster(request, env) {
     image.writeHttpMetadata(headers);
     return new Response(image.body, { headers });
   }
+  // Serve a first paint immediately and warm only this owner's pinned image in
+  // the background. A shared D1 lease prevents simultaneous visits causing a burst.
+  if (videoId === SAIYAARA_ID && ctx?.waitUntil) ctx.waitUntil(warmSaiyaaraPoster(env).catch(() => {}));
 
   const row = await readTikTokOEmbedCache(env, videoId);
   const title = cleanText(row?.description || row?.title, 180, "TikTok video");
@@ -856,7 +859,7 @@ async function tikTokCachedPoster(request, env) {
     status: 200,
     headers: securityHeaders(new Headers({
       "Content-Type": "image/svg+xml; charset=utf-8",
-      "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
+      "Cache-Control": videoId === SAIYAARA_ID ? "public, max-age=60" : "public, max-age=86400, stale-while-revalidate=604800",
       "Cross-Origin-Resource-Policy": "same-origin",
     })),
   });
@@ -3116,13 +3119,13 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <meta name="twitter:description" content="${escapeHtml(description)}">
   <meta name="twitter:image" content="${escapeHtml(thumbnail)}">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/styles.css?v=20261008-saiyaara-fit4">
+  <link rel="stylesheet" href="/styles.css?v=20261010-saiyaara1">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   ${video.provider === "tiktok" ? '<script src="/tiktok-preview-service.js?v=20261008-cache2" defer></script>' : ""}
-  ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>' : ""}
+  ${!viewer ? '<script src="/saiyaara-tagembed.js?v=20261010-1" defer></script>' : ""}
   <script src="/watch.js?v=20261008-2" defer></script>
-  <link rel="stylesheet" href="/swipe-viewer.css?v=20261008-gateway1">
-  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-cache2" defer></script>
+  <link rel="stylesheet" href="/swipe-viewer.css?v=20261010-saiyaara1">
+  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261010-saiyaara1" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
   ${video.provider === "tiktok" ? '<!-- Standard TikTok player requests use the Cloudflare-signed Portainer gateway after a user action. -->' : ""}
 </head>
@@ -3255,15 +3258,10 @@ function renderMedia(video, playbackOrigin, viewer = false) {
     // Only the canonical Saiyaara watch page opts into the owner-supplied
     // Tagembed widget. The swipe preparation document remains metadata-only.
     if (video.slug === "saiyaara-a-cinematic-romance" && !viewer) {
-      const poster = video.tiktok_preview?.thumbnail_url || video.thumbnail_url ||
-        `/api/tiktok/cached-poster?id=${encodeURIComponent(extractTikTokId(video.source_url))}`;
-      return `<div class="saiyaara-tagembed-player" data-saiyaara-tagembed-host data-saiyaara-player="watch" data-saiyaara-poster="${escapeHtml(poster)}">
+      const poster = "/api/tiktok/cached-poster?id=7669587518156705056&v=2";
+      return `<div class="saiyaara-tagembed-player saiyaara-tagembed-host" data-saiyaara-tagembed-host>
         <img class="saiyaara-tagembed-poster" src="${escapeHtml(poster)}" alt="" decoding="async" loading="eager">
-        <iframe class="saiyaara-tagembed-frame" src="https://widget.tagembed.com/2236794?postId=5592899&amp;caption=1&amp;header=1"
-          title="Saiyaara video via Tagembed" loading="eager"
-          allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen
-          referrerpolicy="strict-origin-when-cross-origin"
-          style="width:100%;height:100%;overflow:auto;border:none;"></iframe>
+        <noscript><a href="${escapeHtml(video.source_url)}">Watch Saiyaara on TikTok</a></noscript>
       </div>`;
     }
     const tiktokId = extractTikTokId(video.source_url);

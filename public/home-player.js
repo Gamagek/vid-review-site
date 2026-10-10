@@ -62,8 +62,7 @@ function decorateVideoCards() {
     }
 
     if (card.dataset.videoProvider === "tiktok") {
-      // Tagembed is opt-in for the canonical Saiyaara item only. Unlike
-      // regular TikTok cards, this home tile hosts an interactive mini widget.
+      // Only a cached poster is prepared for Saiyaara; no widget request until a tap.
       if (card.dataset.videoSlug === "saiyaara-a-cinematic-romance" && window.VidBestSaiyaaraTagembed) {
         const replacement = document.createElement("div");
         replacement.className = media.className;
@@ -75,9 +74,7 @@ function decorateVideoCards() {
         surface.setAttribute("aria-label", "Saiyaara TikTok Tagembed mini preview");
         oldSurface.replaceWith(surface);
         card.classList.add("saiyaara-tagembed-tile");
-        const share = parseTikTokShareUrl(card.dataset.videoSource);
-        surface.dataset.saiyaaraPoster = card.dataset.videoThumbnail ||
-          (share ? "/api/tiktok/cached-poster?id=" + encodeURIComponent(share.id) : "");
+        surface.dataset.saiyaaraPoster = window.VidBestSaiyaaraTagembed.posterUrl;
         window.VidBestSaiyaaraTagembed.mount(surface, "tile");
         return;
       }
@@ -472,12 +469,6 @@ function applyCachedTikTokPreview(card, preview) {
   // Cached metadata may arrive after Tagembed mounts. Updating the facade
   // would otherwise erase the live mini widget and leave a black tile.
   if (card.classList.contains("saiyaara-tagembed-tile")) {
-    if (preview.thumbnail_url) {
-      const poster = card.querySelector(".saiyaara-tagembed-poster");
-      const cover = card.querySelector(".saiyaara-tile-cover-poster");
-      if (poster) poster.src = preview.thumbnail_url;
-      if (cover) cover.src = preview.thumbnail_url;
-    }
     return;
   }
   renderTikTokFacade(card);
