@@ -42,10 +42,19 @@ if ((newContent.match(/^  cloudflared:/gm) || []).length !== 1) {
   throw new Error("Exactly one cloudflared service is required");
 }
 const hash = (input) => createHash("sha256").update(input).digest("hex").slice(0, 12);
-const serviceSection = newContent.match(/^services:\s*\n([\s\S]*?)(?=^[a-zA-Z][a-zA-Z0-9_-]*:\s*(?:#.*)?$|\$(?!))/m)?.[1];
-if (!serviceSection) throw new Error("Unable to parse the services section");
+const composeLines = newContent.split(/\r?\n/);
+const servicesStart = composeLines.findIndex(line => /^services:\s*$/.test(line));
+const servicesEnd = composeLines.findIndex((line, i) =>
+  i > servicesStart && /^[a-zA-Z][a-zA-Z0-9_-]*:\s*(?:#.*)?$/.test(line));
+if (servicesStart < 0) throw new Error("Unable to parse the services section");
+const serviceSection = composeLines.slice(servicesStart + 1,
+  servicesEnd > 0 ? servicesEnd : undefined).join("\n");
 const services = [...serviceSection.matchAll(/^  ([a-zA-Z][a-zA-Z0-9_.-]+):\s*$/gm)]
   .map(x => x[1]);
+if (!services.includes("app") || !services.includes("cloudflared") ||
+    !services.includes("rapidapi-tester")) {
+  throw new Error("Expected stack services missing after parsing");
+}
 const expected = new Set(services);
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
