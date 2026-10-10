@@ -278,7 +278,7 @@ test("legacy v7 viewer is opt-in and signs the gateway URL without exposing the 
   assert.equal(response.headers.get("Cache-Control"), "private, no-store");
   assert.equal(response.headers.get("X-Robots-Tag"), "noindex,nofollow");
   const html = await response.text();
-  assert.match(html, /video\\.megasale\\.win\\/legacy\\/watch/);
+  assert.ok(html.includes("video.megasale.win/legacy/watch"));
   assert.match(html, /sig=[a-f0-9]{64}/);
   assert.doesNotMatch(html, new RegExp(secret));
 });
