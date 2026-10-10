@@ -101,9 +101,15 @@ if (typeof stored.StackFileContent !== "string" || !stored.StackFileContent.trim
 }
 const oldContent = stored.StackFileContent;
 const oldEnv = original.Env;
+// For initial connection tests only: no Portainer POST, PUT, or DELETE requests.
+const checkOnly = process.argv.includes("--check-only");
 console.log("Target verified: video-site, stack " + stackId + ", endpoint " + endpointId);
 console.log("Baseline YAML SHA256 prefix " + hash(oldContent) +
   "; candidate " + hash(newContent));
+if (checkOnly) {
+  console.log("READ-ONLY PREFLIGHT PASSED: Cloudflare Service Auth, Portainer API, Stack identity and backup read verified. No deployment performed.");
+  process.exit(0);
+}
 if (oldContent === newContent) {
   console.log("No stack content changes; preserving running containers.");
   process.exit(0);
