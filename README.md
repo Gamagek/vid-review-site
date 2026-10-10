@@ -92,20 +92,41 @@ Deploy the gateway repository first with its `VIDEO_CACHE` R2 binding and matchi
 
 Operational checks and the supplied Portainer code's remaining limitations are documented in the gateway repository's `OPERATIONS.md`. oEmbed metadata lives in D1/Durable Objects, not as playable MP4s in R2. An empty R2 bucket cannot provide a cached video, regardless of successful metadata responses. Private R2 access is expected; no public bucket setting is needed.
 
-### Saiyaara direct Tagembed iframe (owner-provided embed)
+### Saiyaara: cached preview and click-loaded Tagembed
 
-Only the canonical `/watch/saiyaara-a-cinematic-romance` watch stage and its homepage mini tile use the specific iframe supplied by the site owner:
+`public/saiyaara-tagembed.js` owns the canonical Saiyaara player across grid,
+watch, floating popup and fullscreen/swipe. Every surface initially uses the
+same first-party `/api/tiktok/cached-poster?id=7669587518156705056&v=2` image.
+There is **no Tagembed iframe on page load or when a card enters the viewport**.
+Only clicking **Load video** requests widget 2236794, post 5592899. The verified
+`caption=0&header=0` display options remove the redundant post header/caption;
+creator attribution remains in the Vid.Best player. The complete provider
+viewport, including its action row, scales inside the available space without
+cropping. Grid cards retain their standard 230px media height.
 
-```html
-<iframe src="https://widget.tagembed.com/2236794?postId=5592899&amp;caption=1&amp;header=1"
-        allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-        style="width:100%;height:100%;overflow:auto;border:none;"
-        allowfullscreen></iframe>
-```
+The poster cache pins the exact public image already displayed by this owner's
+post. It validates the image type/magic bytes, limits it to 2 MB and stores it in
+R2. The browser caches successful images for a day. A D1 lease shared by the
+background warmup and cron limits unsuccessful upstream fetches to once per day.
+The first miss serves a local text poster immediately, cached for only 60 seconds,
+while warming R2. The known expired TikTok thumbnail URL is not used for this
+player. No video files or Tagembed HTML are copied, and no API key is required.
 
-All three Saiyaara viewing surfaces use the direct Tagembed iframe: **(1)** the main watch stage, including its responsive floating mini/theater modes; **(2)** the homepage mini tile, which shows a correctly cropped cached poster with a Play/reveal button and requests only its iframe when the tile is within 300px of the viewport; and **(3)** the fullscreen/swipe viewer, which mounts a single direct Tagembed iframe for the active Saiyaara card (not the old nested TikTok popup). The swipe viewer does not prewarm neighboring Saiyaara providers and removes inactive iframes on swipe or close. The swipe document `?viewer=1` remains metadata-only because the parent fullscreen viewer mounts the direct iframe itself. No `embed.min.js` script or `.tagembed-widget` scanner is used. The existing Worker CSP permits `widget.tagembed.com` frames.
+At most one Tagembed iframe is active per document. Normal/mini/popup resizing
+keeps it alive. Fullscreen transfers use `Element.moveBefore()` where supported,
+preserving iframe state without another provider load. Older browsers return to
+the poster and wait for another deliberate click. Swiping away destroys the
+inactive player. Closing fullscreen does not automatically reload an old URL.
 
-An iframe `load` event only confirms a document loaded; it does not prove the hosted video is playable. The 14-second timeout displays a loading warning without automatic reloads or destroying the iframe. The user can interact directly with the embedded controls once the homepage poster is revealed; in fullscreen mode the iframe is interactive immediately, with separate next/previous navigation. The parent cannot directly play or unmute a cross-origin Tagembed/TikTok frame, and mobile browsers usually require a tap before playing with sound. Vid.Best grants the iframe `autoplay` permission but cannot force Tagembed to act on it. Widget `2236794` and post `5592899` must exist and permit playback on Tagembed; this cannot be guaranteed by Vid.Best.
+Iframe listeners are attached before `src` is set. A document load is not a
+playback signal, so there is no timeout claiming an already-playing video is
+unavailable. No vendor SDK or undocumented postMessage play/mute/quality commands
+are injected. The inspected Tagembed post autoplays muted and does not expose a
+remote sound/quality API. `allow="autoplay"` delegates browser permission but
+cannot force the provider to unmute or choose a rendition. Those options must
+be enabled in Tagembed or supplied through an owner-authorized direct video.
+Actual widget plays still count toward the provider plan; the cached poster and
+click gate reduce unused loads, not the provider's quota enforcement.
 
 ### Video SEO correctness
 

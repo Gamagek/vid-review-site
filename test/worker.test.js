@@ -424,7 +424,7 @@ test("TikTok watch pages render cached metadata cards without a TikTok player", 
   assert.match(html, /Play in popup/);
   assert.doesNotMatch(html, /<iframe[^>]+tiktok/i);
   assert.doesNotMatch(html, /player\/v1/);
-  assert.doesNotMatch(html, /embed\.js/);
+  assert.doesNotMatch(html, /<script[^>]+src=["']https:\/\/(?:www\.)?tiktok\.com\/embed\.js/i);
 });
 test("Facebook mini preview stays separate from the original-quality watch player", async () => {
   const context = createTestContext();
@@ -2085,7 +2085,7 @@ test("discovers direct TikTok URLs without server-side TikTok requests", async (
   }
 });
 
-test("canonical Saiyaara renders direct iframe URL but swipe remains metadata-only", async () => {
+test("canonical Saiyaara renders a first-party poster with no provider iframe request", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, description, published)
@@ -2104,11 +2104,12 @@ test("canonical Saiyaara renders direct iframe URL but swipe remains metadata-on
   const html = await page.text();
   assert.match(html, /saiyaara-tagembed-player/);
   assert.ok(html.includes('data-saiyaara-player="1"'));
-  assert.ok(html.includes("/swipe-viewer.js?v=20261008-cache2"));
-  assert.ok(html.includes("/swipe-viewer.css?v=20261008-gateway1"));
-  assert.ok(html.includes('class="saiyaara-tagembed-frame"'));
-  assert.ok(html.includes('src="https://widget.tagembed.com/2236794?postId=5592899&amp;caption=1&amp;header=1"'));
-  assert.ok(html.includes('allow="autoplay; fullscreen; picture-in-picture; encrypted-media"'));
+  assert.ok(html.includes("/swipe-viewer.js?v=20261010-saiyaara1"));
+  assert.ok(html.includes("/swipe-viewer.css?v=20261010-saiyaara1"));
+  assert.ok(!html.includes('class="saiyaara-tagembed-frame"'));
+  assert.ok(html.includes("/api/tiktok/cached-poster?id=7669587518156705056&amp;v=2"));
+  assert.ok(!html.includes('src="https://widget.tagembed.com/'));
+  assert.ok(!html.includes("Tagembed has not finished loading"));
   assert.ok(html.includes("saiyaara-tagembed.js"));
   assert.ok(!html.includes('class="tagembed-widget"'));
   assert.ok(!html.includes('data-widget-id="2236794"'));
@@ -2129,8 +2130,8 @@ test("canonical Saiyaara renders direct iframe URL but swipe remains metadata-on
   assert.ok(homeScript.includes("dataset.videoSlug"));
   assert.ok(homeScript.includes("VidBestSaiyaaraTagembed.mount"));
   assert.ok(appScript.includes("dataset.videoSlug"));
-  assert.ok(loader.includes('rootMargin: "300px 0px"'));
-  assert.ok(loader.includes("https://widget.tagembed.com/2236794?postId=5592899&caption=1&header=1"));
+  assert.ok(!loader.includes("IntersectionObserver"));
+  assert.ok(loader.includes("https://widget.tagembed.com/2236794?postId=5592899&caption=0&header=0"));
   assert.ok(!loader.includes("embed.min.js"));
 });
 

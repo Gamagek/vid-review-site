@@ -82,16 +82,6 @@ body[data-viewer-embed="1"] .watch-player-stage { background:#000!important; }
   margin-inline: auto;
   background: #070916;
 }
-.swipe-card.is-saiyaara-widget .swipe-frame-host > iframe.swipe-saiyaara-tagembed {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  display: block;
-  border: 0 !important;
-  background: #070916;
-}
 .swipe-card.is-saiyaara-widget .swipe-gesture { display: none !important; }
 .swipe-card.is-saiyaara-widget .swipe-player-actions [data-play],
 .swipe-card.is-saiyaara-widget .swipe-player-actions [data-sound] { display: none !important; }
@@ -122,3 +112,5 @@ body[data-viewer-embed="1"] .watch-player-stage { background:#000!important; }
 .swipe-card.is-tiktok-gateway .swipe-player-actions [data-play],
 .swipe-card.is-tiktok-gateway .swipe-player-actions [data-sound] { display:none!important; }
 .swipe-card.is-tiktok-gateway .swipe-status { white-space:normal; overflow-wrap:anywhere; }
+
+.swipe-card.is-saiyaara-widget .swipe-player-actions { display:none; }

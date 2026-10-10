@@ -158,3 +158,20 @@ test('thumbnail errors keep original metadata and cooldown prevents repeated CDN
   assert.equal(db.prepare('SELECT thumbnail_url FROM tiktok_oembed_cache').get().thumbnail_url, url);
   for (const value of ['https://tiktokcdn.com.attacker.example/x', 'https://secret@p16.tiktokcdn.com/x', 'http://p16.tiktokcdn.com/x', 'https://127.0.0.1/x']) assert.equal(validThumbnailSource(value), null);
 });
+
+test('Saiyaara caches its pinned image once across concurrent warmups and cron', async t => {
+  const { warmSaiyaaraPoster, SAIYAARA_POSTER, SAIYAARA_ID } = await import('../src/tiktok-thumbnail-cache.js');
+  const { db, env, objects } = fixture(t);
+  db.prepare('UPDATE videos SET source_url = ?').run(`https://www.tiktok.com/@saiyaara.4ever/video/${SAIYAARA_ID}`);
+  db.prepare('INSERT INTO tiktok_oembed_cache VALUES (?, ?, ?)').run(SAIYAARA_ID, 'https://p16.tiktokcdn.com/expired.jpg', new Date().toISOString());
+  let calls = 0;
+  globalThis.fetch = async url => {
+    calls++; assert.equal(url, SAIYAARA_POSTER);
+    return new Response(new Uint8Array([255,216,255,224,0,0]), { headers: { 'Content-Type': 'image/jpeg' } });
+  };
+  await Promise.all([warmSaiyaaraPoster(env), warmSaiyaaraPoster(env), processTikTokThumbnailJobs(env)]);
+  assert.equal(calls, 1); assert.ok(objects.has(thumbnailKey(SAIYAARA_ID)));
+  assert.equal(validThumbnailSource(SAIYAARA_POSTER), null);
+  assert.equal(validThumbnailSource(SAIYAARA_POSTER + '?other=1', SAIYAARA_ID), null);
+  assert.equal(validThumbnailSource(SAIYAARA_POSTER, SAIYAARA_ID), SAIYAARA_POSTER);
+});
