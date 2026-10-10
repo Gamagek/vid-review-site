@@ -108,7 +108,7 @@ async function signedLegacyWatch(request, env) {
   const params = new URL(request.url).searchParams;
   const user = String(params.get("user") || "").replace(/^@/, "");
   const id = String(params.get("id") || "");
-  if (!/^[A-Za-z0-9_.]{1,32}$/.test(user) || !/^\\d{15,25}$/.test(id)) {
+  if (!/^[A-Za-z0-9_.]{1,32}$/.test(user) || !/^[0-9]{15,25}$/.test(id)) {
     return new Response("Invalid TikTok video link", { status: 400, headers: { "Cache-Control": "no-store" } });
   }
   const secret = String(env.SIGN_SECRET || "");
