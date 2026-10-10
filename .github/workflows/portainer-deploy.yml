@@ -34,6 +34,11 @@ jobs:
         run: npm run check
       - name: Check deployment updater syntax
         run: node --check scripts/deploy-portainer.mjs
+      - name: Validate optional v5 scripts
+        run: |
+          node --check scripts/deploy-portainer-v5-addon.mjs
+          node --check scripts/portainer-v5-addon.mjs
+          node --check ops/portainer/legacy-v5-server.cjs
       - name: Verify Teamwork Python
         run: python -m compileall -q services/teamwork/app
 
