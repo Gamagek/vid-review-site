@@ -45,6 +45,8 @@ jobs:
       PORTAINER_ENDPOINT_ID: ${{ vars.PORTAINER_ENDPOINT_ID }}
       PORTAINER_STACK_FILE: ${{ vars.PORTAINER_STACK_FILE || 'ops/portainer/vidbest-v56.yaml' }}
       PORTAINER_TLS_CA_PEM: ${{ secrets.PORTAINER_TLS_CA_PEM }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
     steps:
       - uses: actions/checkout@v4
         with:
