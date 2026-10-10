@@ -43,3 +43,5 @@ jobs:
           python -m pytest -q services/teamwork/tests
       - name: Validate the Worker bundle
         run: npm run check
+      - name: Validate Portainer updater syntax
+        run: node --check scripts/deploy-portainer.mjs
