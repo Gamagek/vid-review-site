@@ -146,4 +146,9 @@ test('workflow uploads backup before any deploy and manual read-only runs stay p
   assert.ok(prepare >= 0 && backup > prepare && deploy > backup);
   assert.equal(steps[backup].with['if-no-files-found'], 'error');
   assert.equal(steps[backup].with.path, '${{ env.PORTAINER_BACKUP_FILE }}');
+  // Runner-only paths are established by a step after the runner exists.
+  const configure = steps.findIndex(step => step.run?.includes('PORTAINER_BACKUP_FILE=$RUNNER_TEMP/'));
+  assert.ok(configure >= 0 && configure < prepare);
+  const ci = parse(readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8'));
+  assert.ok(ci.jobs.test.steps.some(step => step.run?.includes('actionlint" -shellcheck=')));
 });
