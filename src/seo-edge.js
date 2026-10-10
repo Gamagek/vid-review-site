@@ -1,3 +1,4 @@
+import { signedLegacyV5Page } from "./legacy-v5-signer.js";
 import edgeWorker from "./edge.js";
 
 const CANONICAL_ORIGIN = "https://vid.best";
@@ -79,7 +80,7 @@ function standardHeaders(contentType, cacheControl = "public, max-age=60") {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
-    "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' https://www.tiktok.com; frame-src 'self' https://www.tiktok.com https://tiktok-oembed-gateway.gkasunc.workers.dev https://video.megasale.win; media-src 'self' https: https://www.tiktok.com blob:; connect-src 'self'"
+    "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' https://www.tiktok.com; frame-src 'self' https://www.tiktok.com https://tiktok-oembed-gateway.gkasunc.workers.dev https://video.megasale.win https://legacy-video.megasale.win; media-src 'self' https: https://www.tiktok.com blob:; connect-src 'self'"
   });
 }
 
@@ -527,6 +528,10 @@ export default {
         url.pathname = normalizedPath;
         return Response.redirect(url.toString(), 301);
       }
+    }
+
+    if (url.pathname === "/watch-v5" && ["GET", "HEAD"].includes(request.method)) {
+      return signedLegacyV5Page(request, env);
     }
 
     const category = resolveCategory(url.pathname);
