@@ -16,6 +16,11 @@ if (base.protocol !== "https:" || base.username || base.password || base.search 
 }
 if (base.pathname !== "/") throw new Error("PORTAINER_URL must not contain a path");
 const apiKey = required("PORTAINER_API_KEY");
+const cfAccessId = String(process.env.CF_ACCESS_CLIENT_ID || "").trim();
+const cfAccessSecret = String(process.env.CF_ACCESS_CLIENT_SECRET || "").trim();
+if (Boolean(cfAccessId) !== Boolean(cfAccessSecret)) {
+  throw new Error("Both Cloudflare Access service token components must be configured together");
+}
 const stackId = Number(required("PORTAINER_STACK_ID"));
 const endpointId = Number(required("PORTAINER_ENDPOINT_ID"));
 if (!Number.isSafeInteger(stackId) || stackId < 1 ||
@@ -37,8 +42,10 @@ if ((newContent.match(/^  cloudflared:/gm) || []).length !== 1) {
   throw new Error("Exactly one cloudflared service is required");
 }
 const hash = (input) => createHash("sha256").update(input).digest("hex").slice(0, 12);
-const services = [...newContent.matchAll(/^  ([a-zA-Z][a-zA-Z0-9_.-]+):\s*$/gm)]
-  .map(x => x[1]).filter(x => !["volumes","networks"].includes(x));
+const serviceSection = newContent.match(/^services:\s*\n([\s\S]*?)(?=^[a-zA-Z][a-zA-Z0-9_-]*:\s*(?:#.*)?$|\$(?!))/m)?.[1];
+if (!serviceSection) throw new Error("Unable to parse the services section");
+const services = [...serviceSection.matchAll(/^  ([a-zA-Z][a-zA-Z0-9_.-]+):\s*$/gm)]
+  .map(x => x[1]);
 const expected = new Set(services);
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -49,6 +56,10 @@ async function api(path, { method = "GET", body, timeout = 30000 } = {}) {
     headers: { "X-API-Key": apiKey, "Accept": "application/json" },
     signal: AbortSignal.timeout(timeout)
   };
+  if (cfAccessId) {
+    options.headers["CF-Access-Client-Id"] = cfAccessId;
+    options.headers["CF-Access-Client-Secret"] = cfAccessSecret;
+  }
   if (body !== undefined) {
     options.headers["Content-Type"] = "application/json";
     options.body = JSON.stringify(body);
@@ -121,10 +132,10 @@ async function healthy() {
   return failures;
 }
 
-let updated = false;
+let attempted = false;
 try {
+  attempted = true;
   await api(updatePath, { method: "PUT", body: payload(newContent), timeout: 180000 });
-  updated = true;
   let failures = ["waiting"];
   for (let i = 0; i < 24; i++) {
     await sleep(5000);
@@ -140,7 +151,7 @@ try {
   console.error("Deployment failed: " + error.message);
   // A write request can fail after the server already applied changes.
   // Always try to restore the prior YAML if a PUT was attempted.
-  if (updated) {
+  if (attempted) {
     try {
       await api(updatePath, { method: "PUT", body: payload(oldContent), timeout: 180000 });
       console.error("Rollback submitted: previously deployed YAML restored; inspect health.");
