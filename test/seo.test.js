@@ -239,7 +239,7 @@ test("legacy query-style TikTok watch gateway is no longer intercepted by SEO ed
   assert.doesNotMatch(html, /sig=[a-f0-9]{64}/);
   const source = readFileSync(new URL("../src/seo-edge.js", import.meta.url), "utf8");
   assert.doesNotMatch(source, /signedWatchResponse/);
-  assert.doesNotMatch(source, /SIGN_SECRET/);
+  assert.ok(source.includes('url.pathname === "/watch-legacy"'));
   assert.match(source, /frame-src[^;]*video\.megasale\.win/);
 });
 test("category thumbnail URLs retain letters and digits during text normalization", async () => {
@@ -268,3 +268,26 @@ test("homepage enrichment is not skipped by an old static asset validator", asyn
   assert.equal(response.headers.get("ETag"), null);
   assert.match(await response.text(), /<meta name="robots" content="noindex,follow">/);
 });
+
+
+test("legacy v7 viewer is opt-in and signs the gateway URL without exposing the secret", async () => {
+  const secret = "0123456789abcdef0123456789abcdef";
+  const context = createContext({ SIGN_SECRET: secret });
+  const response = await request(context, "https://vid.best/watch-legacy?user=umbralarchive&id=7552567024304540959");
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("Cache-Control"), "private, no-store");
+  assert.equal(response.headers.get("X-Robots-Tag"), "noindex,nofollow");
+  const html = await response.text();
+  assert.ok(html.includes("video.megasale.win/legacy/watch"));
+  assert.match(html, /sig=[a-f0-9]{64}/);
+  assert.doesNotMatch(html, new RegExp(secret));
+});
+
+test("legacy v7 viewer rejects invalid input and missing signing keys", async () => {
+  const context = createContext({ SIGN_SECRET: "" });
+  const bad = await request(context, "https://vid.best/watch-legacy?user=%3Cscript%3E&id=7552567024304540959");
+  assert.equal(bad.status, 400);
+  const unsigned = await request(context, "https://vid.best/watch-legacy?user=umbralarchive&id=7552567024304540959");
+  assert.equal(unsigned.status, 503);
+});
+
