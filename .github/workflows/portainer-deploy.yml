@@ -131,3 +131,50 @@ jobs:
           retention-days: 14
       - name: Update existing stack 27 and verify completion and health
         run: node scripts/deploy-portainer.mjs --deploy
+
+  deploy_v5_addon:
+    name: Deploy optional v5 internal services (one-time, live-merge)
+    needs: [validate, preflight]
+    if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[deploy-v5-addons]') && vars.PORTAINER_AUTO_DEPLOY_ENABLED != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: portainer-production
+    env:
+      PORTAINER_URL: ${{ vars.PORTAINER_URL }}
+      PORTAINER_API_KEY: ${{ secrets.PORTAINER_API_KEY }}
+      PORTAINER_STACK_ID: ${{ vars.PORTAINER_STACK_ID }}
+      PORTAINER_ENDPOINT_ID: ${{ vars.PORTAINER_ENDPOINT_ID }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      PORTAINER_BACKUP_ENCRYPTION_KEY: ${{ secrets.PORTAINER_BACKUP_ENCRYPTION_KEY }}
+      PORTAINER_ADDON_ACTIVATION: 'true'
+      PORTAINER_TLS_CA_PEM: ${{ secrets.PORTAINER_TLS_CA_PEM }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Set isolated encrypted rollback backup path
+        run: echo "PORTAINER_BACKUP_FILE=$RUNNER_TEMP/portainer-v5-addon-backup.enc.json" >> "$GITHUB_ENV"
+      - name: Configure optional trusted Portainer CA
+        if: env.PORTAINER_TLS_CA_PEM != ''
+        shell: bash
+        run: |
+          umask 077
+          printf '%s\n' "$PORTAINER_TLS_CA_PEM" > "$RUNNER_TEMP/portainer-ca.pem"
+          echo "NODE_EXTRA_CA_CERTS=$RUNNER_TEMP/portainer-ca.pem" >> "$GITHUB_ENV"
+      - name: Check live v55 stack, preserved services and optional v5 overlay
+        run: node scripts/deploy-portainer-v5-addon.mjs --check-only
+      - name: Save encrypted original live YAML and environment before any writes
+        uses: actions/upload-artifact@v4
+        with:
+          name: portainer-v5-rollback-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.PORTAINER_BACKUP_FILE }}
+          if-no-files-found: error
+          retention-days: 14
+      - name: Add optional v5 services and verify post-deployment health
+        run: node scripts/deploy-portainer-v5-addon.mjs --deploy
