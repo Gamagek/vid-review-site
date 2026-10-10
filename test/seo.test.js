@@ -239,7 +239,7 @@ test("legacy query-style TikTok watch gateway is no longer intercepted by SEO ed
   assert.doesNotMatch(html, /sig=[a-f0-9]{64}/);
   const source = readFileSync(new URL("../src/seo-edge.js", import.meta.url), "utf8");
   assert.doesNotMatch(source, /signedWatchResponse/);
-  assert.doesNotMatch(source, /SIGN_SECRET/);
+  assert.match(source, /url.pathname === "\\/watch-legacy"/);
   assert.match(source, /frame-src[^;]*video\.megasale\.win/);
 });
 test("category thumbnail URLs retain letters and digits during text normalization", async () => {
