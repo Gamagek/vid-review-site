@@ -675,8 +675,8 @@ services:
               const source = new URL(url.searchParams.get("url") || "");
               validSource = source.protocol === "https:" &&
                 source.hostname === "www.tiktok.com" && !source.username && !source.password &&
-                /^\\/@[A-Za-z0-9_.]{1,32}\\/video\\/\\d{15,25}\\/?$/.test(source.pathname) &&
-                /^\\d+$/.test(url.searchParams.get("exp") || "") &&
+                new RegExp("^/@[A-Za-z0-9_.]{1,32}/video/[0-9]{15,25}/?$").test(source.pathname) &&
+                /^[0-9]+$/.test(url.searchParams.get("exp") || "") &&
                 /^[a-f0-9]{64}$/i.test(url.searchParams.get("sig") || "");
             } catch {}
             if (!validSource) { text(res, 400, "Invalid signed TikTok URL"); return; }
