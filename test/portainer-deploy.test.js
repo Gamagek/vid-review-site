@@ -6,6 +6,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readBackup, writeBackup } from '../scripts/portainer-backup.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const clientId = 'fake-client.access';
@@ -13,20 +14,35 @@ const clientSecret = 'fake-private-service-secret';
 const apiKey = 'fake-private-portainer-key';
 const fingerprint = createHash('sha256').update(clientId).digest('hex');
 const originalEnv = [{ name: 'EXISTING_SECRET', value: 'fake-existing-stack-secret' }];
-const baseline = 'services:\n  app:\n    image: previous-reviewed-image\n';
 const candidate = readFileSync(join(root, 'ops/portainer/vidbest-v56.yaml'), 'utf8');
-const stack = { Id: 27, Name: 'video-site', EndpointId: 3, Type: 2, Env: originalEnv };
+const baseline = candidate.replace('APP_VERSION: "56-R2-ADMIN-APPROVED-RAPIDAPI-CACHE"', 'APP_VERSION: "previous-reviewed-version"');
+const stack = { Id: 27, Name: 'video-site', EndpointId: 3, Type: 2, Status: 1, Env: originalEnv };
+const containers = ['app', 'cloudflared', 'rapidapi-tester'].map(service => ({
+  Id: 'existing-' + service, ImageID: 'sha256:reviewed-' + service,
+  Labels: { 'com.docker.compose.project': 'video-site', 'com.docker.compose.service': service },
+  State: 'running', Status: 'Up (healthy)'
+}));
 
-function run(t, { args = ['--check-only'], env = {}, responses, health = false, unchanged = false } = {}) {
+function run(t, { args = ['--check-only'], env = {}, responses, health = true, unchanged = false,
+  postUpdateHealth = true, rollbackHealth = true, asyncChecks = 2, updateStatus = 200,
+  stuck = false, staleBackup = false, missingBackup = false, cachedImageMismatch = false } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'vidbest-preflight-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   const auditPath = join(dir, 'requests.json');
   const mockPath = join(dir, 'fetch.mjs');
+  const backupPath = join(dir, 'stack.enc.json');
+  if (args.includes('--deploy') && !missingBackup) {
+    writeBackup(backupPath, { version: 1, stackId: 27, endpointId: 3, name: 'video-site',
+      yaml: staleBackup ? 'stale YAML' : (unchanged ? candidate : baseline), env: originalEnv }, apiKey);
+  }
   const mock = `
     import assert from 'node:assert/strict';
     import { writeFileSync } from 'node:fs';
     const audit = [];
     const replies = ${JSON.stringify(responses ?? null)};
+    let liveYaml = ${JSON.stringify(unchanged ? candidate : baseline)};
+    let writes = 0;
+    let pending = 0;
     globalThis.setTimeout = fn => { queueMicrotask(fn); return 0; };
     globalThis.fetch = async (url, options) => {
       assert.equal(url.origin, 'https://portainer.megasale.win');
@@ -43,10 +59,27 @@ function run(t, { args = ['--check-only'], env = {}, responses, health = false, 
         return new Response(reply.body, { status: reply.status ?? 200, headers: reply.headers ?? { 'Content-Type': 'application/json' } });
       }
       let data;
-      if (url.pathname === '/api/stacks/27' && options.method === 'GET') data = ${JSON.stringify(stack)};
-      else if (url.pathname === '/api/stacks/27/file') data = { StackFileContent: ${JSON.stringify(unchanged ? candidate : baseline)} };
-      else if (options.method === 'PUT') data = {};
-      else if (url.pathname === '/api/endpoints/3/docker/containers/json') data = ${JSON.stringify(health ? ['app', 'cloudflared', 'rapidapi-tester'].map(service => ({ Labels: { 'com.docker.compose.project': 'video-site', 'com.docker.compose.service': service }, State: 'running', Status: 'Up (healthy)' })) : [])};
+      if (url.pathname === '/api/stacks/27' && options.method === 'GET') {
+        data = { ...${JSON.stringify(stack)}, Status: pending > 0 ? 3 : 1 };
+        if (pending > 0) pending--;
+      }
+      else if (url.pathname === '/api/stacks/27/file') data = { StackFileContent: liveYaml };
+      else if (options.method === 'PUT') {
+        if (${updateStatus} !== 200) return new Response('PRIVATE_RESPONSE_BODY', {
+          status: ${updateStatus}, headers: { 'Content-Type': 'application/json' }
+        });
+        writes++;
+        liveYaml = JSON.parse(options.body).StackFileContent;
+        pending = ${stuck} ? Infinity : ${asyncChecks};
+        data = {};
+      }
+      else if (url.pathname === '/api/endpoints/3/docker/containers/json') {
+        const healthy = writes === 0 ? ${health} : writes === 1 ? ${postUpdateHealth} : ${rollbackHealth};
+        data = healthy ? ${JSON.stringify(containers)} : [];
+      }
+      else if (url.pathname.startsWith('/api/endpoints/3/docker/images/')) {
+        data = { Id: ${JSON.stringify(cachedImageMismatch ? 'sha256:unreviewed' : 'sha256:reviewed-cloudflared')} };
+      }
       else throw new Error('Unexpected API path');
       return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
     };
@@ -56,6 +89,7 @@ function run(t, { args = ['--check-only'], env = {}, responses, health = false, 
     PORTAINER_STACK_ID: '27', PORTAINER_ENDPOINT_ID: '3', PORTAINER_STACK_FILE: 'ops/portainer/vidbest-v56.yaml',
     CF_ACCESS_CLIENT_ID: clientId, CF_ACCESS_CLIENT_SECRET: clientSecret,
     CF_ACCESS_EXPECTED_CLIENT_ID_SHA256: fingerprint, PORTAINER_AUTO_DEPLOY_ENABLED: 'false', ...env };
+  variables.PORTAINER_BACKUP_FILE = missingBackup ? '' : backupPath;
   let status = 0;
   let output;
   try {
@@ -67,15 +101,19 @@ function run(t, { args = ['--check-only'], env = {}, responses, health = false, 
   }
   const audit = existsSync(auditPath) ? JSON.parse(readFileSync(auditPath, 'utf8')) : [];
   for (const secret of [clientId, clientSecret, apiKey, originalEnv[0].value]) assert.ok(!output.includes(secret), 'Credential was logged');
-  return { status, output, audit };
+  const backup = existsSync(backupPath) ? readBackup(backupPath, apiKey) : null;
+  return { status, output, audit, backup };
 }
 
-test('read-only preflight authenticates both GETs and reads stack YAML without any write', t => {
+test('read-only preflight authenticates GETs, saves an encrypted backup and verifies baseline health', t => {
   const result = run(t);
   assert.equal(result.status, 0, result.output);
   assert.match(result.output, /READ-ONLY PREFLIGHT PASSED/);
   assert.match(result.output, /Client ID identity verified/);
-  assert.deepEqual(result.audit.map(x => [x.method, x.path]), [['GET', '/api/stacks/27'], ['GET', '/api/stacks/27/file']]);
+  assert.equal(result.audit.length, 4);
+  assert.ok(result.audit.every(x => x.method === 'GET'));
+  assert.equal(result.backup.yaml, baseline);
+  assert.deepEqual(result.backup.env, originalEnv);
 });
 
 test('direct invocation defaults to read-only even with the production flag enabled', t => {
@@ -163,12 +201,13 @@ test('explicit healthy deployment preserves all existing environment values and 
 });
 
 test('failed health rolls back the previous YAML and environment without deletes', t => {
-  const result = run(t, { args: ['--deploy'], env: { PORTAINER_AUTO_DEPLOY_ENABLED: 'true' } });
+  const result = run(t, { args: ['--deploy'], env: { PORTAINER_AUTO_DEPLOY_ENABLED: 'true' }, postUpdateHealth: false });
   assert.notEqual(result.status, 0);
   const writes = result.audit.filter(x => x.method === 'PUT');
   assert.equal(writes.length, 2);
   assert.deepEqual(writes[1].body, { StackFileContent: baseline, Env: originalEnv, Prune: false, PullImage: false });
   assert.ok(result.audit.every(x => ['GET', 'PUT'].includes(x.method)));
+  assert.match(result.output, /Rollback verified/);
 });
 
 test('unchanged YAML avoids redeploying running production containers', t => {
@@ -176,4 +215,53 @@ test('unchanged YAML avoids redeploying running production containers', t => {
   assert.equal(result.status, 0, result.output);
   assert.match(result.output, /No stack content changes/);
   assert.ok(result.audit.every(x => x.method === 'GET'));
+});
+
+test('asynchronous acceptance waits for Active status before checking containers', t => {
+  const result = run(t, { args: ['--deploy'], env: { PORTAINER_AUTO_DEPLOY_ENABLED: 'true' }, asyncChecks: 3 });
+  assert.equal(result.status, 0, result.output);
+  const firstWrite = result.audit.findIndex(x => x.method === 'PUT');
+  assert.deepEqual(result.audit.slice(firstWrite + 1, firstWrite + 5).map(x => x.path),
+    Array(4).fill('/api/stacks/27'));
+  assert.match(result.output, /Deployment verified Active and healthy/);
+});
+
+test('409 conflict does not roll back another deployment', t => {
+  const result = run(t, { args: ['--deploy'], env: { PORTAINER_AUTO_DEPLOY_ENABLED: 'true' }, updateStatus: 409 });
+  assert.notEqual(result.status, 0);
+  assert.equal(result.audit.filter(x => x.method === 'PUT').length, 1);
+  assert.doesNotMatch(result.output, /Rollback verified/);
+  assert.ok(!result.output.includes('PRIVATE_RESPONSE_BODY'));
+});
+
+test('unresolved asynchronous deployment is never interrupted by concurrent rollback', t => {
+  const result = run(t, { args: ['--deploy'], env: { PORTAINER_AUTO_DEPLOY_ENABLED: 'true' }, stuck: true });
+  assert.notEqual(result.status, 0);
+  assert.equal(result.audit.filter(x => x.method === 'PUT').length, 1);
+  assert.match(result.output, /Cannot safely submit rollback/);
+});
+
+test('failed rollback health is reported as failure rather than a restored stack', t => {
+  const result = run(t, { args: ['--deploy'], env: { PORTAINER_AUTO_DEPLOY_ENABLED: 'true' },
+    postUpdateHealth: false, rollbackHealth: false });
+  assert.notEqual(result.status, 0);
+  assert.equal(result.audit.filter(x => x.method === 'PUT').length, 2);
+  assert.match(result.output, /Rollback failed/);
+  assert.doesNotMatch(result.output, /Rollback verified/);
+});
+
+test('missing or stale backup prevents every production write', t => {
+  for (const options of [{ missingBackup: true }, { staleBackup: true }]) {
+    const result = run(t, { args: ['--deploy'], env: { PORTAINER_AUTO_DEPLOY_ENABLED: 'true' }, ...options });
+    assert.notEqual(result.status, 0);
+    assert.ok(result.audit.every(x => x.method === 'GET'));
+  }
+});
+
+test('unhealthy baseline and a cached replacement tunnel image fail before deployment', t => {
+  for (const options of [{ health: false }, { cachedImageMismatch: true }]) {
+    const result = run(t, { args: ['--deploy'], env: { PORTAINER_AUTO_DEPLOY_ENABLED: 'true' }, ...options });
+    assert.notEqual(result.status, 0);
+    assert.ok(result.audit.every(x => x.method === 'GET'));
+  }
 });

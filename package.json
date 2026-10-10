@@ -14,7 +14,8 @@
     "db:list": "wrangler d1 migrations list video-reviews-db --remote"
   },
   "devDependencies": {
-    "wrangler": "^4.32.0"
+    "wrangler": "^4.32.0",
+    "yaml": "2.9.1"
   },
   "engines": {
     "node": ">=22.0.0"

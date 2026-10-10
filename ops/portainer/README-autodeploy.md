@@ -21,8 +21,12 @@ precedence over repository fallbacks; check that scope when repairing a credenti
 | PORTAINER_API_KEY | Secret | Existing Portainer API key |
 | CF_ACCESS_CLIENT_ID | Secret | Cloudflare service token **Client ID** |
 | CF_ACCESS_CLIENT_SECRET | Secret | Matching service token **Client Secret** |
-| PORTAINER_AUTO_DEPLOY_ENABLED | Variable | Leave unset or false until production review passes |
+| PORTAINER_AUTO_DEPLOY_ENABLED | Repository variable | Leave unset or false until production review passes |
 | PORTAINER_TLS_CA_PEM | Optional secret | Additional trusted CA PEM; never disables TLS verification |
+| PORTAINER_BACKUP_ENCRYPTION_KEY | Optional secret | Independent high-entropy backup key; defaults to the Portainer API key |
+
+The production flag must be available at repository scope because GitHub evaluates
+the deployment job condition before environment-level variables become available.
 
 A Cloudflare token UUID used in a policy selector is different from its Client ID.
 The Client ID and Client Secret must come from the same service token. Neither is
@@ -52,7 +56,12 @@ on each API request. Redirects are not followed.
 
 It verifies the Client ID pin, reads `GET /api/stacks/27`, checks the returned
 stack ID, name, endpoint, standalone Compose type and existing environment array,
-then reads `GET /api/stacks/27/file`. The YAML backup remains in memory.
+then reads `GET /api/stacks/27/file`. It parses the live and candidate Compose YAML,
+rejects removal of existing services, changes to existing mounts, volume/network
+definitions, ports, replicas or the management tunnel, and checks all baseline
+containers. It also confirms the cached tunnel image matches its running image.
+Jobs save an encrypted YAML and environment backup outside the checkout and upload
+it as an artifact. Preflight performs no Portainer writes.
 Only after all checks pass does it print `READ-ONLY PREFLIGHT PASSED`.
 Read-only mode rejects all API methods other than GET.
 
@@ -67,28 +76,59 @@ Portainer API key works.
 
 Updates use `PUT /api/stacks/{id}?endpointId={endpointId}`, preserving the exact
 existing `Env` array with `Prune=false` and `PullImage=false`. Unchanged YAML is
-not redeployed. The current YAML and environment are kept in memory for a
-best-effort rollback if the update or container health checks fail.
+not redeployed. The deploy job performs a fresh read-only check and uploads its
+encrypted rollback backup **before** invoking `--deploy`. The updater checks that
+the live YAML and environment still match that backup before any write. A
+Git-managed stack is refused by the file updater.
+
+HTTP 200 alone does not prove deployment success. The updater polls the existing
+stack until it is Active, its YAML and environment match the requested update,
+every expected service is running, and services with healthchecks are healthy.
+The default eight-minute health window exceeds the app's 180-second start period.
+The existing cloudflared container must retain its container ID. The deploy job
+allows 30 minutes for an update and verified recovery.
+
+On an update or health failure, the updater waits for any asynchronous deployment
+to finish before submitting the previous YAML and environment. It then verifies
+rollback status, configuration and health. HTTP 4xx rejections, particularly 409
+conflicts with another deployment, do not trigger a rollback. If the stack remains
+Deploying or the management path is unavailable, it refuses a concurrent rollback
+and reports failure. No delete or prune requests are issued.
+
+## Encrypted recovery backup
+
+Artifacts `portainer-preflight-{run_id}-{attempt}` and
+`portainer-rollback-{run_id}-{attempt}` are retained for 14 days. They contain only
+an AES-256-GCM envelope. Each backup uses a random salt and IV and an HKDF-derived
+key. Credentials, inline YAML secrets and environment values are never uploaded
+in plaintext. Keep the independent backup key, or the API key used for that run,
+available securely: rotating a key does not decrypt old artifacts.
+
+`readBackup` in `scripts/portainer-backup.mjs` authenticates and decrypts a
+downloaded envelope for an operator-controlled recovery tool. Its result contains
+`yaml`, `env`, stack ID and endpoint ID. Never print that result or write it into
+the checkout, CI logs or an unencrypted artifact. The automatic rollback uses
+the exact same live YAML and environment captured before the update.
 
 ## Production readiness limitations
 
 A successful authentication preflight alone is insufficient to enable automatic
 production writes. Before enabling the flag:
 
-- Compare the live Compose source and mounted volumes with the candidate. The
-  updater does not yet reject every service/volume/bind-mount change.
-- Keep an independent encrypted backup of the live YAML and environment.
-  The in-memory rollback backup is lost if the runner is cancelled or killed.
-- Extend the health window beyond the app's 180-second healthcheck start period.
-  The current polling window is approximately 120 seconds.
+- Complete the read-only check against the actual live stack and investigate any
+  preservation guard failure before enabling production writes.
+- Confirm the Portainer API user can update stack 27. Read-only success proves
+  read permission, not write permission.
+- Retain backups of persistent application data separately. A YAML/environment
+  backup cannot undo data migrations or application writes.
 - Verify recovery through an independent management path. The stack includes
   cloudflared, which also carries the Portainer management route; a failed tunnel
   restart can prevent the API rollback from reaching Portainer.
-- Pin production images and startup dependencies. The candidate uses
+- Review production images and startup dependencies. The candidate uses
   `cloudflare/cloudflared:latest`, `node:22-alpine`, an unpinned npm SDK install
-  and the latest yt-dlp download at startup.
-- Verify the restored containers after rollback; the current updater submits
-  the old YAML but does not independently confirm rollback health.
+  and the latest yt-dlp download at startup. Automatic updates freeze the tunnel
+  configuration and verify its cached image. Application startup downloads still
+  mean recreating a container can change dependencies even with `PullImage=false`.
 
 Access remains enabled. No public API bypass, frontend API key, video hostname
 routing change or live container mutation is part of preflight.

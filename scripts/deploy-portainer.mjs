@@ -4,6 +4,10 @@
 // GitHub Actions should run this on PUSH to main only, after regression tests pass.
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
+import { isDeepStrictEqual } from "node:util";
+import { isAbsolute, relative, resolve, sep } from "node:path";
+import { containerFailures, readCompose, verifyPreservation } from "./portainer-safety.mjs";
+import { readBackup, writeBackup } from "./portainer-backup.mjs";
 
 const args = process.argv.slice(2);
 if (args.some(arg => !["--check-only", "--deploy"].includes(arg)) ||
@@ -62,30 +66,23 @@ if (!/^ops\/portainer\/[a-zA-Z0-9_.-]+\.ya?ml$/.test(filePath) || filePath.inclu
   throw new Error("Stack file must be a reviewed YAML under ops/portainer/");
 }
 const newContent = readFileSync(filePath, "utf8");
-if (!newContent.includes("\nservices:\n") ||
-    !newContent.includes("  app:") ||
-    !newContent.includes("  cloudflared:") ||
-    !newContent.includes("  rapidapi-tester:")) {
-  throw new Error("Expected Vid.Best services are missing from the Stack YAML");
-}
-if ((newContent.match(/^  cloudflared:/gm) || []).length !== 1) {
-  throw new Error("Exactly one cloudflared service is required");
-}
+const candidateCompose = readCompose(newContent, "Candidate");
 const hash = (input) => createHash("sha256").update(input).digest("hex").slice(0, 12);
-const composeLines = newContent.split(/\r?\n/);
-const servicesStart = composeLines.findIndex(line => /^services:\s*$/.test(line));
-const servicesEnd = composeLines.findIndex((line, i) =>
-  i > servicesStart && /^[a-zA-Z][a-zA-Z0-9_-]*:\s*(?:#.*)?$/.test(line));
-if (servicesStart < 0) throw new Error("Unable to parse the services section");
-const serviceSection = composeLines.slice(servicesStart + 1,
-  servicesEnd > 0 ? servicesEnd : undefined).join("\n");
-const services = [...serviceSection.matchAll(/^  ([a-zA-Z][a-zA-Z0-9_.-]+):\s*$/gm)]
-  .map(x => x[1]);
-if (!services.includes("app") || !services.includes("cloudflared") ||
-    !services.includes("rapidapi-tester")) {
-  throw new Error("Expected stack services missing after parsing");
+const backupFile = String(process.env.PORTAINER_BACKUP_FILE || "").trim();
+if (backupFile && (!isAbsolute(backupFile) || !backupFile.endsWith(".enc.json"))) {
+  throw new Error("Encrypted backup must use an absolute .enc.json path outside the repository");
 }
-const expected = new Set(services);
+const backupRelativePath = relative(resolve(process.cwd()), resolve(backupFile));
+if (backupFile && !backupRelativePath.startsWith(".." + sep)) {
+  throw new Error("Encrypted backup must be outside the repository");
+}
+if (!checkOnly && !backupFile) throw new Error("Production writes require a previously uploaded encrypted backup");
+const backupKey = String(process.env.PORTAINER_BACKUP_ENCRYPTION_KEY || apiKey);
+const healthSeconds = Number(process.env.PORTAINER_HEALTH_TIMEOUT_SECONDS || 480);
+if (!Number.isInteger(healthSeconds) || healthSeconds < 180 || healthSeconds > 900) {
+  throw new Error("Health timeout must be between 180 and 900 seconds");
+}
+const healthAttempts = Math.ceil(healthSeconds / 5);
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function api(path, { method = "GET", body, timeout = 30000 } = {}) {
@@ -128,8 +125,10 @@ async function api(path, { method = "GET", body, timeout = 30000 } = {}) {
       " (unexpected redirect)") + " at " + url.pathname);
   }
   if (!response.ok) {
-    throw new Error("Portainer " + method + " " + url.pathname +
+    const error = new Error("Portainer " + method + " " + url.pathname +
       " returned HTTP " + response.status + " (" + (mime || "unknown content type") + ")");
+    error.httpStatus = response.status;
+    throw error;
   }
   if (mime && mime !== "application/json" && !mime.endsWith("+json")) {
     throw new Error("Portainer API returned HTTP " + response.status + " " + mime +
@@ -158,6 +157,37 @@ if (typeof stored.StackFileContent !== "string" || !stored.StackFileContent.trim
 }
 const oldContent = stored.StackFileContent;
 const oldEnv = original.Env;
+const backupData = { version: 1, stackId, endpointId, name: "video-site", yaml: oldContent, env: oldEnv };
+if (checkOnly && backupFile) {
+  writeBackup(backupFile, backupData, backupKey);
+  console.log("Encrypted YAML and environment backup created; no plaintext secret file written.");
+}
+if (!checkOnly) {
+  if (!isDeepStrictEqual(readBackup(backupFile, backupKey), backupData)) {
+    throw new Error("Live stack changed since its backup was uploaded; refusing stale deployment");
+  }
+}
+const baselineCompose = readCompose(oldContent, "Live");
+const services = verifyPreservation(baselineCompose, candidateCompose);
+if (Number(original.Status) !== 1) throw new Error("Existing stack must be Active before automatic deployment");
+if (!checkOnly && original.GitConfig) throw new Error("File updater refuses a Git-managed Portainer stack");
+
+const filters = encodeURIComponent(JSON.stringify({ label: ["com.docker.compose.project=video-site"] }));
+const containersPath = "api/endpoints/" + endpointId + "/docker/containers/json?all=1&filters=" + filters;
+const baselineContainers = await api(containersPath);
+const initialFailures = containerFailures(baselineContainers, baselineCompose);
+if (initialFailures.length) throw new Error("Existing stack is not healthy: " + initialFailures.join(", "));
+const tunnel = baselineContainers.find(c => c.Labels?.["com.docker.compose.project"] === "video-site" &&
+  c.Labels?.["com.docker.compose.service"] === "cloudflared");
+const tunnelImage = baselineCompose.services.cloudflared.image;
+if (!tunnel?.Id || !tunnel.ImageID || typeof tunnelImage !== "string") throw new Error("Cannot verify the management Tunnel image");
+if (baselineCompose.services.cloudflared.pull_policy && baselineCompose.services.cloudflared.pull_policy !== "never") {
+  throw new Error("Management Tunnel pull policy must not refresh its image during automatic deployment");
+}
+const cachedTunnelImage = await api("api/endpoints/" + endpointId + "/docker/images/" + encodeURIComponent(tunnelImage) + "/json");
+if (cachedTunnelImage.Id !== tunnel.ImageID) {
+  throw new Error("Cached management Tunnel image differs from the running image; refusing implicit replacement");
+}
 // For initial connection tests only: no Portainer POST, PUT, or DELETE requests.
 console.log("Target verified: video-site, stack " + stackId + ", endpoint " + endpointId);
 console.log("Baseline YAML SHA256 prefix " + hash(oldContent) +
@@ -165,7 +195,7 @@ console.log("Baseline YAML SHA256 prefix " + hash(oldContent) +
 if (checkOnly) {
   console.log("READ-ONLY PREFLIGHT PASSED: " +
     (cfAccessId ? "Cloudflare Service Auth, " : "") +
-    "Portainer API, Stack identity, existing environment and YAML backup read verified. No deployment performed.");
+    "Portainer API, Stack identity, existing environment, YAML backup, storage preservation and baseline health verified. No deployment performed.");
   process.exit(0);
 }
 if (oldContent === newContent) {
@@ -180,54 +210,69 @@ const payload = content => ({
   PullImage: false     // No implicit unreviewed image updates.
 });
 
-async function healthy() {
-  const filters = encodeURIComponent(JSON.stringify({
-    label: ["com.docker.compose.project=video-site"]
-  }));
-  const containers = await api("api/endpoints/" + endpointId +
-    "/docker/containers/json?all=1&filters=" + filters);
-  if (!Array.isArray(containers)) throw new Error("Unexpected Docker containers response");
-  const seen = new Map();
-  for (const c of containers) {
-    if (c.Labels?.["com.docker.compose.project"] === "video-site") {
-      seen.set(c.Labels["com.docker.compose.service"], c);
-    }
+async function stackState() {
+  const state = await api(getPath);
+  if (Number(state.Id) !== stackId || state.Name !== "video-site" || Number(state.EndpointId) !== endpointId) {
+    throw new Error("Stack identity changed while waiting for deployment");
   }
-  const failures = [];
-  for (const service of expected) {
-    const c = seen.get(service);
-    if (!c) { failures.push(service + ":missing"); continue; }
-    if (c.State !== "running") { failures.push(service + ":" + c.State); continue; }
-    if (/unhealthy/i.test(c.Status || "")) failures.push(service + ":unhealthy");
-    if (["app", "rapidapi-tester", "legacy-v7"].includes(service) &&
-        !/\(healthy\)/i.test(c.Status || "")) failures.push(service + ":not-healthy-yet");
+  return state;
+}
+
+async function waitForCompletion(content, compose) {
+  let failures = ["waiting"];
+  const deadline = Date.now() + healthSeconds * 1000;
+  for (let i = 0; i < healthAttempts && Date.now() < deadline; i++) {
+    if (i) await sleep(5000);
+    let state;
+    try { state = await stackState(); }
+    catch { failures = ["stack-query-failed"]; continue; }
+    const status = Number(state.Status);
+    if (status === 3) { failures = ["stack-deploying"]; continue; }
+    if (status === 4) throw new Error("Portainer stack deployment entered Error state");
+    if (status !== 1) throw new Error("Portainer stack did not return to Active state");
+    try {
+      const source = await api("api/stacks/" + stackId + "/file");
+      if (source.StackFileContent !== content || !isDeepStrictEqual(state.Env, oldEnv)) {
+        failures = ["stack-content-or-environment-not-converged"]; continue;
+      }
+      const containers = await api(containersPath);
+      failures = containerFailures(containers, compose);
+      const currentTunnel = containers.find(c => c.Labels?.["com.docker.compose.project"] === "video-site" &&
+        c.Labels?.["com.docker.compose.service"] === "cloudflared");
+      if (currentTunnel?.Id !== tunnel.Id) failures.push("management-tunnel-replaced");
+    } catch { failures = ["health-query-failed"]; }
+    if (!failures.length) return;
   }
-  return failures;
+  throw new Error("Health checks did not pass: " + failures.join(", "));
+}
+
+async function waitUntilNotDeploying() {
+  const deadline = Date.now() + healthSeconds * 1000;
+  for (let i = 0; i < healthAttempts && Date.now() < deadline; i++) {
+    if (i) await sleep(5000);
+    try { if ([1, 2, 4].includes(Number((await stackState()).Status))) return; }
+    catch { /* A temporary Tunnel outage must not produce a concurrent rollback write. */ }
+  }
+  throw new Error("Cannot safely submit rollback while stack deployment status is unresolved");
 }
 
 let attempted = false;
 try {
   attempted = true;
   await api(updatePath, { method: "PUT", body: payload(newContent), timeout: 180000 });
-  let failures = ["waiting"];
-  for (let i = 0; i < 24; i++) {
-    await sleep(5000);
-    try { failures = await healthy(); }
-    catch (err) { failures = ["health-query-failed"]; }
-    if (failures.length === 0) {
-      console.log("Deployment healthy: " + [...expected].sort().join(", "));
-      process.exit(0);
-    }
-  }
-  throw new Error("Health checks did not pass: " + failures.join(", "));
+  await waitForCompletion(newContent, candidateCompose);
+  console.log("Deployment verified Active and healthy: " + services.sort().join(", "));
 } catch (error) {
   console.error("Deployment failed: " + error.message);
   // A write request can fail after the server already applied changes.
-  // Always try to restore the prior YAML if a PUT was attempted.
-  if (attempted) {
+  // A rejected request cannot have applied our update. In particular, HTTP 409
+  // belongs to another active deployment and must never trigger our rollback.
+  if (attempted && !(error.httpStatus >= 400 && error.httpStatus < 500)) {
     try {
+      await waitUntilNotDeploying();
       await api(updatePath, { method: "PUT", body: payload(oldContent), timeout: 180000 });
-      console.error("Rollback submitted: previously deployed YAML restored; inspect health.");
+      await waitForCompletion(oldContent, baselineCompose);
+      console.error("Rollback verified: previous YAML, environment and healthy services restored.");
     } catch (rollbackError) {
       console.error("Rollback failed: " + rollbackError.message);
     }

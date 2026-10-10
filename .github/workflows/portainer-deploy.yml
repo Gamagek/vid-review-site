@@ -54,6 +54,8 @@ jobs:
       # Verified via Cloudflare API; SHA-256 of Client ID, never the credential itself.
       # Token: VidBest-GitHub-AutoDeploy (530a942e-7c6f-4740-96c3-5a029e9e59ab).
       CF_ACCESS_EXPECTED_CLIENT_ID_SHA256: 56c5a83d48d7c327d48b58dc9f0d2979c3ab99cf3459baa125c73371f17e4ba1
+      PORTAINER_BACKUP_FILE: ${{ runner.temp }}/portainer-preflight-backup.enc.json
+      PORTAINER_BACKUP_ENCRYPTION_KEY: ${{ secrets.PORTAINER_BACKUP_ENCRYPTION_KEY }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,6 +63,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+      - run: npm ci
       - name: Configure optional trusted Portainer CA
         if: env.PORTAINER_TLS_CA_PEM != ''
         shell: bash
@@ -70,12 +74,19 @@ jobs:
           echo "NODE_EXTRA_CA_CERTS=$RUNNER_TEMP/portainer-ca.pem" >> "$GITHUB_ENV"
       - name: Check Service Auth and Portainer stack in read-only mode
         run: node scripts/deploy-portainer.mjs --check-only
+      - name: Save encrypted read-only backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: portainer-preflight-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.PORTAINER_BACKUP_FILE }}
+          if-no-files-found: error
+          retention-days: 14
 
   deploy:
     needs: [validate, preflight]
     if: ${{ vars.PORTAINER_AUTO_DEPLOY_ENABLED == 'true' && (github.event_name == 'push' || inputs.read_only == false) }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     environment: portainer-production
     env:
       PORTAINER_URL: ${{ vars.PORTAINER_URL }}
@@ -88,6 +99,9 @@ jobs:
       CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
       CF_ACCESS_EXPECTED_CLIENT_ID_SHA256: 56c5a83d48d7c327d48b58dc9f0d2979c3ab99cf3459baa125c73371f17e4ba1
       PORTAINER_AUTO_DEPLOY_ENABLED: ${{ vars.PORTAINER_AUTO_DEPLOY_ENABLED }}
+      PORTAINER_BACKUP_FILE: ${{ runner.temp }}/portainer-backup.enc.json
+      PORTAINER_BACKUP_ENCRYPTION_KEY: ${{ secrets.PORTAINER_BACKUP_ENCRYPTION_KEY }}
+      PORTAINER_HEALTH_TIMEOUT_SECONDS: 480
     steps:
       - uses: actions/checkout@v4
         with:
@@ -95,6 +109,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+      - run: npm ci
       - name: Configure optional trusted Portainer CA
         if: env.PORTAINER_TLS_CA_PEM != ''
         shell: bash
@@ -102,5 +118,14 @@ jobs:
           umask 077
           printf '%s\n' "$PORTAINER_TLS_CA_PEM" > "$RUNNER_TEMP/portainer-ca.pem"
           echo "NODE_EXTRA_CA_CERTS=$RUNNER_TEMP/portainer-ca.pem" >> "$GITHUB_ENV"
-      - name: Update existing stack 27 and verify health (rollback if unhealthy)
+      - name: Prepare current deployment backup without writes
+        run: node scripts/deploy-portainer.mjs --check-only
+      - name: Save encrypted rollback backup before production writes
+        uses: actions/upload-artifact@v4
+        with:
+          name: portainer-rollback-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.PORTAINER_BACKUP_FILE }}
+          if-no-files-found: error
+          retention-days: 14
+      - name: Update existing stack 27 and verify completion and health
         run: node scripts/deploy-portainer.mjs --deploy
