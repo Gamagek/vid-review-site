@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      read_only:
+        description: Run validation and preflight without deploying production
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -46,6 +51,9 @@ jobs:
       PORTAINER_TLS_CA_PEM: ${{ secrets.PORTAINER_TLS_CA_PEM }}
       CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
       CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      # Verified via Cloudflare API; SHA-256 of Client ID, never the credential itself.
+      # Token: VidBest-GitHub-AutoDeploy (530a942e-7c6f-4740-96c3-5a029e9e59ab).
+      CF_ACCESS_EXPECTED_CLIENT_ID_SHA256: 56c5a83d48d7c327d48b58dc9f0d2979c3ab99cf3459baa125c73371f17e4ba1
     steps:
       - uses: actions/checkout@v4
         with:
@@ -65,7 +73,7 @@ jobs:
 
   deploy:
     needs: [validate, preflight]
-    if: ${{ vars.PORTAINER_AUTO_DEPLOY_ENABLED == 'true' }}
+    if: ${{ vars.PORTAINER_AUTO_DEPLOY_ENABLED == 'true' && (github.event_name == 'push' || inputs.read_only == false) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: portainer-production
@@ -78,6 +86,8 @@ jobs:
       PORTAINER_TLS_CA_PEM: ${{ secrets.PORTAINER_TLS_CA_PEM }}
       CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
       CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      CF_ACCESS_EXPECTED_CLIENT_ID_SHA256: 56c5a83d48d7c327d48b58dc9f0d2979c3ab99cf3459baa125c73371f17e4ba1
+      PORTAINER_AUTO_DEPLOY_ENABLED: ${{ vars.PORTAINER_AUTO_DEPLOY_ENABLED }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -93,4 +103,4 @@ jobs:
           printf '%s\n' "$PORTAINER_TLS_CA_PEM" > "$RUNNER_TEMP/portainer-ca.pem"
           echo "NODE_EXTRA_CA_CERTS=$RUNNER_TEMP/portainer-ca.pem" >> "$GITHUB_ENV"
       - name: Update existing stack 27 and verify health (rollback if unhealthy)
-        run: node scripts/deploy-portainer.mjs
+        run: node scripts/deploy-portainer.mjs --deploy

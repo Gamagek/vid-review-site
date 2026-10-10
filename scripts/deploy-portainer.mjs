@@ -5,6 +5,16 @@
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 
+const args = process.argv.slice(2);
+if (args.some(arg => !["--check-only", "--deploy"].includes(arg)) ||
+    (args.includes("--check-only") && args.includes("--deploy"))) {
+  throw new Error("Choose --check-only or --deploy; unknown or conflicting arguments refused");
+}
+// Default to read-only, even when invoked directly outside GitHub Actions.
+const checkOnly = !args.includes("--deploy");
+if (!checkOnly && process.env.PORTAINER_AUTO_DEPLOY_ENABLED !== "true") {
+  throw new Error("Production writes require --deploy and PORTAINER_AUTO_DEPLOY_ENABLED=true");
+}
 const required = (name) => {
   const value = String(process.env[name] || "").trim();
   if (!value) throw new Error("Missing required deployment setting: " + name);
@@ -21,6 +31,26 @@ const cfAccessSecret = String(process.env.CF_ACCESS_CLIENT_SECRET || "").trim();
 if (Boolean(cfAccessId) !== Boolean(cfAccessSecret)) {
   throw new Error("Both Cloudflare Access service token components must be configured together");
 }
+const protectedHost = base.hostname === "portainer.megasale.win";
+if (protectedHost && !cfAccessId) {
+  throw new Error("Cloudflare Access service token is required for the protected Portainer hostname");
+}
+// This is a non-secret fingerprint of the Client ID retrieved from Cloudflare.
+// It distinguishes a wrong token/UUID in GitHub Secrets without logging either credential.
+const expectedAccessIdHash = String(process.env.CF_ACCESS_EXPECTED_CLIENT_ID_SHA256 || "").trim();
+if (expectedAccessIdHash && !/^[a-f0-9]{64}$/.test(expectedAccessIdHash)) {
+  throw new Error("CF_ACCESS_EXPECTED_CLIENT_ID_SHA256 must be a SHA-256 fingerprint");
+}
+if (expectedAccessIdHash &&
+    createHash("sha256").update(cfAccessId).digest("hex") !== expectedAccessIdHash) {
+  const uuid = /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(cfAccessId);
+  throw new Error("Cloudflare Access credential identity mismatch: CF_ACCESS_CLIENT_ID does not match " +
+    "the Client ID of VidBest-GitHub-AutoDeploy allowed by the Portainer policy" +
+    (uuid ? "; a token UUID was supplied instead of a Client ID" : "") +
+    ". Correct the effective GitHub Secret in portainer-production or its repository fallback. No request sent.");
+}
+if (expectedAccessIdHash) console.log("Cloudflare Access Client ID identity verified against the configured policy token.");
+console.log(checkOnly ? "Mode: READ-ONLY; only GET requests permitted." : "Mode: DEPLOY; production write flag verified.");
 const stackId = Number(required("PORTAINER_STACK_ID"));
 const endpointId = Number(required("PORTAINER_ENDPOINT_ID"));
 if (!Number.isSafeInteger(stackId) || stackId < 1 ||
@@ -59,6 +89,7 @@ const expected = new Set(services);
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function api(path, { method = "GET", body, timeout = 30000 } = {}) {
+  if (checkOnly && method !== "GET") throw new Error("Read-only mode refuses all non-GET API requests");
   const url = new URL(path.replace(/^\//, ""), base);
   const options = {
     method,
@@ -75,11 +106,20 @@ async function api(path, { method = "GET", body, timeout = 30000 } = {}) {
     options.headers["Content-Type"] = "application/json";
     options.body = JSON.stringify(body);
   }
-  const response = await fetch(url, options);
+  let response;
+  try { response = await fetch(url, options); }
+  catch {
+    // Node transport errors can include sensitive request details in nested causes.
+    throw new Error("Portainer API transport failed at " + url.pathname +
+      "; check trusted TLS, tunnel reachability and request timeout");
+  }
   // Never print responses or redirect query strings. Those can contain credentials.
   // Only report the status, MIME type, and a fixed classification of a login page.
-  const mime = (response.headers.get("content-type") || "").split(";")[0].toLowerCase();
+  const reportedMime = (response.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
+  const mime = /^[a-z0-9!#$&^_.+-]+\/[a-z0-9!#$&^_.+-]+$/.test(reportedMime) ? reportedMime : "";
   const location = response.headers.get("location") || "";
+  console.log("Portainer API " + method + " " + url.pathname + " -> HTTP " +
+    response.status + "; Content-Type: " + (mime || "missing or invalid"));
   if (response.status >= 300 && response.status < 400) {
     const loginRedirect = location.includes("/cdn-cgi/access/") ||
       location.includes("cloudflareaccess.com");
@@ -96,7 +136,7 @@ async function api(path, { method = "GET", body, timeout = 30000 } = {}) {
       " at " + url.pathname + "; expected JSON (possible Access login or proxy rewrite)");
   }
   const raw = await response.text();
-  if (!raw) return {};
+  if (!raw.trim()) throw new Error("Portainer API returned an empty JSON response at " + url.pathname);
   try { return JSON.parse(raw); }
   catch { throw new Error("Portainer API returned HTTP " + response.status +
     " with malformed JSON at " + url.pathname); }
@@ -105,7 +145,7 @@ async function api(path, { method = "GET", body, timeout = 30000 } = {}) {
 const updatePath = "api/stacks/" + stackId + "?endpointId=" + endpointId;
 const getPath = "api/stacks/" + stackId;
 const original = await api(getPath);
-if (original.Name !== "video-site" || Number(original.EndpointId) !== endpointId ||
+if (Number(original.Id) !== stackId || original.Name !== "video-site" || Number(original.EndpointId) !== endpointId ||
     Number(original.Type) !== 2) {
   throw new Error("Wrong target: must be the existing video-site standalone Compose stack");
 }
@@ -119,12 +159,13 @@ if (typeof stored.StackFileContent !== "string" || !stored.StackFileContent.trim
 const oldContent = stored.StackFileContent;
 const oldEnv = original.Env;
 // For initial connection tests only: no Portainer POST, PUT, or DELETE requests.
-const checkOnly = process.argv.includes("--check-only");
 console.log("Target verified: video-site, stack " + stackId + ", endpoint " + endpointId);
 console.log("Baseline YAML SHA256 prefix " + hash(oldContent) +
   "; candidate " + hash(newContent));
 if (checkOnly) {
-  console.log("READ-ONLY PREFLIGHT PASSED: Cloudflare Service Auth, Portainer API, Stack identity and backup read verified. No deployment performed.");
+  console.log("READ-ONLY PREFLIGHT PASSED: " +
+    (cfAccessId ? "Cloudflare Service Auth, " : "") +
+    "Portainer API, Stack identity, existing environment and YAML backup read verified. No deployment performed.");
   process.exit(0);
 }
 if (oldContent === newContent) {

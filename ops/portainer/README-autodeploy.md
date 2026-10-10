@@ -1,65 +1,94 @@
-# GitHub Actions → Portainer CE auto-deployment
+# GitHub Actions → Cloudflare Access → Portainer
 
-The workflow **always runs a read-only API preflight** after tests on every main push;
-preflight verifies Service Auth, Portainer API, stack ID/name/type and a readable
-YAML backup. It does not mutate Portainer. A production deployment can only start
-when the separate `PORTAINER_AUTO_DEPLOY_ENABLED=true` flag has been set.
+The workflow validates the repository and runs a read-only preflight against the
+existing `video-site` stack (ID 27, endpoint 3). It does not create, replace or
+delete a stack. Production writes require both the workflow flag
+`PORTAINER_AUTO_DEPLOY_ENABLED=true` and an explicit `--deploy` invocation.
+Direct script invocation defaults to read-only. Manual workflow dispatch defaults
+to `read_only=true`, which skips deployment even if the production flag is enabled.
 
-This workflow updates **only** the existing standalone Compose stack `video-site`
-(Portainer stack 27, endpoint 3) after a **main** push and after CI-style tests pass.
-It never creates another tunnel or deletes volumes. A no-change YAML is not redeployed.
-Site Worker deployments remain in the existing Cloudflare `Deploy` workflow.
+## Connection configuration
 
-## Required connection setup
+Jobs use GitHub Environment `portainer-production`. Environment settings take
+precedence over repository fallbacks; check that scope when repairing a credential.
 
-Already entered by the owner:
-- Repository Secret: `PORTAINER_API_KEY` (keep private)
-- Repository Variable: `PORTAINER_STACK_ID=27`
-- Repository Variable: `PORTAINER_ENDPOINT_ID=3`
+| Setting | Type | Required value |
+| --- | --- | --- |
+| PORTAINER_URL | Variable | https://portainer.megasale.win |
+| PORTAINER_STACK_ID | Variable | 27 |
+| PORTAINER_ENDPOINT_ID | Variable | 3 |
+| PORTAINER_STACK_FILE | Optional variable | ops/portainer/vidbest-v56.yaml |
+| PORTAINER_API_KEY | Secret | Existing Portainer API key |
+| CF_ACCESS_CLIENT_ID | Secret | Cloudflare service token **Client ID** |
+| CF_ACCESS_CLIENT_SECRET | Secret | Matching service token **Client Secret** |
+| PORTAINER_AUTO_DEPLOY_ENABLED | Variable | Leave unset or false until production review passes |
+| PORTAINER_TLS_CA_PEM | Optional secret | Additional trusted CA PEM; never disables TLS verification |
 
-Still required before it can actually connect:
-1. Add repository variable `PORTAINER_URL` with a **working trusted-HTTPS origin**
-   (for example `https://portainer.megasale.win` **after** configuring a protected Tunnel route).
-   **Do not** use an unprotected public management hostname. TLS validation is not disabled.
-   If using a private/self-signed CA with a certificate valid for the hostname, add
-   `PORTAINER_TLS_CA_PEM` as a GitHub Actions secret containing the CA PEM chain.
-2. Under Settings → Environments, create `portainer-production`. Restrict deployments
-   to the `main` branch. An optional protection rule can require approval for a rollout.
-3. Optional repository variable `PORTAINER_STACK_FILE` chooses which reviewed YAML
-   should be active. Default: `ops/portainer/vidbest-v56.yaml`.
-   For PR #90's optional historical TikTok container **after it is merged and tested**,
-   choose `ops/portainer/vidbest-v56-with-optional-v7.yaml`.
-4. First merge PR #91 with the deployment flag unset. Inspect the GitHub Actions
-`Portainer production stack (after tests)` read-only `preflight` job to confirm
-`READ-ONLY PREFLIGHT PASSED`. Then, and only then, create repository variable
-   `PORTAINER_AUTO_DEPLOY_ENABLED=true`. Without this switch, the workflow tests
-   changes but does not touch the live stack.
+A Cloudflare token UUID used in a policy selector is different from its Client ID.
+The Client ID and Client Secret must come from the same service token. Neither is
+printed. Do not use an Access browser cookie or an account API token in these secrets.
 
-## What it checks
+## Verified Access identity
 
-- Requires the current Portainer stack to be named `video-site`, be standalone
-  Compose (type 2), and belong to the expected Endpoint ID.
-- Reads and keeps the *existing* Stack environment variables, including secrets;
-  no key or env value is printed.
-- Downloads the current stack source as an ephemeral in-memory backup.
-- Uses Portainer `PUT /api/stacks/{id}?endpointId={endpointId}` with `Prune=false`
-  and `PullImage=false`.
-- Checks running container statuses and the health of app, rapidapi-tester and
-  optional legacy-v7. Attempts to restore the previous YAML if post-update health fails.
+On 2026-10-10 the connected Cloudflare account was inspected directly:
 
-## Limitations
+- Application: `portainer.megasale.win`, self-hosted.
+- Existing `VidBest Portainer Admin` email Allow policy remains in place.
+- `VidBest GitHub Auto Deploy`: Service Auth (`non_identity`), including only token
+  `530a942e-7c6f-4740-96c3-5a029e9e59ab`.
+- Token `VidBest-GitHub-AutoDeploy` is enabled and unexpired.
+- Both workflow jobs pin a non-secret SHA-256 fingerprint of that token's Client ID.
 
-Portainer CE's API token gives significant privileges: protect it in GitHub
-Secrets. A public GitHub repo should **not** execute a privileged self-hosted
-runner on the production VPS. Use GitHub-hosted `ubuntu-latest` with an HTTPS
-protected endpoint instead.
+The pin makes an incorrect GitHub Client ID fail locally before credentials are
+sent. Changing to a different service token requires reviewing and updating both
+fingerprints in the workflow after updating the scoped Access policy and secrets.
+Rotating a Client Secret must be coordinated with its effective GitHub Secret.
+The connected GitHub plugin does not expose Secrets reads or writes.
 
-If Cloudflare Access is enabled for the protected Portainer hostname,
-create one service-token policy scoped to the deployment application and add
-`CF_ACCESS_CLIENT_ID` and `CF_ACCESS_CLIENT_SECRET` as **repository secrets**.
-The workflow automatically sends both service-token headers when configured.
-Do not enable deployment until the hostname and auth path are reachable,
-otherwise runs will fail before altering the Stack.
+## What preflight proves
 
-Rollback is best-effort, not a transactional restore of external mutable state.
-Always keep an independent Portainer backup of your current stack and env.
+The script sends `CF-Access-Client-Id`, `CF-Access-Client-Secret` and `X-API-Key`
+on each API request. Redirects are not followed.
+
+It verifies the Client ID pin, reads `GET /api/stacks/27`, checks the returned
+stack ID, name, endpoint, standalone Compose type and existing environment array,
+then reads `GET /api/stacks/27/file`. The YAML backup remains in memory.
+Only after all checks pass does it print `READ-ONLY PREFLIGHT PASSED`.
+Read-only mode rejects all API methods other than GET.
+
+Logs expose only request method/path, status, a sanitized MIME type, fixed error
+classifications and YAML hash prefixes. They never expose service credentials,
+environment values, redirect query strings, cookies or response bodies.
+A successful Client ID comparison followed by an Access login redirect narrows
+the remaining issue to service-secret authentication; it does not prove the
+Portainer API key works.
+
+## Production update and rollback
+
+Updates use `PUT /api/stacks/{id}?endpointId={endpointId}`, preserving the exact
+existing `Env` array with `Prune=false` and `PullImage=false`. Unchanged YAML is
+not redeployed. The current YAML and environment are kept in memory for a
+best-effort rollback if the update or container health checks fail.
+
+## Production readiness limitations
+
+A successful authentication preflight alone is insufficient to enable automatic
+production writes. Before enabling the flag:
+
+- Compare the live Compose source and mounted volumes with the candidate. The
+  updater does not yet reject every service/volume/bind-mount change.
+- Keep an independent encrypted backup of the live YAML and environment.
+  The in-memory rollback backup is lost if the runner is cancelled or killed.
+- Extend the health window beyond the app's 180-second healthcheck start period.
+  The current polling window is approximately 120 seconds.
+- Verify recovery through an independent management path. The stack includes
+  cloudflared, which also carries the Portainer management route; a failed tunnel
+  restart can prevent the API rollback from reaching Portainer.
+- Pin production images and startup dependencies. The candidate uses
+  `cloudflare/cloudflared:latest`, `node:22-alpine`, an unpinned npm SDK install
+  and the latest yt-dlp download at startup.
+- Verify the restored containers after rollback; the current updater submits
+  the old YAML but does not independently confirm rollback health.
+
+Access remains enabled. No public API bypass, frontend API key, video hostname
+routing change or live container mutation is part of preflight.
