@@ -183,3 +183,27 @@ jobs:
           retention-days: 14
       - name: Add optional v5 services and verify post-deployment health
         run: node scripts/deploy-portainer-v5-addon.mjs --deploy
+
+  audit_524:
+    name: Read-only Portainer 524 incident status
+    needs: validate
+    if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[audit-524]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    environment: portainer-production
+    env:
+      PORTAINER_URL: ${{ vars.PORTAINER_URL }}
+      PORTAINER_API_KEY: ${{ secrets.PORTAINER_API_KEY }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Read stack and container status without changes
+        run: node scripts/portainer-524-audit.mjs
