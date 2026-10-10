@@ -384,7 +384,7 @@ test("query-style /watch no longer exposes or depends on the legacy signed TikTo
   assert.notEqual(response.status, 200);
   const source = readFileSync(new URL("../src/seo-edge.js", import.meta.url), "utf8");
   assert.doesNotMatch(source, /signedWatchResponse/);
-  assert.match(source, /url.pathname === "\\/watch-legacy"/);
+  assert.ok(source.includes('url.pathname === "/watch-legacy"'));
   assert.doesNotMatch(source, /TIKTOK_GATEWAY_ORIGIN/);
   assert.match(source, /frame-src[^;]*video\.megasale\.win/);
 });
