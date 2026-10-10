@@ -193,6 +193,22 @@ console.log("Target verified: video-site, stack " + stackId + ", endpoint " + en
 console.log("Baseline YAML SHA256 prefix " + hash(oldContent) +
   "; candidate " + hash(newContent));
 if (checkOnly) {
+  // Structural audit: expose only service/volume names and a strictly validated
+  // public APP_VERSION label. Never emit Compose YAML, env values or credentials.
+  const serviceNames = c => Object.keys(c.services).sort();
+  const cleanNames = names => names.filter(n => /^[a-z][a-z0-9_.-]{0,63}$/.test(n));
+  const liveServices = cleanNames(serviceNames(baselineCompose));
+  const candidateServices = cleanNames(serviceNames(candidateCompose));
+  const configuredVersion = baselineCompose.services.app?.environment?.APP_VERSION;
+  const version = typeof configuredVersion === "string" &&
+    /^[A-Za-z0-9_.-]{1,96}$/.test(configuredVersion) ? configuredVersion : "unavailable";
+  console.log("LIVE STRUCTURAL INVENTORY (no secrets): app version=" + version +
+    "; services=" + liveServices.join(",") +
+    "; named volumes=" + cleanNames(Object.keys(baselineCompose.volumes || {}).sort()).join(","));
+  console.log("CANDIDATE STRUCTURAL INVENTORY: services=" + candidateServices.join(",") +
+    "; additions=" + candidateServices.filter(n => !liveServices.includes(n)).join(",") +
+    "; removed=" + liveServices.filter(n => !candidateServices.includes(n)).join(","));
+
   console.log("READ-ONLY PREFLIGHT PASSED: " +
     (cfAccessId ? "Cloudflare Service Auth, " : "") +
     "Portainer API, Stack identity, existing environment, YAML backup, storage preservation and baseline health verified. No deployment performed.");
