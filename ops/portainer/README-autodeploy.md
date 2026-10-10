@@ -1,5 +1,10 @@
 # GitHub Actions → Portainer CE auto-deployment
 
+The workflow **always runs a read-only API preflight** after tests on every main push;
+preflight verifies Service Auth, Portainer API, stack ID/name/type and a readable
+YAML backup. It does not mutate Portainer. A production deployment can only start
+when the separate `PORTAINER_AUTO_DEPLOY_ENABLED=true` flag has been set.
+
 This workflow updates **only** the existing standalone Compose stack `video-site`
 (Portainer stack 27, endpoint 3) after a **main** push and after CI-style tests pass.
 It never creates another tunnel or deletes volumes. A no-change YAML is not redeployed.
@@ -24,7 +29,9 @@ Still required before it can actually connect:
    should be active. Default: `ops/portainer/vidbest-v56.yaml`.
    For PR #90's optional historical TikTok container **after it is merged and tested**,
    choose `ops/portainer/vidbest-v56-with-optional-v7.yaml`.
-4. **Only once the HTTPS connection works**, create repository variable
+4. First merge PR #91 with the deployment flag unset. Inspect the GitHub Actions
+`Portainer production stack (after tests)` read-only `preflight` job to confirm
+`READ-ONLY PREFLIGHT PASSED`. Then, and only then, create repository variable
    `PORTAINER_AUTO_DEPLOY_ENABLED=true`. Without this switch, the workflow tests
    changes but does not touch the live stack.
 
