@@ -1,0 +1,63 @@
+name: Portainer production stack (after tests)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vidbest-portainer-production
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Run regression tests
+        run: npm test
+      - name: Validate Worker compilation
+        run: npm run check
+      - name: Check deployment updater syntax
+        run: node --check scripts/deploy-portainer.mjs
+      - name: Verify Teamwork Python
+        run: python -m compileall -q services/teamwork/app
+
+  deploy:
+    needs: validate
+    if: ${{ vars.PORTAINER_AUTO_DEPLOY_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: portainer-production
+    env:
+      PORTAINER_URL: ${{ vars.PORTAINER_URL }}
+      PORTAINER_API_KEY: ${{ secrets.PORTAINER_API_KEY }}
+      PORTAINER_STACK_ID: ${{ vars.PORTAINER_STACK_ID }}
+      PORTAINER_ENDPOINT_ID: ${{ vars.PORTAINER_ENDPOINT_ID }}
+      PORTAINER_STACK_FILE: ${{ vars.PORTAINER_STACK_FILE || 'ops/portainer/vidbest-v56.yaml' }}
+      PORTAINER_TLS_CA_PEM: ${{ secrets.PORTAINER_TLS_CA_PEM }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Configure optional trusted Portainer CA
+        if: env.PORTAINER_TLS_CA_PEM != ''
+        shell: bash
+        run: |
+          umask 077
+          printf '%s\n' "$PORTAINER_TLS_CA_PEM" > "$RUNNER_TEMP/portainer-ca.pem"
+          echo "NODE_EXTRA_CA_CERTS=$RUNNER_TEMP/portainer-ca.pem" >> "$GITHUB_ENV"
+      - name: Update existing stack 27 and verify health (rollback if unhealthy)
+        run: node scripts/deploy-portainer.mjs
