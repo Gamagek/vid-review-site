@@ -1,6 +1,7 @@
 import edgeWorker from "./edge.js";
 
 const CANONICAL_ORIGIN = "https://vid.best";
+const LEGACY_V5_ORIGIN = "https://legacy-video.megasale.win";
 const LEGACY_HOSTS = new Set(["home.vid.best", "www.vid.best"]);
 const MIN_INDEXABLE_CATEGORY_VIDEOS = 3;
 const CATEGORY_DESCRIPTIONS = Object.freeze({
@@ -79,7 +80,7 @@ function standardHeaders(contentType, cacheControl = "public, max-age=60") {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
-    "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' https://www.tiktok.com; frame-src 'self' https://www.tiktok.com https://tiktok-oembed-gateway.gkasunc.workers.dev https://video.megasale.win; media-src 'self' https: https://www.tiktok.com blob:; connect-src 'self'"
+    "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' https://www.tiktok.com; frame-src 'self' https://www.tiktok.com https://tiktok-oembed-gateway.gkasunc.workers.dev https://video.megasale.win https://legacy-video.megasale.win; media-src 'self' https: https://www.tiktok.com blob:; connect-src 'self'"
   });
 }
 
@@ -510,6 +511,34 @@ async function passThroughHome(request, env, ctx) {
   });
 }
 
+async function signedLegacyV5Page(request, env) {
+  const url = new URL(request.url);
+  const user = url.searchParams.get("user") || "";
+  const id = url.searchParams.get("id") || "";
+  if (!/^[A-Za-z0-9_.]{1,32}$/.test(user) || !/^[0-9]{15,25}$/.test(id)) {
+    return new Response("Invalid TikTok video URL", { status: 400 });
+  }
+  if (!env.SIGN_SECRET) return new Response("Legacy player is not configured", { status: 503 });
+  const exp = Math.floor(Date.now() / 1000) + 900;
+  const material = new TextEncoder().encode(id + "." + exp);
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(String(env.SIGN_SECRET)),
+    {name:"HMAC",hash:"SHA-256"},false,["sign"]);
+  const signature = new Uint8Array(await crypto.subtle.sign("HMAC",key,material));
+  const sig = Array.from(signature,b=>b.toString(16).padStart(2,"0")).join("");
+  const source = "https://www.tiktok.com/@" + user + "/video/" + id;
+  const src = LEGACY_V5_ORIGIN + "/watch?url=" + encodeURIComponent(source) +
+    "&exp=" + exp + "&sig=" + sig;
+  const html = '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1"><title>Optional TikTok v5 player</title>' +
+    '<style>body{margin:0;min-height:100vh;background:#070707;color:white;display:grid;place-items:center}' +
+    'iframe{border:0;width:min(100%,605px);height:min(92vh,900px)}</style></head><body>' +
+    '<iframe loading="eager" title="Legacy TikTok preview" allow="fullscreen" src="' + escapeHtml(src) +
+    '"></iframe></body></html>';
+  const headers = standardHeaders("text/html; charset=utf-8","no-store");
+  headers.set("X-Robots-Tag","noindex, nofollow");
+  return new Response(request.method==="HEAD"?null:html,{status:200,headers});
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -527,6 +556,10 @@ export default {
         url.pathname = normalizedPath;
         return Response.redirect(url.toString(), 301);
       }
+    }
+
+    if (url.pathname === "/watch-v5" && ["GET", "HEAD"].includes(request.method)) {
+      return signedLegacyV5Page(request, env);
     }
 
     const category = resolveCategory(url.pathname);
