@@ -368,10 +368,19 @@ function mountFacebookFacade(card) {
   poster.referrerPolicy = "no-referrer";
   poster.src = "/api/facebook/thumbnail?url=" + encodeURIComponent(source);
   poster.addEventListener("error", () => {
+    // Some Facebook CDN thumbnails are signed and the server-side fetch may
+    // fail even while the original image URL remains valid. Try that URL once
+    // before falling back to the branded poster; never remove the play button.
+    const directThumbnail = card.dataset.videoThumbnail || "";
+    if (directThumbnail && poster.dataset.directFallback !== "1") {
+      poster.dataset.directFallback = "1";
+      poster.src = directThumbnail;
+      return;
+    }
     poster.hidden = true;
-    const fallback = surface.querySelector(".media-fallback");
-    if (fallback) fallback.hidden = false;
-  }, { once: true });
+    surface.classList.add("facebook-facade-no-poster");
+    if (status) status.textContent = "Facebook video · tap to play";
+  });
 
   const play = document.createElement("button");
   play.type = "button";
