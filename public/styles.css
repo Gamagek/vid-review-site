@@ -1368,6 +1368,8 @@ html:has(body[data-video-slug="saiyaara-a-cinematic-romance"]) { overflow-x: cli
 
 /* Facebook homepage preview facade: stable poster first, official player only after tap. */
 .facebook-facade-ready .preview-surface { position: relative; overflow: hidden; background: #090b16; }
+.facebook-facade-no-poster .preview-surface::before { content: "Facebook video"; position: absolute; inset: 0; display: grid; place-items: center; color: rgba(255,255,255,.78); font-size: 13px; letter-spacing: .08em; background: radial-gradient(ellipse at 50% 35%, #272b49 0%, #111426 55%, #080a13 100%); pointer-events: none; }
+.facebook-facade-no-poster .facebook-facade-play { z-index: 4; }
 .facebook-facade-poster { display: block; width: 100%; height: 100%; min-height: 150px; object-fit: cover; object-position: center; }
 .facebook-facade-play { position: absolute; z-index: 3; inset: 50% auto auto 50%; transform: translate(-50%, -50%); width: 54px; height: 54px; border: 1px solid rgba(255,255,255,.45); border-radius: 50%; background: rgba(12,15,30,.76); color: #fff; font-size: 23px; cursor: pointer; display: grid; place-items: center; box-shadow: 0 3px 18px rgba(0,0,0,.28); }
 .facebook-facade-play:focus-visible { outline: 3px solid #73d8ff; outline-offset: 3px; }
