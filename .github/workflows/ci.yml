@@ -10,11 +10,11 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - name: Validate Portainer workflow expressions
         shell: bash
         run: |
@@ -23,14 +23,24 @@ jobs:
             --output "$RUNNER_TEMP/actionlint.tar.gz"
           printf '%s  %s\n' '8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8' "$RUNNER_TEMP/actionlint.tar.gz" | sha256sum --check --status
           tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
-          "$RUNNER_TEMP/actionlint" -shellcheck= -pyflakes= .github/workflows/portainer-deploy.yml
+          "$RUNNER_TEMP/actionlint" -shellcheck= -pyflakes= .github/workflows/*.yml
       - name: Use Node.js 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Validate production Docker Compose without starting services
+        run: docker compose -f ops/portainer/vidbest-v56.yaml config --quiet
+        env:
+          R2_ACCESS_KEY: compose-validation-placeholder
+          R2_SECRET_KEY: compose-validation-placeholder
+          SIGN_SECRET: compose-validation-placeholder
+          TESTER_TOKEN: compose-validation-placeholder
+          RAPIDAPI_KEY: compose-validation-placeholder
+          CACHE_HOOK_SECRET: compose-validation-placeholder
+          TUNNEL_TOKEN: compose-validation-placeholder
       - name: Run regression tests
         shell: bash
         run: |
@@ -39,7 +49,7 @@ jobs:
 
       - name: Upload regression test output on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: regression-test-output
           path: test-output.txt

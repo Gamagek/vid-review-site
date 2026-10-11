@@ -2,12 +2,13 @@
 // Portainer CE standalone Compose stack updater for Vid.Best.
 // No TLS bypass, no shell invocation, no secret output, and no automatic stack deletion.
 // GitHub Actions should run this on PUSH to main only, after regression tests pass.
-import { readFileSync } from "node:fs";
+import { appendFileSync, readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 import { isAbsolute, relative, resolve, sep } from "node:path";
 import { containerFailures, readCompose, verifyPreservation } from "./portainer-safety.mjs";
 import { readBackup, writeBackup } from "./portainer-backup.mjs";
+import { createPortainerClient, readDockerInventory } from "./portainer-client.mjs";
 
 const args = process.argv.slice(2);
 if (args.some(arg => !["--check-only", "--deploy"].includes(arg)) ||
@@ -85,61 +86,12 @@ if (!Number.isInteger(healthSeconds) || healthSeconds < 180 || healthSeconds > 9
 const healthAttempts = Math.ceil(healthSeconds / 5);
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-async function api(path, { method = "GET", body, timeout = 30000 } = {}) {
-  if (checkOnly && method !== "GET") throw new Error("Read-only mode refuses all non-GET API requests");
-  const url = new URL(path.replace(/^\//, ""), base);
-  const options = {
-    method,
-    headers: { "X-API-Key": apiKey, "Accept": "application/json" },
-    // Do not follow an HTML login redirect and mistake the final 200 for JSON.
-    redirect: "manual",
-    signal: AbortSignal.timeout(timeout)
-  };
-  if (cfAccessId) {
-    options.headers["CF-Access-Client-Id"] = cfAccessId;
-    options.headers["CF-Access-Client-Secret"] = cfAccessSecret;
-  }
-  if (body !== undefined) {
-    options.headers["Content-Type"] = "application/json";
-    options.body = JSON.stringify(body);
-  }
-  let response;
-  try { response = await fetch(url, options); }
-  catch {
-    // Node transport errors can include sensitive request details in nested causes.
-    throw new Error("Portainer API transport failed at " + url.pathname +
-      "; check trusted TLS, tunnel reachability and request timeout");
-  }
-  // Never print responses or redirect query strings. Those can contain credentials.
-  // Only report the status, MIME type, and a fixed classification of a login page.
-  const reportedMime = (response.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
-  const mime = /^[a-z0-9!#$&^_.+-]+\/[a-z0-9!#$&^_.+-]+$/.test(reportedMime) ? reportedMime : "";
-  const location = response.headers.get("location") || "";
-  console.log("Portainer API " + method + " " + url.pathname + " -> HTTP " +
-    response.status + "; Content-Type: " + (mime || "missing or invalid"));
-  if (response.status >= 300 && response.status < 400) {
-    const loginRedirect = location.includes("/cdn-cgi/access/") ||
-      location.includes("cloudflareaccess.com");
-    throw new Error("Portainer API returned HTTP " + response.status +
-      (loginRedirect ? " (Cloudflare Access login redirect; check Service Auth token)" :
-      " (unexpected redirect)") + " at " + url.pathname);
-  }
-  if (!response.ok) {
-    const error = new Error("Portainer " + method + " " + url.pathname +
-      " returned HTTP " + response.status + " (" + (mime || "unknown content type") + ")");
-    error.httpStatus = response.status;
-    throw error;
-  }
-  if (mime && mime !== "application/json" && !mime.endsWith("+json")) {
-    throw new Error("Portainer API returned HTTP " + response.status + " " + mime +
-      " at " + url.pathname + "; expected JSON (possible Access login or proxy rewrite)");
-  }
-  const raw = await response.text();
-  if (!raw.trim()) throw new Error("Portainer API returned an empty JSON response at " + url.pathname);
-  try { return JSON.parse(raw); }
-  catch { throw new Error("Portainer API returned HTTP " + response.status +
-    " with malformed JSON at " + url.pathname); }
+const headers = { "X-API-Key": apiKey, Accept: "application/json" };
+if (cfAccessId) {
+  headers["CF-Access-Client-Id"] = cfAccessId;
+  headers["CF-Access-Client-Secret"] = cfAccessSecret;
 }
+const api = createPortainerClient({ base, headers, readOnly: checkOnly });
 
 const updatePath = "api/stacks/" + stackId + "?endpointId=" + endpointId;
 const getPath = "api/stacks/" + stackId;
@@ -160,7 +112,11 @@ const oldEnv = original.Env;
 const backupData = { version: 1, stackId, endpointId, name: "video-site", yaml: oldContent, env: oldEnv };
 if (checkOnly && backupFile) {
   writeBackup(backupFile, backupData, backupKey);
-  console.log("Encrypted YAML and environment backup created; no plaintext secret file written.");
+  if (!isDeepStrictEqual(readBackup(backupFile, backupKey), backupData)) {
+    throw new Error("Encrypted backup verification failed; refusing to continue");
+  }
+  if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, "backup_created=true\n");
+  console.log("Encrypted YAML and environment backup created and authenticated; no plaintext secret file written.");
 }
 if (!checkOnly) {
   if (!isDeepStrictEqual(readBackup(backupFile, backupKey), backupData)) {
@@ -174,7 +130,7 @@ if (!checkOnly && original.GitConfig) throw new Error("File updater refuses a Gi
 
 const filters = encodeURIComponent(JSON.stringify({ label: ["com.docker.compose.project=video-site"] }));
 const containersPath = "api/endpoints/" + endpointId + "/docker/containers/json?all=1&filters=" + filters;
-const baselineContainers = await api(containersPath);
+const baselineContainers = await readDockerInventory(api, endpointId, containersPath);
 const initialFailures = containerFailures(baselineContainers, baselineCompose);
 if (initialFailures.length) throw new Error("Existing stack is not healthy: " + initialFailures.join(", "));
 const tunnel = baselineContainers.find(c => c.Labels?.["com.docker.compose.project"] === "video-site" &&
@@ -218,6 +174,15 @@ if (checkOnly) {
 if (oldContent === newContent) {
   console.log("No stack content changes; preserving running containers.");
   process.exit(0);
+}
+
+// A running tunnel is insufficient if its mutable local tag now points to a
+// different image. Check the cached tag with a GET list, without image-inspect
+// or any pull, before allowing Compose to touch production.
+const imageFilters = encodeURIComponent(JSON.stringify({ reference: [tunnelImage] }));
+const images = await api("api/endpoints/" + endpointId + "/docker/images/json?filters=" + imageFilters);
+if (!Array.isArray(images) || !images.some(image => image.Id === tunnel.ImageID && image.RepoTags?.includes(tunnelImage))) {
+  throw new Error("Cached management Tunnel image does not match its running image; refusing implicit pull or replacement");
 }
 
 const payload = content => ({

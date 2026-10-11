@@ -140,7 +140,7 @@ test('workflow uploads backup before any deploy and manual read-only runs stay p
   assert.deepEqual(workflow.jobs.deploy.needs, ['validate', 'preflight']);
   assert.match(workflow.jobs.deploy.if, /inputs\.read_only == false/);
   const steps = workflow.jobs.deploy.steps;
-  const backup = steps.findIndex(step => step.uses === 'actions/upload-artifact@v4');
+  const backup = steps.findIndex(step => step.uses?.startsWith('actions/upload-artifact@'));
   const prepare = steps.findIndex(step => step.run === 'node scripts/deploy-portainer.mjs --check-only');
   const deploy = steps.findIndex(step => step.run === 'node scripts/deploy-portainer.mjs --deploy');
   assert.ok(prepare >= 0 && backup > prepare && deploy > backup);
@@ -151,4 +151,25 @@ test('workflow uploads backup before any deploy and manual read-only runs stay p
   assert.ok(configure >= 0 && configure < prepare);
   const ci = parse(readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8'));
   assert.ok(ci.jobs.test.steps.some(step => step.run?.includes('actionlint" -shellcheck=')));
+});
+
+test('infrastructure verification prevents production writes and retains failed-preflight backups', () => {
+  const stack = parse(readFileSync(new URL('../.github/workflows/portainer-deploy.yml', import.meta.url), 'utf8'));
+  const worker = parse(readFileSync(new URL('../.github/workflows/deploy.yml', import.meta.url), 'utf8'));
+  for (const job of [stack.jobs.deploy, stack.jobs.deploy_v5_addon, worker.jobs.deploy]) {
+    assert.match(job.if, /!contains\(github\.event\.head_commit\.message, '\[read-only-preflight\]'\)/);
+  }
+  const save = stack.jobs.preflight.steps.find(step => step.uses?.startsWith('actions/upload-artifact@'));
+  assert.match(save.if, /always\(\).*backup_created == 'true'/);
+  assert.equal(save.with['if-no-files-found'], 'error');
+  for (const file of ['ci.yml', 'deploy.yml', 'portainer-deploy.yml']) {
+    const workflow = parse(readFileSync(new URL('../.github/workflows/' + file, import.meta.url), 'utf8'));
+    for (const job of Object.values(workflow.jobs)) {
+      assert.equal(job['runs-on'], 'ubuntu-24.04');
+      for (const step of job.steps) {
+        if (step.uses) assert.match(step.uses, /^actions\/(checkout|setup-node|upload-artifact)@[a-f0-9]{40}$/);
+        if (step.uses?.startsWith('actions/setup-node@')) assert.equal(step.with['node-version'], 22);
+      }
+    }
+  }
 });
