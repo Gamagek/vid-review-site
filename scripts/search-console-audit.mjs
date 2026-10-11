@@ -168,7 +168,7 @@ async function auditPage(url, robots, fetchImpl, wait) {
       page.reviewHash = createHash('sha256').update(review).digest('hex');
       if (!review) page.errors.push('review_text_missing_from_html');
       else if (page.reviewWords < 100) page.warnings.push('short_review_needs_editorial_check');
-      if (/demo|player-test/i.test(new URL(url).pathname)) page.warnings.push('demo_page_needs_editorial_check');
+      if (/(?:^|[-/])(?:demo|player-test)(?:-|$)/i.test(new URL(url).pathname)) page.warnings.push('demo_page_needs_editorial_check');
     }
   } catch (error) { page.errors.push(safeCode(error)); }
   return page;
@@ -200,13 +200,18 @@ export async function googleAccessToken(secret, { fetchImpl = globalThis.fetch, 
 }
 
 export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:vid.best', budget = 200,
-  fetchImpl = globalThis.fetch, wait = delay, now = Date.now(), getToken = googleAccessToken } = {}) {
-  const result = { status: secret ? 'pending' : 'not_configured', sitemapSubmitted: false, inspections: [] };
+  fetchImpl = globalThis.fetch, wait = delay, now = Date.now(), getToken = googleAccessToken,
+  progress = () => {} } = {}) {
+  const result = { status: secret ? 'pending' : 'not_configured', authenticated: false,
+    propertyVerified: false, sitemapSubmitted: false, inspections: [] };
   if (!secret) { result.requiredSecret = 'GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON'; return result; }
   let stage = 'authenticate';
   try {
     if (!['sc-domain:vid.best', ORIGIN + '/'].includes(site)) throw new AuditError('invalid_search_console_property');
+    progress('Google credentials configured; requesting OAuth access.');
     const token = await getToken(secret, { fetchImpl, wait, now });
+    result.authenticated = true;
+    progress('Google OAuth authentication succeeded.');
     const headers = { Authorization: 'Bearer ' + token, Accept: 'application/json' };
     const property = 'https://www.googleapis.com/webmasters/v3/sites/' + encodeURIComponent(site);
     stage = 'verify_property_access';
@@ -214,11 +219,14 @@ export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:v
     if (access.status !== 200) { await access.body?.cancel(); throw new AuditError('google_property_http_' + access.status); }
     const info = JSON.parse(await boundedText(access));
     if (!['siteOwner', 'siteFullUser'].includes(info.permissionLevel)) throw new AuditError('search_console_full_access_required');
+    result.propertyVerified = true;
+    progress('Full or Owner Search Console property access verified.');
     stage = 'submit_sitemap';
     const submit = await request(fetchImpl, property + '/sitemaps/' + encodeURIComponent(SITEMAP), { method: 'PUT', headers }, wait);
     if (!submit.ok) { await submit.body?.cancel(); throw new AuditError('google_sitemap_http_' + submit.status); }
     await submit.body?.cancel();
     result.sitemapSubmitted = true;
+    progress('Published sitemap accepted by Google.');
     stage = 'inspect_index_status';
     const reviews = [...new Set(urls.map(publicUrl).filter(url => new URL(url).pathname.startsWith('/watch/')))].sort();
     const limit = Math.min(200, Math.max(1, Number(budget) || 200));
@@ -226,6 +234,7 @@ export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:v
     const selected = reviews.slice(offset).concat(reviews.slice(0, offset)).slice(0, limit);
     result.totalReviews = reviews.length;
     result.inspectionBudget = limit;
+    progress('Reading stored Google index status for ' + selected.length + ' reviews.');
     for (const url of selected) {
       // Under 240 calls/minute; stop the entire run on quota/auth failures.
       await wait(250);
@@ -245,6 +254,9 @@ export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:v
         if (state[field]) { try { row[field] = publicUrl(state[field]); } catch { row[field] = 'outside_canonical_public_routes'; } }
       }
       result.inspections.push(row);
+      if (result.inspections.length % 10 === 0 || result.inspections.length === selected.length) {
+        progress('Google inspections completed: ' + result.inspections.length + '/' + selected.length + '.');
+      }
     }
     result.status = 'success';
   } catch (error) { result.status = 'failed'; result.stage = stage; result.error = safeCode(error); }
@@ -252,9 +264,10 @@ export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:v
 }
 
 export async function runAudit({ fetchImpl = globalThis.fetch, wait = delay, secret = '',
-  site, budget, now = Date.now(), getToken } = {}) {
+  site, budget, now = Date.now(), getToken, progress = () => {} } = {}) {
   const report = { generatedAt: new Date(now).toISOString(), productionWrites: false, errors: [], pages: [] };
   try {
+    progress('Starting public crawlability checks.');
     const robots = await request(fetchImpl, ORIGIN + '/robots.txt', {}, wait);
     if (robots.status !== 200) { await robots.body?.cancel(); throw new AuditError('robots_http_' + robots.status); }
     const robotsText = await boundedText(robots);
@@ -265,6 +278,7 @@ export async function runAudit({ fetchImpl = globalThis.fetch, wait = delay, sec
     const discovered = await discover(fetchImpl, wait);
     report.sitemaps = discovered.maps;
     report.discoveredReviewCount = discovered.urls.filter(url => new URL(url).pathname.startsWith('/watch/')).length;
+    progress('Sitemap discovery complete; published reviews: ' + report.discoveredReviewCount + '.');
     const pending = [...discovered.urls], visited = new Set();
     while (pending.length) {
       const batch = pending.splice(0, 3).filter(url => !visited.has(url));
@@ -272,6 +286,7 @@ export async function runAudit({ fetchImpl = globalThis.fetch, wait = delay, sec
       if (visited.size > MAX_URLS) throw new AuditError('public_audit_budget_exceeded');
       const pages = await Promise.all(batch.map(url => auditPage(url, robotsText, fetchImpl, wait)));
       report.pages.push(...pages);
+      if (report.pages.length % 25 < pages.length) progress('Public pages checked: ' + report.pages.length + '.');
       for (const page of pages) for (const url of page.links || []) {
         if (new URL(url).pathname === '/videos' && !visited.has(url) && !pending.includes(url)) pending.push(url);
       }
@@ -289,8 +304,9 @@ export async function runAudit({ fetchImpl = globalThis.fetch, wait = delay, sec
     }
     report.failedPages = report.pages.filter(page => page.errors.length).length;
     report.publicAuditStatus = !report.errors.length && !report.failedPages ? 'success' : 'failed';
+    progress('Public checks complete: ' + report.publicAuditStatus + '; pages checked: ' + report.pages.length + '.');
     report.searchConsole = report.publicAuditStatus === 'success'
-      ? await syncSearchConsole(discovered.urls, { secret, site, budget, now, fetchImpl, wait, getToken })
+      ? await syncSearchConsole(discovered.urls, { secret, site, budget, now, fetchImpl, wait, getToken, progress })
       : { status: 'skipped_public_audit_failed', sitemapSubmitted: false, inspections: [] };
   } catch (error) { report.errors.push(safeCode(error)); report.publicAuditStatus = 'failed'; }
   return report;
@@ -299,6 +315,7 @@ export async function runAudit({ fetchImpl = globalThis.fetch, wait = delay, sec
 export function summary(report) {
   const google = report.searchConsole;
   const indexed = google?.inspections?.filter(row => row.verdict === 'PASS').length || 0;
+  const coverageCount = state => google?.inspections?.filter(row => row.coverageState === state).length || 0;
   return [
     'Vid.Best public SEO audit: ' + report.publicAuditStatus,
     'Published review URLs discovered: ' + (report.discoveredReviewCount || 0),
@@ -306,8 +323,13 @@ export function summary(report) {
     report.errors.length ? 'Audit errors: ' + report.errors.join(', ') : '',
     'Editorial warnings: ' + report.pages.filter(page => page.warnings.length).length,
     'Search Console: ' + (google?.status || 'not_run'),
+    'Google OAuth authentication: ' + (google?.authenticated ? 'success' : 'not_verified'),
+    'Search Console property access: ' + (google?.propertyVerified ? 'verified' : 'not_verified'),
     'Sitemap submitted to Google: ' + Boolean(google?.sitemapSubmitted),
     'Stored Google index inspections: ' + (google?.inspections?.length || 0) + '; PASS: ' + indexed,
+    google?.inspections?.length ? 'Stored Google coverage: discovered/not indexed: ' + coverageCount('Discovered - currently not indexed')
+      + '; unknown to Google: ' + coverageCount('URL is unknown to Google')
+      + '; crawled/not indexed: ' + coverageCount('Crawled - currently not indexed') : '',
     google?.error ? 'Google stage: ' + google.stage + '; error: ' + google.error : '',
     google?.status === 'not_configured' ? 'Required GitHub Actions secret: GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON' : '',
     'Production writes: none. URL Inspection reads stored index status; it does not request indexing.',
@@ -319,6 +341,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
     secret: process.env.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON || '',
     site: process.env.GOOGLE_SEARCH_CONSOLE_PROPERTY || 'sc-domain:vid.best',
     budget: process.env.GOOGLE_SEARCH_CONSOLE_INSPECTIONS || 200,
+    progress: message => console.log('[SEO audit] ' + message),
   });
   await writeFile('seo-audit-report.json', JSON.stringify(report, null, 2) + '\n');
   await writeFile('seo-audit-summary.txt', summary(report));
