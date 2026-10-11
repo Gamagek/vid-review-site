@@ -25,12 +25,14 @@ const containers = ['app', 'cloudflared', 'rapidapi-tester'].map(service => ({
 
 function run(t, { args = ['--check-only'], env = {}, responses, health = true, unchanged = false,
   postUpdateHealth = true, rollbackHealth = true, asyncChecks = 2, updateStatus = 200,
-  stuck = false, staleBackup = false, missingBackup = false, cachedImageMismatch = false } = {}) {
+  stuck = false, staleBackup = false, missingBackup = false, cachedImageMismatch = false,
+  inventoryTimeouts = 0 } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'vidbest-preflight-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   const auditPath = join(dir, 'requests.json');
   const mockPath = join(dir, 'fetch.mjs');
   const backupPath = join(dir, 'stack.enc.json');
+  const outputPath = join(dir, 'step-output.txt');
   if (args.includes('--deploy') && !missingBackup) {
     writeBackup(backupPath, { version: 1, stackId: 27, endpointId: 3, name: 'video-site',
       yaml: staleBackup ? 'stale YAML' : (unchanged ? candidate : baseline), env: originalEnv }, apiKey);
@@ -43,6 +45,7 @@ function run(t, { args = ['--check-only'], env = {}, responses, health = true, u
     let liveYaml = ${JSON.stringify(unchanged ? candidate : baseline)};
     let writes = 0;
     let pending = 0;
+    let inventoryRequests = 0;
     globalThis.setTimeout = fn => { queueMicrotask(fn); return 0; };
     globalThis.fetch = async (url, options) => {
       assert.equal(url.origin, 'https://portainer.megasale.win');
@@ -74,9 +77,18 @@ function run(t, { args = ['--check-only'], env = {}, responses, health = true, u
         data = {};
       }
       else if (url.pathname === '/api/endpoints/3/docker/containers/json') {
+        if (++inventoryRequests <= ${inventoryTimeouts}) {
+          throw Object.assign(new Error('PRIVATE_TRANSPORT_DETAILS'), { name: 'TimeoutError' });
+        }
         const healthy = writes === 0 ? ${health} : writes === 1 ? ${postUpdateHealth} : ${rollbackHealth};
         data = healthy ? ${JSON.stringify(containers)} : [];
       }
+      else if (url.pathname === '/api/endpoints/3/docker/images/json') {
+        data = [{ Id: ${JSON.stringify(cachedImageMismatch ? 'sha256:unreviewed' : 'sha256:reviewed-cloudflared')},
+          RepoTags: ['cloudflare/cloudflared:latest'] }];
+      }
+      else if (url.pathname === '/api/endpoints/3') data = { Id: 3, Status: 1, Snapshots: [{ Time: 1 }] };
+      else if (url.pathname === '/api/endpoints/3/docker/version') data = { ApiVersion: '1.45', MinAPIVersion: '1.24' };
       else if (url.pathname.startsWith('/api/endpoints/3/docker/images/')) {
         data = { Id: ${JSON.stringify(cachedImageMismatch ? 'sha256:unreviewed' : 'sha256:reviewed-cloudflared')} };
       }
@@ -90,6 +102,7 @@ function run(t, { args = ['--check-only'], env = {}, responses, health = true, u
     CF_ACCESS_CLIENT_ID: clientId, CF_ACCESS_CLIENT_SECRET: clientSecret,
     CF_ACCESS_EXPECTED_CLIENT_ID_SHA256: fingerprint, PORTAINER_AUTO_DEPLOY_ENABLED: 'false', ...env };
   variables.PORTAINER_BACKUP_FILE = missingBackup ? '' : backupPath;
+  variables.GITHUB_OUTPUT = outputPath;
   let status = 0;
   let output;
   try {
@@ -102,7 +115,8 @@ function run(t, { args = ['--check-only'], env = {}, responses, health = true, u
   const audit = existsSync(auditPath) ? JSON.parse(readFileSync(auditPath, 'utf8')) : [];
   for (const secret of [clientId, clientSecret, apiKey, originalEnv[0].value]) assert.ok(!output.includes(secret), 'Credential was logged');
   const backup = existsSync(backupPath) ? readBackup(backupPath, apiKey) : null;
-  return { status, output, audit, backup };
+  const stepOutput = existsSync(outputPath) ? readFileSync(outputPath, 'utf8') : '';
+  return { status, output, audit, backup, stepOutput };
 }
 
 test('read-only preflight authenticates GETs, saves an encrypted backup and verifies baseline health', t => {
@@ -114,6 +128,7 @@ test('read-only preflight authenticates GETs, saves an encrypted backup and veri
   assert.ok(result.audit.every(x => x.method === 'GET'));
   assert.equal(result.backup.yaml, baseline);
   assert.deepEqual(result.backup.env, originalEnv);
+  assert.equal(result.stepOutput, 'backup_created=true\n');
 });
 
 test('direct invocation defaults to read-only even with the production flag enabled', t => {
@@ -159,12 +174,13 @@ test('Access redirect reports status and MIME without following or logging sensi
 
 test('401, 403, 502 and HTML application shell are safely distinguished', t => {
   for (const status of [401, 403, 502, 200]) {
-    const result = run(t, { responses: [{ status, headers: { 'Content-Type': 'text/html' }, body: 'PRIVATE_RESPONSE_BODY' }] });
+    const attempts = status === 502 ? 3 : 1;
+    const result = run(t, { responses: Array(attempts).fill({ status, headers: { 'Content-Type': 'text/html' }, body: 'PRIVATE_RESPONSE_BODY' }) });
     assert.notEqual(result.status, 0);
     assert.match(result.output, new RegExp('HTTP ' + status));
     assert.match(result.output, /text\/html/);
     assert.ok(!result.output.includes('PRIVATE_RESPONSE_BODY'));
-    assert.equal(result.audit.length, 1);
+    assert.equal(result.audit.length, attempts);
   }
 });
 
@@ -260,4 +276,39 @@ test('unhealthy baseline fails before deployment', t => {
     assert.notEqual(result.status, 0);
     assert.ok(result.audit.every(x => x.method === 'GET'));
   }
+});
+
+test('transient Docker inventory timeout retries only GET and then verifies live health', t => {
+  const result = run(t, { inventoryTimeouts: 1 });
+  assert.equal(result.status, 0, result.output);
+  assert.equal(result.audit.filter(x => x.path.endsWith('/containers/json')).length, 2);
+  assert.ok(result.audit.every(x => x.method === 'GET'));
+  assert.match(result.output, /Retrying read-only GET/);
+  assert.ok(!result.output.includes('PRIVATE_TRANSPORT_DETAILS'));
+});
+
+test('persistent Docker timeout retains verified backup, diagnoses endpoint and prevents writes', t => {
+  const result = run(t, { args: ['--deploy'], env: { PORTAINER_AUTO_DEPLOY_ENABLED: 'true' }, inventoryTimeouts: 99 });
+  assert.notEqual(result.status, 0);
+  assert.equal(result.audit.filter(x => x.path.endsWith('/containers/json')).length, 3);
+  assert.ok(result.audit.every(x => x.method === 'GET'));
+  assert.match(result.output, /snapshot-age-seconds=.*diagnostic only, not a live health result/);
+  assert.doesNotMatch(result.output, /PREFLIGHT PASSED|Deployment verified/);
+  assert.ok(result.backup);
+});
+
+test('read-only inventory failure still exposes the authenticated backup output for artifact retention', t => {
+  const result = run(t, { inventoryTimeouts: 99 });
+  assert.notEqual(result.status, 0);
+  assert.equal(result.stepOutput, 'backup_created=true\n');
+  assert.equal(result.backup.yaml, baseline);
+  assert.ok(result.audit.every(x => x.method === 'GET'));
+});
+
+test('a changed cached tunnel image prevents any stack write without image inspection or pull', t => {
+  const result = run(t, { args: ['--deploy'], env: { PORTAINER_AUTO_DEPLOY_ENABLED: 'true' }, cachedImageMismatch: true });
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /refusing implicit pull or replacement/);
+  assert.ok(result.audit.every(x => x.method === 'GET'));
+  assert.ok(!result.audit.some(x => /\/images\/.+\/json$/.test(x.path)));
 });
