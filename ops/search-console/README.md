@@ -4,6 +4,11 @@ The **Review indexing audit** GitHub workflow runs every day at 04:47 UTC
 (10:17 Sri Lanka time), after a successful Cloudflare **Deploy** workflow, and
 on manual dispatch. GitHub schedules can be delayed. Each run retains JSON and
 text reports for 14 days in its Actions artifacts.
+Reports include the workflow attempt number, so a retry retains its own report.
+Safe progress messages show public crawl counts, successful Google authentication,
+verified property access, sitemap acceptance and completed inspection counts.
+The summary counts discovered/not indexed, unknown and crawled/not indexed review URLs.
+No credential values, service account identities or Google response bodies are logged.
 
 Without Google credentials it already audits the live published sitemap,
 robots.txt, GET/HEAD responses, canonical URLs, noindex directives, review text

@@ -63,6 +63,18 @@ test('sitemap extraction rejects external, authenticated and private routes, tru
   assert.throws(() => parseSitemap('<!DOCTYPE x><urlset xmlns="' + NS + '"></urlset>'), /invalid_sitemap_xml/);
 });
 
+test('real demo URLs are flagged without misclassifying Demon Hunters or Voldemort reviews', async () => {
+  const urls = [ORIGIN + '/watch/golden-kpop-demon-hunters', ORIGIN + '/watch/dumbledore-vs-voldemort', ORIGIN + '/watch/youtube-embed-experience-demo'];
+  const fake = publicSite({
+    [ORIGIN + '/sitemaps/videos-1.xml']: () => new Response(map(urls), { headers: { 'content-type': 'application/xml' } }),
+    [ORIGIN + '/videos']: () => new Response(page(ORIGIN + '/videos', urls), { headers: { 'content-type': 'text/html' } }),
+  });
+  const report = await runAudit({ fetchImpl: fake.fetchImpl, wait: noop });
+  assert.equal(report.publicAuditStatus, 'success');
+  for (const url of urls.slice(0, 2)) assert.equal(report.pages.find(row => row.url === url).warnings.includes('demo_page_needs_editorial_check'), false);
+  assert.equal(report.pages.find(row => row.url === urls[2]).warnings.includes('demo_page_needs_editorial_check'), true);
+});
+
 test('robots checks respect specific Googlebot groups, longest rules, wildcards and allow overrides', () => {
   assert.equal(robotsAllows('User-agent: *\nDisallow: /\nAllow: /watch/', '/watch/review'), true);
   assert.equal(robotsAllows('User-agent: *\nAllow: /\nUser-agent: Googlebot\nDisallow: /watch/', '/watch/review'), false);
@@ -97,9 +109,10 @@ test('malformed credentials never call Google or reveal secret contents in error
 });
 
 test('Search Console submits one sitemap and reads bounded, paced index statuses without indexing API calls', async () => {
-  const calls = [], waits = [];
+  const calls = [], waits = [], progress = [];
   const urls = Array.from({ length: 205 }, (_, i) => ORIGIN + '/watch/review-' + i);
-  const result = await syncSearchConsole(urls, { secret: 'configured', now: 0, budget: 5000,
+  const result = await syncSearchConsole(urls, { secret: 'configured-secret-sentinel', now: 0, budget: 5000,
+    progress: message => progress.push(message),
     getToken: async () => 'test-token-sentinel', wait: async ms => waits.push(ms),
     fetchImpl: async (url, options) => {
       calls.push({ url, method: options.method || 'GET' });
@@ -118,12 +131,18 @@ test('Search Console submits one sitemap and reads bounded, paced index statuses
     },
   });
   assert.equal(result.status, 'success');
+  assert.equal(result.authenticated, true);
+  assert.equal(result.propertyVerified, true);
   assert.equal(result.sitemapSubmitted, true);
   assert.equal(result.inspections.length, 200);
   assert.equal(new Set(result.inspections.map(row => row.url)).size, 200);
   assert.equal(calls.filter(call => call.method === 'PUT').length, 1);
   assert.equal(waits.filter(ms => ms === 250).length, 200);
   assert.doesNotMatch(JSON.stringify(result), /sentinel/);
+  assert.doesNotMatch(progress.join('\n'), /sentinel|Authorization|Bearer|private_key|client_email/);
+  assert.ok(progress.includes('Google OAuth authentication succeeded.'));
+  assert.ok(progress.includes('Full or Owner Search Console property access verified.'));
+  assert.equal(progress.at(-1), 'Google inspections completed: 200/200.');
   assert.equal(result.inspections[0].googleCanonical, 'outside_canonical_public_routes');
   assert.ok(calls.every(call => !call.url.includes('indexing.googleapis.com')));
 });
