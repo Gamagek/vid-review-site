@@ -4,7 +4,17 @@ import { isLikelyCrawler, sanitizeWatchHtml } from "../src/edge.js";
 
 test("recognizes common search crawlers without flagging ordinary browsers", () => {
   assert.equal(isLikelyCrawler("Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"), true);
+  for (const agent of ["Googlebot", "Google-InspectionTool", "bingbot", "VidBest-SEO-Audit/1.0"]) {
+    assert.equal(isLikelyCrawler(agent), true);
+  }
+  assert.equal(isLikelyCrawler({ cf: { verifiedBotCategory: "Search Engine Crawler" } }), true);
   assert.equal(isLikelyCrawler("Mozilla/5.0 Chrome/140.0 Mobile Safari/537.36"), false);
+});
+
+test("TikTok markup without an embed URL must not invent the source upload date", () => {
+  const html = '<body data-video-provider="tiktok"><script type="application/ld+json" nonce="abc">{"@graph":[{"@type":"WebPage"},{"@type":"VideoObject","uploadDate":"2026-09-01"}]}</script></body>';
+  assert.doesNotMatch(sanitizeWatchHtml(html), /VideoObject|2026-09-01/);
+  assert.match(sanitizeWatchHtml(html), /WebPage/);
 });
 
 test("removes VideoObject markup when the page only has the site favicon", () => {

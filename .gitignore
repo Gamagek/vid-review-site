@@ -11,3 +11,5 @@ coverage/
 __pycache__/
 *.py[cod]
 .pytest_cache/
+seo-audit-report.json
+seo-audit-summary.txt

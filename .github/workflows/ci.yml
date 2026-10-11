@@ -64,3 +64,5 @@ jobs:
         run: npm run check
       - name: Validate Portainer updater syntax
         run: node --check scripts/deploy-portainer.mjs
+      - name: Validate Search Console automation syntax
+        run: node --check scripts/search-console-audit.mjs

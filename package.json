@@ -6,6 +6,7 @@
   "description": "Vid.Best video review and discovery platform on Cloudflare Workers, D1 and R2.",
   "scripts": {
     "test": "node --test",
+    "seo:audit": "node scripts/search-console-audit.mjs",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "check": "node --check scripts/bootstrap-legacy-d1.mjs && wrangler deploy --dry-run --outdir .wrangler-dry-run",

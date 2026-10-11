@@ -269,6 +269,9 @@ Worker runtime secrets such as `GEMINI_KEY`, `ADMIN_SECRET_KEY`, `REACTION_SALT`
 
 ### Search Console indexing checks
 
+- Daily public audits and optional Google sitemap/index-status automation are
+  configured in `.github/workflows/seo-audit.yml`. See
+  [the secure Search Console connection and audit evidence](ops/search-console/README.md).
 - Submit `https://vid.best/sitemap.xml` in the verified Vid.Best property. It links to the public page, video and eligible category sitemaps.
 - The homepage includes server-rendered links to the 12 most recently updated published reviews; `/videos` provides the existing larger directory. Drafts remain excluded.
 - `/index.html` and trailing-slash variants of public page routes redirect to their preferred paths. Tracking parameters use the existing clean canonical; search/filter and sign-in URLs remain `noindex`.

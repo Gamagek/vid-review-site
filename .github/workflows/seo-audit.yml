@@ -1,0 +1,56 @@
+name: Review indexing audit
+
+on:
+  schedule:
+    - cron: '47 4 * * *'
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Deploy]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vidbest-search-console-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out reviewed main branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Use Node.js 22
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+      - name: Audit public pages and synchronize Search Console when configured
+        run: node scripts/search-console-audit.mjs
+        env:
+          GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_SEARCH_CONSOLE_PROPERTY: ${{ vars.GOOGLE_SEARCH_CONSOLE_PROPERTY || 'sc-domain:vid.best' }}
+          GOOGLE_SEARCH_CONSOLE_INSPECTIONS: '200'
+      - name: Publish concise indexing summary
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          if [ -f seo-audit-summary.txt ]; then
+            cat seo-audit-summary.txt >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Save credential-free technical and indexing reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: vidbest-seo-audit-${{ github.run_id }}
+          path: |
+            seo-audit-report.json
+            seo-audit-summary.txt
+          if-no-files-found: error
+          retention-days: 14

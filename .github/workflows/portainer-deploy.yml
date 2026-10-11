@@ -53,6 +53,8 @@ jobs:
         run: python -m compileall -q services/teamwork/app
 
   preflight:
+    # SEO releases only update the Cloudflare Worker; Portainer work is paused.
+    if: ${{ !contains(github.event.head_commit.message, '[seo-only]') }}
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 8
@@ -107,7 +109,7 @@ jobs:
 
   deploy:
     needs: [validate, preflight]
-    if: ${{ vars.PORTAINER_AUTO_DEPLOY_ENABLED == 'true' && (github.event_name == 'push' || inputs.read_only == false) && !contains(github.event.head_commit.message, '[read-only-preflight]') }}
+    if: ${{ vars.PORTAINER_AUTO_DEPLOY_ENABLED == 'true' && (github.event_name == 'push' || inputs.read_only == false) && !contains(github.event.head_commit.message, '[read-only-preflight]') && !contains(github.event.head_commit.message, '[seo-only]') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment: portainer-production
@@ -157,7 +159,7 @@ jobs:
   deploy_v5_addon:
     name: Deploy optional v5 internal services (one-time, live-merge)
     needs: [validate, preflight]
-    if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[deploy-v5-addons]') && vars.PORTAINER_AUTO_DEPLOY_ENABLED != 'true' && !contains(github.event.head_commit.message, '[read-only-preflight]') }}
+    if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[deploy-v5-addons]') && vars.PORTAINER_AUTO_DEPLOY_ENABLED != 'true' && !contains(github.event.head_commit.message, '[read-only-preflight]') && !contains(github.event.head_commit.message, '[seo-only]') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment: portainer-production
