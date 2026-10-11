@@ -57,7 +57,7 @@ function decorateVideoCards() {
     if (status) status.textContent = previewAvailabilityMessage(card);
 
     if (card.dataset.videoProvider === "facebook") {
-      mountFacebookDirectPlayer(card);
+      mountFacebookFacade(card);
       return;
     }
 
@@ -344,6 +344,71 @@ function stopPreview(card = null, statusMessage = "") {
 
   const status = active.querySelector(".preview-status");
   if (status) status.textContent = statusMessage || previewAvailabilityMessage(active);
+}
+
+function mountFacebookFacade(card) {
+  if (!card?.isConnected || card.dataset.facebookPlayerMounted === "1") return;
+  const surface = card.querySelector(".preview-surface");
+  if (!surface) return;
+  const source = card.dataset.videoSource || "";
+  const embedUrl = safeFacebookDirectEmbed(card.dataset.videoEmbed, source);
+  if (!embedUrl) {
+    const status = card.querySelector(".preview-status");
+    if (status) status.textContent = "Open video to play";
+    return;
+  }
+
+  // Keep the homepage tile as a stable thumbnail card. Facebook's signed
+  // CDN image URLs expire, so request the server-side cached thumbnail route.
+  const poster = document.createElement("img");
+  poster.className = "facebook-facade-poster";
+  poster.alt = "";
+  poster.loading = isNearViewport(card) ? "eager" : "lazy";
+  poster.decoding = "async";
+  poster.referrerPolicy = "no-referrer";
+  poster.src = "/api/facebook/thumbnail?url=" + encodeURIComponent(source);
+  poster.addEventListener("error", () => {
+    poster.hidden = true;
+    const fallback = surface.querySelector(".media-fallback");
+    if (fallback) fallback.hidden = false;
+  }, { once: true });
+
+  const play = document.createElement("button");
+  play.type = "button";
+  play.className = "facebook-facade-play";
+  play.setAttribute("aria-label", "Play Facebook video");
+  play.textContent = "▶";
+
+  const fallback = surface.querySelector(".media-fallback");
+  if (fallback) {
+    fallback.hidden = false;
+    fallback.textContent = "Facebook video";
+  }
+  surface.replaceChildren(poster, play);
+  surface.style.opacity = "1";
+  card.classList.add("facebook-facade-ready");
+  const status = card.querySelector(".preview-status");
+  if (status) status.textContent = "Tap to play Facebook video";
+
+  const activate = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (card.dataset.facebookPlayerMounted === "1") return;
+    const iframe = document.createElement("iframe");
+    iframe.className = "facebook-direct-player";
+    iframe.src = embedUrl;
+    iframe.title = card.dataset.videoTitle || "Facebook video";
+    iframe.loading = "eager";
+    iframe.referrerPolicy = "strict-origin-when-cross-origin";
+    iframe.allow = "autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share; fullscreen";
+    iframe.allowFullscreen = true;
+    iframe.setAttribute("playsinline", "true");
+    surface.replaceChildren(iframe);
+    card.dataset.facebookPlayerMounted = "1";
+    if (status) status.textContent = "";
+  };
+  play.addEventListener("click", activate);
+  surface.addEventListener("click", activate, { once: true });
 }
 
 function mountFacebookDirectPlayer(card) {
