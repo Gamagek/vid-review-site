@@ -13,6 +13,9 @@ import {
   notifyNewVideoSubscribers,
 } from "./member-auth.js";
 
+const REVIEW_TEXT_MAX_LENGTH = 60_000;
+const VIDEO_PAYLOAD_MAX_BYTES = 256_000;
+
 const CATEGORIES = Object.freeze({
   "Entertainment, Movies & Games": [
     "Movie Trailers",
@@ -1850,7 +1853,7 @@ async function recordVideoInterest(request, env, videoId) {
 }
 
 async function createVideo(request, env, ctx) {
-  const body = await readJson(request);
+  const body = await readJson(request, VIDEO_PAYLOAD_MAX_BYTES);
   const baseUrl = getBaseUrl(request, env);
   const data = await validateVideoPayload(body, null, baseUrl, env);
   data.slug = await uniqueSlug(env, data.title, body.slug);
@@ -1911,7 +1914,7 @@ async function createVideo(request, env, ctx) {
 async function updateVideo(request, env, id, ctx) {
   const existing = await env.DB.prepare("SELECT * FROM videos WHERE id = ?").bind(id).first();
   if (!existing) throw new AppError(404, "Video not found");
-  const body = await readJson(request);
+  const body = await readJson(request, VIDEO_PAYLOAD_MAX_BYTES);
   const data = await validateVideoPayload(body, existing, getBaseUrl(request, env), env);
 
   const row = await env.DB.prepare(
@@ -2090,6 +2093,11 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
       : tikTokCache ? (sameTikTokJob ? existing.cache_status : "pending")
         : (cacheSourceUrl ? cleanText(existing?.cache_status, 20, "pending") : "none");
 
+  const reviewText = cleanLongText(body.review_text, REVIEW_TEXT_MAX_LENGTH + 1, existing?.review_text || "");
+  if (reviewText.length > REVIEW_TEXT_MAX_LENGTH) {
+    throw new AppError(400, "Review text must be 60,000 characters or fewer");
+  }
+
   return {
     title,
     source_url: media.source_url,
@@ -2108,7 +2116,7 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
     primary_category: category,
     subcategory,
     description: cleanLongText(body.description, 2400, existing?.description || ""),
-    review_text: cleanLongText(body.review_text, 7000, existing?.review_text || ""),
+    review_text: reviewText,
     seo_title: cleanText(body.seo_title, 70, existing?.seo_title || title).slice(0, 70),
     seo_description: cleanText(body.seo_description, 180, existing?.seo_description || "").slice(0, 180),
     seo_tags: parseTags(body.seo_tags, parseTags(existing?.seo_tags)),
@@ -3081,7 +3089,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
         <button class="button text-button" type="button" data-interest="less">Show fewer like this</button>
         <p id="interest-status" class="form-status" role="status"></p>
       </div>
-      ${video.review_text ? `<section class="review-copy"><h2>Review & discovery notes</h2>${paragraphs(video.review_text)}</section>` : ""}
+      ${video.review_text ? `<section class="review-copy"><h2>Review & discovery notes</h2>${paragraphs(video.review_text, REVIEW_TEXT_MAX_LENGTH)}</section>` : ""}
       ${video.transcript ? `<details class="transcript-panel"><summary>Read transcript</summary><div>${paragraphs(video.transcript)}</div></details>` : ""}
       <a class="source-link" href="${escapeHtml(video.source_page_url || video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open original source ↗</a>
     </article>
@@ -3838,8 +3846,8 @@ function preparePlaybackEmbed(value, playbackOrigin) {
   }
 }
 
-function paragraphs(text) {
-  return cleanLongText(text, 7000).split(/\n{2,}/).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("");
+function paragraphs(text, maximum = 7000) {
+  return cleanLongText(text, maximum).split(/\n{2,}/).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("");
 }
 
 function dynamicHtml(html, status = 200, scriptNonce = "") {
