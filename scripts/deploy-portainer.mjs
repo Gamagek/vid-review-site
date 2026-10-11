@@ -184,10 +184,11 @@ if (!tunnel?.Id || !tunnel.ImageID || typeof tunnelImage !== "string") throw new
 if (baselineCompose.services.cloudflared.pull_policy && baselineCompose.services.cloudflared.pull_policy !== "never") {
   throw new Error("Management Tunnel pull policy must not refresh its image during automatic deployment");
 }
-const cachedTunnelImage = await api("api/endpoints/" + endpointId + "/docker/images/" + encodeURIComponent(tunnelImage) + "/json");
-if (cachedTunnelImage.Id !== tunnel.ImageID) {
-  throw new Error("Cached management Tunnel image differs from the running image; refusing implicit replacement");
-}
+// Image inspection through Portainer's Docker proxy can hang even when the
+// stack and container listing are healthy. Do not require that slow endpoint
+// during read-only preflight. Deployment still preserves the running tunnel
+// container identity in waitForCompletion and forbids image pulls.
+console.log("Management Tunnel container identity verified from Docker listing; image inspect skipped.");
 // For initial connection tests only: no Portainer POST, PUT, or DELETE requests.
 console.log("Target verified: video-site, stack " + stackId + ", endpoint " + endpointId);
 console.log("Baseline YAML SHA256 prefix " + hash(oldContent) +
@@ -262,36 +263,15 @@ async function waitForCompletion(content, compose) {
   throw new Error("Health checks did not pass: " + failures.join(", "));
 }
 
-async function waitUntilNotDeploying() {
-  const deadline = Date.now() + healthSeconds * 1000;
-  for (let i = 0; i < healthAttempts && Date.now() < deadline; i++) {
-    if (i) await sleep(5000);
-    try { if ([1, 2, 4].includes(Number((await stackState()).Status))) return; }
-    catch { /* A temporary Tunnel outage must not produce a concurrent rollback write. */ }
-  }
-  throw new Error("Cannot safely submit rollback while stack deployment status is unresolved");
-}
-
-let attempted = false;
 try {
-  attempted = true;
   await api(updatePath, { method: "PUT", body: payload(newContent), timeout: 180000 });
   await waitForCompletion(newContent, candidateCompose);
   console.log("Deployment verified Active and healthy: " + services.sort().join(", "));
 } catch (error) {
-  console.error("Deployment failed: " + error.message);
-  // A write request can fail after the server already applied changes.
-  // A rejected request cannot have applied our update. In particular, HTTP 409
-  // belongs to another active deployment and must never trigger our rollback.
-  if (attempted && !(error.httpStatus >= 400 && error.httpStatus < 500)) {
-    try {
-      await waitUntilNotDeploying();
-      await api(updatePath, { method: "PUT", body: payload(oldContent), timeout: 180000 });
-      await waitForCompletion(oldContent, baselineCompose);
-      console.error("Rollback verified: previous YAML, environment and healthy services restored.");
-    } catch (rollbackError) {
-      console.error("Rollback failed: " + rollbackError.message);
-    }
-  }
+  console.error("Deployment failed or outcome unresolved: " + error.message);
+  // A timed-out/524 PUT may have succeeded on the origin. Never issue an
+  // automatic second PUT: it could race the first and damage a live stack.
+  // Retain the encrypted backup for operator-reviewed recovery only.
+  console.error("No automatic rollback attempted. Inspect live stack state, YAML and container health before any further write.");
   process.exitCode = 1;
 }
