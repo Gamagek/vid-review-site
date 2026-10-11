@@ -17,7 +17,7 @@
   // Keep the owner-supplied Saiyaara widget on a single direct frame in each
   // active context, rather than creating a TikTok popup inside the swipe viewer.
   const SAIYAARA_SLUG = "saiyaara-a-cinematic-romance";
-  const SAIYAARA_TAGEMBED_URL = "https://widget.tagembed.com/2236794?postId=5592899&caption=1&header=1";
+  const saiyaaraOriginal = original.querySelector("[data-saiyaara-tagembed-host]");
   const isSaiyaara = (card) => card?.video?.provider === "tiktok" &&
     card.video.slug === SAIYAARA_SLUG;
   const symbols = { like: "👍", love: "♥", useful: "💡" };
@@ -90,6 +90,8 @@
   }
   function destroyPlayer(card) {
     card.stopGatewayObserver?.(); card.stopGatewayObserver = null;
+    if (card.saiyaaraPrepared) window.VidBestSaiyaaraTagembed?.unmount(card.host);
+    card.saiyaaraPrepared = false;
     card.loadToken = null; card.host.replaceChildren(); card.frame = null; card.ready = false; card.bridge = false;
     card.loading = null; card.suspended = null; card.playing = false; card.actualMuted = true; card.soundBlocked = false;
     card.seconds = 0; card.duration = 0;
@@ -100,7 +102,7 @@
     refreshPlayback(card); refreshTimeline(card);
   }
   async function prepareCard(card) {
-    if (card.frame || card.loading || !opened) return;
+    if (card.frame || card.loading || card.saiyaaraPrepared || !opened) return;
     // Production TikTok cards use the Cloudflare player with explicit cache status.
     // Saiyaara preserves its separate Tagembed fallback below.
     if (card.video.provider === "tiktok" && !isSaiyaara(card)) {
@@ -162,36 +164,26 @@
       return;
     }
     if (isSaiyaara(card)) {
-      // A neighboring card must never pre-load a second provider iframe.
-      // The original watch-stage iframe is suspended by pauseOriginal().
       if (!desired(card)) return;
-      const iframe = document.createElement("iframe");
-      iframe.title = "Saiyaara video on Tagembed";
-      iframe.className = "swipe-saiyaara-tagembed";
-      iframe.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
-      iframe.loading = "eager";
-      iframe.referrerPolicy = "strict-origin-when-cross-origin";
-      iframe.setAttribute("allowfullscreen", "");
-      card.frame = iframe;
-      card.ready = false;
-      card.controllable = false; // No supported remote play/mute protocol.
+      const player = window.VidBestSaiyaaraTagembed;
+      if (!player) { message(card, "Open the full review to load this player."); return; }
+      card.saiyaaraPrepared = true;
+      card.controllable = false;
       card.el.classList.add("is-interactive", "is-saiyaara-widget");
-      card.host.replaceChildren(iframe);
+      const options = {
+        onFrame(frame) { card.frame = frame; },
+        onStop() { card.frame = null; card.ready = false; if (desired(card)) clearTimeout(timer); },
+        onLoad(frame) {
+          if (card.frame !== frame) return;
+          card.ready = true;
+          message(card, "Sound is controlled by Tagembed. Use ↑/↓ for next.");
+          if (desired(card)) scheduleCount(card);
+          updatePreparation();
+        },
+      };
+      if (!player.transfer(saiyaaraOriginal, card.host, "swipe", options)) player.mount(card.host, "swipe", options);
       updateHint(card);
-      message(card, "Loading Tagembed · tap inside the video for playback and sound.");
-      iframe.addEventListener("load", () => {
-        if (card.frame !== iframe) return;
-        card.ready = true;
-        message(card, "Tap inside the embedded video to play or enable sound. Use ↑/↓ to change videos.");
-        if (desired(card)) scheduleCount(card);
-        updatePreparation();
-      }, { once: true });
-      iframe.addEventListener("error", () => {
-        if (card.frame !== iframe) return;
-        message(card, "Tagembed could not load. The source may not permit embedding on this connection.");
-      }, { once: true });
-      // Start just one request for the selected card; stop it on swipe/close.
-      iframe.src = SAIYAARA_TAGEMBED_URL;
+      if (!card.ready) message(card, "Tap Load video when ready. Preview uses no Tagembed widget views.");
       return;
     }
     const token = {}; card.loadToken = token;
@@ -311,7 +303,7 @@
     for (let i = 0; i < cards.length; i++) {
       const card = cards[i];
       if (i < index - 1 || i > index + 1 || (i !== index && (!warmProviders.has(card.video.provider) || (card.ready && !card.controllable)))) {
-        if (card.frame || card.loading) destroyPlayer(card);
+        if (card.frame || card.loading || card.saiyaaraPrepared) destroyPlayer(card);
       }
     }
     void prepareCard(cards[index]);
@@ -467,6 +459,7 @@
   function pauseOriginal() {
     original.querySelectorAll("video,audio").forEach((video) => video.pause());
     original.querySelectorAll("iframe[src]").forEach((frame) => {
+      if (frame.classList.contains("saiyaara-tagembed-frame")) return;
       if (frame.getAttribute("src") === "about:blank") return;
       if (!frame.dataset.swipeOriginalSrc) frame.dataset.swipeOriginalSrc = frame.getAttribute("src");
       frame.src = "about:blank";
@@ -484,6 +477,7 @@
     overflow = document.documentElement.style.overflow; document.documentElement.style.overflow = "hidden";
     savedInert = [...document.body.children].filter((el) => el !== viewer).map((el) => [el, el.inert]);
     savedInert.forEach(([el]) => { el.inert = true; });
+    if (!isSaiyaara(cards[index])) window.VidBestSaiyaaraTagembed?.stop(saiyaaraOriginal);
     pauseOriginal(); suspension = new MutationObserver(pauseOriginal); suspension.observe(original, { subtree: true, childList: true });
     history.pushState({ ...history.state, vidbestSwipe: true }, "", location.href);
     toggleFullscreen(); closeButton.focus();
@@ -493,6 +487,12 @@
   function close(fromHistory = false) {
     if (!opened) return;
     opened = false; clearTimeout(timer); suspension?.disconnect();
+    const current = cards[index];
+    if (isSaiyaara(current) && saiyaaraOriginal) {
+      // Keep a playing iframe alive when the browser supports state-preserving
+      // moves. Never restore an old src and spend another widget view on close.
+      window.VidBestSaiyaaraTagembed?.transfer(current.host, saiyaaraOriginal, "watch");
+    }
     cards.forEach(destroyPlayer); closeReview(false);
     if (document.fullscreenElement === viewer) document.exitFullscreen().catch(() => {});
     viewer.hidden = true; document.documentElement.style.overflow = overflow;
