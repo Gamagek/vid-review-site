@@ -73,6 +73,22 @@ test("admin event setup works with the manual editor and no AI controls", () => 
   assert.ok(app.elements.get("#admin-library-search").listeners.has("input"));
 });
 
+test("manual editor accepts the complete long review supported by the save API", async () => {
+  const app = editor(async () => Response.json({ analysis: null }));
+  app.state.categories = { Technology: ["Web Development"] };
+  const review = "A detailed review paragraph. ".repeat(800) + "Final original section.";
+  const maximum = Number(html.match(/<textarea\b[^>]*id="review-text"[^>]*maxlength="(\d+)"/)[1]);
+  assert.equal(maximum, 60_000);
+  assert.ok(review.length > 7000 && review.length <= maximum);
+  await app.call(`editVideo(${JSON.stringify({
+    ...records(1)[0],
+    source_url: "https://example.com/oldest.mp4",
+    media_type: "raw",
+    review_text: review,
+  })})`);
+  assert.equal(app.elements.get("#review-text").value, review);
+});
+
 test("full library reaches older drafts across multiple pages and can search them", async () => {
   const videos = records(127);
   const requests = [];

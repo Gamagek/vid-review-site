@@ -2105,6 +2105,86 @@ test("repairs a legacy TikTok source while preserving its editorial title", asyn
   assert.ok(!html.includes('data-tiktok-watch-src='));
   assert.ok(!html.includes('video.megasale.win'));
 });
+test("long reviews expose every original section and their final paragraph to crawlers", async () => {
+  const context = createTestContext();
+  const publishedAt = "2020-02-03T04:05:06.000Z";
+  const modifiedAt = "2020-02-04T04:05:06.000Z";
+  const sections = Array.from({ length: 6 }, (_, i) =>
+    `${i + 1}. Original section ${i + 1}\n\n${"A detailed observation about this scene. ".repeat(65)}`,
+  );
+  const finalParagraph = "Final reflection: kindness & courage <remain> important.";
+  const review = [...sections, finalParagraph].join("\n\n");
+  assert.ok(review.length > 7000);
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug, title, source_url, media_type, primary_category, subcategory,
+     review_text, published, created_at, updated_at)
+    VALUES ('long-review', 'Long review', 'https://www.youtube.com/watch?v=M7lc1UVf-VE',
+      'youtube', 'Music', 'Music Videos', ?, 1, ?, ?)`)
+    .run(review, publishedAt, modifiedAt);
+
+  const response = await seoEdge.fetch(new Request("https://vid.best/watch/long-review", {
+    headers: { "User-Agent": "Googlebot" },
+  }), context.env, context.ctx);
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  for (let i = 1; i <= 6; i += 1) assert.ok(html.includes(`${i}. Original section ${i}`));
+  assert.ok(html.includes("Final reflection: kindness &amp; courage &lt;remain&gt; important."));
+  assert.ok(!html.includes("<remain>"));
+  const schema = JSON.parse(html.match(/<script\b[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/s)[1]);
+  const page = schema["@graph"].find(item => item["@type"] === "WebPage");
+  assert.equal(page.datePublished, publishedAt);
+  assert.equal(page.dateModified, modifiedAt);
+  assert.equal(context.sqlite.prepare("SELECT review_text FROM videos").get().review_text, review);
+});
+
+test("admin create and edit preserve long multilingual reviews above the old byte and character limits", async () => {
+  const context = createTestContext();
+  const review = `1. Original heading\n\n${"අදහස ".repeat(6000)}\n\nFinal paragraph.`;
+  const body = {
+    title: "Multilingual review",
+    source_url: "https://www.youtube.com/watch?v=M7lc1UVf-VE",
+    primary_category: "Music",
+    subcategory: "Music Videos",
+    review_text: review,
+    published: false,
+  };
+  assert.ok(new TextEncoder().encode(JSON.stringify(body)).length > 65536);
+  const headers = { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" };
+  const createdResponse = await send(context, "/api/videos", {
+    method: "POST", headers, body: JSON.stringify(body),
+  });
+  assert.equal(createdResponse.status, 201);
+  const created = (await createdResponse.json()).video;
+  assert.equal(created.review_text, review);
+  const editedReview = review + "\n\nA new final reflection.";
+  const editedResponse = await send(context, `/api/videos/${created.id}`, {
+    method: "PATCH", headers, body: JSON.stringify({ review_text: editedReview }),
+  });
+  assert.equal(editedResponse.status, 200);
+  const edited = (await editedResponse.json()).video;
+  assert.equal(edited.review_text, editedReview);
+  assert.equal(edited.created_at, created.created_at);
+  assert.equal(edited.source_url, created.source_url);
+  assert.equal(edited.slug, created.slug);
+  assert.equal(context.sqlite.prepare("SELECT review_text FROM videos").get().review_text, editedReview);
+});
+
+test("oversized reviews are rejected without silently shortening a saved review", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug, title, source_url, media_type, primary_category, subcategory, review_text, published)
+    VALUES ('saved-review', 'Saved review', 'https://example.com/video.mp4',
+      'raw', 'Music', 'Music Videos', 'Keep every original word.', 0)`).run();
+  const before = context.sqlite.prepare("SELECT * FROM videos").all();
+  const headers = { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" };
+  const response = await send(context, "/api/videos/1", {
+    method: "PATCH", headers, body: JSON.stringify({ review_text: "x".repeat(60_001) }),
+  });
+  assert.equal(response.status, 400);
+  assert.match((await response.json()).error, /60,000 characters/);
+  assert.deepEqual(context.sqlite.prepare("SELECT * FROM videos").all(), before);
+});
+
 test("distinct Saiyaara review pages retain their saved titles, language and dates", async () => {
   const context = createTestContext();
   const publishedAt = "2020-02-03T04:05:06.000Z";
