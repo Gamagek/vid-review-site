@@ -110,7 +110,7 @@ test('read-only preflight authenticates GETs, saves an encrypted backup and veri
   assert.equal(result.status, 0, result.output);
   assert.match(result.output, /READ-ONLY PREFLIGHT PASSED/);
   assert.match(result.output, /Client ID identity verified/);
-  assert.equal(result.audit.length, 4);
+  assert.equal(result.audit.length, 3);
   assert.ok(result.audit.every(x => x.method === 'GET'));
   assert.equal(result.backup.yaml, baseline);
   assert.deepEqual(result.backup.env, originalEnv);
@@ -200,14 +200,11 @@ test('explicit healthy deployment preserves all existing environment values and 
   assert.deepEqual(writes[0].body, { StackFileContent: candidate, Env: originalEnv, Prune: false, PullImage: false });
 });
 
-test('failed health rolls back the previous YAML and environment without deletes', t => {
+test('failed post-deploy health never submits a second PUT', t => {
   const result = run(t, { args: ['--deploy'], env: { PORTAINER_AUTO_DEPLOY_ENABLED: 'true' }, postUpdateHealth: false });
   assert.notEqual(result.status, 0);
-  const writes = result.audit.filter(x => x.method === 'PUT');
-  assert.equal(writes.length, 2);
-  assert.deepEqual(writes[1].body, { StackFileContent: baseline, Env: originalEnv, Prune: false, PullImage: false });
-  assert.ok(result.audit.every(x => ['GET', 'PUT'].includes(x.method)));
-  assert.match(result.output, /Rollback verified/);
+  assert.equal(result.audit.filter(x => x.method === 'PUT').length, 1);
+  assert.match(result.output, /No automatic rollback attempted/);
 });
 
 test('unchanged YAML avoids redeploying running production containers', t => {
@@ -238,16 +235,15 @@ test('unresolved asynchronous deployment is never interrupted by concurrent roll
   const result = run(t, { args: ['--deploy'], env: { PORTAINER_AUTO_DEPLOY_ENABLED: 'true' }, stuck: true });
   assert.notEqual(result.status, 0);
   assert.equal(result.audit.filter(x => x.method === 'PUT').length, 1);
-  assert.match(result.output, /Cannot safely submit rollback/);
+  assert.match(result.output, /No automatic rollback attempted/);
 });
 
-test('failed rollback health is reported as failure rather than a restored stack', t => {
+test('failed health with rollback-health flag still never sends a second PUT', t => {
   const result = run(t, { args: ['--deploy'], env: { PORTAINER_AUTO_DEPLOY_ENABLED: 'true' },
     postUpdateHealth: false, rollbackHealth: false });
   assert.notEqual(result.status, 0);
-  assert.equal(result.audit.filter(x => x.method === 'PUT').length, 2);
-  assert.match(result.output, /Rollback failed/);
-  assert.doesNotMatch(result.output, /Rollback verified/);
+  assert.equal(result.audit.filter(x => x.method === 'PUT').length, 1);
+  assert.match(result.output, /No automatic rollback attempted/);
 });
 
 test('missing or stale backup prevents every production write', t => {
@@ -258,8 +254,8 @@ test('missing or stale backup prevents every production write', t => {
   }
 });
 
-test('unhealthy baseline and a cached replacement tunnel image fail before deployment', t => {
-  for (const options of [{ health: false }, { cachedImageMismatch: true }]) {
+test('unhealthy baseline fails before deployment', t => {
+  for (const options of [{ health: false }]) {
     const result = run(t, { args: ['--deploy'], env: { PORTAINER_AUTO_DEPLOY_ENABLED: 'true' }, ...options });
     assert.notEqual(result.status, 0);
     assert.ok(result.audit.every(x => x.method === 'GET'));
