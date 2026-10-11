@@ -2080,7 +2080,7 @@ test("builds a batch TikTok preview from the Cloudflare oEmbed gateway and then 
     globalThis.fetch = originalFetch;
   }
 });
-test("repairs a legacy TikTok record with only its source URL and uses the Saiyaara oEmbed title", async () => {
+test("repairs a legacy TikTok source while preserving its editorial title", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
     `INSERT INTO videos (
@@ -2096,14 +2096,40 @@ test("repairs a legacy TikTok record with only its source URL and uses the Saiya
   const page = await send(context, "/watch/saiyaara-tiktok");
   assert.equal(page.status, 200);
   const html = await page.text();
-  assert.ok(html.includes("<title>Saiyaara; A Cinematic Romance | Vid.Best</title>"));
-  assert.ok(html.includes("<h1>Saiyaara; A Cinematic Romance</h1>"));
+  assert.ok(html.includes("<title>Saiyaara movie TikTok | Vid.Best</title>"));
+  assert.ok(html.includes("<h1>Saiyaara movie TikTok</h1>"));
   assert.ok(html.includes('class="tiktok-preview-card"'));
   assert.ok(html.includes('data-tiktok-id="6718335390845095173"'));
   assert.ok(html.includes('data-video-provider="tiktok"'));
   assert.ok(html.includes('data-tiktok-player-mode="metadata-card"'));
   assert.ok(!html.includes('data-tiktok-watch-src='));
   assert.ok(!html.includes('video.megasale.win'));
+});
+test("distinct Saiyaara review pages retain their saved titles, language and dates", async () => {
+  const context = createTestContext();
+  const publishedAt = "2020-02-03T04:05:06.000Z";
+  const modifiedAt = "2020-02-04T04:05:06.000Z";
+  const records = [
+    ["saiyaara-review-portrait", "Romantic portrait fan edit"],
+    ["saiyaara-bass-remix", "Saiyaara bass remix — धुन"],
+  ];
+  for (const [slug, title] of records) {
+    context.sqlite.prepare(
+      `INSERT INTO videos (slug, title, source_url, media_type, primary_category,
+        subcategory, published, created_at, updated_at)
+       VALUES (?, ?, ?, 'youtube', 'Music', 'Music Videos', 1, ?, ?)`,
+    ).run(slug, title, "https://www.youtube.com/watch?v=M7lc1UVf-VE", publishedAt, modifiedAt);
+    const response = await send(context, `/watch/${slug}`);
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.ok(html.includes(`<title>${title} | Vid.Best</title>`));
+    assert.ok(html.includes(`<h1>${title}</h1>`));
+    const schema = JSON.parse(html.match(/<script\b[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/s)[1]);
+    assert.equal(schema["@graph"].find(item => item["@type"] === "VideoObject").name, title);
+    const page = schema["@graph"].find(item => item["@type"] === "WebPage");
+    assert.equal(page.datePublished, publishedAt);
+    assert.equal(page.dateModified, modifiedAt);
+  }
 });
 test("discovers direct TikTok URLs without server-side TikTok requests", async () => {
   const context = createTestContext();

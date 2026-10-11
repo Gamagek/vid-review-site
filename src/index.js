@@ -3146,9 +3146,7 @@ function buildTikTokPostUrl(value, id) {
 }
 
 function watchDisplayTitle(video) {
-  return /saiyaara/i.test(String(video.slug || "")) || /saiyaara/i.test(String(video.title || ""))
-    ? "Saiyaara; A Cinematic Romance"
-    : video.title;
+  return video.title;
 }
 
 function renderMedia(video, playbackOrigin, viewer = false) {
