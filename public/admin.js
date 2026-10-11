@@ -1,6 +1,10 @@
 const adminState = {
   categories: {},
   videos: [],
+  libraryTotal: 0,
+  libraryLoading: false,
+  libraryError: "",
+  libraryRequestId: 0,
   sourceMode: "link",
   activeDiscoveryRequestId: null,
   analysisDraft: null,
@@ -50,14 +54,12 @@ const ui = {
   thumbnailUploadStatus: document.querySelector("#thumbnail-upload-status"),
   sourcePublishedAt: document.querySelector("#source-published-at"),
   sourceDurationSeconds: document.querySelector("#source-duration-seconds"),
-  notes: document.querySelector("#ai-notes"),
+  notes: document.querySelector("#editor-notes"),
   scanMedia: document.querySelector("#scan-media"),
   analysisGroundSearch: document.querySelector("#analysis-ground-search"),
   analysisStatus: document.querySelector("#analysis-status"),
   analysisTranscript: document.querySelector("#analysis-transcript"),
   analysisOcr: document.querySelector("#analysis-ocr"),
-  aiButton: document.querySelector("#ai-generate"),
-  aiStatus: document.querySelector("#ai-status"),
   seoTitle: document.querySelector("#seo-title"),
   seoDescription: document.querySelector("#seo-description"),
   description: document.querySelector("#description"),
@@ -69,6 +71,8 @@ const ui = {
   saveStatus: document.querySelector("#save-status"),
   reset: document.querySelector("#reset-form"),
   videoList: document.querySelector("#admin-video-list"),
+  librarySearch: document.querySelector("#admin-library-search"),
+  libraryStatus: document.querySelector("#admin-library-status"),
   moderationList: document.querySelector("#moderation-list"),
   discoveryList: document.querySelector("#discovery-request-list"),
   refreshVideos: document.querySelector("#refresh-videos"),
@@ -121,12 +125,15 @@ function bindAdminEvents() {
   });
   ui.uploadButton.addEventListener("click", uploadFile);
   ui.uploadHlsButton.addEventListener("click", uploadHlsFolder);
-  ui.aiButton.addEventListener("click", generateCopy);
   ui.scanMedia.addEventListener("click", startMediaAnalysis);
   ui.videoForm.addEventListener("submit", saveVideo);
   ui.cacheTikTokNow.addEventListener("click", requestAuthorizedTikTokCacheNow);
   ui.reset.addEventListener("click", resetEditor);
   ui.refreshVideos.addEventListener("click", loadAdminVideos);
+  ui.librarySearch.addEventListener("input", () => {
+    ui.videoList.scrollTop = 0;
+    renderAdminLibrary();
+  });
   ui.refreshComments.addEventListener("click", loadPendingComments);
   ui.refreshDiscoveries.addEventListener("click", loadDiscoveryRequests);
 }
@@ -164,6 +171,16 @@ async function unlockAdmin() {
 }
 
 async function lockAdmin() {
+  adminState.libraryRequestId += 1;
+  adminState.videos = [];
+  adminState.libraryTotal = 0;
+  adminState.libraryLoading = false;
+  adminState.libraryError = "";
+  ui.librarySearch.value = "";
+  ui.videoList.replaceChildren();
+  ui.videoList.setAttribute("aria-busy", "false");
+  ui.refreshVideos.disabled = false;
+  setStatus(ui.libraryStatus, "");
   clearTimeout(adminState.cachePollTimer);
   try { await adminApi("/api/admin/session", { method: "DELETE" }); } catch { /* Clear the local UI even if logout fails. */ }
   ui.workspace.hidden = true;
@@ -299,7 +316,7 @@ function selectDiscoveredVideo(video) {
     video.description || "",
   ].filter(Boolean).join("\n").slice(0, 1500);
   updatePreview();
-  setStatus(ui.videoSearchStatus, "Video selected. Choose a category, generate the draft, verify it, then save.", "success");
+  setStatus(ui.videoSearchStatus, "Video selected. Choose a category, write your review and SEO details, then save.", "success");
   ui.category.focus();
 }
 
@@ -715,35 +732,6 @@ function uploadAssetFile(file, key, onProgress) {
   });
 }
 
-async function generateCopy() {
-  ui.aiButton.disabled = true;
-  setStatus(ui.aiStatus, "Gemini is drafting careful editorial copy…");
-  try {
-    const result = await adminApi("/api/ai/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: ui.title.value,
-        source_url: ui.sourceUrl.value,
-        primary_category: ui.category.value,
-        subcategory: ui.category.value === "Other" ? ui.otherSubcategory.value.trim() : ui.subcategory.value,
-        notes: ui.notes.value,
-      }),
-    });
-    const generated = result.generated;
-    ui.seoTitle.value = generated.seo_title || "";
-    ui.seoDescription.value = generated.seo_description || "";
-    ui.description.value = generated.description || "";
-    ui.reviewText.value = generated.review_text || "";
-    ui.tags.value = (generated.seo_tags || []).join(", ");
-    setStatus(ui.aiStatus, "Draft generated. Review facts before saving.", "success");
-  } catch (error) {
-    setStatus(ui.aiStatus, error.message, "error");
-  } finally {
-    ui.aiButton.disabled = false;
-  }
-}
-
 function currentAnalysisSource() {
   return adminState.sourceMode === "upload"
     ? ui.r2Key.dataset.url || ui.sourceUrl.value.trim()
@@ -839,7 +827,7 @@ function applyMediaAnalysis(analysis) {
   const warningCount = adminState.analysisDraft.warnings.length;
   setStatus(
     ui.analysisStatus,
-    `Analysis complete${warningCount ? ` with ${warningCount} note${warningCount === 1 ? "" : "s"}` : ""}. Review the evidence, then use AI Generate.`,
+    `Analysis complete${warningCount ? ` with ${warningCount} note${warningCount === 1 ? "" : "s"}` : ""}. Verify the evidence and write your own review.`,
     warningCount ? "" : "success",
   );
 }
@@ -979,19 +967,77 @@ async function saveVideo(event) {
 }
 
 async function loadAdminVideos() {
-  ui.videoList.replaceChildren(adminListMessage("Loading records…"));
+  const requestId = ++adminState.libraryRequestId;
+  adminState.videos = [];
+  adminState.libraryTotal = 0;
+  adminState.libraryLoading = true;
+  adminState.libraryError = "";
+  ui.refreshVideos.disabled = true;
+  ui.videoList.scrollTop = 0;
+  renderAdminLibrary();
   try {
-    const result = await adminApi("/api/admin/videos?limit=48&sort=newest");
-    adminState.videos = result.videos || [];
-    ui.videoList.replaceChildren();
-    if (!adminState.videos.length) {
-      ui.videoList.append(adminListMessage("No records yet."));
-      return;
+    let offset = 0;
+    const seen = new Set();
+    while (true) {
+      const result = await adminApi(`/api/admin/videos?limit=48&sort=newest&offset=${offset}`);
+      if (requestId !== adminState.libraryRequestId) return;
+      const total = Number(result.pagination?.total);
+      const page = result.videos;
+      if (!Number.isSafeInteger(total) || total < 0 || !Array.isArray(page)) {
+        throw new Error("The video library response is incomplete. Refresh to retry.");
+      }
+      adminState.libraryTotal = total;
+      let added = 0;
+      for (const video of page) {
+        const id = Number(video.id);
+        if (!Number.isSafeInteger(id) || id < 1) throw new Error("The video library response is incomplete. Refresh to retry.");
+        if (seen.has(id)) continue;
+        seen.add(id);
+        adminState.videos.push(video);
+        added += 1;
+      }
+      offset += page.length;
+      renderAdminLibrary();
+      if (offset >= total) {
+        if (adminState.videos.length < total) throw new Error("The library changed while loading. Refresh to load the complete list.");
+        break;
+      }
+      if (!added) throw new Error("The video library stopped before all records were loaded. Refresh to retry.");
     }
-    adminState.videos.forEach((video) => ui.videoList.append(renderAdminVideo(video)));
   } catch (error) {
-    ui.videoList.replaceChildren(adminListMessage(error.message));
+    if (requestId !== adminState.libraryRequestId) return;
+    adminState.libraryError = error.message;
+  } finally {
+    if (requestId === adminState.libraryRequestId) {
+      adminState.libraryLoading = false;
+      ui.refreshVideos.disabled = false;
+      renderAdminLibrary();
+    }
   }
+}
+
+function renderAdminLibrary() {
+  const query = ui.librarySearch.value.trim().toLocaleLowerCase();
+  const videos = adminState.videos.filter((video) => !query || [
+    video.id, video.title, video.slug, video.primary_category, video.subcategory,
+  ].some((value) => String(value ?? "").toLocaleLowerCase().includes(query)));
+  const loaded = adminState.videos.length;
+  const progress = adminState.libraryLoading && !loaded
+    ? "Loading video library…"
+    : `${loaded} of ${adminState.libraryTotal} videos loaded${adminState.libraryLoading ? "…" : "."}`;
+  const matches = query ? ` ${videos.length} matching video${videos.length === 1 ? "" : "s"}.` : "";
+  setStatus(ui.libraryStatus, `${progress}${matches}${adminState.libraryError ? ` ${adminState.libraryError}` : ""}`, adminState.libraryError ? "error" : "");
+  ui.videoList.setAttribute("aria-busy", String(adminState.libraryLoading));
+  const scrollTop = ui.videoList.scrollTop;
+  ui.videoList.replaceChildren();
+  if (!videos.length) {
+    ui.videoList.append(adminListMessage(adminState.libraryLoading
+      ? "Loading the remaining videos…"
+      : adminState.libraryError || (query ? "No matching videos." : "No records yet.")));
+    return;
+  }
+  videos.forEach((video) => ui.videoList.append(renderAdminVideo(video)));
+  ui.videoList.scrollTop = scrollTop;
 }
 
 function renderAdminVideo(video) {
@@ -1242,7 +1288,6 @@ function resetEditor(clearStatus = true) {
   setSourceMode("link");
   setStatus(ui.uploadStatus, "");
   setStatus(ui.thumbnailUploadStatus, "");
-  setStatus(ui.aiStatus, "");
   setStatus(ui.videoSearchStatus, "");
   ui.videoSearchResults.replaceChildren();
   if (clearStatus) setStatus(ui.saveStatus, "");
@@ -1265,8 +1310,7 @@ async function adminApi(url, options = {}) {
 
 async function requestJson(url, options = {}) {
   const controller = new AbortController();
-  const timeoutMs = url.startsWith("/api/ai/generate") ? 35000 : 15000;
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  const timeout = setTimeout(() => controller.abort(), 15000);
   let response;
   try {
     response = await fetch(url, { credentials: "same-origin", ...options, signal: controller.signal });

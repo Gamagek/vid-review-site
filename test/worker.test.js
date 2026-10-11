@@ -60,7 +60,7 @@ class TestD1Database {
   }
 
   async batch(statements) {
-    return Promise.all(statements.map((statement) => statement.run()));
+    return Promise.all(statements.map((statement) => /^\s*(?:SELECT|WITH)\b/i.test(statement.sql) ? statement.all() : statement.run()));
   }
 }
 
@@ -784,25 +784,73 @@ test("never serves objects outside the managed uploads prefix", async () => {
   assert.equal(context.bucket.reads, 0);
 });
 
-test("returns a consistent 504 when Gemini times out", async () => {
+test("removed AI review API makes no upstream requests or content changes", async (t) => {
   const context = createTestContext({ GEMINI_KEY: "test-key" });
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = async () => { throw new DOMException("Timed out", "TimeoutError"); };
-  try {
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug, title, source_url, media_type, primary_category, subcategory, review_text, published)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 1)`)
+    .run("existing-review", "Existing review", "https://example.com/video.mp4", "raw", "Technology", "Web Development", "Keep this saved review.");
+  const before = context.sqlite.prepare("SELECT * FROM videos").all();
+  const upstream = t.mock.method(globalThis, "fetch", async () => { throw new Error("No upstream request is allowed"); });
+  for (const headers of [{}, { Authorization: `Bearer ${secret}` }]) {
     const response = await send(context, "/api/ai/generate", {
       method: "POST",
-      headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: "Safe test video",
-        primary_category: "Technology",
-        subcategory: "Web Development",
-      }),
+      headers: { ...headers, "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Do not generate a review" }),
     });
-    assert.equal(response.status, 504);
-    assert.deepEqual(await response.json(), { success: false, error: "An upstream service timed out" });
-  } finally {
-    globalThis.fetch = originalFetch;
+    assert.equal(response.status, 404);
+    assert.deepEqual(await response.json(), { success: false, error: "API route not found" });
   }
+  assert.equal(upstream.mock.callCount(), 0);
+  assert.deepEqual(context.sqlite.prepare("SELECT * FROM videos").all(), before);
+});
+
+test("admin pagination includes every older draft with deterministic ordering and stored editorial fields", async () => {
+  const context = createTestContext();
+  const insert = context.sqlite.prepare(`INSERT INTO videos
+    (slug, title, source_url, media_type, primary_category, subcategory, review_text, seo_title, seo_description, seo_tags, published, created_at)
+    VALUES (?, ?, ?, 'raw', 'Technology', 'Web Development', ?, ?, ?, ?, ?, '2026-10-10T00:00:00Z')`);
+  for (let id = 1; id <= 127; id += 1) {
+    insert.run(`library-${id}`, `Saved video ${id}`, `https://example.com/${id}.mp4`, `Original review ${id}`, `SEO title ${id}`, `SEO description ${id}`, '["manual review"]', id % 2);
+  }
+  context.sqlite.prepare("INSERT INTO video_source_metadata (video_id, source_published_at, source_duration) VALUES (1, '2025-06-20', 'PT2M')").run();
+  const unauthenticated = await send(context, "/api/admin/videos?limit=48");
+  assert.equal(unauthenticated.status, 401);
+  const rows = [];
+  for (const offset of [0, 48, 96]) {
+    const response = await send(context, `/api/admin/videos?limit=48&sort=newest&offset=${offset}`, { headers: { Authorization: `Bearer ${secret}` } });
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get("Cache-Control"), /no-store/);
+    const result = await response.json();
+    assert.equal(result.pagination.total, 127);
+    rows.push(...result.videos);
+  }
+  assert.deepEqual(rows.map((row) => row.id), Array.from({ length: 127 }, (_, index) => 127 - index));
+  assert.equal(rows.filter((row) => !row.published).length, 63);
+  const oldest = rows.at(-1);
+  assert.equal(oldest.review_text, "Original review 1");
+  assert.equal(oldest.seo_title, "SEO title 1");
+  assert.equal(oldest.seo_description, "SEO description 1");
+  assert.deepEqual(oldest.seo_tags, ["manual review"]);
+  assert.equal(oldest.source_published_at, "2025-06-20");
+  assert.equal(oldest.source_duration, "PT2M");
+  const publicResponse = await send(context, "/api/videos?limit=48&sort=newest");
+  const published = await publicResponse.json();
+  assert.equal(published.pagination.total, 64);
+  assert.ok(published.videos.every((row) => row.published));
+});
+
+test("admin can reach records beyond the public 5000-offset cap", async () => {
+  const context = createTestContext();
+  context.sqlite.exec(`WITH RECURSIVE ids(id) AS (SELECT 1 UNION ALL SELECT id + 1 FROM ids WHERE id < 5005)
+    INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, published, created_at)
+    SELECT 'large-' || id, 'Saved video ' || id, 'https://example.com/' || id || '.mp4', 'raw', 'Technology', 'Web Development', 1, '2026-10-10T00:00:00Z' FROM ids`);
+  const response = await send(context, "/api/admin/videos?limit=3&sort=newest&offset=5001", { headers: { Authorization: `Bearer ${secret}` } });
+  assert.equal(response.status, 200);
+  const result = await response.json();
+  assert.equal(result.pagination.offset, 5001);
+  assert.equal(result.pagination.total, 5005);
+  assert.deepEqual(result.videos.map((video) => video.id), [4, 3, 2]);
 });
 
 test("uses a nonce for dynamic JSON-LD and removes unsafe-inline scripts", async () => {
@@ -823,11 +871,6 @@ test("uses a nonce for dynamic JSON-LD and removes unsafe-inline scripts", async
   const nonce = policy.match(/'nonce-([^']+)'/)?.[1];
   assert.ok(nonce);
   assert.match(await response.text(), new RegExp(`<script type="application/ld\\+json" nonce="${nonce.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}">`));
-});
-
-test("gives AI generation a longer browser timeout than ordinary requests", () => {
-  const source = readFileSync(new URL("../public/admin.js", import.meta.url), "utf8");
-  assert.match(source, /url\.startsWith\("\/api\/ai\/generate"\) \? 35000 : 15000/);
 });
 
 test("caches TikTok oEmbed gateway metadata durably in D1 for 24 hours", async () => {
