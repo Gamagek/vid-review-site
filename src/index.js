@@ -354,11 +354,6 @@ async function route(request, env, ctx) {
     return moderateComment(request, env, Number(match[1]));
   }
 
-  if (path === "/api/ai/generate" && request.method === "POST") {
-    await requireAdmin(request, env);
-    return generateAiCopy(request, env);
-  }
-
   if (path === "/api/ai/analyze-media" && request.method === "POST") {
     await requireAdmin(request, env);
     return startMediaAnalysis(request, env);
@@ -1696,7 +1691,7 @@ async function listVideos(request, env, includeUnpublished) {
   const subcategory = cleanText(url.searchParams.get("subcategory"), 80);
   const query = cleanText(url.searchParams.get("q"), 120);
   const limit = clampInteger(url.searchParams.get("limit"), 1, 48, 18);
-  const offset = clampInteger(url.searchParams.get("offset"), 0, 5000, 0);
+  const offset = clampInteger(url.searchParams.get("offset"), 0, includeUnpublished ? 2_147_483_647 : 5000, 0);
   const sort = url.searchParams.get("sort") || "newest";
   const sortSql = {
     newest: "v.created_at DESC",
@@ -1734,9 +1729,9 @@ async function listVideos(request, env, includeUnpublished) {
     ? `SELECT v.*, m.source_published_at, m.source_duration
        FROM videos v
        LEFT JOIN video_source_metadata m ON m.video_id = v.id
-       ${whereSql} ORDER BY ${sortSql} LIMIT ? OFFSET ?`
+       ${whereSql} ORDER BY ${sortSql}, v.id DESC LIMIT ? OFFSET ?`
     : `SELECT v.*
-       FROM videos v ${whereSql} ORDER BY ${sortSql} LIMIT ? OFFSET ?`;
+       FROM videos v ${whereSql} ORDER BY ${sortSql}, v.id DESC LIMIT ? OFFSET ?`;
   const listStatement = env.DB.prepare(selectSql).bind(...bindings, limit, offset);
   const countStatement = env.DB.prepare(`SELECT COUNT(*) AS total FROM videos v ${whereSql}`).bind(...bindings);
   const [listResult, countRow] = await env.DB.batch([listStatement, countStatement]);
@@ -2404,88 +2399,6 @@ async function moderateComment(request, env, commentId) {
     ).bind(comment.video_id, comment.video_id),
   ]);
   return json({ success: true, status });
-}
-
-async function generateAiCopy(request, env) {
-  if (!env.GEMINI_KEY) throw new AppError(503, "GEMINI_KEY is not configured");
-  const data = await readJson(request, 32768);
-  const title = cleanText(data.title, 160);
-  const category = cleanText(data.primary_category, 80);
-  const subcategory = cleanText(data.subcategory, 80);
-  const sourceUrl = cleanText(data.source_url, 1200);
-  const notes = cleanLongText(data.notes, 1500);
-  if (!title) throw new AppError(400, "Enter a title before using AI Generate");
-  if (!Object.hasOwn(CATEGORIES, category) || !CATEGORIES[category].includes(subcategory)) {
-    throw new AppError(400, "Choose a valid category and subcategory first");
-  }
-
-  const prompt = [
-    "Create professional search-friendly editorial copy for a video discovery listing.",
-    "Use only the supplied title, category, subcategory, URL and notes.",
-    "Do not claim to have watched the video, do not invent measurements, quotes, people, events or product claims.",
-    "Write neutral, useful copy that clearly signals uncertainty when details are unavailable.",
-    `Title: ${title}`,
-    `Category: ${category}`,
-    `Subcategory: ${subcategory}`,
-    `Source URL: ${sourceUrl || "not supplied"}`,
-    `Admin notes: ${notes || "none"}`,
-  ].join("\n");
-
-  const model = cleanText(env.GEMINI_MODEL, 80, "gemini-3.1-flash-lite");
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-goog-api-key": env.GEMINI_KEY,
-    },
-    body: JSON.stringify({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.35,
-        maxOutputTokens: 1200,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: "OBJECT",
-          properties: {
-            seoTitle: { type: "STRING", description: "SEO title, maximum 65 characters" },
-            seoDescription: { type: "STRING", description: "Meta description, maximum 160 characters" },
-            description: { type: "STRING", description: "Helpful listing summary, 90 to 160 words" },
-            reviewText: { type: "STRING", description: "Editorial discovery review, 160 to 300 words" },
-            tags: { type: "ARRAY", items: { type: "STRING" }, description: "8 to 14 concise SEO tags" },
-          },
-          required: ["seoTitle", "seoDescription", "description", "reviewText", "tags"],
-        },
-      },
-    }),
-    signal: AbortSignal.timeout(25000),
-  });
-
-  if (!response.ok) {
-    const errorBody = cleanText(await response.text(), 300);
-    console.error("Gemini request failed", response.status, errorBody);
-    throw new AppError(502, `Gemini returned HTTP ${response.status}`);
-  }
-  const payload = await response.json();
-  const text = (payload.candidates?.[0]?.content?.parts || []).map((part) => part.text || "").join("").trim();
-  if (!text) throw new AppError(502, "Gemini returned an empty response");
-  let generated;
-  try {
-    generated = JSON.parse(text);
-  } catch {
-    throw new AppError(502, "Gemini returned invalid structured data");
-  }
-
-  return json({
-    success: true,
-    generated: {
-      seo_title: cleanText(generated.seoTitle, 65),
-      seo_description: cleanText(generated.seoDescription, 160),
-      description: cleanLongText(generated.description, 2400),
-      review_text: cleanLongText(generated.reviewText, 7000),
-      seo_tags: parseTags(generated.tags),
-    },
-  });
 }
 
 function teamworkConfiguration(env) {

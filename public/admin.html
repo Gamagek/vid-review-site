@@ -7,9 +7,9 @@
   <meta name="theme-color" content="#070913">
   <title>Vid.Best Admin</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/styles.css?v=20261011-manual-library">
   <script src="/tiktok-preview-service.js?v=20261008-cache2" defer></script>
-  <script src="/admin.js?v=20261010-cache-jobs" defer></script>
+  <script src="/admin.js?v=20261011-manual-library" defer></script>
   <script src="/admin-safety.js" defer></script>
   <script src="/admin-comment-images.js" defer></script>
 </head>
@@ -106,7 +106,7 @@
                 <label><span>Original publish date</span><input id="source-published-at" type="date"><small>Used for verified VideoObject SEO. Check the source before entering it.</small></label>
                 <label><span>Video duration (seconds)</span><input id="source-duration-seconds" type="number" min="1" max="604800" inputmode="numeric" placeholder="For example: 951"><small>Optional. Provider data is preferred when available.</small></label>
               </div>
-              <label><span>Private notes for AI context (not published)</span><textarea id="ai-notes" maxlength="1500" placeholder="Facts you verified, transcript/OCR notes, key themes, products or speakers…"></textarea></label>
+              <label><span>Private editorial notes (not published)</span><textarea id="editor-notes" maxlength="1500" placeholder="Facts you verified, transcript/OCR notes, key themes, products or speakers…"></textarea></label>
               <div class="analysis-controls">
                 <div>
                   <strong>Teamwork media analysis</strong>
@@ -120,10 +120,8 @@
               <label><span>Visible text found by OCR (private evidence)</span><textarea id="analysis-ocr" maxlength="20000" rows="5" placeholder="Time-coded text detected in your uploaded video appears here"></textarea></label>
             </div>
 
-            <div class="form-section ai-section">
-              <div class="form-section-heading"><span>03</span><div><h2>Editorial & SEO</h2><p>Generate a careful draft, then review every claim before publishing.</p></div></div>
-              <button id="ai-generate" class="button ai-button" type="button"><span>✦</span> AI Generate</button>
-              <p id="ai-status" class="form-status" role="status"></p>
+            <div class="form-section">
+              <div class="form-section-heading"><span>03</span><div><h2>Editorial & SEO</h2><p>Write an original review and accurate metadata, then verify the details before publishing.</p></div></div>
               <label><span>SEO title</span><input id="seo-title" name="seo_title" maxlength="70"></label>
               <label><span>SEO description</span><textarea id="seo-description" name="seo_description" maxlength="180"></textarea></label>
               <label><span>Listing description</span><textarea id="description" name="description" maxlength="2400" rows="5"></textarea></label>
@@ -150,8 +148,10 @@
             <div id="discovery-request-list" class="admin-list"></div>
           </section>
           <section class="glass-panel queue-panel">
-            <div class="side-heading"><div><p class="eyebrow">Library</p><h2>Recent records</h2></div><button id="refresh-videos" type="button" aria-label="Refresh videos">↻</button></div>
-            <div id="admin-video-list" class="admin-list"></div>
+            <div class="side-heading"><div><p class="eyebrow">Library</p><h2>All videos</h2></div><button id="refresh-videos" type="button" aria-label="Refresh all videos">↻</button></div>
+            <label class="admin-library-search"><span>Search saved videos</span><input id="admin-library-search" type="search" maxlength="120" placeholder="Title, category or video ID" autocomplete="off"></label>
+            <p id="admin-library-status" class="form-status admin-library-status" role="status"></p>
+            <div id="admin-video-list" class="admin-list" tabindex="0" role="region" aria-label="All saved video reviews" aria-busy="false"></div>
           </section>
           <section class="glass-panel queue-panel">
             <div class="side-heading"><div><p class="eyebrow">Moderation</p><h2>Pending comments</h2></div><button id="refresh-comments" type="button" aria-label="Refresh comments">↻</button></div>

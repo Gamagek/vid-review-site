@@ -720,9 +720,6 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
 .progress-track span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-two)); transition: width .2s; }
 .admin-preview { min-height: 220px; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--line); border-radius: 17px; color: #727892; background: #050711; }
 .admin-preview iframe, .admin-preview video, .admin-preview img { width: 100%; height: 320px; border: 0; object-fit: contain; }
-.ai-section { position: relative; }
-.ai-button { width: max-content; color: white; border-color: rgba(165,135,255,.35); background: linear-gradient(120deg, rgba(135,93,255,.28), rgba(45,209,255,.13)); }
-.ai-button span { color: #d8ccff; font-size: 1.1rem; }
 .publish-options { display: flex; flex-wrap: wrap; gap: 22px; margin-bottom: 25px; }
 .switch-label { display: flex; grid-template-columns: none; flex-direction: row; align-items: center; gap: 9px; cursor: pointer; }
 .switch-label input { position: absolute; opacity: 0; pointer-events: none; }
@@ -738,6 +735,9 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
 .side-heading h2 { margin: 0; font-size: 1.1rem; }
 .side-heading button { width: 34px; height: 34px; cursor: pointer; }
 .admin-list { display: grid; gap: 9px; max-height: 540px; overflow: auto; scrollbar-width: thin; }
+.admin-library-search { margin-bottom: 12px; }
+.admin-library-status { min-height: 1.4em; margin: 0 0 12px; }
+#admin-video-list { overscroll-behavior: contain; }
 .admin-list-empty { padding: 24px 10px; color: var(--muted); text-align: center; font-size: .8rem; }
 .admin-list-item { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.025); }
 .admin-list-item h3 { margin: 0; font-size: .87rem; line-height: 1.35; }

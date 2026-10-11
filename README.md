@@ -10,7 +10,6 @@ Vid.Best is a Cloudflare-native video review and discovery platform built with:
 - Cloudflare Static Assets for the public and admin interfaces
 - Cloudflare D1 (`video-reviews-db`) for reviews, reactions, comments, discovery requests and verified source metadata
 - Cloudflare R2 (`vid-assets`) for uploaded video/image assets
-- Gemini, through the Worker secret `GEMINI_KEY`, for structured editorial drafts
 - A private, optional Teamwork API for administrator-requested OCR, transcription and page evidence
 - Dynamic `/watch/:slug` pages with unique metadata and canonical URLs
 - Trusted provider embeds plus direct/R2 media in a persistent watch experience
@@ -23,13 +22,15 @@ There is **no need to create or commit one physical HTML file per video**. A req
 
 ### Deliberate publishing instead of search-page generation
 
-A public search that finds nothing does not create an indexable page. Visitors can submit a discovery request, which enters the administrator queue. A useful review is created only after an administrator selects a source, generates/edits the draft and deliberately enables **Published**.
+A public search that finds nothing does not create an indexable page. Visitors can submit a discovery request, which enters the administrator queue. A useful review is created only after an administrator selects a source, writes and checks the review, and deliberately enables **Published**.
 
 New records are draft-first. This avoids turning arbitrary visitor searches into thousands of thin public pages.
 
-### Editorial AI and media analysis
+### Manual reviews and media evidence
 
-Gemini drafting runs through the Worker. The optional service in `services/teamwork/` performs administrator-requested frame OCR, transcription and page extraction on Oracle Linux, then returns evidence for human review. It never publishes pages. Ollama is optional and disabled by default; on a very small machine, leave it disabled and let Gemini create the editorial draft from the extracted evidence.
+Administrators write review text, listing descriptions, SEO titles, descriptions and tags themselves. The AI review generator and its API have been removed. Existing saved reviews are preserved. The optional service in `services/teamwork/` performs administrator-requested frame OCR, transcription and page extraction on Oracle Linux, then returns private evidence for human review. It never publishes pages. Ollama evidence summaries remain optional and disabled by default.
+
+The admin **All videos** library loads every saved record, including drafts, through successive authenticated 48-record pages. It shows the loaded/total count, supports title/category/video-ID search and keeps Edit, View and Delete controls for older records. An incomplete load is reported with a refresh action; it is never presented as a complete library. Manual review editing helps improve page content but does not guarantee Google indexing.
 
 ### 4get / external crawler integration
 
@@ -175,7 +176,6 @@ Set `PUBLIC_BASE_URL` to the final HTTPS site origin. Until the custom domain is
 ### 3. Add Worker secrets
 
 ```bash
-npx wrangler secret put GEMINI_KEY
 npx wrangler secret put ADMIN_SECRET_KEY
 npx wrangler secret put REACTION_SALT
 npx wrangler secret put TEAMWORK_API_KEY
@@ -211,8 +211,8 @@ In Cloudflare, attach the final custom domain to the Worker, then make `PUBLIC_B
 3. Search YouTube or paste a supported public URL, or upload a supported asset to R2.
 4. Choose category/subcategory.
 5. Optionally choose **Scan media**. Owned R2 video can be transcribed and OCR-scanned; external provider pages are crawl-only and are not downloaded.
-6. Review the private OCR/transcript evidence, add verified notes, then use **AI Generate**.
-7. Check and edit all generated claims, title, description and tags.
+6. Review the private OCR/transcript evidence and add verified editorial notes.
+7. Write an original review, listing description, SEO title/description and tags, then verify every claim.
 8. Supply a genuine thumbnail URL or upload a PNG/JPEG/WebP/AVIF/GIF thumbnail from the admin form.
 9. For a non-YouTube provider, enter the verified original publish date and duration in seconds so the page can safely emit `VideoObject` metadata.
 10. Enable **Published** only after the record is useful and verified.
@@ -236,7 +236,7 @@ Two workflows are included:
 - `.github/workflows/ci.yml` — tests and validates the Worker on pull requests and `main` pushes.
 - `.github/workflows/deploy.yml` — tests, validates, applies D1 migrations, then deploys on `main` when `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are configured as GitHub Actions secrets. If those secrets are absent, deployment steps are skipped rather than exposing credentials or failing mysteriously.
 
-Worker runtime secrets such as `GEMINI_KEY`, `ADMIN_SECRET_KEY`, `REACTION_SALT` and `YOUTUBE_API_KEY` remain in Cloudflare.
+Worker runtime secrets such as `ADMIN_SECRET_KEY`, `REACTION_SALT` and `YOUTUBE_API_KEY` remain in Cloudflare.
 
 ## API overview
 
@@ -256,7 +256,7 @@ Worker runtime secrets such as `GEMINI_KEY`, `ADMIN_SECRET_KEY`, `REACTION_SALT`
 | `POST /api/videos/:id/interest` | Public | Store a privacy-hashed more/fewer preference |
 | `GET/POST /api/videos/:id/comments` | Public | Read approved / submit pending comments |
 | `GET /api/admin/discover?q=...` | Admin | Search YouTube or inspect a direct URL |
-| `POST /api/ai/generate` | Admin | Generate a structured Gemini draft |
+| `GET /api/admin/videos` | Admin | Page through all saved reviews, including drafts |
 | `POST/GET /api/ai/analyze-media...` | Admin | Start and poll a private Teamwork analysis job |
 | `GET/PUT /api/admin/videos/:id/analysis` | Admin | Read or save reviewed transcript/OCR evidence |
 | `GET /captions/:slug.vtt` | Public | Serve generated captions for a published matching source |
