@@ -336,25 +336,35 @@ function homepageTopicLinks(categories) {
   ).join(" · ");
 }
 
-async function videoIndexPage(env) {
-  let rows = [];
-  try {
-    const result = await env.DB.prepare(
-      `SELECT slug, title, primary_category, subcategory, description
-       FROM videos
-       WHERE published = 1
-       ORDER BY featured DESC, trending DESC, updated_at DESC, id DESC
-       LIMIT 200`,
-    ).all();
-    rows = result.results || [];
-  } catch (error) {
-    console.error("Video index query failed", error?.message || error);
+async function videoIndexPage(request, env) {
+  const url = new URL(request.url);
+  const pageValue = url.searchParams.get("page") || "1";
+  const page = Number(pageValue);
+  if (!/^[1-9]\d{0,4}$/.test(pageValue)) {
+    return htmlResponse('<meta name="robots" content="noindex"><h1>Review directory page not found</h1>', 404, "noindex,follow");
   }
-
-  const canonical = `${CANONICAL_ORIGIN}/videos`;
+  if (url.searchParams.has("page") && page === 1) {
+    url.searchParams.delete("page");
+    return Response.redirect(url.toString(), 301);
+  }
+  const pageSize = 100;
+  const result = await env.DB.prepare(
+    `SELECT slug, title, primary_category, subcategory, description
+     FROM videos WHERE published = 1
+     ORDER BY updated_at DESC, id DESC LIMIT ? OFFSET ?`,
+  ).bind(pageSize + 1, (page - 1) * pageSize).all();
+  const found = result.results || [];
+  const hasNext = found.length > pageSize;
+  const rows = found.slice(0, pageSize);
+  if (page > 1 && !rows.length) {
+    return htmlResponse('<meta name="robots" content="noindex"><h1>Review directory page not found</h1>', 404, "noindex,follow");
+  }
+  const pageUrl = n => `${CANONICAL_ORIGIN}/videos${n === 1 ? "" : `?page=${n}`}`;
+  const canonical = pageUrl(page);
+  const pagination = `<nav aria-label="Review directory pages">${page > 1 ? `<a rel="prev" href="${pageUrl(page - 1)}">Previous reviews</a> · ` : ""}<span>Page ${page}</span>${hasNext ? ` · <a rel="next" href="${pageUrl(page + 1)}">More reviews</a>` : ""}</nav>`;
   const itemList = rows.map((row, index) => ({
     "@type": "ListItem",
-    position: index + 1,
+    position: (page - 1) * pageSize + index + 1,
     name: row.title,
     url: `${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}`
   }));
@@ -378,7 +388,7 @@ async function videoIndexPage(env) {
     return `<article class="video-tile glass-panel"><div class="tile-content"><div class="tile-badges"><span class="badge">${escapeHtml(row.primary_category || "Video")}</span><span class="badge secondary">${escapeHtml(row.subcategory || "")}</span></div><h2><a class="tile-title" href="${escapeHtml(url)}">${escapeHtml(row.title)}</a></h2><p class="tile-description">${escapeHtml(description)}</p></div></article>`;
   }).join("");
 
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>All Video Reviews, Tutorials &amp; Discoveries | Vid.Best</title><meta name="description" content="Browse published Vid.Best video reviews, tutorials and discoveries with permanent watch pages."><meta name="robots" content="index,follow,max-image-preview:large,max-video-preview:-1,max-snippet:-1"><link rel="canonical" href="${escapeHtml(canonical)}"><meta property="og:type" content="website"><meta property="og:site_name" content="Vid.Best"><meta property="og:title" content="All Video Reviews, Tutorials &amp; Discoveries | Vid.Best"><meta property="og:url" content="${escapeHtml(canonical)}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"><script type="application/ld+json">${jsonForHtml(schema)}</script></head><body><header class="site-header compact"><a class="brand" href="/" aria-label="Vid.Best homepage"><span class="brand-mark">V</span><span>Vid.Best</span></a><a class="button ghost" href="/">Explore all</a></header><main><section class="section-pad"><div class="section-heading"><div><p class="eyebrow">Permanent video library</p><h1>All published videos</h1></div><p>Every listed title links directly to a permanent Vid.Best watch page.</p></div><div class="video-grid">${links}</div></section></main><footer class="site-footer"><a class="brand small" href="/"><span class="brand-mark">V</span><span>Vid.Best</span></a><p>Video review and discovery, designed for curiosity.</p><span><a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a></span></footer></body></html>`;
+  return htmlResponse(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>All Video Reviews, Tutorials &amp; Discoveries | Vid.Best</title><meta name="description" content="Browse published Vid.Best video reviews, tutorials and discoveries with permanent watch pages."><meta name="robots" content="index,follow,max-image-preview:large,max-video-preview:-1,max-snippet:-1"><link rel="canonical" href="${escapeHtml(canonical)}"><meta property="og:type" content="website"><meta property="og:site_name" content="Vid.Best"><meta property="og:title" content="All Video Reviews, Tutorials &amp; Discoveries | Vid.Best"><meta property="og:url" content="${escapeHtml(canonical)}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"><script type="application/ld+json">${jsonForHtml(schema)}</script></head><body><header class="site-header compact"><a class="brand" href="/" aria-label="Vid.Best homepage"><span class="brand-mark">V</span><span>Vid.Best</span></a><a class="button ghost" href="/">Explore all</a></header><main><section class="section-pad"><div class="section-heading"><div><p class="eyebrow">Permanent video library</p><h1>All published videos</h1></div><p>Every listed title links directly to a permanent Vid.Best watch page.</p></div><div class="video-grid">${links}</div>${pagination}</section></main><footer class="site-footer"><a class="brand small" href="/"><span class="brand-mark">V</span><span>Vid.Best</span></a><p>Video review and discovery, designed for curiosity.</p><span><a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a></span></footer></body></html>`);
 }
 
 async function pagesSitemap() {
@@ -440,7 +450,7 @@ async function enrichHomepageHtml(html, env) {
   return output;
 }
 
-function enrichWatchHtml(html) {
+async function enrichWatchHtml(html, env) {
   let output = String(html);
   const categoryRegex = /"item":"https:\/\/vid\.best\/\?category=([^"]+)"/g;
   output = output.replace(categoryRegex, (match, encodedCategory) => {
@@ -461,6 +471,20 @@ function enrichWatchHtml(html) {
     const nav = `<nav class="vidbest-seo-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true"> / </span><a href="${escapeHtml(categoryUrl(breadcrumbCategory))}">${escapeHtml(breadcrumbCategory)}</a></nav>`;
     output = output.replace('<article class="watch-copy glass-panel">', `${nav}<article class="watch-copy glass-panel">`);
     output = output.replace("</head>", '<style id="vidbest-seo-breadcrumb-style">.vidbest-seo-breadcrumb{max-width:1200px;margin:12px auto 0;padding:0 24px;font-size:13px;opacity:.82}.vidbest-seo-breadcrumb a{text-decoration:none}.vidbest-seo-breadcrumb a:hover{text-decoration:underline}</style></head>');
+  }
+  const id = Number(output.match(/data-video-id="(\d+)"/)?.[1] || 0);
+  if (id && breadcrumbCategory && !output.includes('id="vidbest-related-reviews"')) {
+    try {
+      const related = await env.DB.prepare(
+        `SELECT slug, title FROM videos WHERE published = 1 AND id != ?
+         AND primary_category = ? ORDER BY updated_at DESC, id DESC LIMIT 6`,
+      ).bind(id, breadcrumbCategory).all();
+      const links = (related.results || []).map(row => `<li><a href="${escapeHtml(`${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}`)}">${escapeHtml(row.title)}</a></li>`).join("");
+      const section = `<section id="vidbest-related-reviews" class="related-panel glass-panel"><h2>More reviews to explore</h2><nav aria-label="Related video reviews"><ul>${links}</ul><a href="/videos">Browse all video reviews</a></nav></section>`;
+      output = output.replace('</article>', `</article>${section}`);
+    } catch {
+      // Optional recommendations must not hide the review when unavailable.
+    }
   }
   return output;
 }
@@ -495,7 +519,7 @@ async function passThroughHome(request, env, ctx) {
   }
 
   const rawHtml = await response.text();
-  const watchHtml = url.pathname.startsWith("/watch/") ? enrichWatchHtml(rawHtml) : rawHtml;
+  const watchHtml = url.pathname.startsWith("/watch/") ? await enrichWatchHtml(rawHtml, env) : rawHtml;
   let html = url.pathname === "/" && response.ok ? await enrichHomepageHtml(watchHtml, env) : watchHtml;
   if (filteredHome) {
     html = html.replace(/<meta\s+name="robots"\s+content="[^"]*"\s*\/?\s*>/i,
@@ -511,7 +535,7 @@ async function passThroughHome(request, env, ctx) {
   });
 }
 
-export default {
+const seoWorker = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const hostname = url.hostname.toLowerCase();
@@ -552,7 +576,7 @@ export default {
     }
 
     if (url.pathname === "/videos" && ["GET", "HEAD"].includes(request.method)) {
-      return htmlResponse(await videoIndexPage(env));
+      return videoIndexPage(request, env);
     }
 
     return passThroughHome(request, env, ctx);
@@ -561,4 +585,24 @@ export default {
   scheduled(...args) {
     return edgeWorker.scheduled?.(...args);
   }
+};
+
+
+export default {
+  async fetch(request, env, ctx) {
+    let response;
+    try {
+      response = await seoWorker.fetch(request, env, ctx);
+    } catch (error) {
+      const path = new URL(request.url).pathname;
+      if (!["GET", "HEAD"].includes(request.method) || !/^\/(?:videos|category\/[^/]+|sitemap\.xml|sitemaps\/[^/]+\.xml)$/.test(path)) throw error;
+      console.error("Public SEO response unavailable");
+      response = htmlResponse('<meta name="robots" content="noindex"><h1>Temporarily unavailable</h1>', 503, "noindex,follow");
+      response.headers.set("Retry-After", "60");
+    }
+    if (request.method !== "HEAD") return response;
+    await response.body?.cancel();
+    return new Response(null, { status: response.status, statusText: response.statusText, headers: response.headers });
+  },
+  scheduled(...args) { return seoWorker.scheduled(...args); }
 };

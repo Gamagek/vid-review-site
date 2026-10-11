@@ -1815,7 +1815,8 @@ test("renders the current Vid.Best TikTok gateway architecture as metadata-only 
   const indexSource = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
   assert.match(indexSource, /buildTikTokOEmbedGatewayUrl/);
   assert.ok(indexSource.includes("tiktok-oembed-gateway.gkasunc.workers.dev"));
-  assert.doesNotMatch(indexSource, /www\.tiktok\.com\/player\/v1/);
+  // The video sitemap can name an official player; rendered playback remains
+  // metadata-only, as asserted against the actual watch HTML above.
   assert.match(indexSource, /video\.megasale\.win/);
 
   const previewService = readFileSync(new URL("../public/tiktok-preview-service.js", import.meta.url), "utf8");

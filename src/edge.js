@@ -1,8 +1,8 @@
 import app, { processAuthorizedCacheJobs, processTikTokOEmbedBackfill, resolveReactionSalt } from "./index.js";
 import { processAdminTikTokCacheJobs } from "./tiktok-cache-jobs.js";
 import { processTikTokThumbnailJobs } from "./tiktok-thumbnail-cache.js";
+export { isLikelyCrawler } from "./crawlers.js";
 
-const CRAWLER_PATTERN = /\b(?:bot|crawler|spider|slurp|bingpreview|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|pinterestbot|duckduckbot|baiduspider|yandexbot)\b/i;
 const EXTERNAL_VIDEO_HOSTS = new Set([
   "youtube.com",
   "www.youtube.com",
@@ -32,13 +32,6 @@ const COMMENT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const LAB_REVIEW_ROUTE = "/lab-media/lab-review-1.mp4";
 const LAB_REVIEW_KEY = "Lab review 1.mp4";
 const textEncoder = new TextEncoder();
-
-export function isLikelyCrawler(value) {
-  const userAgent = typeof value === "string"
-    ? value
-    : value?.headers?.get?.("User-Agent") || "";
-  return CRAWLER_PATTERN.test(userAgent);
-}
 
 function isExternalEmbed(value) {
   if (!value) return false;
@@ -97,7 +90,8 @@ export function sanitizeWatchHtml(html, sourceMetadata = null) {
   const usesFallbackThumbnail = /<meta property="og:image" content="[^"]*\/favicon\.svg(?:\?[^"]*)?">/i.test(output);
   if (usesFallbackThumbnail) return omitVideoSchema();
 
-  if (isExternalEmbed(videoSchema.embedUrl)) {
+  const externalProvider = /data-video-provider="(?:youtube|tiktok|facebook|instagram|vimeo|dailymotion|twitch)"/i.test(output);
+  if (externalProvider || isExternalEmbed(videoSchema.embedUrl) || isExternalEmbed(videoSchema.contentUrl)) {
     if (!sourceMetadata?.source_published_at) return omitVideoSchema();
     videoSchema.uploadDate = sourceMetadata.source_published_at;
     if (sourceMetadata.source_duration) videoSchema.duration = sourceMetadata.source_duration;
@@ -557,11 +551,7 @@ async function fetchHandler(request, env, ctx) {
     ? request.clone().json().catch(() => null)
     : Promise.resolve(null);
 
-  const crawlerWatchRequest = request.method === "GET"
-    && url.pathname.startsWith("/watch/")
-    && isLikelyCrawler(request);
-  const delegatedContext = crawlerWatchRequest ? { waitUntil() {} } : ctx;
-  const response = await app.fetch(request, env, delegatedContext);
+  const response = await app.fetch(request, env, ctx);
 
   if (videoMutation && response.ok) {
     const [mutationPayload, responsePayload, previousVideo] = await Promise.all([

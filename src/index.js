@@ -1,4 +1,5 @@
 import { parseInstagramUrl } from "../public/instagram-utils.js";
+import { isLikelyCrawler } from "./crawlers.js";
 import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStatus } from "./tiktok-cache-jobs.js";
 import { tikTokCacheCandidate } from "./admin-tiktok-cache.js";
 import { isCachedTikTokThumbnail, thumbnailKey } from "./tiktok-thumbnail-cache.js";
@@ -219,11 +220,11 @@ async function route(request, env, ctx) {
     return instagramPreviewBatch(request, env);
   }
 
-  if (path === "/robots.txt" && request.method === "GET") {
+  if (path === "/robots.txt" && ["GET", "HEAD"].includes(request.method)) {
     return robotsResponse(request, env);
   }
 
-  if ((path === "/privacy" || path === "/terms") && request.method === "GET") {
+  if ((path === "/privacy" || path === "/terms") && ["GET", "HEAD"].includes(request.method)) {
     const legalAsset = await env.ASSETS.fetch(request);
     return secureAssetResponse(legalAsset, path);
   }
@@ -233,11 +234,11 @@ async function route(request, env, ctx) {
   }
 
   let match = path.match(/^\/sitemaps\/videos-(\d+)\.xml$/);
-  if (match && request.method === "GET") {
+  if (match && ["GET", "HEAD"].includes(request.method)) {
     return videoSitemapResponse(request, env, Number(match[1]));
   }
 
-  if (path.startsWith("/watch/") && request.method === "GET") {
+  if (path.startsWith("/watch/") && ["GET", "HEAD"].includes(request.method)) {
     return watchPage(request, env, ctx, path.slice("/watch/".length));
   }
 
@@ -2973,7 +2974,8 @@ function secureStoredContentType(headers) {
 }
 
 async function watchPage(request, env, ctx, slugInput) {
-  const slug = safeDecode(slugInput).split("/")[0];
+  const slug = safeDecode(slugInput);
+  if (!slug || slug.includes("/")) return dynamicHtml(notFoundPage(), 404);
   const legacySlugRedirects = new Map([
     ["fyppppppppppppppppppppppp-fyp-ahaanpanday-aneetpadda-saiyaara", "saiyaara-a-cinematic-romance"],
   ]);
@@ -2999,7 +3001,9 @@ async function watchPage(request, env, ctx, slugInput) {
     video.tiktok_preview = tikTokPreviewFromRow(previewRow, previewRow ? "d1" : "missing");
   }
   const viewer = new URL(request.url).searchParams.get("viewer") === "1";
-  if (!viewer) ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
+  if (!viewer && request.method === "GET" && !isLikelyCrawler(request)) {
+    ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
+  }
   const scriptNonce = createCspNonce();
   const response = dynamicHtml(renderWatchHtml(video, request, env, scriptNonce), 200, scriptNonce);
   response.headers.set("Cache-Control", "private, no-store");
@@ -3959,7 +3963,7 @@ async function videoSitemapResponse(request, env, page) {
   const result = await env.DB.prepare(
     `SELECT v.slug, v.title, v.description, v.seo_description, v.thumbnail_url,
             v.embed_url, v.source_url, v.media_type, v.created_at, v.updated_at,
-            m.source_published_at
+            m.source_published_at, m.source_duration
      FROM videos v
      LEFT JOIN video_source_metadata m ON m.video_id = v.id
      WHERE v.published = 1 ORDER BY v.id ASC LIMIT 1000 OFFSET ?`,
@@ -3981,7 +3985,7 @@ async function videoSitemapResponse(request, env, page) {
     const canDescribeVideo = thumbnail && (Boolean(row.embed_url) || Boolean(row.source_published_at) || provider === "tiktok" || provider === "facebook");
     if (canDescribeVideo) {
       const playerUrl = provider === "tiktok"
-        ? ""
+        ? `https://www.tiktok.com/player/v1/${row.source_url.match(/\/video\/(\d+)/)?.[1] || ""}`
         : provider === "facebook"
           ? getSafeFacebookEmbedUrl(row)
           : row.embed_url
@@ -3990,9 +3994,10 @@ async function videoSitemapResponse(request, env, page) {
       const location = playerUrl
         ? `<video:player_loc allow_embed="yes">${escapeXml(playerUrl)}</video:player_loc>`
         : `<video:content_loc>${escapeXml(absoluteUrl(row.source_url, base))}</video:content_loc>`;
-      const publicationDate = row.source_published_at || row.created_at;
       const duration = parseDurationSeconds(row.source_duration);
-      videoEntry = `<video:video><video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc><video:title>${escapeXml(row.title)}</video:title><video:description>${escapeXml(description)}</video:description>${location}<video:publication_date>${escapeXml(publicationDate)}</video:publication_date>${duration ? `<video:duration>${duration}</video:duration>` : ""}</video:video>`;
+      const publicationDate = row.source_published_at
+        ? `<video:publication_date>${escapeXml(row.source_published_at)}</video:publication_date>` : "";
+      videoEntry = `<video:video><video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc><video:title>${escapeXml(row.title)}</video:title><video:description>${escapeXml(description)}</video:description>${location}${publicationDate}${duration ? `<video:duration>${duration}</video:duration>` : ""}</video:video>`;
     }
     return `<url><loc>${escapeXml(canonical)}</loc><lastmod>${escapeXml(row.updated_at)}</lastmod>${videoEntry}</url>`;
   }).join("");

@@ -268,3 +268,90 @@ test("homepage enrichment is not skipped by an old static asset validator", asyn
   assert.equal(response.headers.get("ETag"), null);
   assert.match(await response.text(), /<meta name="robots" content="noindex,follow">/);
 });
+
+test("HEAD has GET status and MIME, an empty body and no review view writes", async () => {
+  const context = createContext();
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug,title,source_url,media_type,primary_category,subcategory,review_text,published,views)
+    VALUES ('head-review','HEAD review','https://example.com/test.mp4','raw','Technology','Web Development','Actual review text',1,5)`).run();
+  for (const path of ['/robots.txt', '/sitemaps/videos-1.xml', '/sitemap.xml', '/videos', '/watch/head-review']) {
+    const head = await request(context, 'https://vid.best' + path, { method: 'HEAD' });
+    assert.equal(head.status, 200, path);
+    assert.equal(await head.text(), '', path);
+    assert.match(head.headers.get('Content-Type'), /(?:text|xml)/);
+  }
+  for (const agent of ['Googlebot', 'bingbot', 'Google-InspectionTool', 'VidBest-SEO-Audit/1.0']) {
+    assert.equal((await request(context, 'https://vid.best/watch/head-review', { headers: { 'User-Agent': agent } })).status, 200);
+  }
+  assert.equal(context.sqlite.prepare("SELECT views FROM videos WHERE slug='head-review'").get().views, 5);
+  await request(context, 'https://vid.best/watch/head-review', { headers: { 'User-Agent': 'Mozilla/5.0 Chrome/140.0' } });
+  assert.equal(context.sqlite.prepare("SELECT views FROM videos WHERE slug='head-review'").get().views, 6);
+  const missing = await request(context, 'https://vid.best/watch/missing', { method: 'HEAD' });
+  assert.equal(missing.status, 404);
+  assert.equal(await missing.text(), '');
+  assert.equal((await request(context, 'https://vid.best/watch/head-review/invalid')).status, 404);
+});
+
+test("related review links are in public HTML and never expose drafts", async () => {
+  const context = createContext();
+  const insert = context.sqlite.prepare(`INSERT INTO videos
+    (slug,title,source_url,media_type,primary_category,subcategory,review_text,published)
+    VALUES (?,?,'https://example.com/test.mp4','raw','Technology','Web Development','Useful original text',?)`);
+  insert.run('current-review', 'Current review', 1);
+  insert.run('related-public', 'Related <review>', 1);
+  insert.run('related-draft', 'Secret draft', 0);
+  const html = await (await request(context, 'https://vid.best/watch/current-review')).text();
+  const related = html.match(/<section id="vidbest-related-reviews"[\s\S]*?<\/section>/)?.[0];
+  assert.match(related, /href="https:\/\/vid.best\/watch\/related-public"/);
+  assert.match(related, /Related &lt;review&gt;/);
+  assert.doesNotMatch(related, /related-draft|Secret draft|current-review/);
+});
+
+test("the crawlable directory covers libraries beyond the old 200 review limit", async () => {
+  const context = createContext();
+  context.sqlite.prepare('UPDATE videos SET published=0').run();
+  const insert = context.sqlite.prepare(`INSERT INTO videos
+    (slug,title,source_url,media_type,primary_category,subcategory,published)
+    VALUES (?,?,'https://example.com/test.mp4','raw','Technology','Web Development',1)`);
+  for (let i = 1; i <= 201; i++) insert.run('library-' + i, 'Review ' + i);
+  const urls = new Set();
+  for (const page of [1, 2, 3]) {
+    const url = 'https://vid.best/videos' + (page > 1 ? '?page=' + page : '');
+    const response = await request(context, url);
+    const html = await response.text();
+    assert.equal(response.status, 200);
+    assert.ok(html.includes('<link rel="canonical" href="' + url + '">'));
+    for (const match of html.matchAll(/href="(https:\/\/vid.best\/watch\/library-\d+)"/g)) urls.add(match[1]);
+    if (page < 3) assert.ok(html.includes('rel="next" href="https://vid.best/videos?page=' + (page + 1) + '"'));
+  }
+  assert.equal(urls.size, 201);
+  assert.equal((await request(context, 'https://vid.best/videos?page=4')).status, 404);
+  assert.equal((await request(context, 'https://vid.best/videos?page=abc')).status, 404);
+  const duplicate = await request(context, 'https://vid.best/videos?page=1');
+  assert.equal(duplicate.status, 301);
+  assert.equal(duplicate.headers.get('Location'), 'https://vid.best/videos');
+});
+
+test("a directory database failure returns retryable 503 instead of an empty indexable 200", async () => {
+  const response = await request(createContext({ DB: { prepare() { throw new Error('DB unavailable'); } } }), 'https://vid.best/videos');
+  assert.equal(response.status, 503);
+  assert.equal(response.headers.get('Retry-After'), '60');
+  assert.match(response.headers.get('X-Robots-Tag'), /noindex/);
+});
+
+test("video sitemap uses TikTok player locations and only verified video publication dates", async () => {
+  const context = createContext();
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug,title,source_url,media_type,primary_category,subcategory,description,published)
+    VALUES ('tiktok-map','TikTok review','https://www.tiktok.com/@creator/video/1234567890123456789','tiktok','Technology','Web Development','Useful video',1)`).run();
+  let xml = await (await request(context, 'https://vid.best/sitemaps/videos-1.xml')).text();
+  const entry = text => text.match(/<url><loc>https:\/\/vid.best\/watch\/tiktok-map<\/loc>[\s\S]*?<\/url>/)[0];
+  assert.match(entry(xml), /<video:player_loc allow_embed="yes">https:\/\/www.tiktok.com\/player\/v1\/1234567890123456789/);
+  assert.doesNotMatch(entry(xml), /video:content_loc|video:publication_date/);
+  const id = context.sqlite.prepare("SELECT id FROM videos WHERE slug='tiktok-map'").get().id;
+  context.sqlite.prepare(`INSERT INTO video_source_metadata (video_id,source_published_at,source_duration)
+    VALUES (?,'2024-05-06T07:08:09Z','PT1M2S')`).run(id);
+  xml = await (await request(context, 'https://vid.best/sitemaps/videos-1.xml')).text();
+  assert.match(entry(xml), /<video:publication_date>2024-05-06T07:08:09Z/);
+  assert.match(entry(xml), /<video:duration>62<\/video:duration>/);
+});
