@@ -24,7 +24,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.event_name == 'push' && 'vidbest-discovery-diagnostics' || inputs.thumbnails_only && 'vidbest-thumbnail-audit' || 'vidbest-search-console-audit' }}
+  group: ${{ github.event_name == 'push' && 'vidbest-discovery-diagnostics' || github.event_name == 'workflow_run' && 'vidbest-deployment-diagnostics' || inputs.thumbnails_only && 'vidbest-thumbnail-audit' || 'vidbest-search-console-audit' }}
   cancel-in-progress: false
 
 jobs:
