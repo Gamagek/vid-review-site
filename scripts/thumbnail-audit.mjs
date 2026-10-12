@@ -24,9 +24,39 @@ function allowedImage(value) {
   } catch { return false; }
 }
 
+async function boundedBody(response) {
+  if (!response.body || Number(response.headers.get('content-length')) > MAX_BYTES) throw new Error('Invalid size');
+  const reader = response.body.getReader();const parts=[];let size=0;
+  try { for (;;) { const {value,done}=await reader.read();if(done)break;size+=value.byteLength;
+    if(size>MAX_BYTES){await reader.cancel();throw new Error('Invalid size');}parts.push(value); }
+  } finally { reader.releaseLock(); }
+  const bytes=new Uint8Array(size);let offset=0;for(const part of parts){bytes.set(part,offset);offset+=part.byteLength;}return bytes;
+}
+
+async function watchThumbnail(row, fetcher) {
+  if (!/^https:\/\/vid\.best\/watch\/[a-z0-9-]+$/.test(row.page)) return {page:'outside_canonical_public_review_routes',status:'invalid_watch_url'};
+  let response;
+  try {
+    response=await fetcher(row.page,{redirect:'manual',signal:AbortSignal.timeout(12000),headers:{'User-Agent':'VidBest-SEO-Audit/1.0',Accept:'text/html'}});
+    if(!response.ok||!/^text\/html\b/i.test(response.headers.get('content-type')||'')){
+      await response.body?.cancel();return {page:row.page,status:'watch_metadata_unverified',httpStatus:response.status};
+    }
+    const html=new TextDecoder().decode(await boundedBody(response));
+    for(const tag of html.match(/<meta\b[^>]{0,4096}>/gi)||[]){
+      const attrs={};for(const match of tag.matchAll(/([a-zA-Z:-]+)\s*=\s*(["'])(.*?)\2/g))attrs[match[1].toLowerCase()]=decode(match[3]);
+      if((attrs.property||attrs.name||'').toLowerCase()!=='og:image'||!attrs.content)continue;
+      const url=new URL(attrs.content,row.page);
+      if(url.pathname==='/favicon.svg')continue;
+      const result=await probeThumbnail({...row,thumbnail:url.href},fetcher);
+      return {...result,metadataSource:'watch_open_graph'};
+    }
+    return {page:row.page,status:'missing',metadataSource:'watch_open_graph'};
+  } catch { await response?.body?.cancel().catch(()=>{});return {page:row.page,status:'watch_metadata_unverified'}; }
+}
+
 export async function probeThumbnail(row, fetcher = fetch) {
   const result = {page:row.page, status:'missing'};
-  if (!row.thumbnail) return result;
+  if (!row.thumbnail) return watchThumbnail(row,fetcher);
   try { result.host = new URL(row.thumbnail).hostname; } catch {}
   if (!allowedImage(row.thumbnail)) return {...result, status:'invalid_image_url'};
   let response;
@@ -37,7 +67,13 @@ export async function probeThumbnail(row, fetcher = fetch) {
     result.contentType = (response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
     if (!response.ok || !TYPES.has(result.contentType)) {
       await response.body?.cancel();
-      return {...result, status:response.ok ? 'non_image' : 'http_error'};
+      const failed={...result,status:response.ok?'non_image':'http_error'};
+      const imageUrl=new URL(row.thumbnail);
+      if(response.status===404&&imageUrl.hostname==='i.ytimg.com'&&/^\/vi\/[a-zA-Z0-9_-]{11}\/hq[123]\.jpg$/.test(imageUrl.pathname)&&!imageUrl.search){
+        const candidate=new URL('hqdefault.jpg',imageUrl).href;
+        failed.fallback={variant:'same_video_hqdefault',...await probeThumbnail({...row,thumbnail:candidate},fetcher)};
+      }
+      return failed;
     }
     if (Number(response.headers.get('content-length')) > MAX_BYTES || !response.body) {
       await response.body?.cancel();

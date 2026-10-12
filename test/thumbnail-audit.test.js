@@ -25,3 +25,23 @@ test('thumbnail checks redact signed URLs and distinguish images from HTML',asyn
   const redirect=await probeThumbnail(row,async(url,options)=>{assert.equal(options.redirect,'manual');return new Response(null,{status:302,headers:{Location:'https://login.invalid'}});});
   assert.equal(redirect.status,'http_error');
 });
+
+test('a real watch-page cover is found when optional video sitemap metadata is absent',async()=>{
+  const calls=[];const r=await probeThumbnail({page:'https://vid.best/watch/lab-review-1-player-test',thumbnail:''},async(url,options)=>{
+    calls.push(url);assert.equal(options.redirect,'manual');
+    return url.includes('/watch/')?new Response('<meta content="/review-covers/lab.jpg" property="og:image">',{headers:{'Content-Type':'text/html'}}):new Response(new Uint8Array([255,216,255,217]),{headers:{'Content-Type':'image/jpeg'}});
+  });assert.equal(r.status,'ok');assert.equal(r.metadataSource,'watch_open_graph');assert.deepEqual(calls,['https://vid.best/watch/lab-review-1-player-test','https://vid.best/review-covers/lab.jpg']);
+});
+
+test('watch fallback rejects private pages and does not count a site icon as a video cover',async()=>{
+  assert.equal((await probeThumbnail({page:'https://vid.best/admin',thumbnail:''},()=>{throw Error('no fetch')})).status,'invalid_watch_url');
+  const r=await probeThumbnail({page:'https://vid.best/watch/example',thumbnail:''},async()=>new Response('<meta property="og:image" content="https://vid.best/favicon.svg">',{headers:{'Content-Type':'text/html'}}));assert.equal(r.status,'missing');
+  const error=await probeThumbnail({page:'https://vid.best/watch/example',thumbnail:''},async()=>{throw Error('private-sentinel')});assert.equal(error.status,'watch_metadata_unverified');assert.doesNotMatch(JSON.stringify(error),/sentinel/);
+});
+
+test('a missing YouTube frame diagnoses only the same-video official default and preserves the failure',async()=>{
+  const calls=[];const row={page:'https://vid.best/watch/cricket',thumbnail:'https://i.ytimg.com/vi/YVT1oUI2nTE/hq2.jpg'};
+  const r=await probeThumbnail(row,async(url)=>{calls.push(url);return url.endsWith('hq2.jpg')?new Response(null,{status:404}):new Response(new Uint8Array([255,216,255,217]),{headers:{'Content-Type':'image/jpeg'}})});
+  assert.equal(r.status,'http_error');assert.equal(r.httpStatus,404);assert.equal(r.fallback.status,'ok');assert.equal(r.fallback.variant,'same_video_hqdefault');assert.deepEqual(calls,[row.thumbnail,'https://i.ytimg.com/vi/YVT1oUI2nTE/hqdefault.jpg']);
+  const forbidden=await probeThumbnail(row,async()=>new Response(null,{status:403}));assert.equal(forbidden.fallback,undefined);
+});
