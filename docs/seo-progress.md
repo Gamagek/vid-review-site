@@ -26,3 +26,10 @@ Local validation: 233 Node tests passed; Worker dry-run compiled; deployment scr
 6. Recheck Google coverage after Google processes the sitemap; avoid repeatedly inspecting all URLs within the same day. Record material changes and the next task here. Do not manufacture rankings, bulk filler, spam links or unlimited indexing claims.
 
 The connected scheduled SEO task runs every two hours. Existing Portainer repair automation remains paused. Each run should read current main and this queue, complete a verified task, and update this checkpoint. Reconfirm remote state before any mutation.
+
+
+## Published follow-up
+
+PR #117 deployed the stable/crawlable poster fixes successfully. PR #118 added a visually inspected, explicitly labelled Digital Love editorial cover to missing thumbnail 88; its existing created_at and updated_at remain 2026-10-04T13:29:37.836Z. Other covers remain a per-video audit/verification task, not a completed bulk generation claim. Both PRs passed 233 Node and four Python tests.
+
+Sitemap diagnostics now distinguish PUT acceptance from Google's actual GET processing state: pending, last download, error/warning counts. Missing or failed status reads remain unverified. Thumbnail checks run first so they do not wait behind the full URL Inspection batch. The added status/redaction tests pass (235 Node tests total).

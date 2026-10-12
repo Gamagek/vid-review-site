@@ -36,6 +36,9 @@ jobs:
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
+      - name: Audit published thumbnail HTTP availability without credentials
+        run: node scripts/thumbnail-audit.mjs
+
       - name: Audit public pages and synchronize Search Console when configured
         if: ${{ !inputs.thumbnails_only }}
         run: node scripts/search-console-audit.mjs
@@ -43,9 +46,6 @@ jobs:
           GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON }}
           GOOGLE_SEARCH_CONSOLE_PROPERTY: ${{ vars.GOOGLE_SEARCH_CONSOLE_PROPERTY || 'sc-domain:vid.best' }}
           GOOGLE_SEARCH_CONSOLE_INSPECTIONS: '200'
-      - name: Audit published thumbnail HTTP availability without credentials
-        run: node scripts/thumbnail-audit.mjs
-
       - name: Publish concise indexing summary
         if: ${{ always() }}
         shell: bash
