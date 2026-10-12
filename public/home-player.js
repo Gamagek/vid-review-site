@@ -527,8 +527,7 @@ function safeFacebookDirectEmbed(embedValue, sourceValue) {
       isFacebookDirectSource(href)
     ) {
       const canonical = new URL(href);
-      canonical.search = "";
-      canonical.hash = "";
+      cleanFacebookTracking(canonical);
       embed.searchParams.set("href", canonical.toString());
       embed.searchParams.set("show_text", "false");
       embed.searchParams.set("autoplay", "true");
@@ -541,8 +540,7 @@ function safeFacebookDirectEmbed(embedValue, sourceValue) {
     const source = new URL(String(sourceValue || ""));
     const host = source.hostname.toLowerCase().replace(/^www\./, "");
     if (source.protocol !== "https:" || !(host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch")) return "";
-    source.search = "";
-    source.hash = "";
+    cleanFacebookTracking(source);
     const params = new URLSearchParams({
       height: "314",
       href: source.toString(),
@@ -566,6 +564,16 @@ function isFacebookDirectSource(value) {
   } catch {
     return false;
   }
+}
+
+function cleanFacebookTracking(url) {
+  // watch/?v=... and permalink.php identify their content in the query.
+  // Remove tracking without discarding the actual video/post identity.
+  const identity = new Set(["v", "id", "story_fbid", "video_id"]);
+  for (const key of [...url.searchParams.keys()]) {
+    if (!identity.has(key)) url.searchParams.delete(key);
+  }
+  url.hash = "";
 }
 
 async function activateTikTokPreviewCard(card) {
