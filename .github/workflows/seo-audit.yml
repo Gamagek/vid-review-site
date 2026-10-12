@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - scripts/search-console-audit.mjs
+      - scripts/thumbnail-audit.mjs
       - .github/workflows/seo-audit.yml
   schedule:
     - cron: '47 4 * * *'

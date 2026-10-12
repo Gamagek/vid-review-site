@@ -3532,6 +3532,15 @@ async function facebookThumbnailEndpoint(request, env) {
     if (!/^[1-9]\d{0,8}$/.test(id || "")) throw new AppError(400, "Invalid video ID");
     const row = await env.DB.prepare("SELECT id,source_url,thumbnail_url FROM videos WHERE id = ? AND published = 1").bind(Number(id)).first();
     if (!row || !isFacebookUrl(row.source_url)) throw new AppError(404, "Video not found");
+    // Old sitemap/card addresses must continue to resolve after a hosted cover replaces a provider poster.
+    try {
+      const base = getBaseUrl(request, env);
+      const cover = new URL(row.thumbnail_url || "", base);
+      if (row.thumbnail_url && cover.origin === base && !cover.search && !cover.hash &&
+          /^\/(?:review-covers|facebook-previews|media)\/.+\.(?:jpe?g|png|webp|avif|gif)$/i.test(cover.pathname)) {
+        return new Response(null, {status:302,headers:{Location:cover.href,"Cache-Control":"public, max-age=60"}});
+      }
+    } catch { /* Keep provider poster fallback for unavailable/invalid covers. */ }
     const image = await readFacebookPoster(env, row, () => fetchFacebookPreview(env, row.source_url));
     if (!image) throw new AppError(404, "Facebook thumbnail is unavailable");
     return image;

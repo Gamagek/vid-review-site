@@ -2468,3 +2468,22 @@ test("poster requests preserve video dates and never reveal draft images by ID",
     assert.deepEqual(context.sqlite.prepare("SELECT * FROM videos ORDER BY id").all(),rows);
   } finally { globalThis.fetch = original; }
 });
+
+test('cached Facebook poster addresses resolve to hosted covers without exposing drafts or private targets',async()=>{
+  const context=createTestContext();
+  context.sqlite.exec(`INSERT INTO videos(slug,title,source_url,media_type,primary_category,subcategory,thumbnail_url,published,created_at,updated_at)
+    VALUES('hosted-cover','Cover','https://www.facebook.com/reel/123','facebook','Other','Other','/review-covers/ant.webp',1,'original-created','original-updated')`);
+  const row=context.sqlite.prepare('SELECT * FROM videos').get();const before=row;
+  const old=globalThis.fetch;globalThis.fetch=async()=>{throw Error('provider unavailable')};
+  try {
+    const response=await send(context,`/api/facebook/thumbnail?id=${row.id}&v=old-version`);
+    assert.equal(response.status,302);assert.equal(response.headers.get('Location'),'https://example.com/review-covers/ant.webp');
+    assert.deepEqual(context.sqlite.prepare('SELECT * FROM videos').get(),before);
+    for(const target of ['https://outside.example/private.webp','/api/private.webp','/review-covers/ant.webp?token=sentinel','/review-covers/ant.webp#secret']){
+      context.sqlite.prepare('UPDATE videos SET thumbnail_url=?').run(target);
+      assert.equal((await send(context,`/api/facebook/thumbnail?id=${row.id}`)).headers.get('Location'),null);
+    }
+    context.sqlite.prepare("UPDATE videos SET published=0,thumbnail_url='/review-covers/ant.webp'").run();
+    assert.equal((await send(context,`/api/facebook/thumbnail?id=${row.id}`)).status,404);
+  } finally {globalThis.fetch=old;}
+});
