@@ -227,6 +227,31 @@ export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:v
     await submit.body?.cancel();
     result.sitemapSubmitted = true;
     progress('Published sitemap accepted by Google.');
+    // Acceptance is not proof that Google has downloaded or processed the sitemap.
+    result.sitemapProcessing = {status:'not_verified'};
+    try {
+      const response = await request(fetchImpl, property + '/sitemaps/' + encodeURIComponent(SITEMAP), {headers}, wait);
+      if (!response.ok) {
+        await response.body?.cancel();
+        result.sitemapProcessing.error = 'google_sitemap_status_http_' + response.status;
+      } else {
+        const feed = JSON.parse(await boundedText(response));
+        if (feed.path !== SITEMAP) throw new AuditError('invalid_google_sitemap_status');
+        const state = {status:'verified'};
+        if (typeof feed.isPending === 'boolean') state.isPending = feed.isPending;
+        for (const field of ['lastDownloaded','lastSubmitted']) {
+          if (typeof feed[field] === 'string' && /^\d{4}-\d{2}-\d{2}T[0-9:.+-]+Z?$/.test(feed[field])) state[field] = feed[field].slice(0,40);
+        }
+        for (const field of ['errors','warnings']) {
+          if (/^\d{1,12}$/.test(String(feed[field]))) state[field] = Number(feed[field]);
+        }
+        result.sitemapProcessing = state;
+        progress('Google sitemap processing status verified; pending: ' + (state.isPending ?? 'unspecified')
+          + '; last downloaded: ' + (state.lastDownloaded || 'not reported')
+          + '; errors: ' + (state.errors ?? 'not reported') + '; warnings: ' + (state.warnings ?? 'not reported') + '.');
+      }
+    } catch (error) { result.sitemapProcessing.error = safeCode(error); }
+
     stage = 'inspect_index_status';
     const reviews = [...new Set(urls.map(publicUrl).filter(url => new URL(url).pathname.startsWith('/watch/')))].sort();
     const limit = Math.min(200, Math.max(1, Number(budget) || 200));
@@ -326,6 +351,13 @@ export function summary(report) {
     'Google OAuth authentication: ' + (google?.authenticated ? 'success' : 'not_verified'),
     'Search Console property access: ' + (google?.propertyVerified ? 'verified' : 'not_verified'),
     'Sitemap submitted to Google: ' + Boolean(google?.sitemapSubmitted),
+    google?.sitemapProcessing ? 'Google sitemap processing: ' + google.sitemapProcessing.status
+      + '; pending: ' + (google.sitemapProcessing.isPending ?? 'not_verified')
+      + '; last downloaded: ' + (google.sitemapProcessing.lastDownloaded || 'not_reported')
+      + '; errors: ' + (google.sitemapProcessing.errors ?? 'not_reported')
+      + '; warnings: ' + (google.sitemapProcessing.warnings ?? 'not_reported') : '',
+    google?.sitemapProcessing?.error ? 'Sitemap processing diagnostic: ' + google.sitemapProcessing.error : '',
+
     'Stored Google index inspections: ' + (google?.inspections?.length || 0) + '; PASS: ' + indexed,
     google?.inspections?.length ? 'Stored Google coverage: discovered/not indexed: ' + coverageCount('Discovered - currently not indexed')
       + '; unknown to Google: ' + coverageCount('URL is unknown to Google')

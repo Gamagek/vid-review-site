@@ -174,3 +174,25 @@ test('restricted Search Console property access is rejected before sitemap submi
   assert.equal(result.sitemapSubmitted, false);
   assert.equal(result.error, 'search_console_full_access_required');
 });
+
+
+test('Google sitemap acceptance and actual processing are reported separately without response secrets', async () => {
+  const result = await syncSearchConsole([], {secret:'configured',getToken:async()=>'private-token',wait:noop,
+    fetchImpl:async (url,options)=>{
+      if(options.method==='PUT')return new Response(null,{status:204});
+      if(url.includes('/sitemaps/'))return json({path:ORIGIN+'/sitemap.xml',isPending:true,lastDownloaded:'2026-10-11T12:00:00Z',errors:'2',warnings:'0',privateData:'private-sentinel',contents:[{private:'private-sentinel'}]});
+      return json({permissionLevel:'siteOwner'});
+    }});
+  assert.equal(result.sitemapSubmitted,true);
+  assert.deepEqual(result.sitemapProcessing,{status:'verified',isPending:true,lastDownloaded:'2026-10-11T12:00:00Z',errors:2,warnings:0});
+  assert.doesNotMatch(JSON.stringify(result),/private-sentinel|private-token/);
+});
+
+test('unavailable sitemap processing status remains unverified rather than falsely reporting zero errors',async()=>{
+  const result=await syncSearchConsole([],{secret:'configured',getToken:async()=>'test-token',wait:noop,
+    fetchImpl:async(url,options)=>options.method==='PUT'?new Response(null,{status:204}):url.includes('/sitemaps/')?json({private:'hidden-sentinel'},404):json({permissionLevel:'siteOwner'})});
+  assert.equal(result.status,'success');
+  assert.equal(result.sitemapSubmitted,true);
+  assert.deepEqual(result.sitemapProcessing,{status:'not_verified',error:'google_sitemap_status_http_404'});
+  assert.doesNotMatch(JSON.stringify(result),/hidden-sentinel/);
+});
