@@ -3,6 +3,7 @@ import { isLikelyCrawler } from "./crawlers.js";
 import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStatus } from "./tiktok-cache-jobs.js";
 import { tikTokCacheCandidate } from "./admin-tiktok-cache.js";
 import { isCachedTikTokThumbnail, thumbnailKey } from "./tiktok-thumbnail-cache.js";
+import { facebookPosterUrl, readFacebookPoster } from "./facebook-posters.js";
 import {
   requestMemberLogin,
   verifyMemberLogin,
@@ -1279,7 +1280,7 @@ function serializeVideo(row) {
     ...row,
     provider,
     embed_url: provider === "facebook" ? getSafeFacebookEmbedUrl(row) : row.embed_url,
-    thumbnail_url: row.thumbnail_url || instagramThumbnail || null,
+    thumbnail_url: provider === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url || instagramThumbnail || null,
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
     published: Boolean(row.published),
@@ -1749,7 +1750,7 @@ async function listVideos(request, env, includeUnpublished) {
 
 async function hydrateVideos(env, rows) {
   if (!rows.length) return [];
-  await enrichFacebookRows(env, rows);
+  // A slow provider metadata request must not hold the entire homepage feed.
   const ids = rows.map((row) => Number(row.id));
   const placeholders = ids.map(() => "?").join(",");
   const reactionResult = await env.DB.prepare(
@@ -1764,13 +1765,17 @@ async function hydrateVideos(env, rows) {
 }
 
 async function getPublicVideo(env, slug) {
-  const row = await env.DB.prepare(
+  let row = await env.DB.prepare(
     `SELECT v.*, 
             a.transcript, a.language AS transcript_language,
             CASE WHEN length(a.captions_vtt) > 0 THEN 1 ELSE 0 END AS has_captions
      FROM videos v LEFT JOIN video_analysis a ON a.video_id = v.id AND a.source_url = v.source_url
      WHERE v.slug = ? AND v.published = 1`,
   ).bind(slug).first();
+  if (!row) {
+    const target = await readSlugRedirect(env, slug);
+    if (target) return getPublicVideo(env, target);
+  }
   if (!row) throw new AppError(404, "Video not found");
   await enrichFacebookRows(env, [row]);
   const [video] = await hydrateVideos(env, [row]);
@@ -1916,10 +1921,16 @@ async function updateVideo(request, env, id, ctx) {
   if (!existing) throw new AppError(404, "Video not found");
   const body = await readJson(request, VIDEO_PAYLOAD_MAX_BYTES);
   const data = await validateVideoPayload(body, existing, getBaseUrl(request, env), env);
+  let nextSlug = existing.slug;
+  if (/^facebook-reel-pending-\d+$/.test(existing.slug) && data.title !== existing.title && detectMediaProvider(data) === "facebook") {
+    nextSlug = await uniqueSlug(env, data.title);
+    await env.DB.prepare("INSERT OR IGNORE INTO video_slug_redirects (old_slug, video_id) VALUES (?, ?)")
+      .bind(existing.slug, id).run();
+  }
 
   const row = await env.DB.prepare(
     `UPDATE videos SET
-      title = ?, source_url = ?, source_page_url = ?, embed_url = ?, media_type = ?, r2_key = ?,
+      slug = ?, title = ?, source_url = ?, source_page_url = ?, embed_url = ?, media_type = ?, r2_key = ?,
       redistribution_certified = ?, redistribution_certified_at = ?,
       cache_source_url = ?, cache_status = ?, cache_error = ?, cache_attempts = ?, cache_next_attempt_at = ?, cached_at = ?,
       primary_category = ?, subcategory = ?, description = ?, review_text = ?,
@@ -1928,6 +1939,7 @@ async function updateVideo(request, env, id, ctx) {
       updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
     WHERE id = ? RETURNING *`,
   ).bind(
+    nextSlug,
     data.title,
     data.source_url,
     data.source_page_url,
@@ -2132,10 +2144,13 @@ async function persistFacebookPreview(env, row) {
     const preview = await fetchFacebookPreview(env, row.source_url);
     if (!preview) return;
     const nextEmbed = buildFacebookPlayerUrl(preview.url);
-    const nextThumbnail = preview.thumbnail_url || row.thumbnail_url || null;
+    const nextThumbnail = row.thumbnail_url || preview.thumbnail_url || null;
     await env.DB.prepare(
-      "UPDATE videos SET embed_url = COALESCE(?, embed_url), thumbnail_url = COALESCE(?, thumbnail_url), updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id = ?",
-    ).bind(nextEmbed || null, nextThumbnail, Number(row.id)).run();
+      "UPDATE videos SET embed_url = COALESCE(?, embed_url), thumbnail_url = COALESCE(NULLIF(thumbnail_url, ''), ?) WHERE id = ? AND source_url = ?",
+    ).bind(nextEmbed || null, nextThumbnail, Number(row.id), row.source_url).run();
+    if (nextThumbnail && safeFacebookThumbnailUrl(nextThumbnail)) {
+      await readFacebookPoster(env, { ...row, thumbnail_url: nextThumbnail }, async () => preview);
+    }
   } catch (error) {
     console.error("Facebook preview enrichment failed", error?.message || error);
   }
@@ -2312,9 +2327,20 @@ async function uniqueSlug(env, title, requested) {
   for (let attempt = 0; attempt < 8; attempt += 1) {
     const candidate = attempt === 0 ? base : `${base}-${crypto.randomUUID().slice(0, 6)}`;
     const exists = await env.DB.prepare("SELECT 1 FROM videos WHERE slug = ?").bind(candidate).first();
-    if (!exists) return candidate;
+    if (!exists && !await slugWasUsed(env, candidate)) return candidate;
   }
   return `${base}-${Date.now().toString(36)}`;
+}
+
+async function slugWasUsed(env, slug) {
+  return Boolean(await env.DB.prepare("SELECT 1 FROM video_slug_redirects WHERE old_slug = ?").bind(slug).first());
+}
+
+async function readSlugRedirect(env, slug) {
+  const row = await env.DB.prepare(
+    "SELECT v.slug FROM video_slug_redirects r JOIN videos v ON v.id = r.video_id WHERE r.old_slug = ? AND v.published = 1 AND v.slug != r.old_slug",
+  ).bind(slug).first();
+  return row?.slug || null;
 }
 
 function slugify(value) {
@@ -2913,7 +2939,15 @@ async function watchPage(request, env, ctx, slugInput) {
      LEFT JOIN video_source_metadata m ON m.video_id = v.id
      WHERE v.slug = ? AND v.published = 1`,
   ).bind(slug).first();
-  if (!row) return dynamicHtml(notFoundPage(), 404);
+  if (!row) {
+    const target = await readSlugRedirect(env, slug);
+    if (target) {
+      const location = new URL(request.url);
+      location.pathname = "/watch/" + encodeURIComponent(target);
+      return Response.redirect(location.toString(), 301);
+    }
+    return dynamicHtml(notFoundPage(), 404);
+  }
   await enrichFacebookRows(env, [row]);
   const [video] = await hydrateVideos(env, [row]);
   if (video.provider === "tiktok") {
@@ -3493,6 +3527,15 @@ function safeInstagramThumbnailUrl(value) {
 
 async function facebookThumbnailEndpoint(request, env) {
   const url = new URL(request.url);
+  if (url.searchParams.has("id")) {
+    const id = url.searchParams.get("id");
+    if (!/^[1-9]\d{0,8}$/.test(id || "")) throw new AppError(400, "Invalid video ID");
+    const row = await env.DB.prepare("SELECT id,source_url,thumbnail_url FROM videos WHERE id = ? AND published = 1").bind(Number(id)).first();
+    if (!row || !isFacebookUrl(row.source_url)) throw new AppError(404, "Video not found");
+    const image = await readFacebookPoster(env, row, () => fetchFacebookPreview(env, row.source_url));
+    if (!image) throw new AppError(404, "Facebook thumbnail is unavailable");
+    return image;
+  }
   const requested = cleanText(url.searchParams.get("url"), 2000);
   if (!requested || !isFacebookUrl(requested)) throw new AppError(400, "Add a Facebook video URL");
   let normalized;

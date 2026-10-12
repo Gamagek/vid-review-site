@@ -358,19 +358,26 @@ function mountFacebookFacade(card) {
     return;
   }
 
-  // Keep the homepage tile as a stable thumbnail card. Facebook's signed
-  // CDN image URLs expire, so request the server-side cached thumbnail route.
+  // Small local covers appear without a provider request. Signed CDN covers
+  // use the durable server poster instead of resolving the share link again.
   const poster = document.createElement("img");
   poster.className = "facebook-facade-poster";
   poster.alt = "";
   poster.loading = isNearViewport(card) ? "eager" : "lazy";
   poster.decoding = "async";
   poster.referrerPolicy = "no-referrer";
-  poster.src = "/api/facebook/thumbnail?url=" + encodeURIComponent(source);
+  poster.width = 384;
+  poster.height = 216;
+  const savedPoster = card.dataset.videoThumbnail || "";
+  poster.src = savedPoster || "/api/facebook/thumbnail?id=" + encodeURIComponent(card.dataset.videoId || "");
+  const fallback = card.querySelector(".media-fallback");
+  poster.addEventListener("load", () => {
+    if (fallback) fallback.hidden = true;
+  }, { once: true });
   poster.addEventListener("error", () => {
     poster.hidden = true;
-    const fallback = surface.querySelector(".media-fallback");
     if (fallback) fallback.hidden = false;
+    surface.style.background = "transparent";
   }, { once: true });
 
   const play = document.createElement("button");
@@ -379,16 +386,16 @@ function mountFacebookFacade(card) {
   play.setAttribute("aria-label", "Play Facebook video");
   play.textContent = "▶";
 
-  const fallback = surface.querySelector(".media-fallback");
   if (fallback) {
-    fallback.hidden = false;
-    fallback.textContent = "Facebook video";
+    fallback.hidden = Boolean(card.querySelector(".tile-media > img")?.complete && card.querySelector(".tile-media > img")?.naturalWidth);
+    fallback.textContent = "Facebook";
   }
   surface.replaceChildren(poster, play);
+  surface.removeAttribute("aria-hidden");
   surface.style.opacity = "1";
   card.classList.add("facebook-facade-ready");
   const status = card.querySelector(".preview-status");
-  if (status) status.textContent = "Tap to play Facebook video";
+  if (status) status.textContent = "Tap to preview · Open the title for the review";
 
   const activate = (event) => {
     event.preventDefault();
