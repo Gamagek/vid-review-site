@@ -19,13 +19,14 @@ function facade({ saveData = false, reducedMotion = false } = {}) {
   const card = { isConnected: true, dataset: { videoId: "162", videoProvider: "facebook", videoTitle: "Outdoor challenge", videoSource: "https://www.facebook.com/reel/123?tracking=private", videoThumbnail: "/facebook-previews/tiny.jpg" },
     classList: { add() {}, remove() {} }, getBoundingClientRect() { return { top: 0, bottom: 216 }; },
     querySelector(name) { return { ".tile-media": media, ".preview-surface": surface, ".media-fallback": fallback, ".preview-status": status, ".tile-media > img": cover }[name] || null; } };
+  media.closest = () => card;
   const timers = new Map(); let nextTimer = 0;
   const scope = { document: { hidden: false, addEventListener() {}, querySelectorAll() { return [card]; }, createElement: element },
     window: { innerHeight: 800, setTimeout(fn) { timers.set(++nextTimer, fn); return nextTimer; }, clearTimeout(id) { timers.delete(id); } },
     navigator: { connection: { saveData } }, matchMedia() { return { matches: reducedMotion }; }, URL, URLSearchParams, location: { origin: "https://vid.best" } };
   runInNewContext(source + "\nthis.testState = previewState;", scope);
   scope.mountFacebookFacade(card);
-  return { surface, fallback, status, card, scope, timers };
+  return { surface, fallback, status, media, card, scope, timers };
 }
 
 test("Facebook poster appears immediately; a visible tile starts its muted official player without a tap", () => {
@@ -78,7 +79,9 @@ test("Facebook tiles are observed and unsafe non-HTTPS sources cannot become pla
   const h = facade(); let observed;
   h.scope.testState.observer = { observe(card) { observed = card; } };
   h.scope.decorateVideoCards();
-  assert.equal(observed, h.card);
+  assert.equal(observed, h.media);
+  h.scope.handleVisibility([{ target: h.media, isIntersecting: true, intersectionRatio: 0.9 }]);
+  assert.equal(h.scope.testState.candidateCard, h.card);
   assert.equal(h.scope.safeFacebookDirectEmbed("", "http://www.facebook.com/reel/123"), "");
   assert.equal(h.scope.safeFacebookDirectEmbed("", "https://facebook.com.evil.test/reel/123"), "");
 });
