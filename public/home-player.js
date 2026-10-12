@@ -21,6 +21,7 @@ const previewState = {
   observer: null,
   activeCleanup: null,
   tiktokMetadataRequested: new Set(),
+  facebookControllers: new Map(),
 };
 
 document.addEventListener("DOMContentLoaded", initializePreviews);
@@ -58,6 +59,9 @@ function decorateVideoCards() {
 
     if (card.dataset.videoProvider === "facebook") {
       mountFacebookFacade(card);
+      media.addEventListener("pointerenter", () => schedulePreview(card));
+      media.addEventListener("focus", () => schedulePreview(card));
+      previewState.observer?.observe(card);
       return;
     }
 
@@ -118,7 +122,7 @@ function previewAvailabilityMessage(card) {
       : "TikTok preview needs a normal sharing link";
   }
   if (card.dataset.videoProvider === "facebook") {
-    return "Loading Facebook player…";
+    return "Muted preview loads when visible";
   }
   return canPreview(card) ? "Preview loads automatically" : "Open video to play";
 }
@@ -126,7 +130,7 @@ function previewAvailabilityMessage(card) {
 function canPreview(card) {
   const provider = card.dataset.videoProvider;
   if (provider === "tiktok") return false;
-  if (provider === "facebook") return false;
+  if (provider === "facebook") return Boolean(safeFacebookDirectEmbed(card.dataset.videoEmbed, card.dataset.videoSource));
   const direct = Boolean(card.dataset.videoSource) && ["direct", "raw", "r2"].includes(provider);
   const embed = Boolean(card.dataset.videoEmbed) && EMBED_PREVIEW_PROVIDERS.has(provider);
   return direct || embed;
@@ -167,6 +171,7 @@ function chooseVisibleCandidate() {
     ? previewState.visibility.get(previewState.activeCard) || 0
     : 0;
 
+  if (previewState.activeCard?.dataset.videoProvider === "facebook" && activeTikTokIsFullscreen(previewState.activeCard)) return;
   if (previewState.activeCard?.dataset.videoProvider === "tiktok") {
     if (activeTikTokIsFullscreen(previewState.activeCard)) return;
     if (activeRatio < ACTIVE_MIN_VISIBILITY) stopPreview(previewState.activeCard);
@@ -227,6 +232,11 @@ function startPreview(card) {
   previewState.candidateCard = null;
   previewState.timer = null;
   stopPreview();
+  if (card.dataset.videoProvider === "facebook") {
+    card.classList.remove("preview-pending");
+    mountFacebookDirectPlayer(card);
+    return;
+  }
   const surface = card.querySelector(".preview-surface");
   const player = createPreviewPlayer(card);
   card.classList.remove("preview-pending");
@@ -320,6 +330,7 @@ function safePreviewEmbed(value, provider) {
 
 function stopPreview(card = null, statusMessage = "") {
   if (card && previewState.activeCard !== card) return;
+  if (!card) cancelCandidate();
   const active = previewState.activeCard;
   if (!active) return;
   const provider = active.dataset.videoProvider;
@@ -334,6 +345,14 @@ function stopPreview(card = null, statusMessage = "") {
   active.classList.remove("facebook-facade-ready");
   active.classList.remove("facebook-direct-player-ready");
   previewState.activeCard = null;
+
+  if (provider === "facebook") {
+    delete active.dataset.facebookPlayerMounted;
+    delete active.dataset.facebookPlayback;
+    previewState.facebookControllers.delete(active);
+    mountFacebookFacade(active);
+    return;
+  }
 
   if (provider === "tiktok") {
     renderTikTokFacade(active);
@@ -395,30 +414,26 @@ function mountFacebookFacade(card) {
   surface.style.opacity = "1";
   card.classList.add("facebook-facade-ready");
   const status = card.querySelector(".preview-status");
-  if (status) status.textContent = "Tap to preview · Open the title for the review";
+  if (status) status.textContent = previewsAllowed()
+    ? "Muted preview loads when visible · Tap for sound"
+    : "Tap to play · Open the title for the review";
 
   const activate = (event) => {
     event.preventDefault();
     event.stopPropagation();
-    if (card.dataset.facebookPlayerMounted === "1") return;
-    const iframe = document.createElement("iframe");
-    iframe.className = "facebook-direct-player";
-    iframe.src = embedUrl;
-    iframe.title = card.dataset.videoTitle || "Facebook video";
-    iframe.loading = "eager";
-    iframe.referrerPolicy = "strict-origin-when-cross-origin";
-    iframe.allow = "autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share; fullscreen";
-    iframe.allowFullscreen = true;
-    iframe.setAttribute("playsinline", "true");
-    surface.replaceChildren(iframe);
-    card.dataset.facebookPlayerMounted = "1";
-    if (status) status.textContent = "";
+    const controller = previewState.facebookControllers.get(card);
+    if (controller) controller.play({ sound: true });
+    else mountFacebookDirectPlayer(card, true);
   };
   play.addEventListener("click", activate);
-  surface.addEventListener("click", activate, { once: true });
+  // Bind once: restoring a poster after scrolling must not accumulate handlers.
+  if (card.dataset.facebookSurfaceBound !== "1") {
+    surface.addEventListener("click", activate);
+    card.dataset.facebookSurfaceBound = "1";
+  }
 }
 
-function mountFacebookDirectPlayer(card) {
+function mountFacebookDirectPlayer(card, sound = false) {
   if (!card?.isConnected || card.dataset.facebookPlayerMounted === "1") return;
   const surface = card.querySelector(".preview-surface");
   if (!surface) return;
@@ -430,6 +445,48 @@ function mountFacebookDirectPlayer(card) {
     return;
   }
 
+  cancelCandidate();
+  stopPreview();
+  previewState.activeCard = card;
+  card.dataset.facebookPlayerMounted = "1";
+  card.classList.add("preview-playing");
+  const status = card.querySelector(".preview-status");
+  const poster = surface.querySelector(".facebook-facade-poster");
+  const play = surface.querySelector(".facebook-facade-play");
+
+  if (window.VidBestFacebookPreview) {
+    const source = new URL(embedUrl).searchParams.get("href");
+    const controller = window.VidBestFacebookPreview.mount(surface, {
+      source,
+      title: card.dataset.videoTitle,
+      onState(value) {
+        if (previewState.activeCard !== card) return;
+        card.dataset.facebookPlayback = value;
+        if (value === "ready" || value === "playing" || value === "paused" || value === "ended") {
+          if (poster) poster.hidden = true;
+          if (play) {
+            play.classList.add("facebook-sound-toggle");
+            play.textContent = value === "playing" ? "♫" : "▶";
+            play.setAttribute("aria-label", value === "playing" ? "Enable Facebook preview sound" : "Play Facebook video");
+          }
+        }
+        if (status) status.textContent = value === "playing" ? "Facebook preview · Tap for sound"
+          : value === "loading" ? "Loading muted Facebook preview…" : "Tap to play on Facebook player";
+      },
+      onError() {
+        if (previewState.activeCard !== card) return;
+        mountFacebookIframeFallback(card, surface, embedUrl);
+      },
+    });
+    previewState.facebookControllers.set(card, controller);
+    previewState.activeCleanup = () => controller.destroy();
+    if (sound) controller.play({ sound: true });
+    return;
+  }
+  mountFacebookIframeFallback(card, surface, embedUrl);
+}
+
+function mountFacebookIframeFallback(card, surface, embedUrl) {
   const nearViewport = isNearViewport(card);
   const iframe = document.createElement("iframe");
   iframe.className = "facebook-direct-player";
@@ -447,7 +504,7 @@ function mountFacebookDirectPlayer(card) {
   card.classList.add("facebook-direct-player-ready");
   card.dataset.facebookPlayerMounted = "1";
   const status = card.querySelector(".preview-status");
-  if (status) status.textContent = "";
+  if (status) status.textContent = "Tap the Facebook player to play";
 }
 
 function isNearViewport(card) {
@@ -466,6 +523,10 @@ function safeFacebookDirectEmbed(embedValue, sourceValue) {
       embed.pathname === "/plugins/video.php" &&
       isFacebookDirectSource(href)
     ) {
+      const canonical = new URL(href);
+      canonical.search = "";
+      canonical.hash = "";
+      embed.searchParams.set("href", canonical.toString());
       embed.searchParams.set("show_text", "false");
       embed.searchParams.set("autoplay", "true");
       embed.searchParams.set("muted", "true");
@@ -476,7 +537,9 @@ function safeFacebookDirectEmbed(embedValue, sourceValue) {
   try {
     const source = new URL(String(sourceValue || ""));
     const host = source.hostname.toLowerCase().replace(/^www\./, "");
-    if (!(host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch")) return "";
+    if (source.protocol !== "https:" || !(host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch")) return "";
+    source.search = "";
+    source.hash = "";
     const params = new URLSearchParams({
       height: "314",
       href: source.toString(),
@@ -496,7 +559,7 @@ function isFacebookDirectSource(value) {
   try {
     const url = new URL(value);
     const host = url.hostname.toLowerCase().replace(/^www\./, "");
-    return host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch";
+    return url.protocol === "https:" && (host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch");
   } catch {
     return false;
   }
