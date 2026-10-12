@@ -199,8 +199,24 @@ export async function googleAccessToken(secret, { fetchImpl = globalThis.fetch, 
   return data.access_token;
 }
 
+async function readSitemapProcessing(fetchImpl, property, sitemap, headers, wait) {
+  try {
+    const response = await request(fetchImpl, property + '/sitemaps/' + encodeURIComponent(sitemap), {headers}, wait);
+    if (!response.ok) { await response.body?.cancel(); return {status:'not_verified',error:'google_sitemap_status_http_' + response.status}; }
+    const feed = JSON.parse(await boundedText(response));
+    if (feed.path !== sitemap) throw new AuditError('invalid_google_sitemap_status');
+    const state = {status:'verified'};
+    if (typeof feed.isPending === 'boolean') state.isPending = feed.isPending;
+    for (const field of ['lastDownloaded','lastSubmitted']) {
+      if (typeof feed[field] === 'string' && /^\d{4}-\d{2}-\d{2}T[0-9:.+-]+Z?$/.test(feed[field])) state[field] = feed[field].slice(0,40);
+    }
+    for (const field of ['errors','warnings']) if (/^\d{1,12}$/.test(String(feed[field]))) state[field] = Number(feed[field]);
+    return state;
+  } catch (error) { return {status:'not_verified',error:safeCode(error)}; }
+}
+
 export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:vid.best', budget = 200,
-  fetchImpl = globalThis.fetch, wait = delay, now = Date.now(), getToken = googleAccessToken,
+  reviewSitemaps = [], fetchImpl = globalThis.fetch, wait = delay, now = Date.now(), getToken = googleAccessToken,
   progress = () => {} } = {}) {
   const result = { status: secret ? 'pending' : 'not_configured', authenticated: false,
     propertyVerified: false, sitemapSubmitted: false, inspections: [] };
@@ -208,6 +224,9 @@ export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:v
   let stage = 'authenticate';
   try {
     if (!['sc-domain:vid.best', ORIGIN + '/'].includes(site)) throw new AuditError('invalid_search_console_property');
+    const maps = [...new Set(reviewSitemaps.map(publicUrl))];
+    if (maps.length > 10 || maps.some(url => !/^https:\/\/vid\.best\/sitemaps\/videos-[1-9]\d*\.xml$/.test(url))) throw new AuditError('invalid_review_sitemap');
+
     progress('Google credentials configured; requesting OAuth access.');
     const token = await getToken(secret, { fetchImpl, wait, now });
     result.authenticated = true;
@@ -227,34 +246,21 @@ export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:v
     await submit.body?.cancel();
     result.sitemapSubmitted = true;
     progress('Published sitemap accepted by Google.');
-    // Acceptance is not proof that Google has downloaded or processed the sitemap.
-    result.sitemapProcessing = {status:'not_verified'};
-    try {
-      const response = await request(fetchImpl, property + '/sitemaps/' + encodeURIComponent(SITEMAP), {headers}, wait);
-      if (!response.ok) {
-        await response.body?.cancel();
-        result.sitemapProcessing.error = 'google_sitemap_status_http_' + response.status;
-      } else {
-        const feed = JSON.parse(await boundedText(response));
-        if (feed.path !== SITEMAP) throw new AuditError('invalid_google_sitemap_status');
-        const state = {status:'verified'};
-        if (typeof feed.isPending === 'boolean') state.isPending = feed.isPending;
-        for (const field of ['lastDownloaded','lastSubmitted']) {
-          if (typeof feed[field] === 'string' && /^\d{4}-\d{2}-\d{2}T[0-9:.+-]+Z?$/.test(feed[field])) state[field] = feed[field].slice(0,40);
-        }
-        for (const field of ['errors','warnings']) {
-          if (/^\d{1,12}$/.test(String(feed[field]))) state[field] = Number(feed[field]);
-        }
-        result.sitemapProcessing = state;
-        progress('Google sitemap processing status verified; pending: ' + (state.isPending ?? 'unspecified')
-          + '; last downloaded: ' + (state.lastDownloaded || 'not reported')
-          + '; errors: ' + (state.errors ?? 'not reported') + '; warnings: ' + (state.warnings ?? 'not reported') + '.');
-      }
-    } catch (error) { result.sitemapProcessing.error = safeCode(error); }
-
+    // Acceptance is not proof that Google downloaded the index or its children.
+    result.sitemapProcessing = await readSitemapProcessing(fetchImpl, property, SITEMAP, headers, wait);
+    result.reviewSitemaps = [];
+    stage = 'submit_review_sitemaps';
+    for (const sitemap of maps) {
+      const response = await request(fetchImpl, property + '/sitemaps/' + encodeURIComponent(sitemap), {method:'PUT',headers}, wait);
+      if (!response.ok) { await response.body?.cancel(); throw new AuditError('google_review_sitemap_http_' + response.status); }
+      await response.body?.cancel();
+      const processing = await readSitemapProcessing(fetchImpl, property, sitemap, headers, wait);
+      result.reviewSitemaps.push({url:sitemap,submitted:true,processing});
+      progress('Review sitemap accepted by Google; processing: ' + processing.status + '; pending: ' + (processing.isPending ?? 'not_verified') + '; last downloaded: ' + (processing.lastDownloaded || 'not_reported') + '.');
+    }
     stage = 'inspect_index_status';
     const reviews = [...new Set(urls.map(publicUrl).filter(url => new URL(url).pathname.startsWith('/watch/')))].sort();
-    const limit = Math.min(200, Math.max(1, Number(budget) || 200));
+    const limit = Math.min(200, Math.max(0, Number.isFinite(Number(budget)) ? Number(budget) : 200));
     const offset = Math.floor(now / 86400000) * limit % Math.max(1, reviews.length);
     const selected = reviews.slice(offset).concat(reviews.slice(0, offset)).slice(0, limit);
     result.totalReviews = reviews.length;
@@ -331,7 +337,8 @@ export async function runAudit({ fetchImpl = globalThis.fetch, wait = delay, sec
     report.publicAuditStatus = !report.errors.length && !report.failedPages ? 'success' : 'failed';
     progress('Public checks complete: ' + report.publicAuditStatus + '; pages checked: ' + report.pages.length + '.');
     report.searchConsole = report.publicAuditStatus === 'success'
-      ? await syncSearchConsole(discovered.urls, { secret, site, budget, now, fetchImpl, wait, getToken, progress })
+      ? await syncSearchConsole(discovered.urls, { secret, site, budget, now, fetchImpl, wait, getToken, progress,
+          reviewSitemaps: discovered.maps.map(map => map.url).filter(url => /\/sitemaps\/videos-\d+\.xml$/.test(url)) })
       : { status: 'skipped_public_audit_failed', sitemapSubmitted: false, inspections: [] };
   } catch (error) { report.errors.push(safeCode(error)); report.publicAuditStatus = 'failed'; }
   return report;
@@ -358,6 +365,7 @@ export function summary(report) {
       + '; warnings: ' + (google.sitemapProcessing.warnings ?? 'not_reported') : '',
     google?.sitemapProcessing?.error ? 'Sitemap processing diagnostic: ' + google.sitemapProcessing.error : '',
 
+    google?.reviewSitemaps?.length ? 'Review sitemaps submitted separately: ' + google.reviewSitemaps.length + '; processing: ' + JSON.stringify(google.reviewSitemaps.map(row => row.processing)) : '',
     'Stored Google index inspections: ' + (google?.inspections?.length || 0) + '; PASS: ' + indexed,
     google?.inspections?.length ? 'Stored Google coverage: discovered/not indexed: ' + coverageCount('Discovered - currently not indexed')
       + '; unknown to Google: ' + coverageCount('URL is unknown to Google')
