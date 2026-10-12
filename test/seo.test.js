@@ -376,6 +376,7 @@ test("Facebook sitemap, watch page, topic and directory share a crawlable stable
   for (const path of ['/watch/facebook-poster-1','/category/technology','/videos']) {
     const html = await (await request(context, `https://vid.best${path}`, {headers:{'User-Agent':'Googlebot'}})).text();
     assert.ok(html.includes(poster) || html.includes(poster.replace('https://vid.best', '')));
+    if (path === '/category/technology') assert.ok(html.includes(`<meta property="og:image" content="${poster}">`));
     assert.doesNotMatch(html, /expires=old|scontent/);
   }
   const robots = await (await request(context, 'https://vid.best/robots.txt')).text();
