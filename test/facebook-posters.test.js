@@ -52,3 +52,32 @@ test("poster storage rejects HTML, oversized images and non-provider fetch targe
     assert.equal(env.BUCKET.data.size, 0);
   } finally { globalThis.fetch = original; }
 });
+
+test("a Facebook page pasted as a cover uses its actual preview image", async () => {
+  const original = globalThis.fetch, env = { BUCKET: bucket() };
+  const requested = [];
+  globalThis.fetch = async url => {
+    requested.push(url);
+    return new Response(new Uint8Array([255,216,255,217]), {headers:{'Content-Type':'image/jpeg'}});
+  };
+  try {
+    const response = await readFacebookPoster(env, {...row, thumbnail_url:row.source_url}, async () => ({thumbnail_url:'https://scontent.xx.fbcdn.net/actual.jpg'}));
+    assert.equal(response.status, 200);
+    assert.deepEqual(requested, ['https://scontent.xx.fbcdn.net/actual.jpg']);
+    assert.equal(env.BUCKET.data.size, 1);
+  } finally { globalThis.fetch = original; }
+});
+
+test("an expired provider image retries a refreshed poster once and caches it", async () => {
+  const original = globalThis.fetch, env = { BUCKET: bucket() };
+  let requests = 0;
+  globalThis.fetch = async () => ++requests === 1
+    ? new Response('expired', {status:403})
+    : new Response(new Uint8Array([255,216,255,217]), {headers:{'Content-Type':'image/jpeg'}});
+  try {
+    const response = await readFacebookPoster(env, row, async () => ({thumbnail_url:'https://scontent.xx.fbcdn.net/fresh.jpg'}));
+    assert.equal(response.status, 200);
+    assert.equal(requests, 2);
+    assert.equal(env.BUCKET.data.size, 1);
+  } finally { globalThis.fetch = original; }
+});

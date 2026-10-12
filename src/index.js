@@ -3923,7 +3923,7 @@ async function videoSitemapResponse(request, env, page) {
   if (!Number.isSafeInteger(page) || page < 1 || page > 50000) throw new AppError(404, "Sitemap page not found");
   const base = getBaseUrl(request, env);
   const result = await env.DB.prepare(
-    `SELECT v.slug, v.title, v.description, v.seo_description, v.thumbnail_url,
+    `SELECT v.id, v.slug, v.title, v.description, v.seo_description, v.thumbnail_url,
             v.embed_url, v.source_url, v.media_type, v.created_at, v.updated_at,
             m.source_published_at, m.source_duration
      FROM videos v
@@ -3938,7 +3938,7 @@ async function videoSitemapResponse(request, env, page) {
     const canonical = `${base}/watch/${encodeURIComponent(row.slug)}`;
     const provider = detectMediaProvider(row);
     const thumbnail = row.thumbnail_url
-      ? absoluteUrl(row.thumbnail_url, base)
+      ? absoluteUrl(provider === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url, base)
       : provider === "tiktok"
         ? `${base}/api/tiktok/cached-poster?id=${encodeURIComponent(row.source_url.match(/\/video\/(\d+)/)?.[1] || "")}`
         : "";
@@ -3986,6 +3986,8 @@ function robotsResponse(request, env) {
     "Disallow: /api/",
     "Allow: /api/tiktok/cached-poster",
     "Allow: /api/tiktok/preflight",
+    "Allow: /api/facebook/thumbnail",
+    "Allow: /api/instagram/thumbnail",
     `Sitemap: ${base}/sitemap.xml`,
   ].join("\n") + "\n";
   return new Response(body, {
