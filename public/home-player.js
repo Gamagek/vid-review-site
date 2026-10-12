@@ -61,7 +61,9 @@ function decorateVideoCards() {
       mountFacebookFacade(card);
       media.addEventListener("pointerenter", () => schedulePreview(card));
       media.addEventListener("focus", () => schedulePreview(card));
-      previewState.observer?.observe(card);
+      // Review text can be taller than the phone viewport. Autoplay follows
+      // the actual video rectangle, rather than the whole review card.
+      previewState.observer?.observe(media);
       return;
     }
 
@@ -153,7 +155,8 @@ function parseTikTokShareUrl(value) {
 
 function handleVisibility(entries) {
   entries.forEach((entry) => {
-    previewState.visibility.set(entry.target, entry.isIntersecting ? entry.intersectionRatio : 0);
+    const card = entry.target.closest?.(".video-tile") || entry.target;
+    previewState.visibility.set(card, entry.isIntersecting ? entry.intersectionRatio : 0);
 
   });
   chooseVisibleCandidate();
