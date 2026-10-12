@@ -1,0 +1,7 @@
+# Editorial cover provenance
+
+`public/review-covers/digital-love-illustrated-v1.webp` was generated with the built-in imagegen tool for published review 88, which had no cover. This is an abstract editorial illustration based on the saved title, not a frame or an assertion about unseen video scenes. Visible labels: DIGITAL LOVE; ART REVIEW; Illustrated review cover; Vid.Best. No performers, scenes, rankings or SEO promises were invented. The original generation was visually checked; WebP delivery encoding preserves its composition and dimensions while reducing transfer size. The migration fills only the missing cover of the exact record and leaves every other field, including both dates, unchanged.
+
+Prompt: Create a 16:9 Vid.Best illustrated review cover for Romantic AI Art: The Beauty of Digital Love & Sweet Moments. Abstract glowing heart of digital particles and ribbons of light, deep navy with soft pink/peach accents, no people or invented video scenes. Exact text DIGITAL LOVE, ART REVIEW, Illustrated review cover, Vid.Best. High contrast, safe margins, no clickbait or search-ranking claims.
+
+Existing valid source posters and owner covers should be preserved. Continue per-video inventory from the credential-free thumbnail artifact; generate further illustrative covers only when appropriate and visibly distinguish them from actual source frames.
