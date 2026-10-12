@@ -22,6 +22,7 @@ const migrations = [
   "0018_tiktok_oembed_cache.sql",
   "0019_tiktok_oembed_backfill.sql",
   "0020_member_personalization.sql",
+  "0022_facebook_readable_slugs.sql",
 ];
 
 class TestD1Statement {
@@ -1726,6 +1727,9 @@ test("enriches Facebook share links with a Microlink-style thumbnail and officia
         { status: 200, headers: { "Content-Type": "text/html" } },
       );
     }
+    if (value === "https://scontent.xx.fbcdn.net/test.jpg") {
+      return new Response(new Uint8Array([255,216,255,217]), { headers: { "Content-Type": "image/jpeg" } });
+    }
     throw new Error("Unexpected Facebook request: " + value);
   };
   try {
@@ -1733,7 +1737,8 @@ test("enriches Facebook share links with a Microlink-style thumbnail and officia
     assert.equal(response.status, 200);
     const result = await response.json();
     assert.equal(result.video.provider, "facebook");
-    assert.equal(result.video.thumbnail_url, "https://scontent.xx.fbcdn.net/test.jpg");
+    assert.match(result.video.thumbnail_url, /^\/api\/facebook\/thumbnail\?id=\d+&v=/);
+    assert.equal((await send(context, result.video.thumbnail_url)).headers.get("Content-Type"), "image/jpeg");
     assert.equal(result.video.facebook_preview_title, "Pause for a moment, Breathe, Observe.");
     assert.match(result.video.facebook_preview_description, /Theravada Vipassana/);
     assert.ok(result.video.embed_url.includes("facebook.com/plugins/video.php"));
@@ -2398,4 +2403,68 @@ test('TikTok edge hits preserve stale status and reject metadata older than seve
     if (oldCaches === undefined) delete globalThis.caches;
     else globalThis.caches = oldCaches;
   }
+});
+
+test("placeholder migrations preserve dates and drafts while old published URLs redirect", async () => {
+  const context = createTestContext();
+  const oldSlug = "facebook-reel-pending-24";
+  const canonical = "outdoor-challenge-comedy-big-reactions-around-the-table";
+  const source = "https://www.facebook.com/reel/123";
+  const embed = "https://www.facebook.com/plugins/video.php?href=" + encodeURIComponent(source);
+  context.sqlite.prepare(`INSERT INTO videos (slug,title,source_url,embed_url,media_type,primary_category,subcategory,description,review_text,thumbnail_url,published,created_at,updated_at)
+    VALUES (?, 'Outdoor challenge', ?, ?, 'facebook','Other','Other','Saved description','Saved review','https://vid.best/facebook-previews/local.jpg',1,'2026-10-11T21:26:22.701Z','2026-10-12T06:02:21.964Z')`).run(oldSlug, source, embed);
+  context.sqlite.prepare(`INSERT INTO videos (slug,title,source_url,media_type,primary_category,subcategory,published)
+    VALUES ('facebook-reel-pending-01','Draft reaction',?,'facebook','Other','Other',0)`).run(source);
+  const before = context.sqlite.prepare("SELECT * FROM videos WHERE slug=?").get(oldSlug);
+  const migration = readFileSync(new URL("../migrations/0022_facebook_readable_slugs.sql",import.meta.url),"utf8");
+  context.sqlite.exec(migration);
+  context.sqlite.exec(migration);
+  const after = context.sqlite.prepare("SELECT * FROM videos WHERE id=?").get(before.id);
+  assert.deepEqual({ ...after, slug: oldSlug }, { ...before });
+  const redirect = await send(context, "/watch/" + oldSlug + "?viewer=1");
+  assert.equal(redirect.status,301);
+  assert.equal(redirect.headers.get("Location"),"https://example.com/watch/" + canonical + "?viewer=1");
+  const page = await send(context,"/watch/" + canonical + "?viewer=1");
+  assert.equal(page.status,200);
+  assert.match(await page.text(), /Outdoor challenge/);
+  const api = await send(context,"/api/videos/" + oldSlug);
+  assert.equal((await api.json()).video.slug,canonical);
+  const draft = context.sqlite.prepare("SELECT * FROM videos WHERE title='Draft reaction'").get();
+  assert.equal(draft.published,0);
+  assert.equal((await send(context,"/watch/facebook-reel-pending-01")).status,404);
+  assert.equal((await send(context,"/watch/" + draft.slug)).status,404);
+});
+
+test("Facebook feed does not wait on external metadata and exposes a stable poster URL", async () => {
+  const context = createTestContext();
+  context.sqlite.exec(`INSERT INTO videos (slug,title,source_url,media_type,primary_category,subcategory,published)
+    VALUES ('fast-facebook','Fast Facebook','https://www.facebook.com/reel/999','facebook','Other','Other',1)`);
+  const original = globalThis.fetch;
+  let requests = 0;
+  globalThis.fetch = async () => { requests++; throw new Error("Provider unavailable"); };
+  try {
+    const response = await send(context,"/api/videos");
+    assert.equal(response.status,200);
+    const { videos } = await response.json();
+    assert.match(videos[0].thumbnail_url,/^\/api\/facebook\/thumbnail\?id=\d+&v=/);
+    assert.equal(requests,0);
+  } finally { globalThis.fetch = original; }
+});
+
+test("poster requests preserve video dates and never reveal draft images by ID", async () => {
+  const context = createTestContext();
+  context.sqlite.exec(`INSERT INTO videos (slug,title,source_url,media_type,primary_category,subcategory,thumbnail_url,published,created_at,updated_at)
+    VALUES ('cached-facebook','Cached','https://www.facebook.com/reel/123','facebook','Other','Other','https://scontent.xx.fbcdn.net/cover.jpg',1,'2026-01-01','2026-02-01'),
+           ('draft-facebook','Draft','https://www.facebook.com/reel/456','facebook','Other','Other','https://scontent.xx.fbcdn.net/draft.jpg',0,'2026-01-01','2026-02-01')`);
+  const rows = context.sqlite.prepare("SELECT * FROM videos ORDER BY id").all();
+  const original = globalThis.fetch;
+  globalThis.fetch = async () => new Response(new Uint8Array([255,216,255,217]),{headers:{"Content-Type":"image/jpeg"}});
+  try {
+    assert.equal((await send(context,"/api/facebook/thumbnail?id=" + rows[0].id)).status,200);
+    globalThis.fetch = async () => { throw new Error("Expired"); };
+    assert.equal((await send(context,"/api/facebook/thumbnail?id=" + rows[0].id)).status,200);
+    assert.equal((await send(context,"/api/facebook/thumbnail?id=" + rows[1].id)).status,404);
+    assert.equal((await send(context,"/api/facebook/thumbnail?id=0")).status,400);
+    assert.deepEqual(context.sqlite.prepare("SELECT * FROM videos ORDER BY id").all(),rows);
+  } finally { globalThis.fetch = original; }
 });
