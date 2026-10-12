@@ -42,6 +42,30 @@ jobs:
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
+      - name: Verify deployed gratitude cover and stale public poster address
+        if: ${{ github.event_name == 'workflow_run' }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          const cover = 'https://vid.best/review-covers/remembering-kindness-illustrated-v1.webp';
+          const image = await fetch(cover, {redirect:'manual', signal:AbortSignal.timeout(15000)});
+          const type = (image.headers.get('content-type') || '').split(';')[0];
+          assert.equal(image.status, 200); assert.equal(type, 'image/webp');
+          assert.equal(Number(image.headers.get('content-length')), 91398);
+          await image.body?.cancel();
+          const old = await fetch('https://vid.best/api/facebook/thumbnail?id=160&v=old-version', {redirect:'manual', signal:AbortSignal.timeout(15000)});
+          const location = old.headers.get('location');
+          if (old.status === 302) {
+            const target = new URL(location);
+            assert.equal(target.origin, 'https://vid.best');
+            assert.match(target.pathname, /^\/(?:review-covers|facebook-previews|media)\/.+\.(?:jpe?g|png|webp|avif|gif)$/i);
+            assert.equal(target.search, ''); assert.equal(target.hash, '');
+          }
+          // Owner cover edits may change this destination; report rather than overwrite or fail them.
+          await old.body?.cancel();
+          console.log(JSON.stringify({hostedCoverStatus:image.status,contentType:type,bytes:91398,stalePosterStatus:old.status,redirectMatchesIllustration:location === cover}));
+          JS
+
       - name: Audit published thumbnail HTTP availability without credentials
         run: node scripts/thumbnail-audit.mjs
 
@@ -51,7 +75,8 @@ jobs:
         env:
           GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON }}
           GOOGLE_SEARCH_CONSOLE_PROPERTY: ${{ vars.GOOGLE_SEARCH_CONSOLE_PROPERTY || 'sc-domain:vid.best' }}
-          GOOGLE_SEARCH_CONSOLE_INSPECTIONS: ${{ github.event_name == 'push' && '0' || '200' }}
+          # Daily/manual audits inspect URLs; repeated deployments only read sitemap processing state.
+          GOOGLE_SEARCH_CONSOLE_INSPECTIONS: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && '200' || '0' }}
       - name: Publish concise indexing summary
         if: ${{ always() }}
         shell: bash
