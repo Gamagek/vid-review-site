@@ -1,6 +1,11 @@
 name: Review indexing audit
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/search-console-audit.mjs
+      - .github/workflows/seo-audit.yml
   schedule:
     - cron: '47 4 * * *'
   workflow_dispatch:
@@ -18,7 +23,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ inputs.thumbnails_only && 'vidbest-thumbnail-audit' || 'vidbest-search-console-audit' }}
+  group: ${{ github.event_name == 'push' && 'vidbest-discovery-diagnostics' || inputs.thumbnails_only && 'vidbest-thumbnail-audit' || 'vidbest-search-console-audit' }}
   cancel-in-progress: false
 
 jobs:
@@ -45,7 +50,7 @@ jobs:
         env:
           GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON }}
           GOOGLE_SEARCH_CONSOLE_PROPERTY: ${{ vars.GOOGLE_SEARCH_CONSOLE_PROPERTY || 'sc-domain:vid.best' }}
-          GOOGLE_SEARCH_CONSOLE_INSPECTIONS: '200'
+          GOOGLE_SEARCH_CONSOLE_INSPECTIONS: ${{ github.event_name == 'push' && '0' || '200' }}
       - name: Publish concise indexing summary
         if: ${{ always() }}
         shell: bash

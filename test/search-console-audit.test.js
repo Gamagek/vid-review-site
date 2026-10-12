@@ -196,3 +196,28 @@ test('unavailable sitemap processing status remains unverified rather than false
   assert.deepEqual(result.sitemapProcessing,{status:'not_verified',error:'google_sitemap_status_http_404'});
   assert.doesNotMatch(JSON.stringify(result),/hidden-sentinel/);
 });
+
+
+test('discovered review sitemap can be submitted directly with zero URL inspections',async()=>{
+  const calls=[];const child=ORIGIN+'/sitemaps/videos-1.xml';
+  const result=await syncSearchConsole([ORIGIN+'/watch/a'],{secret:'configured',budget:0,reviewSitemaps:[child,child],getToken:async()=>'test-token',wait:noop,
+    fetchImpl:async(url,options)=>{
+      calls.push({url,method:options.method||'GET'});
+      if(options.method==='PUT')return new Response(null,{status:204});
+      if(url.includes('/sitemaps/'))return json({path:decodeURIComponent(url.split('/sitemaps/')[1]),isPending:true,errors:'0',warnings:'0'});
+      return json({permissionLevel:'siteOwner'});
+    }});
+  assert.equal(result.status,'success');assert.equal(result.inspections.length,0);
+  assert.equal(result.inspectionBudget,0);assert.equal(result.reviewSitemaps.length,1);
+  assert.equal(result.reviewSitemaps[0].submitted,true);assert.equal(result.reviewSitemaps[0].processing.isPending,true);
+  assert.equal(calls.filter(x=>x.method==='PUT').length,2);
+  assert.ok(calls.every(x=>!x.url.includes('urlInspection')&&!x.url.includes('indexing.googleapis')));
+});
+
+test('private or unrelated sitemap targets are rejected before Google authentication',async()=>{
+  for(const url of ['https://outside.example/sitemaps/videos-1.xml',ORIGIN+'/api/private',ORIGIN+'/sitemaps/videos-1.xml?secret=sentinel']){
+    let authenticated=false;
+    const result=await syncSearchConsole([],{secret:'configured',reviewSitemaps:[url],getToken:async()=>{authenticated=true;throw Error('must not authenticate')},wait:noop});
+    assert.equal(authenticated,false);assert.equal(result.status,'failed');assert.doesNotMatch(JSON.stringify(result),/sentinel/);
+  }
+});
