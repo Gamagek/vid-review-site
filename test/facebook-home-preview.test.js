@@ -85,3 +85,20 @@ test("Facebook tiles are observed and unsafe non-HTTPS sources cannot become pla
   assert.equal(h.scope.safeFacebookDirectEmbed("", "http://www.facebook.com/reel/123"), "");
   assert.equal(h.scope.safeFacebookDirectEmbed("", "https://facebook.com.evil.test/reel/123"), "");
 });
+
+test("Facebook watch and permalink links keep their identity when tracking is removed", () => {
+  const h = facade();
+  for (const input of ["https://www.facebook.com/watch/?v=123&fbclid=tracking", "https://www.facebook.com/permalink.php?story_fbid=456&id=789&rdid=tracking"]) {
+    for (const embed of ["", "https://www.facebook.com/plugins/video.php?href=" + encodeURIComponent(input)]) {
+      const player = new URL(h.scope.safeFacebookDirectEmbed(embed, input));
+      const href = new URL(player.searchParams.get("href"));
+      assert.equal(href.searchParams.get("fbclid"), null);
+      assert.equal(href.searchParams.get("rdid"), null);
+      if (href.pathname === "/watch/") assert.equal(href.searchParams.get("v"), "123");
+      else {
+        assert.equal(href.searchParams.get("story_fbid"), "456");
+        assert.equal(href.searchParams.get("id"), "789");
+      }
+    }
+  }
+});
