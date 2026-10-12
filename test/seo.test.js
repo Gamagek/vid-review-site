@@ -364,7 +364,7 @@ test("Facebook sitemap, watch page, topic and directory share a crawlable stable
     const source = `https://www.facebook.com/reel/1234567890${i}`;
     context.sqlite.prepare(`INSERT INTO videos
       (slug,title,source_url,embed_url,media_type,primary_category,subcategory,description,thumbnail_url,published,created_at,updated_at)
-      VALUES (?,?,?,?,'facebook','Technology','Web Development','An original review',?,1,'2024-01-02T03:04:05Z','2024-01-02T03:04:05Z')`)
+      VALUES (?,?,?,?,'facebook','Music','Music Videos','An original review',?,1,'2024-01-02T03:04:05Z','2024-01-02T03:04:05Z')`)
       .run(`facebook-poster-${i}`, `Facebook review ${i}`, source,
         `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(source)}`,
         `https://scontent.xx.fbcdn.net/poster-${i}.jpg?expires=old`);
@@ -373,9 +373,10 @@ test("Facebook sitemap, watch page, topic and directory share a crawlable stable
   const sitemap = await (await request(context, 'https://vid.best/sitemaps/videos-1.xml')).text();
   const poster = sitemap.match(/<video:thumbnail_loc>(https:\/\/vid.best\/api\/facebook\/thumbnail\?id=\d+&amp;v=[a-f0-9]+)<\/video:thumbnail_loc>/)[1];
   assert.doesNotMatch(sitemap, /NaN|expires=old|scontent/);
-  for (const path of ['/watch/facebook-poster-1','/category/technology','/videos']) {
+  for (const path of ['/watch/facebook-poster-1','/category/music','/videos']) {
     const html = await (await request(context, `https://vid.best${path}`, {headers:{'User-Agent':'Googlebot'}})).text();
     assert.ok(html.includes(poster) || html.includes(poster.replace('https://vid.best', '')));
+    if (path === '/category/music') assert.match(html, /<meta property="og:image" content="https:\/\/vid\.best\/api\/facebook\/thumbnail\?id=\d+&amp;v=[a-f0-9]+">/);
     assert.doesNotMatch(html, /expires=old|scontent/);
   }
   const robots = await (await request(context, 'https://vid.best/robots.txt')).text();

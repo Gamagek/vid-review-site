@@ -42,3 +42,12 @@ Cloudflare adaptive analytics for 2026-10-11 21:00 through 2026-10-12 21:00 UTC,
 Submit publicly verified review sitemap children separately through supported Search Console Sitemaps PUT, then read their processing state. On audit-code/config pushes, run diagnostics with zero URL Inspections; daily/post-deployment audits retain their bounded normal inspection budget. No unrestricted Indexing API, spoofed-user-agent access exception or security change is involved.
 
 Live posters for 160 and 161 returned HTTP 404 despite real browser playback of 160 (ant/gratitude footage). Public provider poster fallback can still be unavailable; remaining source-based covers are unfinished. Browser frame capture timed out, and downloadMedia reports blob downloads unsupported in embedded frames. Do not reuse rejected end-screen captures as thumbnails. Continue from actual source posters/frames or clearly labelled illustrations without inventing scenes.
+
+
+## Completed remote diagnostics
+
+Run 38308362850 succeeded: 149 published reviews, 163 public pages, zero technical failures; stored Google coverage 27 discovered/not indexed, 122 unknown, 0 indexed, 0 crawled/not indexed. Remote image audit: 115 image HTTP successes, 33 errors (13 TikTok CDN 403s, 19 Facebook poster 404s, one YouTube frame thumbnail 404), one missing lab/demo cover. These are request availability results, not visual-quality or Google eligibility guarantees.
+
+Run 38310446373 succeeded with zero URL Inspections. Google accepted the separate videos-1.xml submission. Google reports review sitemap lastDownloaded 2026-10-02T23:03:49.238Z, lastSubmitted 2026-10-12T21:26:50.743Z, isPending true, errors 0, warnings 0. Index sitemap lastDownloaded 2026-10-12T13:03:11.104Z, pending true, errors/warnings 0. This is evidence of stale review-sitemap processing; why Google schedules the crawl remains external, and the submission does not prove immediate indexing.
+
+Fill the last missing lab/demo cover with its actual source frame and make category Open Graph image URLs absolute. Preserve publish dates and source content; use the Recent reviews heading without an updated-date label. The remaining 33 provider poster failures require source-based or explicitly illustrative per-video replacement. The Dilscoop record's hq2.jpg is 404; the official same-video hqdefault.jpg could not be verified in this browser because of a Site Unavailable network screen. Do not treat that network screen as a YouTube takedown or bot block, and do not change the source/video ID blindly.

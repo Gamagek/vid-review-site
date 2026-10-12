@@ -175,7 +175,8 @@ function categoryCard(row) {
 
 function publicThumbnail(row) {
   if (!row.thumbnail_url) return "";
-  return cleanText(row.media_type === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url, 2000);
+  const value = cleanText(row.media_type === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url, 2000);
+  try { return new URL(value, CANONICAL_ORIGIN).href; } catch { return ""; }
 }
 
 function categoryPage(category, rows, total) {
@@ -425,7 +426,7 @@ async function enrichHomepageHtml(html, env) {
 
   if (recent.length && !output.includes('id="vidbest-recent-reviews"')) {
     const links = recent.map((row) => `<li><a href="${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}">${escapeHtml(row.title)}</a></li>`).join("");
-    output = output.replace("</main>", `<section id="vidbest-recent-reviews" class="section-pad" aria-labelledby="recent-reviews-heading"><h2 id="recent-reviews-heading">Recently updated reviews</h2><ul>${links}</ul><a class="button ghost" href="/videos">Browse all published videos</a></section></main>`);
+    output = output.replace("</main>", `<section id="vidbest-recent-reviews" class="section-pad" aria-labelledby="recent-reviews-heading"><h2 id="recent-reviews-heading">Recent reviews</h2><ul>${links}</ul><a class="button ghost" href="/videos">Browse all published videos</a></section></main>`);
   }
 
   if (!output.includes("vidbest-seo-topic-nav")) {
