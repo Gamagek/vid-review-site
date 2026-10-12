@@ -39,13 +39,51 @@ function initializePreviews() {
   decorateVideoCards();
   void loadCachedTikTokFacadePreviews();
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) stopPreview();
+    if (document.hidden) {
+      stopPreview();
+      if (activeFacebookPreview) {
+        const card = activeFacebookPreview;
+        card.querySelector(".preview-surface")?.replaceChildren();
+        card.dataset.facebookPlayerMounted = "0";
+        card.classList.remove("facebook-direct-player-ready");
+        activeFacebookPreview = null;
+        mountFacebookFacade(card);
+      }
+    }
     else chooseVisibleCandidate();
   });
   window.addEventListener("pagehide", () => stopPreview());
   document.addEventListener("fullscreenchange", chooseVisibleCandidate);
   document.addEventListener("webkitfullscreenchange", chooseVisibleCandidate);
 }
+
+// Keep Facebook iframe traffic bounded: at most one visible preview.
+let activeFacebookPreview = null;
+const facebookPreviewObserver = "IntersectionObserver" in window
+  ? new IntersectionObserver((entries) => {
+      if (document.hidden) return;
+      for (const entry of entries) {
+        const card = entry.target;
+        if (entry.intersectionRatio >= 0.75 && previewsAllowed()) {
+          if (activeFacebookPreview && activeFacebookPreview !== card) {
+            const old = activeFacebookPreview;
+            old.querySelector(".preview-surface")?.replaceChildren();
+            old.dataset.facebookPlayerMounted = "0";
+            old.classList.remove("facebook-direct-player-ready");
+            mountFacebookFacade(old);
+          }
+          activeFacebookPreview = card;
+          mountFacebookDirectPlayer(card);
+        } else if (activeFacebookPreview === card && entry.intersectionRatio < 0.2) {
+          card.querySelector(".preview-surface")?.replaceChildren();
+          card.dataset.facebookPlayerMounted = "0";
+          card.classList.remove("facebook-direct-player-ready");
+          activeFacebookPreview = null;
+          mountFacebookFacade(card);
+        }
+      }
+    }, { threshold: [0, 0.2, 0.75, 1] })
+  : null;
 
 function decorateVideoCards() {
   if (previewState.activeCard && !previewState.activeCard.isConnected) stopPreview();
@@ -58,6 +96,9 @@ function decorateVideoCards() {
 
     if (card.dataset.videoProvider === "facebook") {
       mountFacebookFacade(card);
+      // A single muted Facebook embed is attempted only while its tile is
+      // clearly visible. Facebook/mobile browsers may still require a tap.
+      facebookPreviewObserver?.observe(card);
       return;
     }
 
