@@ -1,5 +1,6 @@
 import { signedLegacyV5Page } from "./legacy-v5-signer.js";
 import edgeWorker from "./edge.js";
+import { facebookPosterUrl } from "./facebook-posters.js";
 
 const CANONICAL_ORIGIN = "https://vid.best";
 const LEGACY_HOSTS = new Set(["home.vid.best", "www.vid.best"]);
@@ -127,7 +128,7 @@ async function categoryStats(env) {
 async function categoryRows(env, category) {
   const result = await env.DB.prepare(
     `SELECT v.id, v.slug, v.title, v.description, v.review_text, v.thumbnail_url,
-            v.subcategory, v.views, v.created_at, v.updated_at
+            v.subcategory, v.views, v.created_at, v.updated_at, v.source_url, v.media_type
      FROM videos v
      WHERE v.published = 1 AND v.primary_category = ?
      ORDER BY v.featured DESC, v.trending DESC, v.reaction_count DESC, v.updated_at DESC, v.id DESC
@@ -140,7 +141,7 @@ function categoryCard(row) {
   const url = `${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}`;
   const description = cleanLongText(row.description || row.review_text || "", 320) ||
     "Open the full Vid.Best review and discovery page.";
-  const thumb = row.thumbnail_url ? cleanText(row.thumbnail_url, 2000) : "";
+  const thumb = publicThumbnail(row);
   const image = thumb
     ? `<img src="${escapeHtml(thumb)}" alt="${escapeHtml(row.title)} thumbnail" loading="lazy" decoding="async" width="640" height="360">`
     : `<span class="media-fallback" aria-hidden="true">▶</span>`;
@@ -172,10 +173,15 @@ function categoryCard(row) {
     </article>`;
 }
 
+function publicThumbnail(row) {
+  if (!row.thumbnail_url) return "";
+  return cleanText(row.media_type === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url, 2000);
+}
+
 function categoryPage(category, rows, total) {
   const canonical = categoryUrl(category);
   const description = `${CATEGORY_DESCRIPTIONS[category]} ${total.toLocaleString()} published review${total === 1 ? "" : "s"} are currently in this topic.`;
-  const firstThumb = rows.find((row) => row.thumbnail_url)?.thumbnail_url || "";
+  const firstThumb = publicThumbnail(rows.find((row) => row.thumbnail_url) || {});
   const itemList = rows.map((row, index) => ({
     "@type": "ListItem",
     position: index + 1,
@@ -349,7 +355,7 @@ async function videoIndexPage(request, env) {
   }
   const pageSize = 100;
   const result = await env.DB.prepare(
-    `SELECT slug, title, primary_category, subcategory, description
+    `SELECT id, slug, title, primary_category, subcategory, description, thumbnail_url, source_url, media_type
      FROM videos WHERE published = 1
      ORDER BY updated_at DESC, id DESC LIMIT ? OFFSET ?`,
   ).bind(pageSize + 1, (page - 1) * pageSize).all();
@@ -385,7 +391,9 @@ async function videoIndexPage(request, env) {
   const links = rows.map((row) => {
     const url = `${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}`;
     const description = cleanLongText(row.description || "", 220) || "Open this permanent Vid.Best watch page.";
-    return `<article class="video-tile glass-panel"><div class="tile-content"><div class="tile-badges"><span class="badge">${escapeHtml(row.primary_category || "Video")}</span><span class="badge secondary">${escapeHtml(row.subcategory || "")}</span></div><h2><a class="tile-title" href="${escapeHtml(url)}">${escapeHtml(row.title)}</a></h2><p class="tile-description">${escapeHtml(description)}</p></div></article>`;
+    const thumb = publicThumbnail(row);
+    const image = thumb ? `<a class="tile-media" href="${escapeHtml(url)}"><img src="${escapeHtml(thumb)}" alt="${escapeHtml(row.title)} thumbnail" loading="lazy" decoding="async" width="640" height="360"></a>` : "";
+    return `<article class="video-tile glass-panel">${image}<div class="tile-content"><div class="tile-badges"><span class="badge">${escapeHtml(row.primary_category || "Video")}</span><span class="badge secondary">${escapeHtml(row.subcategory || "")}</span></div><h2><a class="tile-title" href="${escapeHtml(url)}">${escapeHtml(row.title)}</a></h2><p class="tile-description">${escapeHtml(description)}</p></div></article>`;
   }).join("");
 
   return htmlResponse(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>All Video Reviews, Tutorials &amp; Discoveries | Vid.Best</title><meta name="description" content="Browse published Vid.Best video reviews, tutorials and discoveries with permanent watch pages."><meta name="robots" content="index,follow,max-image-preview:large,max-video-preview:-1,max-snippet:-1"><link rel="canonical" href="${escapeHtml(canonical)}"><meta property="og:type" content="website"><meta property="og:site_name" content="Vid.Best"><meta property="og:title" content="All Video Reviews, Tutorials &amp; Discoveries | Vid.Best"><meta property="og:url" content="${escapeHtml(canonical)}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"><script type="application/ld+json">${jsonForHtml(schema)}</script></head><body><header class="site-header compact"><a class="brand" href="/" aria-label="Vid.Best homepage"><span class="brand-mark">V</span><span>Vid.Best</span></a><a class="button ghost" href="/">Explore all</a></header><main><section class="section-pad"><div class="section-heading"><div><p class="eyebrow">Permanent video library</p><h1>All published videos</h1></div><p>Every listed title links directly to a permanent Vid.Best watch page.</p></div><div class="video-grid">${links}</div>${pagination}</section></main><footer class="site-footer"><a class="brand small" href="/"><span class="brand-mark">V</span><span>Vid.Best</span></a><p>Video review and discovery, designed for curiosity.</p><span><a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a></span></footer></body></html>`);
