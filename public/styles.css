@@ -1366,7 +1366,7 @@ html:has(body[data-video-slug="saiyaara-a-cinematic-romance"]) { overflow-x: cli
 }
 
 
-/* Facebook homepage preview facade: stable poster first, official player only after tap. */
+/* Facebook homepage preview: stable poster first, one visible muted official player. */
 .facebook-facade-ready .preview-surface { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; pointer-events: auto; }
 .facebook-facade-ready .play-orb { display: none; }
 .facebook-facade-ready .tile-media::after, .facebook-facade-ready .preview-status { pointer-events: none; }
@@ -1374,3 +1374,7 @@ html:has(body[data-video-slug="saiyaara-a-cinematic-romance"]) { overflow-x: cli
 .facebook-facade-play { position: absolute; z-index: 3; inset: 50% auto auto 50%; transform: translate(-50%, -50%); width: 54px; height: 54px; border: 1px solid rgba(255,255,255,.45); border-radius: 50%; background: rgba(12,15,30,.76); color: #fff; font-size: 23px; cursor: pointer; display: grid; place-items: center; box-shadow: 0 3px 18px rgba(0,0,0,.28); }
 .facebook-facade-play:focus-visible { outline: 3px solid #73d8ff; outline-offset: 3px; }
 .facebook-facade-ready .facebook-direct-player { display: block; width: 100%; height: 100%; min-height: 0; border: 0; background: #05060a; }
+.facebook-sdk-player { position: absolute; inset: 0; width: 100%; height: 100%; background: #000; }
+.facebook-sdk-player > span, .facebook-sdk-player iframe { display: block !important; width: 100% !important; height: 100% !important; border: 0; }
+.facebook-facade-poster[hidden] { display: none; }
+.facebook-sound-toggle { inset: auto 10px 10px auto; transform: none; width: 34px; height: 34px; font-size: 18px; }
