@@ -1,5 +1,15 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 2026-10-13: Facebook publish-time previews deployed
+
+PR 131 merged as 597fea6d1d49f9ad27c18f8eccd83d2ff7e469c5. CI 38358665738 passed 250 Node tests, four Python tests, Worker compilation, workflow expressions, Compose validation and script syntax. Worker deployment 38358753689 applied migration 0030 and succeeded. Publishing future Facebook records now durably prepares the public canonical player URL and available source poster; admin status and bounded retries are supported. Owner-uploaded files receive a small real source-frame thumbnail when no custom cover is selected. See docs/facebook-tile-previews.md for behavior and provider limitations.
+
+Live browser verification: Outdoor Challenge record 162 reached the SDK's startedPlaying/playing state without a tap. Scrolling away restored its poster and hid/paused the reusable player; returning resumed the same vidbest-facebook-video-1 host with one iframe. The deployed admin includes the new frame helper and publish-preview status code. All 154 existing video records (150 published, four drafts) retained identical protected fingerprints, including dates, covers, sources and editorial content; only normal activity counters were excluded. No live test review was published. Portainer run 38358756244 validated and every production/preflight job remained skipped.
+
+Latest completed zero-inspection audit 38358797966 / artifact 11793257917: 150 published reviews, 164 public pages, zero technical failures; 121 HTTP image successes, 29 image errors. Review sitemap processing is pending with zero errors/warnings; lastDownloaded 2026-10-13T05:07:32.485Z. This run inspected zero URLs. The last full stored inspection covers the earlier 149-review snapshot (120 discovered, 29 unknown, zero indexed); it does not establish the new 150th review's status.
+
+Next cover target is confirmed: record 152, past-present-progress-smart-ict, has an actual 404 poster result. Public Facebook reel 816323456721169 shows Smart ICT with Nadeera Sampath, a Sinhala Past/Present/Progress caption, and an opening title referring to Amazon and Apple before/after. Its video element reports 25.03 seconds; no original poster attribute is exposed. A returning login prompt limited further viewing, so do not claim to have verified the full montage/audio. A clearly labelled symbolic learning/progress illustration is appropriate; preserve review content and dates. Pre-change protected fingerprint: 4692:f3b282a2; created_at 2026-10-11T21:26:22.701Z; updated_at 2026-10-12T16:15:35.398Z.
+
 ## 2026-10-13: Live Kindly cover verified
 
 PR 129 merged as 261e3ebfd286c14ccb397d08c41e7857934d8a03. CI 38349504766 passed workflow expressions, Compose validation, 241 Node tests, four Teamwork Python tests, Worker compilation and both deployment-script syntax checks. Worker deployment 38349582828 succeeded and applied guarded migration 0029. Portainer run 38349582807 validated; preflight, deploy and optional production jobs stayed skipped.

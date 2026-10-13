@@ -1,5 +1,13 @@
 # Editorial cover provenance
 
+## Past, Present & Progress — symbolic editorial illustration
+
+`public/review-covers/past-present-progress-illustrated-v1.webp` is a clearly labelled symbolic cover for published record 152. Public source verification resolved the saved share link to Facebook reel 816323456721169, attributed to Smart ICT with Nadeera Sampath. The Sinhala caption explicitly says Past/Present/Progress and an opening visible title refers to Amazon and Apple before/after; the video element reports 25.03 seconds and has no poster attribute. A returning login prompt limited further viewing. No full-video/audio, exact corporate timeline, building or warehouse observations are asserted.
+
+Built-in imagegen produced an illustrated open notebook, rising gold steps, a luminous path and abstract digital shapes, representing the verified learning/progress theme. These are symbolic artwork, not video scenes or a source frame. Exact labels: PAST • PRESENT • PROGRESS; LEARNING, ONE STEP AT A TIME; Illustrated review cover; Vid.Best. The original output was visually checked; delivery WebP is 1024×576, 100,884 bytes. Guarded migration 0031 replaces only the known invalid Facebook HTML thumbnail, preserving owner edits, dates, source, substantial review and all SEO fields.
+
+Prompt: Use case illustration-story; wide 16:9 Vid.Best editorial review cover for the source-verified Past/Present/Progress caption. Tactile paper-cut/painted symbolic educational collage with a small open notebook, rising warm gold stepping shapes, luminous teal path and abstract digital blocks; deep indigo/purple, cream paper texture, readable typography and safe margins. Exact labels above. No people, company/provider logos, creator-watermark imitation, dates, statistics, factual timeline, invented Amazon/Apple buildings, screenshot UI, rankings or clickbait. Never claim to reproduce unseen source scenes.
+
 ## Live Kindly — verified illustrative cover
 
 `public/review-covers/live-kindly-illustrated-v1.webp` is a clearly labelled editorial illustration for published Facebook review 149. Public browser playback verified Nethu Uduwana video 275163778863394: a 20-second video dated 20 March 2024 showing a blue-and-warm-orange sky/cloud montage with small birds. The generated composition uses only that verified visual theme; it is not a source frame or an exact reconstruction. Built-in image generation produced the illustration, and its delivery WebP is 1024 × 576 / 64,168 bytes. Exact labels: LIVE KINDLY; TIME & PEACEFUL MOMENTS; Illustrated review cover; Vid.Best. Guarded migration 0029 replaces only the exact broken Facebook share-page thumbnail and leaves the source, review, SEO fields, publication state, owner edits and both dates unchanged.
