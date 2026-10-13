@@ -2987,6 +2987,16 @@ async function watchPage(request, env, ctx, slugInput) {
   return response;
 }
 
+// Google VideoObject.contentUrl and video sitemap content_loc are actual playable
+// media bytes, never a Facebook/YouTube share page or a generic landing URL.
+function verifiedVideoFileUrl(value, base) {
+  try {
+    const url = new URL(String(value || ""), base);
+    if (!["https:", "http:"].includes(url.protocol) || url.username || url.password) return "";
+    return /\\.(?:mp4|m4v|webm|ogv|mov)$/i.test(url.pathname) ? url.toString() : "";
+  } catch { return ""; }
+}
+
 function renderWatchHtml(video, request, env, scriptNonce) {
   const viewer = new URL(request.url).searchParams.get("viewer") === "1";
   const saiyaaraWidget = video.provider === "tiktok" &&
@@ -3003,34 +3013,32 @@ function renderWatchHtml(video, request, env, scriptNonce) {
       ? `${baseUrl}/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`
       : "";
   const tags = Array.isArray(video.seo_tags) ? video.seo_tags.slice(0, 20) : [];
-  const uploadDate = video.source_published_at || video.created_at;
+  // A Vid.Best review's creation date is not the original third-party video's
+  // publication date. Google requires the *video* date when it is known.
+  const uploadDate = video.source_published_at || (video.provider === "r2" ? video.created_at : "");
+  const mediaFileUrl = verifiedVideoFileUrl(video.source_url, baseUrl);
+  const sourceAttribution = (() => {
+    try {
+      const url = new URL(video.source_page_url || video.source_url);
+      return ["http:", "https:"].includes(url.protocol) ? url.toString() : "";
+    } catch { return ""; }
+  })();
   const videoSchema = {
     "@type": "VideoObject",
     "@id": `${canonical}#video`,
     name: watchDisplayTitle(video),
     description,
     ...(thumbnail ? { thumbnailUrl: [thumbnail] } : {}),
-    uploadDate,
+    ...(uploadDate ? { uploadDate } : {}),
     url: canonical,
     mainEntityOfPage: canonical,
     ...(video.source_duration ? { duration: video.source_duration } : {}),
     ...(video.provider === "facebook" && getSafeFacebookEmbedUrl(video) ? { embedUrl: getSafeFacebookEmbedUrl(video) } : video.embed_url && video.provider !== "tiktok" ? { embedUrl: preparePlaybackEmbed(video.embed_url, playbackOrigin) } : {}),
-    ...(!video.embed_url && video.provider !== "tiktok" ? { contentUrl: video.source_url } : {}),
+    ...(mediaFileUrl && !video.embed_url && video.provider !== "tiktok" ? { contentUrl: mediaFileUrl } : {}),
     ...(tags.length ? { keywords: tags.join(", ") } : {}),
     ...(video.primary_category ? { genre: [video.primary_category, video.subcategory].filter(Boolean) } : {}),
-    interactionStatistic: [
-      {
-        "@type": "InteractionCounter",
-        interactionType: { "@type": "WatchAction" },
-        userInteractionCount: Number(video.views) + 1,
-      },
-      {
-        "@type": "InteractionCounter",
-        interactionType: { "@type": "LikeAction" },
-        userInteractionCount: Number(video.reaction_count),
-      },
-    ],
-    publisher: { "@type": "Organization", name: env.APP_NAME || "Vid.Best", url: baseUrl },
+    // Site page views are not verified video plays. Do not claim WatchActions,
+    // video likes, or that Vid.Best originally published an external video.
     ...(video.transcript ? { transcript: cleanLongText(video.transcript, 5000) } : {}),
   };
   const schema = {
@@ -3059,7 +3067,9 @@ function renderWatchHtml(video, request, env, scriptNonce) {
         inLanguage: video.transcript_language || "en",
         datePublished: video.created_at,
         dateModified: video.updated_at,
-        primaryImageOfPage: thumbnail,
+        publisher: { "@id": `${baseUrl}#organization` },
+        ...(sourceAttribution ? { isBasedOn: sourceAttribution } : {}),
+        ...(thumbnail ? { primaryImageOfPage: thumbnail } : {}),
         mainEntity: { "@id": `${canonical}#video` },
         isPartOf: { "@id": `${baseUrl}#website` },
       },
@@ -4020,22 +4030,25 @@ async function videoSitemapResponse(request, env, page) {
         ? `${base}/api/tiktok/cached-poster?id=${encodeURIComponent(row.source_url.match(/\/video\/(\d+)/)?.[1] || "")}`
         : "";
     const description = cleanText(row.seo_description || row.description || `Discover ${row.title} on Vid.Best.`, 180);
+    const mediaFileUrl = verifiedVideoFileUrl(row.source_url, base);
+    const tiktokVideoId = provider === "tiktok" ? row.source_url.match(/\/video\/(\d+)/)?.[1] : "";
+    const playerUrl = tiktokVideoId
+      ? `https://www.tiktok.com/player/v1/${tiktokVideoId}`
+      : provider === "facebook"
+        ? getSafeFacebookEmbedUrl(row)
+        : row.embed_url
+          ? preparePlaybackEmbed(row.embed_url, base)
+          : "";
     let videoEntry = "";
-    const canDescribeVideo = thumbnail && (Boolean(row.embed_url) || Boolean(row.source_published_at) || provider === "tiktok" || provider === "facebook");
-    if (canDescribeVideo) {
-      const playerUrl = provider === "tiktok"
-        ? `https://www.tiktok.com/player/v1/${row.source_url.match(/\/video\/(\d+)/)?.[1] || ""}`
-        : provider === "facebook"
-          ? getSafeFacebookEmbedUrl(row)
-          : row.embed_url
-            ? preparePlaybackEmbed(row.embed_url, base)
-            : "";
+    // Unknown third-party URLs are landing pages, not video:content_loc.
+    if (thumbnail && (playerUrl || mediaFileUrl)) {
       const location = playerUrl
         ? `<video:player_loc allow_embed="yes">${escapeXml(playerUrl)}</video:player_loc>`
-        : `<video:content_loc>${escapeXml(absoluteUrl(row.source_url, base))}</video:content_loc>`;
+        : `<video:content_loc>${escapeXml(mediaFileUrl)}</video:content_loc>`;
       const duration = parseDurationSeconds(row.source_duration);
-      const publicationDate = row.source_published_at
-        ? `<video:publication_date>${escapeXml(row.source_published_at)}</video:publication_date>` : "";
+      const publicationValue = row.source_published_at || (provider === "r2" ? row.created_at : "");
+      const publicationDate = publicationValue
+        ? `<video:publication_date>${escapeXml(publicationValue)}</video:publication_date>` : "";
       videoEntry = `<video:video><video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc><video:title>${escapeXml(row.title)}</video:title><video:description>${escapeXml(description)}</video:description>${location}${publicationDate}${duration ? `<video:duration>${duration}</video:duration>` : ""}</video:video>`;
     }
     return `<url><loc>${escapeXml(canonical)}</loc><lastmod>${escapeXml(row.updated_at)}</lastmod>${videoEntry}</url>`;
