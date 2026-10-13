@@ -1,5 +1,13 @@
 # Editorial cover provenance
 
+## When Your Mind Feels Too Full — original public source poster
+
+`public/review-covers/quiet-presence-source-poster-v1.jpg` is the exact public Open Graph JPEG poster exposed by Quiet Presence's Facebook reel 3197508787117279, reached through published record 45's saved share URL. Public playback, Quiet Presence attribution, Public visibility and the source caption about pausing with a peaceful forest were checked on 13 October 2026. The player reports 18.113 seconds. No full-video or audio analysis, location identity, therapeutic result or medical claim is asserted.
+
+The unaltered source poster was downloaded from the reel's own `og:image`, not captured from the player or an end screen. It is a 1080×1920 JPEG, 205,834 bytes; SHA-256 `b7d414ac4fbe5fbdd476952b12a58f21f58640e010d7cff2cf9765bae3ca4901`. It shows the source's vertical sunrise, mist, forest edge and flower field without added labels or generated content. No expiring Facebook CDN URL is stored in the application or migration.
+
+Migration 0037 changes only record 45's known expiring provider poster when its exact source-media path, owner-edit timestamp, publication state and category still match. It leaves both site dates, substantial review, description, SEO fields, source and owner edits unchanged. Pre-deployment created_at is `2026-09-27T18:02:43.958Z`; updated_at is `2026-09-30T17:54:22.518Z`.
+
 ## Master Ānāpānasati Meditation — original public source poster
 
 `public/review-covers/anapanasati-source-poster-v1.jpg` is the exact public Open Graph JPEG poster exposed by the saved Facebook source for published record 44. The share URL resolves to reel 1986667352042256. Public playback, Public visibility, the creator attribution `වටිනා ධර්ම ලිපි,දේශනා බණ Dharma Articles,Dhamma Sermons`, and the bilingual caption about Theravada Vipassana, breath awareness and present-moment observation were checked on 13 October 2026. The player reports 20.011 seconds. No full-video or audio analysis, participant identity, medical benefit, guaranteed outcome or broader doctrinal claim is asserted.
