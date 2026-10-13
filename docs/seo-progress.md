@@ -1,5 +1,15 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 2026-10-13: Original Animal Compassion poster prepared
+
+Current main was verified at 83616d7d0ba8201ae07351c99dbbbe0cee1b3719, including PRs 136–138. Latest completed audit 38385875542 / artifact 11805198486 was downloaded and read: 151 published reviews, 165 public pages, zero technical failures and two editorial/demo warnings. Thumbnail inventory: 137 HTTP image successes, 14 failures (13 TikTok 403s and the removed Dilscoop 404). Fourteen of the HTTP successes are title-only SVG preview artwork; they are not verified source posters and remain in the accurate-cover queue. Record 159 currently serves that SVG artwork while its stored cover is still a Facebook HTML page.
+
+Google OAuth/property access succeeded. Review sitemap lastDownloaded 2026-10-13T10:45:10.761Z (13 October 16:15:10 Asia/Colombo), pending true, errors/warnings zero. The root sitemap lastDownloaded is 2026-10-13T07:45:09.502Z. This run made zero URL Inspections; it establishes no new indexed-page count. Keep the previous full stored inspection snapshot separate and do not repeat another full batch today.
+
+Public source verification for non-comedy record 159 succeeded. Anil Oskar video 382088081635044 plays publicly and displays Public visibility and 25 June 2024 attribution. The exact main-video backdrop poster was downloaded and visually verified: original 680×850 JPEG, 61,020 bytes, containing the source's antlered-animal/water imagery, Sinhala captions and watermark. No full-video/audio, rescue outcome or religious interpretation is asserted, and no source date is rewritten. Migration 0032 replaces only the exact invalid HTML thumbnail if owner-edit guards match; all existing text, source fields, publication state and dates are preserved. Protected-field fingerprint before deployment: 4917:7a861ed4; created_at 2026-10-11T21:26:22.701Z; updated_at 2026-10-12T13:59:42.010Z.
+
+Next: after CI/merge/Worker deployment, verify the live JPEG and absolute watch image metadata, confirm every other field of record 159 is unchanged and read the next completed zero-inspection artifact. Then distinguish title-artwork availability from source-poster readiness in the thumbnail report so future runs prioritize real remaining cover work. Preserve Funny & Comedy, drafts, protected Saiyaara/Summer and removed Dilscoop media; keep Portainer automatic deployment disabled.
+
 ## 2026-10-13: Facebook preview start priority
 
 Mobile evidence showed a fully visible Facebook tile remaining on its facade while a neighbouring YouTube tile owned the homepage's single active preview slot. The official Facebook player itself was working; cross-provider arbitration prevented it from starting. Facebook tiles now request the shared SDK as soon as a near-viewport card is rendered, start without the former 120 ms application delay, and receive visible-card priority over an adjacent one-step iframe provider. The existing one-active-preview limit, Data Saver and reduced-motion controls, offscreen pause, cached player reuse and owner poster behavior remain in place.

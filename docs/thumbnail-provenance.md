@@ -1,5 +1,13 @@
 # Editorial cover provenance
 
+## Animal Compassion — original public source poster
+
+`public/review-covers/animal-compassion-source-poster-v1.jpg` is the original public JPEG poster displayed behind the main video on Anil Oskar's Facebook video 382088081635044. Public browser playback, creator attribution, the Public visibility marker and the source post's displayed 25 June 2024 date were checked on 13 October 2026. The video player reports 113.5 seconds. A short portion was viewed; no full-video/audio verification, rescue outcome, animal identity or religious interpretation is asserted.
+
+The exact 680×850 poster was downloaded from the main video's own backdrop image and visually checked. It shows an antlered animal in water with the source's existing Sinhala captions and watermark. These captions are retained as part of the original source artwork, not independently endorsed factual claims. This is not a generated illustration or a browser/player screenshot. JPEG bytes remain unaltered: 61,020 bytes; SHA-256 `60b4afec6a886d07f5d5c321b9d04abcca34552ba6edf6cac7ac1bbda51f501f`. No expiring CDN URL is committed or logged.
+
+Guarded migration 0032 changes only record 159's known HTML-page thumbnail when its slug, publication state, media/category, source and original updated_at still match. Owner covers, editorial content, publication metadata and both dates remain unchanged. Pre-change protected-field fingerprint: `4917:7a861ed4`, excluding only thumbnail and activity counters. Verify the hosted JPEG, live metadata and this fingerprint after deployment before marking the poster published.
+
 ## Past, Present & Progress — symbolic editorial illustration
 
 `public/review-covers/past-present-progress-illustrated-v1.webp` is a clearly labelled symbolic cover for published record 152. Public source verification resolved the saved share link to Facebook reel 816323456721169, attributed to Smart ICT with Nadeera Sampath. The Sinhala caption explicitly says Past/Present/Progress and an opening visible title refers to Amazon and Apple before/after; the video element reports 25.03 seconds and has no poster attribute. A returning login prompt limited further viewing. No full-video/audio, exact corporate timeline, building or warehouse observations are asserted.
