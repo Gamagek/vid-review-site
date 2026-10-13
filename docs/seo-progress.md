@@ -1,5 +1,11 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 13 October 2026: Quiet Presence source poster verified
+
+The sole remaining non-comedy title-art placeholder, published record 45 `facebook-discovery-5c11fe`, was verified directly from its saved public Facebook source. The share URL resolves to reel 3197508787117279, attributed to Quiet Presence, with Public visibility, a caption about pausing with a peaceful forest and an 18.113-second player. Facebook exposes its own exact 1080×1920 Open Graph JPEG. The 205,834-byte poster was downloaded and visually checked: it shows the source's sunrise, mist, forest edge and flower field, not a browser screenshot, end screen, generated scene or full-video copy. No location, medical effect or guaranteed therapeutic outcome is asserted.
+
+Guarded migration 0037 replaces only the known expiring provider-image path when the exact record, source, owner-edit timestamp, publication state and category still match; it stores no signed CDN URL. All existing source fields, substantial review/SEO text, publication state, owner edits and original dates remain unchanged. Pre-deployment created_at is `2026-09-27T18:02:43.958Z`; updated_at is `2026-09-30T17:54:22.518Z`. Next: pass tests and Worker compilation, publish through PR/CI, verify the D1 field delta and hosted image, then read only the resulting zero-inspection artifact. After this, the eight remaining title-art placeholders are all protected reaction/comedy/parody entries and must not be edited.
+
 ## 13 October 2026: Ānāpānasati source poster deployed and verified
 
 The next non-comedy placeholder, published record 44 `facebook-discovery`, was verified directly from its saved public Facebook source. The share URL resolves to reel 1986667352042256, attributed to `වටිනා ධර්ම ලිපි,දේශනා බණ Dharma Articles,Dhamma Sermons`, with Public visibility, a bilingual Theravada Vipassana/breath-awareness caption and a 20.011-second player. Facebook exposes its own exact 1280×720 Open Graph JPEG; the 64,004-byte poster was downloaded and visually checked. It is the source's meditation portrait, not a browser screenshot, end screen, generated scene or full-video copy. No participant identity, medical result or guaranteed spiritual outcome is asserted.
