@@ -424,3 +424,24 @@ test("only real video-file URLs become contentUrl and sitemap content_loc", asyn
   const xml = await (await request(context, 'https://vid.best/sitemaps/videos-1.xml')).text();
   assert.match(xml, /<video:content_loc>https:\/\/cdn.example.com\/clip.mp4\?token=test<\/video:content_loc>/);
 });
+
+test("trust pages are readable, discoverable, and respond through the public Worker", async () => {
+  const context = createContext();
+  for (const route of ["/about", "/editorial", "/contact"]) {
+    const response = await request(context, "https://vid.best" + route);
+    assert.equal(response.status, 200, route);
+    assert.match(response.headers.get("Content-Type"), /text\/html/);
+    assert.equal((await request(context, "https://vid.best" + route + "/")).status, 301);
+    const source = readFileSync(new URL("../public" + route + ".html", import.meta.url), "utf8");
+    assert.match(source, new RegExp('<link rel="canonical" href="https://vid\\.best' + route + '">'));
+    assert.match(source, /<main class="information-page">/);
+    assert.match(source, /<h1>/);
+    assert.match(source, /href="\/contact"/);
+  }
+  const sitemap = await (await request(context, "https://vid.best/sitemaps/pages.xml")).text();
+  for (const route of ["/about", "/editorial", "/contact", "/privacy", "/terms"]) {
+    assert.ok(sitemap.includes("<loc>https://vid.best" + route + "</loc>"), route);
+  }
+  const contact = readFileSync(new URL("../public/contact.html", import.meta.url), "utf8");
+  assert.match(contact, /mailto:info@vid\.best/);
+});
