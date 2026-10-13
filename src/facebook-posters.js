@@ -105,10 +105,10 @@ export async function readFacebookPoster(env, row, getPreview, { cacheOnly = fal
 // Fast, honest on-site artwork when Facebook does not expose a usable cover.
 // Unlike a remote signed image, this is always a valid image and never a broken <img>.
 export function facebookPlaceholderResponse(row) {
-  const escape = value => String(value || "").replace(/[\\u0000-\\u001f]/g, " ")
+  const escape = value => String(value || "").replace(/[\u0000-\u001f]/g, " ")
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&apos;");
-  const words = String(row?.title || "Facebook video").trim().split(/\\s+/);
+  const words = String(row?.title || "Facebook video").trim().split(/\s+/);
   const lines = [""];
   for (const word of words) {
     const index = lines.length - 1;
