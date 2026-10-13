@@ -1,5 +1,11 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 14 October 2026: new public trust pages blocked the audit allowlist
+
+Current main `165b9aa225603a6d6b0ecd658b5e61dfd323b92c` includes PR 151's public About, Editorial and Contact pages in the pages sitemap. Latest completed audit 38456096454 / artifact 11842044021 was downloaded and read: thumbnail scan covered 164 published reviews (143 available images, eight protected placeholders and 13 provider HTTP failures), but the public SEO audit stopped during sitemap parsing with `unsafe_public_url`, before checking any pages or calling Google. The audit's fixed public-route allowlist lacked the three new routes; this is an audit compatibility failure, not evidence of a Google crawl rejection or zero indexed pages.
+
+The repair adds only the exact `/about`, `/editorial` and `/contact` public paths. Origin, credentials, query, fragment and private-route restrictions remain enforced. A regression exercises the updated pages sitemap through the full read-only public audit and checks that private subpaths and signed/query URLs remain rejected. Next: pass CI, merge, read the resulting zero-inspection artifact, then finish the separately requested Facebook tile playback/readiness investigation. Preserve all review text, dates, drafts, protected comedy topics and paused Portainer deployment.
+
 ## 13 October 2026: Quiet Presence source poster verified
 
 The sole remaining non-comedy title-art placeholder, published record 45 `facebook-discovery-5c11fe`, was verified directly from its saved public Facebook source. The share URL resolves to reel 3197508787117279, attributed to Quiet Presence, with Public visibility, a caption about pausing with a peaceful forest and an 18.113-second player. Facebook exposes its own exact 1080×1920 Open Graph JPEG. The 205,834-byte poster was downloaded and visually checked: it shows the source's sunrise, mist, forest edge and flower field, not a browser screenshot, end screen, generated scene or full-video copy. No location, medical effect or guaranteed therapeutic outcome is asserted.

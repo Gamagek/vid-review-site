@@ -55,6 +55,31 @@ test('public technical failures prevent Google submission and include safe diagn
   assert.deepEqual(report.pages.find(page => page.url === url).errors, ['head_http_404', 'canonical_mismatch', 'page_noindex']);
 });
 
+test('public trust pages in the deployed pages sitemap are audited without widening private-route access', async () => {
+  const trustPages = ['/about', '/editorial', '/contact'].map(path => ORIGIN + path);
+  const fake = publicSite({
+    [ORIGIN + '/sitemaps/pages.xml']: () => new Response(map([ORIGIN + '/', ORIGIN + '/videos', ...trustPages]), { headers: { 'content-type': 'application/xml' } }),
+  });
+  const report = await runAudit({ fetchImpl: fake.fetchImpl, wait: noop });
+  assert.equal(report.publicAuditStatus, 'success');
+  assert.equal(report.discoveredReviewCount, 2);
+  assert.equal(report.pages.length, 8);
+  for (const url of trustPages) {
+    assert.equal(publicUrl(url), url);
+    const checked = report.pages.find(row => row.url === url);
+    assert.deepEqual(checked.errors, []);
+    assert.equal(checked.headStatus, 200);
+    assert.equal(checked.getStatus, 200);
+    assert.equal(checked.canonical, url);
+    for (const suffix of ['/admin', '?token=private', '#private']) {
+      assert.throws(() => publicUrl(url + suffix), /unsafe_public_url/);
+    }
+  }
+  assert.ok(fake.calls.every(call => ['GET', 'HEAD'].includes(call.method)));
+  assert.equal(report.productionWrites, false);
+  assert.equal(report.searchConsole.status, 'not_configured');
+});
+
 test('sitemap extraction rejects external, authenticated and private routes, truncated XML and entities', () => {
   for (const url of ['https://evil.example/watch/x', 'https://user:secret@vid.best/watch/x', ORIGIN + '/api/private', ORIGIN + '/watch/x?token=secret', ORIGIN + '/admin']) {
     assert.throws(() => publicUrl(url), /unsafe_public_url/);
