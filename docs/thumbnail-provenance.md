@@ -1,5 +1,9 @@
 # Editorial cover provenance
 
+## 14 October 2026: inventory after the global preview scheduler repair
+
+PRs 152–153 add no poster assets and change no saved thumbnails, reviews, dates, source metadata or publication states. PR 152 restores the audit for the new public About, Editorial and Contact sitemap routes; PR 153 changes only frontend playback selection/warm-up and its tests/docs. Latest completed artifact 11857731946 from audit 38482641461 checks 164 published reviews: 142 available images, eight marked title-art placeholders and 14 provider HTTP failures (13 TikTok 403s and Dilscoop's 404). The preceding artifact reported 143/13 because Dilscoop was briefly available. Preserve source/owner edits and report this variability honestly; an HTTP response alone does not verify visual relevance or Google indexing. The eight remaining placeholders are protected reaction/comedy/parody entries. No generated scene, video copy, end-screen capture or provider workaround was introduced.
+
 ## When Your Mind Feels Too Full — original public source poster
 
 `public/review-covers/quiet-presence-source-poster-v1.jpg` is the exact public Open Graph JPEG poster exposed by Quiet Presence's Facebook reel 3197508787117279, reached through published record 45's saved share URL. Public playback, Quiet Presence attribution, Public visibility and the source caption about pausing with a peaceful forest were checked on 13 October 2026. The player reports 18.113 seconds. No full-video or audio analysis, location identity, therapeutic result or medical claim is asserted.
