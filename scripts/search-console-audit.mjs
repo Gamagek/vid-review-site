@@ -27,7 +27,7 @@ const delay = ms => new Promise(done => setTimeout(done, ms));
 export function publicUrl(value) {
   let url;
   try { url = new URL(value, ORIGIN); } catch { throw new AuditError('unsafe_public_url'); }
-  const safePath = /^\/(?:$|robots\.txt$|sitemap\.xml$|sitemaps\/[a-z0-9-]+\.xml$|videos$|privacy$|terms$|category\/[a-z0-9-]+$|watch\/[^/]+$)/.test(url.pathname);
+  const safePath = /^\/(?:$|robots\.txt$|sitemap\.xml$|sitemaps\/[a-z0-9-]+\.xml$|videos$|privacy$|terms$|about$|editorial$|contact$|category\/[a-z0-9-]+$|watch\/[^/]+$)/.test(url.pathname);
   const safeQuery = !url.search || (url.pathname === '/videos' && /^\?page=[1-9]\d{0,4}$/.test(url.search));
   if (url.origin !== ORIGIN || url.username || url.password || url.hash || !safePath || !safeQuery) throw new AuditError('unsafe_public_url');
   return url.href;
