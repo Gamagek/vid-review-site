@@ -4,6 +4,7 @@ import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStat
 import { tikTokCacheCandidate } from "./admin-tiktok-cache.js";
 import { isCachedTikTokThumbnail, thumbnailKey } from "./tiktok-thumbnail-cache.js";
 import { facebookPosterUrl, readFacebookPoster } from "./facebook-posters.js";
+import { queueFacebookPreview, runFacebookPreviewJobs, attachFacebookPreviews, facebookPreviewStatus } from "./facebook-preview-jobs.js";
 import {
   requestMemberLogin,
   verifyMemberLogin,
@@ -329,6 +330,12 @@ async function route(request, env, ctx) {
   if (path === "/api/admin/videos" && request.method === "GET") {
     await requireAdmin(request, env);
     return listVideos(request, env, true);
+  }
+
+  match = path.match(/^\/api\/admin\/videos\/(\d+)\/facebook-preview$/);
+  if (match && request.method === "GET") {
+    await requireAdmin(request, env);
+    return facebookPreviewStatus(env, Number(match[1]));
   }
 
   if (path === "/api/admin/discover" && request.method === "GET") {
@@ -1753,9 +1760,9 @@ async function hydrateVideos(env, rows) {
   // A slow provider metadata request must not hold the entire homepage feed.
   const ids = rows.map((row) => Number(row.id));
   const placeholders = ids.map(() => "?").join(",");
-  const reactionResult = await env.DB.prepare(
+  const [reactionResult] = await Promise.all([env.DB.prepare(
     `SELECT video_id, reaction, COUNT(*) AS count FROM reactions WHERE video_id IN (${placeholders}) GROUP BY video_id, reaction`,
-  ).bind(...ids).all();
+  ).bind(...ids).all(), attachFacebookPreviews(env, rows, buildFacebookPlayerUrl)]);
   const reactionsByVideo = new Map();
   for (const item of reactionResult.results || []) {
     if (!reactionsByVideo.has(item.video_id)) reactionsByVideo.set(item.video_id, { like: 0, love: 0, useful: 0 });
@@ -1904,7 +1911,7 @@ async function createVideo(request, env, ctx) {
 
   if (row?.published) {
     ctx?.waitUntil?.(notifyNewVideoSubscribers(env, row));
-    if (detectMediaProvider(row) === "facebook") ctx?.waitUntil?.(persistFacebookPreview(env, row));
+    if (detectMediaProvider(row) === "facebook") row.facebook_preview = await scheduleFacebookPreview(env, ctx, row);
   }
   if (detectMediaProvider(row) === "tiktok" && String(env.TIKTOK_OEMBED_REFRESH_ON_PUBLISH || "") === "1") {
     ctx?.waitUntil?.(persistTikTokOEmbedMetadata(env, row));
@@ -1984,7 +1991,7 @@ async function updateVideo(request, env, id, ctx) {
     ctx?.waitUntil?.(notifyNewVideoSubscribers(env, row));
   }
   if (row?.published && detectMediaProvider(row) === "facebook") {
-    ctx?.waitUntil?.(persistFacebookPreview(env, row));
+    row.facebook_preview = await scheduleFacebookPreview(env, ctx, row);
   }
   if (
     detectMediaProvider(row) === "tiktok"
@@ -2139,21 +2146,35 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
   };
 }
 
-async function persistFacebookPreview(env, row) {
+async function scheduleFacebookPreview(env, ctx, row) {
+  const summary = await queueFacebookPreview(env, row);
+  if (ctx?.waitUntil) ctx.waitUntil(processFacebookPreviewJobs(env, { videoId: Number(row.id), limit: 1 })
+    .catch(() => console.warn("Facebook preview preparation deferred", Number(row.id))));
+  return summary;
+}
+
+export function processFacebookPreviewJobs(env, options) {
+  return runFacebookPreviewJobs(env, prepareFacebookPreview, options);
+}
+
+export async function prepareFacebookPreview(env, row) {
+  let canonical = "";
   try {
-    const preview = await fetchFacebookPreview(env, row.source_url);
-    if (!preview) return;
-    const nextEmbed = buildFacebookPlayerUrl(preview.url);
-    const nextThumbnail = row.thumbnail_url || preview.thumbnail_url || null;
-    await env.DB.prepare(
-      "UPDATE videos SET embed_url = COALESCE(?, embed_url), thumbnail_url = COALESCE(NULLIF(thumbnail_url, ''), ?) WHERE id = ? AND source_url = ?",
-    ).bind(nextEmbed || null, nextThumbnail, Number(row.id), row.source_url).run();
-    if (nextThumbnail && safeFacebookThumbnailUrl(nextThumbnail)) {
-      await readFacebookPoster(env, { ...row, thumbnail_url: nextThumbnail }, async () => preview);
-    }
-  } catch (error) {
-    console.error("Facebook preview enrichment failed", error?.message || error);
-  }
+    const href = new URL(row.embed_url || "").searchParams.get("href");
+    if (isSupportedFacebookContentUrl(href)) canonical = cleanFacebookContentUrl(href);
+  } catch {}
+  if (!canonical && isSupportedFacebookContentUrl(row.source_url)) canonical = cleanFacebookContentUrl(row.source_url);
+  const ownerCover = row.thumbnail_url && facebookPosterUrl(row) === row.thumbnail_url;
+  let preview;
+  const metadata = async () => {
+    if (preview === undefined) preview = await fetchFacebookPreview(env, canonical || row.source_url);
+    return preview;
+  };
+  if (!canonical) canonical = cleanFacebookContentUrl((await metadata())?.url) || "";
+  const image = ownerCover ? null : await readFacebookPoster(env, row, metadata);
+  const posterStatus = ownerCover ? "owner_cover" : image ? "saved" : "missing";
+  await image?.body?.cancel();
+  return { canonical_url: canonical || null, poster_status: posterStatus };
 }
 
 function normalizeMedia(sourceInput, r2KeyInput, baseUrl) {
@@ -3587,8 +3608,10 @@ const KNOWN_FACEBOOK_RESOLUTIONS = new Map([
 ]);
 
 async function enrichFacebookRows(env, rows) {
+  await attachFacebookPreviews(env, rows, buildFacebookPlayerUrl);
   const candidates = rows.filter((row) => {
     if (!isFacebookUrl(row?.source_url)) return false;
+    if (row.facebook_preview) return false;
     if (!row.thumbnail_url) return true;
     try {
       const stored = new URL(String(row.embed_url || ""));
@@ -3662,10 +3685,17 @@ async function fetchFacebookPreview(env, sourceUrl) {
       signal: AbortSignal.timeout(7000),
     });
     if (response.ok) {
-      const html = await response.text();
-      title = decodeHtmlEntities(cleanText(readMetaTag(html, "og:title") || readMetaTag(html, "twitter:title"), 180));
-      description = decodeHtmlEntities(cleanText(readMetaTag(html, "og:description") || readMetaTag(html, "description"), 320));
-      thumbnailUrl = safeFacebookThumbnailUrl(readMetaTag(html, "og:image") || readMetaTag(html, "twitter:image"));
+      const html = await boundedFacebookHtml(response);
+      const pageTitle = decodeHtmlEntities(readMetaTag(html, "og:title") || readMetaTag(html, "twitter:title"));
+      const loginPage = /\/(?:login|checkpoint|recover)(?:[/.?]|$)/i.test(String(response.url || ""))
+        || /^(?:Facebook\s*(?:[-–|]\s*(?:log|sign)\s*in.*)?|Log in to Facebook|Sign up for Facebook)$/i.test(pageTitle.trim());
+      if (!loginPage) {
+        title = cleanText(pageTitle, 180);
+        description = decodeHtmlEntities(cleanText(readMetaTag(html, "og:description") || readMetaTag(html, "description"), 320));
+        thumbnailUrl = safeFacebookThumbnailUrl(readMetaTag(html, "og:image") || readMetaTag(html, "twitter:image"));
+      }
+    } else {
+      await response.body?.cancel();
     }
   } catch {}
 
@@ -3733,9 +3763,31 @@ function safeFacebookThumbnailUrl(value) {
   }
 }
 
+async function boundedFacebookHtml(response) {
+  const limit = 2 * 1024 * 1024;
+  if (!response.body || Number(response.headers.get("Content-Length")) > limit) {
+    await response.body?.cancel();
+    return "";
+  }
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let text = "", bytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > limit) { await reader.cancel(); return ""; }
+      text += decoder.decode(value, { stream: true });
+    }
+    return text + decoder.decode();
+  } finally { reader.releaseLock(); }
+}
+
 function isFacebookUrl(value) {
   try {
     const url = new URL(String(value || ""));
+    if (url.protocol !== "https:" || url.username || url.password || url.port) return false;
     const host = url.hostname.toLowerCase().replace(/^www\./, "");
     return host === "facebook.com" || host.endsWith(".facebook.com") || host === "fb.watch";
   } catch {
@@ -3761,7 +3813,7 @@ function isSupportedFacebookContentUrl(value) {
     const path = url.pathname.toLowerCase();
     return /^\/reel\/[^/]+\/?$/.test(path)
       || /^\/[^/]+\/reels?\/(?:pfbid[\w-]+|[^/]+)\/?$/.test(path)
-      || /^\/[^/]+\/videos\/[^/]+\/?$/.test(path)
+      || /^\/[^/]+\/videos\/(?:[^/]+\/)?\d+\/?$/.test(path)
       || /^\/watch\/\?(?:[^#]*&)?v=\d+/.test(url.pathname + url.search)
       || /^\/video\.php$/.test(path) && url.searchParams.has("v");
   } catch {
@@ -3806,18 +3858,34 @@ async function resolveFacebookContentUrl(env, sourceUrl) {
       signal: AbortSignal.timeout(7000),
     });
     const finalUrl = String(response.url || "");
-    if (!response.ok || !isSupportedFacebookContentUrl(finalUrl)) return known || null;
+    if (!response.ok) { await response.body?.cancel(); return known || null; }
+    let canonical = cleanFacebookContentUrl(finalUrl);
+    if (!canonical && isFacebookUrl(finalUrl) && !/\/(?:login|checkpoint|recover)(?:[/.?]|$)/i.test(new URL(finalUrl).pathname)) {
+      const html = await boundedFacebookHtml(response);
+      canonical = cleanFacebookContentUrl(decodeHtmlEntities(readMetaTag(html, "og:url")));
+    } else await response.body?.cancel();
+    if (!canonical) return known || null;
 
     if (cache) {
-      const cached = json({ url: finalUrl }, 200, {
+      const cached = json({ url: canonical }, 200, {
         "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
       });
       await cache.put(cacheKey, cached.clone());
     }
-    return finalUrl;
+    return canonical;
   } catch {
     return known || null;
   }
+}
+
+function cleanFacebookContentUrl(value) {
+  if (!isSupportedFacebookContentUrl(value)) return "";
+  const url = new URL(value);
+  url.hash = "";
+  for (const key of [...url.searchParams.keys()]) {
+    if (!["v", "id", "story_fbid"].includes(key)) url.searchParams.delete(key);
+  }
+  return url.toString();
 }
 
 function getSafeFacebookEmbedUrl(video) {
@@ -3848,6 +3916,7 @@ async function fetchMicrolinkFacebookPreview(sourceUrl) {
     if (!response.ok) return null;
     const payload = await response.json().catch(() => null);
     const data = payload?.data || {};
+    if (/^(?:Facebook\s*(?:[-–|].*)?|Log in to Facebook|Sign up for Facebook)$/i.test(String(data.title || "").trim())) return null;
     return {
       title: decodeHtmlEntities(cleanText(data.title, 180)),
       description: decodeHtmlEntities(cleanText(data.description, 320)),

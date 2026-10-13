@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
-import worker, { processTikTokOEmbedBackfill } from "../src/index.js";
+import worker, { processTikTokOEmbedBackfill, processFacebookPreviewJobs, prepareFacebookPreview } from "../src/index.js";
+import { queueFacebookPreview, runFacebookPreviewJobs, facebookPreviewStatus } from "../src/facebook-preview-jobs.js";
 import { refreshSourceMetadata, sanitizeWatchHtml } from "../src/edge.js";
 import seoEdge from "../src/seo-edge.js";
 
@@ -23,6 +24,7 @@ const migrations = [
   "0019_tiktok_oembed_backfill.sql",
   "0020_member_personalization.sql",
   "0022_facebook_readable_slugs.sql",
+  "0030_facebook_preview_jobs.sql",
 ];
 
 class TestD1Statement {
@@ -2486,4 +2488,116 @@ test('cached Facebook poster addresses resolve to hosted covers without exposing
     context.sqlite.prepare("UPDATE videos SET published=0,thumbnail_url='/review-covers/ant.webp'").run();
     assert.equal((await send(context,`/api/facebook/thumbnail?id=${row.id}`)).status,404);
   } finally {globalThis.fetch=old;}
+});
+
+test("publishing a Facebook link prepares a durable poster before a visitor requests it", async () => {
+  const context = createTestContext(), original = globalThis.fetch;
+  const share = 'https://www.facebook.com/share/v/PublicShare/';
+  const canonical = 'https://www.facebook.com/creator/videos/12345/';
+  let upstream = 0;
+  globalThis.fetch = async url => {
+    upstream++;
+    if (String(url).includes('fbcdn.net')) return new Response(new Uint8Array([255,216,255,217]), {headers:{'Content-Type':'image/jpeg'}});
+    const response = new Response('<meta property="og:url" content="' + canonical + '"><meta property="og:title" content="Public source"><meta property="og:description" content="Source caption"><meta property="og:image" content="https://scontent.xx.fbcdn.net/poster.jpg">', {headers:{'Content-Type':'text/html'}});
+    Object.defineProperty(response, 'url', {value:String(url)});
+    return response;
+  };
+  try {
+    const response = await send(context, '/api/videos', {method:'POST', headers:{Authorization:`Bearer ${secret}`, 'Content-Type':'application/json'}, body:JSON.stringify({title:'New Facebook review', source_url:share, primary_category:'Other', subcategory:'Other', description:'Owner description', review_text:'Owner review', published:true})});
+    assert.equal(response.status,201);
+    const saved = (await response.json()).video;
+    assert.equal(saved.facebook_preview.status,'pending');
+    const before = context.sqlite.prepare('SELECT * FROM videos WHERE id = ?').get(saved.id);
+    await Promise.all(context.pending);
+    const job = context.sqlite.prepare('SELECT * FROM facebook_preview_jobs WHERE video_id = ?').get(saved.id);
+    assert.equal(job.status,'ready');
+    assert.equal(job.canonical_url,canonical);
+    assert.equal(job.poster_status,'saved');
+    assert.deepEqual(context.sqlite.prepare('SELECT * FROM videos WHERE id = ?').get(saved.id),before);
+    assert.equal(context.bucket.objects.size,1);
+    const calls = upstream;
+    globalThis.fetch = async () => { throw new Error('Provider must not be needed by a ready tile'); };
+    const feed = await send(context,'/api/videos');
+    const tile = (await feed.json()).videos.find(v=>v.id===saved.id);
+    assert.equal(new URL(tile.embed_url).searchParams.get('href'),canonical);
+    assert.equal(tile.facebook_preview.status,'ready');
+    const poster = await send(context,tile.thumbnail_url);
+    assert.equal(poster.status,200);
+    assert.equal(upstream,calls);
+    const denied = await send(context,`/api/admin/videos/${saved.id}/facebook-preview`);
+    assert.equal(denied.status,401);
+    const status = await send(context,`/api/admin/videos/${saved.id}/facebook-preview`, {headers:{Authorization:`Bearer ${secret}`}});
+    assert.equal((await status.json()).preview.status,'ready');
+  } finally { globalThis.fetch = original; }
+});
+
+test("Facebook preview jobs preserve owner covers and do not prepare pending drafts", async () => {
+  const context = createTestContext(), original = globalThis.fetch;
+  context.sqlite.exec(`INSERT INTO videos(slug,title,source_url,media_type,primary_category,subcategory,thumbnail_url,published,created_at,updated_at)
+    VALUES ('future-fb','Owner edit','https://www.facebook.com/reel/456','facebook','Other','Other','/review-covers/owner.webp',0,'original-publish','owner-update')`);
+  let row=context.sqlite.prepare('SELECT * FROM videos').get();
+  assert.equal(await queueFacebookPreview(context.env,row),null);
+  assert.equal(context.sqlite.prepare('SELECT COUNT(*) AS n FROM facebook_preview_jobs').get().n,0);
+  context.sqlite.exec('UPDATE videos SET published=1');
+  row=context.sqlite.prepare('SELECT * FROM videos').get();
+  globalThis.fetch=async()=>{throw new Error('Owner cover and canonical source need no provider call');};
+  try {
+    await queueFacebookPreview(context.env,row);
+    await processFacebookPreviewJobs(context.env);
+    assert.equal(context.sqlite.prepare('SELECT status FROM facebook_preview_jobs').get().status,'ready');
+    assert.deepEqual(context.sqlite.prepare('SELECT * FROM videos').get(),row);
+    await queueFacebookPreview(context.env,row);
+    assert.equal((await processFacebookPreviewJobs(context.env)).length,0);
+    assert.equal(context.sqlite.prepare('SELECT attempts FROM facebook_preview_jobs').get().attempts,1);
+  } finally { globalThis.fetch=original; }
+});
+
+test("failed Facebook poster preparation has a finite retry budget and read-only status", async () => {
+  const context=createTestContext();
+  context.sqlite.exec(`INSERT INTO videos(slug,title,source_url,media_type,primary_category,subcategory,published)
+    VALUES ('no-poster','Original review','https://www.facebook.com/reel/789','facebook','Other','Other',1)`);
+  const row=context.sqlite.prepare('SELECT * FROM videos').get();
+  await queueFacebookPreview(context.env,row);
+  let calls=0;
+  const prepare=async()=>{calls++;return {canonical_url:row.source_url,poster_status:'missing'};};
+  for(let attempt=0;attempt<4;attempt++) {
+    context.sqlite.exec('UPDATE facebook_preview_jobs SET next_attempt_at=NULL');
+    await runFacebookPreviewJobs(context.env,prepare);
+  }
+  assert.equal(context.sqlite.prepare('SELECT status FROM facebook_preview_jobs').get().status,'needs_poster');
+  await runFacebookPreviewJobs(context.env,prepare);
+  await facebookPreviewStatus(context.env,row.id);
+  await queueFacebookPreview(context.env,{...row,review_text:'A new editorial section'});
+  await runFacebookPreviewJobs(context.env,prepare);
+  assert.equal(calls,4);
+  assert.deepEqual(context.sqlite.prepare('SELECT * FROM videos').get(),row);
+});
+
+test("late Facebook preparation cannot attach old metadata after owner changes the source", async () => {
+  const context=createTestContext();
+  context.sqlite.exec(`INSERT INTO videos(slug,title,source_url,media_type,primary_category,subcategory,published)
+    VALUES ('source-race','Owner review','https://www.facebook.com/reel/111','facebook','Other','Other',1)`);
+  const row=context.sqlite.prepare('SELECT * FROM videos').get();
+  await queueFacebookPreview(context.env,row);
+  await runFacebookPreviewJobs(context.env,async()=>{
+    context.sqlite.exec("UPDATE videos SET source_url='https://www.facebook.com/reel/222', thumbnail_url='/review-covers/new-owner.webp'");
+    await queueFacebookPreview(context.env,context.sqlite.prepare('SELECT * FROM videos').get());
+    return {canonical_url:row.source_url,poster_status:'saved'};
+  });
+  const job=context.sqlite.prepare('SELECT * FROM facebook_preview_jobs').get();
+  assert.equal(job.source_url,'https://www.facebook.com/reel/222');
+  assert.equal(job.canonical_url,null);
+  assert.equal(job.status,'pending');
+  assert.equal(context.sqlite.prepare('SELECT thumbnail_url FROM videos').get().thumbnail_url,'/review-covers/new-owner.webp');
+});
+
+test("Facebook preparation strips tracking and never treats a thumbnail page as an image", async () => {
+  const context=createTestContext(),original=globalThis.fetch;
+  globalThis.fetch=async()=>new Response('<html>Login</html>',{headers:{'Content-Type':'text/html'}});
+  try {
+    const prepared=await prepareFacebookPreview(context.env,{id:77,source_url:'https://www.facebook.com/watch/?v=567&fbclid=tracking',embed_url:'',thumbnail_url:'https://www.facebook.com/share/v/not-an-image/'});
+    assert.equal(prepared.canonical_url,'https://www.facebook.com/watch/?v=567');
+    assert.equal(prepared.poster_status,'missing');
+    assert.equal(context.bucket.objects.size,0);
+  } finally {globalThis.fetch=original;}
 });

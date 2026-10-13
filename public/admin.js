@@ -11,6 +11,8 @@ const adminState = {
   analysisSource: "",
   analysisPollTimer: null,
   cachePollTimer: null,
+  facebookPollTimers: new Map(),
+  framePromise: null,
 };
 
 const ui = {
@@ -182,6 +184,8 @@ async function lockAdmin() {
   ui.refreshVideos.disabled = false;
   setStatus(ui.libraryStatus, "");
   clearTimeout(adminState.cachePollTimer);
+  for (const timer of adminState.facebookPollTimers.values()) window.clearTimeout(timer);
+  adminState.facebookPollTimers.clear();
   try { await adminApi("/api/admin/session", { method: "DELETE" }); } catch { /* Clear the local UI even if logout fails. */ }
   ui.workspace.hidden = true;
   ui.loginPanel.hidden = false;
@@ -595,6 +599,13 @@ function uploadFile() {
       ui.uploadProgress.style.width = "100%";
       setStatus(ui.uploadStatus, "Upload complete.", "success");
       updatePreview();
+      if (videoFile && !ui.thumbnail.value && window.VidBestPreviewFrame) {
+        const generation = Number(ui.editingId.value || 0);
+        const work = prepareUploadedThumbnail(file, result.url, generation);
+        adminState.framePromise = work;
+        const clear = () => { if (adminState.framePromise === work) adminState.framePromise = null; };
+        void work.then(clear, clear);
+      }
     } else {
       setStatus(ui.uploadStatus, result.error || `Upload failed with HTTP ${request.status}`, "error");
     }
@@ -604,6 +615,27 @@ function uploadFile() {
     setStatus(ui.uploadStatus, "Network error during upload.", "error");
   });
   request.send(file);
+}
+
+async function prepareUploadedThumbnail(file, source, editingId) {
+  const current = () => !ui.workspace.hidden && ui.sourceUrl.value === source && Number(ui.editingId.value || 0) === editingId && !ui.thumbnail.value;
+  if (!current()) return;
+  setStatus(ui.thumbnailUploadStatus, "Preparing a small source-frame thumbnail…");
+  try {
+    const blob = await window.VidBestPreviewFrame.capture(file);
+    if (!current()) return;
+    const extension = blob.type === 'image/png' ? 'png' : blob.type === 'image/jpeg' ? 'jpg' : 'webp';
+    const response = await fetch('/api/assets?filename=video-preview.' + extension, {
+      method: 'PUT', credentials: 'same-origin', headers: { 'Content-Type': blob.type || 'image/webp' }, body: blob,
+    });
+    const result = await response.json();
+    if (!response.ok || !result.url) throw new Error('Thumbnail upload failed');
+    if (!current()) return;
+    ui.thumbnail.value = result.url;
+    setStatus(ui.thumbnailUploadStatus, "Source-frame thumbnail prepared.", "success");
+  } catch {
+    if (current()) setStatus(ui.thumbnailUploadStatus, "Video uploaded. Automatic thumbnail unavailable; choose a custom image.", "error");
+  }
 }
 
 function uploadThumbnail() {
@@ -927,6 +959,12 @@ async function saveVideo(event) {
   const submit = ui.videoForm.querySelector('button[type="submit"]');
   submit.disabled = true;
   try {
+    if (adminState.framePromise) {
+      setStatus(ui.saveStatus, "Preparing uploaded video thumbnail…");
+      await adminState.framePromise;
+      if (ui.editingId.value !== id || ui.sourceUrl.value !== payload.source_url) throw new Error("The source changed while preparing the thumbnail. Save this record again.");
+      payload.thumbnail_url = ui.thumbnail.value;
+    }
     const result = await adminApi(id ? `/api/videos/${id}` : "/api/videos", {
       method: id ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
@@ -956,14 +994,46 @@ async function saveVideo(event) {
       : result.video.cache_status === "failed"
         ? ` Auto-cache needs attention: ${result.video.cache_error || "retry pending"}.`
         : "";
-    setStatus(ui.saveStatus, `Saved: ${result.video.title}.${cacheMessage}${queueWarning}${analysisWarning}`, queueWarning || analysisWarning ? "error" : "success");
+    const previewMessage = facebookPreviewMessage(result.video.facebook_preview);
+    setStatus(ui.saveStatus, `Saved: ${result.video.title}.${cacheMessage}${previewMessage ? ` ${previewMessage}` : ""}${queueWarning}${analysisWarning}`, queueWarning || analysisWarning ? "error" : "success");
     resetEditor(false);
     await Promise.all([loadAdminVideos(), loadDiscoveryRequests()]);
+    if (result.video.facebook_preview) scheduleFacebookPreviewStatus(result.video.id);
   } catch (error) {
     setStatus(ui.saveStatus, error.message, "error");
   } finally {
     submit.disabled = false;
   }
+}
+
+function facebookPreviewMessage(preview) {
+  if (!preview) return "";
+  if (preview.status === "ready") return preview.poster_status === "owner_cover"
+    ? "Facebook tile ready with your cover."
+    : "Facebook tile ready; source poster saved.";
+  if (preview.status === "needs_poster") return "Facebook player ready. Add a custom thumbnail: the public source did not provide a usable poster.";
+  if (preview.status === "needs_source") return "Facebook preview needs a public video/reel URL; verify the source and save again.";
+  if (preview.status === "retry") return "Facebook preview partially prepared; automatic retry scheduled. You can add a custom thumbnail now.";
+  return "Facebook tile preview preparing automatically…";
+}
+
+function scheduleFacebookPreviewStatus(id, remaining = 12) {
+  window.clearTimeout(adminState.facebookPollTimers.get(id));
+  if (!remaining || ui.workspace.hidden) return;
+  const timer = window.setTimeout(async () => {
+    adminState.facebookPollTimers.delete(id);
+    if (ui.workspace.hidden) return;
+    const generation = adminState.libraryRequestId;
+    try {
+      // Read-only status polling never repeats a prepare request or provider call.
+      const result = await adminApi(`/api/admin/videos/${id}/facebook-preview`);
+      if (ui.workspace.hidden || generation !== adminState.libraryRequestId) return;
+      const record = adminState.videos.find(video => Number(video.id) === Number(id));
+      if (record) { record.facebook_preview = result.preview; renderAdminLibrary(); }
+      if (["pending", "preparing"].includes(result.preview?.status)) scheduleFacebookPreviewStatus(id, remaining - 1);
+    } catch { /* Leave the last verified state; refresh can retry the status read. */ }
+  }, 2500);
+  adminState.facebookPollTimers.set(id, timer);
 }
 
 async function loadAdminVideos() {
@@ -1055,6 +1125,9 @@ function renderAdminVideo(video) {
       ? ` · Auto-cache ${video.cache_status}`
       : "";
   meta.textContent = `${video.published ? "Published" : "Draft"}${cacheState} · ${formatDate(video.created_at)}`;
+  const previewDetail = document.createElement("p");
+  previewDetail.textContent = facebookPreviewMessage(video.facebook_preview);
+  previewDetail.hidden = !previewDetail.textContent;
   const actions = document.createElement("div");
   actions.className = "admin-item-actions";
   const edit = document.createElement("button");
@@ -1071,7 +1144,7 @@ function renderAdminVideo(video) {
   remove.textContent = "Delete";
   remove.addEventListener("click", () => deleteVideo(video));
   actions.append(edit, view, remove);
-  item.append(heading, detail, meta, actions);
+  item.append(heading, detail, meta, actions, previewDetail);
   return item;
 }
 

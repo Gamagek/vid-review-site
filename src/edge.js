@@ -1,4 +1,4 @@
-import app, { processAuthorizedCacheJobs, processTikTokOEmbedBackfill, resolveReactionSalt } from "./index.js";
+import app, { processAuthorizedCacheJobs, processTikTokOEmbedBackfill, processFacebookPreviewJobs, resolveReactionSalt } from "./index.js";
 import { processAdminTikTokCacheJobs } from "./tiktok-cache-jobs.js";
 import { processTikTokThumbnailJobs } from "./tiktok-thumbnail-cache.js";
 export { isLikelyCrawler } from "./crawlers.js";
@@ -608,6 +608,8 @@ async function fetchHandler(request, env, ctx) {
 }
 
 async function scheduledHandler(controller, env, ctx) {
+  ctx.waitUntil(processFacebookPreviewJobs(env, { limit: 2 })
+    .catch(() => console.warn('Scheduled Facebook preview preparation deferred')));
   ctx.waitUntil(processAdminTikTokCacheJobs(env, { limit: 2 })
     .catch(error => console.error('Scheduled TikTok cache failed', error.message)));
   ctx.waitUntil(processTikTokThumbnailJobs(env, { limit: 3 })

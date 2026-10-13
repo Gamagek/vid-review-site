@@ -21,7 +21,7 @@
       if (!script) {
         script = document.createElement("script");
         script.id = "vidbest-facebook-sdk";
-        script.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v23.0&autoLogAppEvents=0";
+        script.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=0&version=v23.0&autoLogAppEvents=0";
         script.async = true;
         script.defer = true;
         script.addEventListener("load", ready, { once: true });
@@ -53,6 +53,7 @@
     let fb;
     let readyHandler;
     let soundRequested = false;
+    let pausedRequested = false;
     const subscriptions = [];
     const timeout = window.setTimeout(() => fail(), 15000);
 
@@ -70,6 +71,7 @@
     }
     function play({ sound = false } = {}) {
       if (!live) return;
+      pausedRequested = false;
       soundRequested ||= sound;
       if (!instance) return;
       try {
@@ -78,13 +80,22 @@
         instance.play();
       } catch { state("paused"); }
     }
+    function pause() {
+      if (!live) return;
+      pausedRequested = true;
+      soundRequested = false;
+      try { instance?.mute(); instance?.pause(); } catch {}
+    }
     function destroy() {
       if (!live) return;
       live = false;
       window.clearTimeout(timeout);
       try { instance?.pause(); } catch {}
-      for (const [event, handler] of subscriptions) {
-        try { instance?.unsubscribe(event, handler); } catch {}
+      for (const [event, handler, subscription] of subscriptions) {
+        try {
+          if (subscription?.removeListener) subscription.removeListener();
+          else instance?.unsubscribe?.(event, handler);
+        } catch {}
       }
       if (readyHandler) {
         try { fb?.Event.unsubscribe("xfbml.ready", readyHandler); } catch {}
@@ -107,19 +118,23 @@
         instance = message.instance;
         framePermissions();
         for (const [event, value] of [["startedPlaying", "playing"], ["paused", "paused"], ["finishedPlaying", "ended"]]) {
-          const handler = () => state(value);
-          instance.subscribe(event, handler);
-          subscriptions.push([event, handler]);
+          const handler = () => {
+            state(value);
+            if (value === "ended" && !pausedRequested) play();
+          };
+          const subscription = instance.subscribe(event, handler);
+          subscriptions.push([event, handler, subscription]);
         }
         state("ready");
         // Autoplay starts muted. Sound is requested only by an explicit tap.
-        play();
+        if (pausedRequested) pause();
+        else play();
       };
       fb.Event.subscribe("xfbml.ready", readyHandler);
       fb.XFBML.parse(container, framePermissions);
     }).catch(fail);
-    return { play, destroy };
+    return { play, pause, destroy };
   }
 
-  window.VidBestFacebookPreview = { mount };
+  window.VidBestFacebookPreview = { mount, preload: () => loadSdk().catch(() => {}) };
 })();

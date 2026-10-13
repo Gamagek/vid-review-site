@@ -17,6 +17,7 @@ const migrations = [
   "0010_video_analysis.sql",
   "0011_spirituality_buddhism.sql",
   "0022_facebook_readable_slugs.sql",
+  "0030_facebook_preview_jobs.sql",
 ];
 
 class TestD1Statement {
