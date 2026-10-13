@@ -229,7 +229,7 @@ async function route(request, env, ctx) {
     return robotsResponse(request, env);
   }
 
-  if ((path === "/privacy" || path === "/terms") && ["GET", "HEAD"].includes(request.method)) {
+  if (["/privacy", "/terms", "/about", "/editorial", "/contact"].includes(path) && ["GET", "HEAD"].includes(request.method)) {
     const legalAsset = await env.ASSETS.fetch(request);
     return secureAssetResponse(legalAsset, path);
   }
@@ -3156,6 +3156,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
       </div>
       ${video.review_text ? `<section class="review-copy"><h2>Review & discovery notes</h2>${paragraphs(video.review_text, REVIEW_TEXT_MAX_LENGTH)}</section>` : ""}
       ${video.transcript ? `<details class="transcript-panel"><summary>Read transcript</summary><div>${paragraphs(video.transcript)}</div></details>` : ""}
+      <p class="review-source-note">Vid.Best provides commentary on external media, not a claim of original video authorship. <a href="/editorial">How our reviews work</a>.</p>
       <a class="source-link" href="${escapeHtml(video.source_page_url || video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open original source ↗</a>
     </article>
     <section class="comments-panel glass-panel">
@@ -3184,7 +3185,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   </main>
   <footer class="site-footer">
     <span>Vid.Best · Video discovery and reviews</span>
-    <span><a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a></span>
+    <span><a href="/about">About</a> · <a href="/editorial">Editorial</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></span>
   </footer>
 </body>
 </html>`;
