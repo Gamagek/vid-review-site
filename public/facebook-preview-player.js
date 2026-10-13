@@ -7,7 +7,7 @@
     if (window.FB?.XFBML?.parse && window.FB?.Event) return Promise.resolve(window.FB);
     if (sdkPromise) return sdkPromise;
     sdkPromise = new Promise((resolve, reject) => {
-      const timer = window.setTimeout(() => reject(new Error("Facebook player unavailable")), 8000);
+      const timer = window.setTimeout(() => reject(new Error("Facebook player unavailable")), 6500);
       const ready = () => {
         if (!window.FB?.XFBML?.parse || !window.FB?.Event) return;
         window.clearTimeout(timer);
@@ -32,6 +32,8 @@
         document.head.append(script);
       } else ready();
     });
+    // Do not poison all future tiles with a permanently rejected SDK promise.
+    sdkPromise.catch(() => { sdkPromise = null; });
     return sdkPromise;
   }
 
@@ -55,7 +57,7 @@
     let soundRequested = false;
     let pausedRequested = false;
     const subscriptions = [];
-    const timeout = window.setTimeout(() => fail(), 15000);
+    const timeout = window.setTimeout(() => fail(), 9000);
 
     function state(value) {
       if (!live) return;
