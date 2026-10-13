@@ -1740,7 +1740,10 @@ test("enriches Facebook share links with a Microlink-style thumbnail and officia
     const result = await response.json();
     assert.equal(result.video.provider, "facebook");
     assert.match(result.video.thumbnail_url, /^\/api\/facebook\/thumbnail\?id=\d+&v=/);
-    assert.equal((await send(context, result.video.thumbnail_url)).headers.get("Content-Type"), "image/jpeg");
+    const instantPoster = await send(context, result.video.thumbnail_url);
+    assert.equal(instantPoster.status, 200);
+    assert.match(instantPoster.headers.get("Content-Type"), /^image\/svg\+xml/);
+    assert.match(await instantPoster.text(), /Facebook video preview artwork/);
     assert.equal(result.video.facebook_preview_title, "Pause for a moment, Breathe, Observe.");
     assert.match(result.video.facebook_preview_description, /Theravada Vipassana/);
     assert.ok(result.video.embed_url.includes("facebook.com/plugins/video.php"));
