@@ -53,7 +53,7 @@ async function boundedImage(response) {
   return bytes;
 }
 
-export async function readFacebookPoster(env, row, getPreview) {
+export async function readFacebookPoster(env, row, getPreview, { cacheOnly = false } = {}) {
   const version = fingerprint(row.source_url + "|" + (row.thumbnail_url || ""));
   const key = `facebook-thumbnails/${Number(row.id)}-${version}`;
   let stored;
@@ -68,6 +68,9 @@ export async function readFacebookPoster(env, row, getPreview) {
     metadata.set("ETag", stored.httpEtag);
     return new Response(stored.body, { headers: metadata });
   }
+  // Homepage requests must not wait on a remote Facebook page or signed CDN URL.
+  // Scheduled jobs may still fetch approved image bytes and save them into R2.
+  if (cacheOnly) return null;
   const storedThumbnail = providerImage(row.thumbnail_url);
   const fetchImage = async thumbnail => {
     if (!thumbnail) return null;
@@ -97,4 +100,34 @@ export async function readFacebookPoster(env, row, getPreview) {
   const { bytes, type } = result;
   try { await env.BUCKET?.put(key, bytes, { httpMetadata: { contentType: type, cacheControl: headers["Cache-Control"] } }); } catch { /* Serve valid bytes even when durable storage is temporarily unavailable. */ }
   return new Response(bytes, { headers: { ...headers, "Content-Type": type } });
+}
+
+// Fast, honest on-site artwork when Facebook does not expose a usable cover.
+// Unlike a remote signed image, this is always a valid image and never a broken <img>.
+export function facebookPlaceholderResponse(row) {
+  const escape = value => String(value || "").replace(/[\u0000-\u001f]/g, " ")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+  const words = String(row?.title || "Facebook video").trim().split(/\s+/);
+  const lines = [""];
+  for (const word of words) {
+    const index = lines.length - 1;
+    if (lines[index] && (lines[index] + " " + word).length > 32 && lines.length < 3) lines.push(word);
+    else lines[index] = (lines[index] ? lines[index] + " " : "") + word;
+  }
+  const title = lines.slice(0, 3).map((line, index) =>
+    '<text x="42" y="' + (194 + 44 * index) + '" fill="#f0f5ff" font-size="28" font-weight="700" font-family="Arial,sans-serif">' +
+    escape(line.slice(0, 37)) + '</text>').join("");
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Facebook video preview artwork">' +
+    '<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#1d294c"/><stop offset="1" stop-color="#080c1e"/></linearGradient></defs>' +
+    '<rect width="640" height="360" fill="url(#bg)"/><circle cx="580" cy="10" r="165" fill="#3156a8" opacity=".18"/>' +
+    '<rect x="28" y="28" rx="16" width="193" height="43" fill="#284783"/>' +
+    '<text x="44" y="57" fill="white" font-size="18" font-weight="bold" font-family="Arial,sans-serif">FACEBOOK VIDEO</text>' +
+    title + '<rect x="0" y="333" width="640" height="27" fill="#1c335d"/>' +
+    '<text x="42" y="351" fill="#b5d3ff" font-size="13" font-family="Arial,sans-serif">Vid.Best • Preview artwork (not video footage)</text></svg>';
+  return new Response(svg, { status: 200, headers: {
+    "Content-Type": "image/svg+xml; charset=utf-8",
+    "Cache-Control": "public, max-age=300, stale-while-revalidate=600",
+    "X-Content-Type-Options": "nosniff",
+  } });
 }

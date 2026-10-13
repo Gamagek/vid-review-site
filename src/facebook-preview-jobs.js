@@ -104,3 +104,15 @@ export async function facebookPreviewStatus(env, id) {
     headers: { 'Cache-Control': 'no-store' },
   });
 }
+
+// Migrations and older admin imports can predate the publish-time enqueue.
+// Backfill only missing rows, without replacing existing statuses or covers.
+export async function backfillFacebookPreviewJobs(env, limit = 12) {
+  const result = await env.DB.prepare(`INSERT OR IGNORE INTO facebook_preview_jobs
+    (video_id, source_url, thumbnail_value)
+    SELECT v.id, v.source_url, COALESCE(v.thumbnail_url, '')
+    FROM videos v LEFT JOIN facebook_preview_jobs j ON j.video_id = v.id
+    WHERE v.published = 1 AND v.media_type = 'facebook' AND j.video_id IS NULL
+    ORDER BY v.id DESC LIMIT ?`).bind(Math.max(1, Math.min(25, limit))).run();
+  return Number(result.meta?.changes || 0);
+}

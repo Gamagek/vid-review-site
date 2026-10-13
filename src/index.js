@@ -3,7 +3,7 @@ import { isLikelyCrawler } from "./crawlers.js";
 import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStatus } from "./tiktok-cache-jobs.js";
 import { tikTokCacheCandidate } from "./admin-tiktok-cache.js";
 import { isCachedTikTokThumbnail, thumbnailKey } from "./tiktok-thumbnail-cache.js";
-import { facebookPosterUrl, readFacebookPoster } from "./facebook-posters.js";
+import { facebookPosterUrl, readFacebookPoster, facebookPlaceholderResponse } from "./facebook-posters.js";
 import { queueFacebookPreview, runFacebookPreviewJobs, attachFacebookPreviews, facebookPreviewStatus } from "./facebook-preview-jobs.js";
 import {
   requestMemberLogin,
@@ -3551,7 +3551,7 @@ async function facebookThumbnailEndpoint(request, env) {
   if (url.searchParams.has("id")) {
     const id = url.searchParams.get("id");
     if (!/^[1-9]\d{0,8}$/.test(id || "")) throw new AppError(400, "Invalid video ID");
-    const row = await env.DB.prepare("SELECT id,source_url,thumbnail_url FROM videos WHERE id = ? AND published = 1").bind(Number(id)).first();
+    const row = await env.DB.prepare("SELECT id,title,source_url,thumbnail_url FROM videos WHERE id = ? AND published = 1").bind(Number(id)).first();
     if (!row || !isFacebookUrl(row.source_url)) throw new AppError(404, "Video not found");
     // Old sitemap/card addresses must continue to resolve after a hosted cover replaces a provider poster.
     try {
@@ -3562,9 +3562,8 @@ async function facebookThumbnailEndpoint(request, env) {
         return new Response(null, {status:302,headers:{Location:cover.href,"Cache-Control":"public, max-age=60"}});
       }
     } catch { /* Keep provider poster fallback for unavailable/invalid covers. */ }
-    const image = await readFacebookPoster(env, row, () => fetchFacebookPreview(env, row.source_url));
-    if (!image) throw new AppError(404, "Facebook thumbnail is unavailable");
-    return image;
+    const image = await readFacebookPoster(env, row, () => null, { cacheOnly: true });
+    return image || facebookPlaceholderResponse(row);
   }
   const requested = cleanText(url.searchParams.get("url"), 2000);
   if (!requested || !isFacebookUrl(requested)) throw new AppError(400, "Add a Facebook video URL");
