@@ -1,5 +1,17 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 2026-10-13: Animal Compassion source poster deployed; accurate inventory classification
+
+PR 139 merged as 9c78a19936b2b7dd93c43ae7922934762e1daa54 after CI 38387746320 passed 257 Node tests, four Python tests, Worker compilation, workflow/Compose checks and deployment/audit syntax. Worker deployment 38387863721 succeeded and applied guarded migration 0032. Portainer run 38387863666 validated and its read-only preflight succeeded; production and optional deploy jobs stayed skipped.
+
+Published record 159 now uses its original public 680×850 JPEG source poster. Live watch canonical, index/follow robots and absolute Open Graph image are correct. Browser rendering confirms the original artwork; actual audit 38387938204 / artifact 11807492811 verifies HTTP 200 image/jpeg, 61,020 bytes. Every protected field of the production row is unchanged, fingerprint 4917:7a861ed4; created_at 2026-10-11T21:26:22.701Z and updated_at 2026-10-12T13:59:42.010Z remain identical. No substantial text, source/publication metadata, owner edits, comedy topics or drafts were rewritten.
+
+The completed post-deployment audit checked 151 reviews and 165 public pages with zero technical failures and two editorial/demo warnings. Its 137 HTTP image successes include 13 title-artwork SVG placeholders; 14 other images fail (13 protected/provider TikTok 403s and the removed Dilscoop 404). The following inventory change marks only the site's known placeholder endpoint with a response header and reports those entries as `placeholder`, retaining them in the source-poster queue. Owner SVG artwork and provider images are not inferred to be placeholders. Local validation: 258 Node tests passed and Worker compilation succeeded; confirm the new classification in the next completed artifact after CI/merge/deploy.
+
+Google OAuth and property verification passed. Review sitemap lastDownloaded is 2026-10-13T10:51:09.415Z (13 October 16:21:09 Asia/Colombo), pending true, errors/warnings zero. Zero URL Inspections were used; this does not establish any new indexed-review count. The separate last full stored snapshot remains 149 reviews: 120 discovered, 29 unknown, zero indexed. Two owner-added published reviews have not been inspected here.
+
+Next: read the classification release's completed artifact, then verify the public source for `trust-yourself-cinematic-confidence` before choosing a real source poster or clearly labelled illustration. Preserve owner covers, original dates and substantial multilingual reviews; do not invent wolf/scene/audio facts. Keep comedy/parody topics, drafts, removed Dilscoop, Saiyaara/Summer, infrastructure and Portainer automatic deployment protected. No redundant full Google inspection batch or Indexing API publication.
+
 ## 2026-10-13: Original Animal Compassion poster prepared
 
 Current main was verified at 83616d7d0ba8201ae07351c99dbbbe0cee1b3719, including PRs 136–138. Latest completed audit 38385875542 / artifact 11805198486 was downloaded and read: 151 published reviews, 165 public pages, zero technical failures and two editorial/demo warnings. Thumbnail inventory: 137 HTTP image successes, 14 failures (13 TikTok 403s and the removed Dilscoop 404). Fourteen of the HTTP successes are title-only SVG preview artwork; they are not verified source posters and remain in the accurate-cover queue. Record 159 currently serves that SVG artwork while its stored cover is still a Facebook HTML page.

@@ -89,7 +89,12 @@ export async function probeThumbnail(row, fetcher = fetch) {
         if (size > MAX_BYTES) { await reader.cancel(); return {...result,status:'invalid_size'}; }
       }
     } finally { reader.releaseLock(); }
-    return {...result, bytes:size, status:size ? 'ok' : 'empty'};
+    const imageUrl = new URL(row.thumbnail);
+    // Only trust the explicit marker on our own known fallback endpoint.
+    // A valid owner SVG or provider image is not automatically a placeholder.
+    const placeholder = imageUrl.hostname === 'vid.best' && imageUrl.pathname === '/api/facebook/thumbnail' &&
+      result.contentType === 'image/svg+xml' && response.headers.get('X-VidBest-Poster-Kind') === 'placeholder';
+    return {...result, bytes:size, status:size ? (placeholder ? 'placeholder' : 'ok') : 'empty'};
   } catch {
     await response?.body?.cancel().catch(() => {});
     // Fetch errors can contain signed source URLs. Never persist their text.
@@ -116,7 +121,7 @@ async function main() {
   for (let i=0;i<entries.length;i+=4) results.push(...await Promise.all(entries.slice(i,i+4).map(row=>probeThumbnail(row))));
   const counts = results.reduce((out,row)=>(out[row.status]=(out[row.status]||0)+1,out),{});
   await writeFile('thumbnail-audit-report.json',JSON.stringify({generatedAt:new Date().toISOString(),productionWrites:'none',counts,results},null,2)+'\n');
-  const summary = `Published thumbnail checks: ${results.length}\nImage HTTP checks: ${JSON.stringify(counts)}\nSource URLs and credentials: omitted. HTTP image availability does not prove Google indexing or visual relevance.\n`;
+  const summary = `Published thumbnail checks: ${results.length}\nImage checks: ${JSON.stringify(counts)}\nKnown title-artwork placeholders: ${counts.placeholder || 0} (HTTP image available; source poster still needed)\nSource URLs and credentials: omitted. HTTP image availability does not prove Google indexing or visual relevance.\n`;
   await writeFile('thumbnail-audit-summary.txt',summary);
   console.log(summary);
 }

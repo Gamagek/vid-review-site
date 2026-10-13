@@ -26,6 +26,22 @@ test('thumbnail checks redact signed URLs and distinguish images from HTML',asyn
   assert.equal(redirect.status,'http_error');
 });
 
+test('known title artwork remains in the source-poster queue while ordinary SVGs remain images',async()=>{
+  const response = () => new Response('<svg xmlns="http://www.w3.org/2000/svg"><text>Title artwork</text></svg>',{
+    headers:{'Content-Type':'image/svg+xml; charset=utf-8','X-VidBest-Poster-Kind':'placeholder'},
+  });
+  const row={page:'https://vid.best/watch/example',thumbnail:'https://vid.best/api/facebook/thumbnail?id=159&v=version'};
+  const placeholder=await probeThumbnail(row,async()=>response());
+  assert.equal(placeholder.status,'placeholder');
+  assert.equal(placeholder.httpStatus,200);
+  assert.ok(placeholder.bytes>0);
+  assert.equal((await probeThumbnail({...row,thumbnail:'https://vid.best/review-covers/owner.svg'},async()=>response())).status,'ok');
+  assert.equal((await probeThumbnail({...row,thumbnail:'https://scontent.xx.fbcdn.net/poster.svg'},async()=>response())).status,'ok');
+  const ordinary=await probeThumbnail(row,async()=>new Response('<svg/>',{headers:{'Content-Type':'image/svg+xml'}}));
+  assert.equal(ordinary.status,'ok');
+  assert.doesNotMatch(JSON.stringify(placeholder),/id=159|version/);
+});
+
 test('a real watch-page cover is found when optional video sitemap metadata is absent',async()=>{
   const calls=[];const r=await probeThumbnail({page:'https://vid.best/watch/lab-review-1-player-test',thumbnail:''},async(url,options)=>{
     calls.push(url);assert.equal(options.redirect,'manual');

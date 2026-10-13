@@ -127,6 +127,7 @@ export function facebookPlaceholderResponse(row) {
     '<text x="42" y="351" fill="#b5d3ff" font-size="13" font-family="Arial,sans-serif">Vid.Best • Preview artwork (not video footage)</text></svg>';
   return new Response(svg, { status: 200, headers: {
     "Content-Type": "image/svg+xml; charset=utf-8",
+    "X-VidBest-Poster-Kind": "placeholder",
     "Cache-Control": "public, max-age=300, stale-while-revalidate=600",
     "X-Content-Type-Options": "nosniff",
   } });
