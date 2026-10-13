@@ -6,7 +6,9 @@
 
 The unaltered source poster was downloaded from the reel's own `og:image`, not captured from the player or an end screen. It is a 1080×1920 JPEG, 205,834 bytes; SHA-256 `b7d414ac4fbe5fbdd476952b12a58f21f58640e010d7cff2cf9765bae3ca4901`. It shows the source's vertical sunrise, mist, forest edge and flower field without added labels or generated content. No expiring Facebook CDN URL is stored in the application or migration.
 
-Migration 0037 changes only record 45's known expiring provider poster when its exact source-media path, owner-edit timestamp, publication state and category still match. It leaves both site dates, substantial review, description, SEO fields, source and owner edits unchanged. Pre-deployment created_at is `2026-09-27T18:02:43.958Z`; updated_at is `2026-09-30T17:54:22.518Z`.
+Migration 0037 changes only record 45's known expiring provider poster when its exact source-media path, owner-edit timestamp, publication state and category still match. The original `LIKE` path guard failed closed under Cloudflare D1's bounded pattern implementation in Deploy 38438379083; the Worker was not deployed, D1 was unchanged and no migration ledger entry was written. PR 149 replaced only that guard with bounded `substr`/`instr` checks after a read-only production match test. Deploy 38438988842 then applied migration 0037 successfully.
+
+Production D1 comparison confirms `thumbnail_url` is the only changed field; both site dates, substantial review, description, SEO fields, source and owner edits are identical. created_at remains `2026-09-27T18:02:43.958Z`; updated_at remains `2026-09-30T17:54:22.518Z`. Audit 38439074013 / artifact 11835055064 verifies the same-origin poster as HTTP 200 image/jpeg, 205,834 bytes, and the live page exposes the correct canonical, index/follow robots and absolute image metadata.
 
 ## Master Ānāpānasati Meditation — original public source poster
 
