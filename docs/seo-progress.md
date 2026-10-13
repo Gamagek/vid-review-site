@@ -1,5 +1,20 @@
 # Vid.Best indexing and thumbnail work queue
 
+## Latest verified checkpoint — 13 October 2026
+
+Completed PR 124 (independent zero-inspection deployment diagnostics) and PR 125 (guarded garden cover). PR 125 merged as 9e2bdc3d480ffc6f466d3f96cd40c21172b8586c; CI 38330281526 and Worker deployment 38330423497 passed. Tests: 241 Node, four Python, workflow expressions, Compose validation, Worker compilation and updater syntax. Portainer run 38330423492 validated and all production jobs stayed skipped.
+
+Latest completed diagnostic 38330473653 / artifact 11782656400: 163 public pages, zero technical failures; 149 thumbnails, 118 HTTP image successes and 31 errors (13 TikTok CDN 403, 17 Facebook poster 404, one YouTube poster 404). It used ZERO URL Inspections, so use the separate full stored inspection 38320516778 / artifact 11779470912 for Google coverage: 120 discovered, 29 unknown, zero indexed reviews. No redundant full inspection batch was requested here.
+
+Review sitemap lastDownloaded 2026-10-13T00:58:51.459Z (13 October 06:28:51 Asia/Colombo), pending true, zero errors/warnings. Google is downloading the review sitemap again and has discovered many more reviews; indexing/crawl scheduling remains Google's decision. Verified Googlebot sample evidence is recorded below; no security settings or route changes were made.
+
+Garden record 144 is repaired: public cover HTTP 200 image/webp, 126,544 bytes, confirmed by the actual Actions artifact and browser image rendering. Browser navigation of the old public poster address resolves to the new hosted cover. Live watch Open Graph image is the absolute hosted cover and its canonical is the matching watch URL. Protected-field fingerprint remains 3183:3dd3d707 before/after, including both dates and all editorial/source fields (excluding only thumbnail and normal activity counters). No comedy/parody reviews or drafts were edited.
+
+Dilscoop source availability is now verified: public YouTube Shorts YVT1oUI2nTE shows Video unavailable and reports removal following a copyright removal request by Copyright Integrity International. This explains why both its frame and default poster are 404; it is not evidence of a browser bot block. Keep record 108, its dates and substantive review unchanged. Do not copy/rehost the removed video, evade its removal or use another video's poster to imply the original remains available.
+
+Next task: continue the remaining 30 provider image failures individually, prioritizing non-comedy Facebook nature/educational/spiritual reviews with verifiable public sources and preserving accurate owner posters. Resolve the removed-source case only with a verified lawful source/owner decision; do not mask it with an unrelated image. Read the latest artifact before further mutations. Continue tracking actual Google crawl/discovery changes from stored daily inspections and verified crawler analytics, without redundant same-day full batches.
+
+
 Preserve original publication dates, substantive editorial structure, owner edits and all existing production media/data. Do not edit Funny & Comedy topics, add a Last updated label, publish pending drafts, or enable Portainer automatic deployment.
 
 ## Verified evidence, 12 October 2026
