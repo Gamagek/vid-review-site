@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { facebookPosterUrl, readFacebookPoster } from "../src/facebook-posters.js";
+import { facebookPosterUrl, readFacebookPoster, facebookPlaceholderResponse } from "../src/facebook-posters.js";
 
 function bucket() {
   const data = new Map();
@@ -79,5 +79,21 @@ test("an expired provider image retries a refreshed poster once and caches it", 
     assert.equal(response.status, 200);
     assert.equal(requests, 2);
     assert.equal(env.BUCKET.data.size, 1);
+  } finally { globalThis.fetch = original; }
+});
+
+
+test("homepage cache-only lookup does not block on provider network", async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = async () => { throw new Error("Homepage must not fetch a remote poster"); };
+  try {
+    const env = { BUCKET: bucket() };
+    assert.equal(await readFacebookPoster(env, row, () => { throw new Error("No remote metadata"); }, { cacheOnly: true }), null);
+    const placeholder = facebookPlaceholderResponse({ title: "Broken <thumbnail> & a review" });
+    assert.equal(placeholder.status, 200);
+    assert.match(placeholder.headers.get("Content-Type"), /image\\/svg\\+xml/);
+    const svg = await placeholder.text();
+    assert.match(svg, /Broken &lt;thumbnail&gt; &amp; a review/);
+    assert.doesNotMatch(svg, /<thumbnail>/);
   } finally { globalThis.fetch = original; }
 });
