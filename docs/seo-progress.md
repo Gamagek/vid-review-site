@@ -1,5 +1,15 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 2026-10-13: Live Kindly cover verified
+
+PR 129 merged as 261e3ebfd286c14ccb397d08c41e7857934d8a03. CI 38349504766 passed workflow expressions, Compose validation, 241 Node tests, four Teamwork Python tests, Worker compilation and both deployment-script syntax checks. Worker deployment 38349582828 succeeded and applied guarded migration 0029. Portainer run 38349582807 validated; preflight, deploy and optional production jobs stayed skipped.
+
+Published record 149 now uses the explicitly labelled Live Kindly editorial illustration. The public source resolved to Nethu Uduwana video 275163778863394, played publicly as a 20-second video dated 20 March 2024, and visibly showed a blue-and-warm-orange sky/cloud montage with small birds. The illustration follows only those verified elements and is not a screenshot or a claim that its layout exactly reproduces the source. Live cover is HTTP 200 image/webp, 64,168 bytes. Watch canonical, index/follow robots and absolute Open Graph image metadata are correct. Protected-field fingerprint remained 4216:854301a1 before/after; created_at 2026-10-11T21:26:22.701Z and updated_at 2026-10-12T18:00:38.474Z were preserved.
+
+Zero-inspection audit 38349628055 / artifact 11791105116 succeeded: 149 published thumbnails, 120 image successes and 29 errors; 163 public pages and zero technical failures. Google OAuth and Full/Owner property access passed. Root and review sitemap processing are verified and pending with zero errors/warnings; the review sitemap lastDownloaded value advanced to 2026-10-13T03:13:33.793Z. This run inspected zero URLs, so current Google coverage remains the stored full result: 120 discovered, 29 unknown and zero indexed reviews. Google crawl/index scheduling remains external.
+
+Next task: continue the 29 image failures individually. Prioritize non-comedy record 152, Past, Present & Progress, if its public source can be played and visually verified. Preserve every owner cover, editorial field and date; do not change Funny & Comedy, drafts, Saiyaara/Summer media or Portainer state.
+
 ## 2026-10-13: Nature Is Power cover verified
 
 PR 127 merged as d1d765703c1c8ba37ff255ff52ee5c10b5be0601. CI 38339749119 passed workflow expressions, Compose validation, 241 Node tests, four Teamwork Python tests, Worker compilation and updater syntax. Worker deployment 38339856108 succeeded and applied guarded migration 0028. Portainer run 38339855944 validated; preflight, deploy and optional production jobs stayed skipped.

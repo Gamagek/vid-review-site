@@ -1,5 +1,11 @@
 # Editorial cover provenance
 
+## Live Kindly — verified illustrative cover
+
+`public/review-covers/live-kindly-illustrated-v1.webp` is a clearly labelled editorial illustration for published Facebook review 149. Public browser playback verified Nethu Uduwana video 275163778863394: a 20-second video dated 20 March 2024 showing a blue-and-warm-orange sky/cloud montage with small birds. The generated composition uses only that verified visual theme; it is not a source frame or an exact reconstruction. Built-in image generation produced the illustration, and its delivery WebP is 1024 × 576 / 64,168 bytes. Exact labels: LIVE KINDLY; TIME & PEACEFUL MOMENTS; Illustrated review cover; Vid.Best. Guarded migration 0029 replaces only the exact broken Facebook share-page thumbnail and leaves the source, review, SEO fields, publication state, owner edits and both dates unchanged.
+
+Prompt: Wide 16:9 Vid.Best editorial review cover based only on the verified public source: serene blue and warm orange sunset sky, layered clouds and small birds in flight; calm painted landscape/water atmosphere. Exact text LIVE KINDLY, TIME & PEACEFUL MOMENTS, Illustrated review cover, Vid.Best. Clearly illustrative, never a claimed screenshot or source frame. No people, provider logos, creator-watermark imitation, rankings, clickbait or unsupported claims.
+
 ## Nature Is Power — verified illustrative cover
 
 `public/review-covers/nature-is-power-illustrated-v1.webp` is a clearly labelled editorial illustration for published Facebook record 145. Browser verification resolved the saved share link to Kaushalya Bandara public video 1162995741422575, dated 15 August 2024. The 20-second source visibly played and showed blue sky, green highlands, a winding river and a foreground tree; its Sinhala caption describes nature as a healer and asks viewers to respect the earth. The generated cover is not a source frame and does not claim its exact landscape layout appears in the video. Delivery asset: 1024 × 576 WebP, 132,500 bytes. Exact labels: NATURE IS POWER; EARTH & QUIET STRENGTH; Illustrated review cover; Vid.Best. Migration 0028 replaces only the exact invalid Facebook HTML cover of record 145 and preserves source, review/SEO fields, publication state, owner edits and both dates.
