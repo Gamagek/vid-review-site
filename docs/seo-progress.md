@@ -1,5 +1,15 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 2026-10-13: Placeholder inventory verified; Trust Yourself source poster prepared
+
+PR 140 merged as 00e1c99fa8953fc9205cac42f9d27a80c610668a after CI 38388606969 passed 258 Node tests, four Python tests, workflow/Compose checks, Worker compilation and script syntax. Worker deployment 38388731160 succeeded. Completed diagnostic 38388790377 / artifact 11808000359 now distinguishes known title artwork: 152 published reviews, 166 public pages, zero technical failures, two editorial/demo warnings; 125 available non-placeholder images, 13 title-artwork placeholders and 14 HTTP failures. A new owner-published review is included; this task did not publish drafts or create test records. Availability is not proof of visual accuracy or indexing.
+
+Google OAuth/property access succeeded. Review sitemap lastDownloaded 2026-10-13T11:10:21.740Z (13 October 16:40:21 Asia/Colombo), pending true, errors/warnings zero. The diagnostic made zero inspections and establishes no new index count. Last full stored snapshot remains 149 reviews: 120 discovered, 29 unknown, zero indexed; three newer published reviews are outside that snapshot.
+
+Next accurate-cover target was publicly verified: record 151, `trust-yourself-cinematic-confidence`. Its saved share link resolves to Lakmal Suranjith video 273200312546873, with Public visibility, a Sinhala confidence caption and displayed 12 April 2024 attribution. Public playback exposes an 18.553-second cinematic clip; no movie, cast, real animal event or audio claim is asserted. The main video's exact original JPEG poster was downloaded and visually checked: 539×960, 52,816 bytes, without image edits or an end-screen capture. Guarded migration 0033 replaces only the matching invalid HTML thumbnail and preserves owner covers, all text, source/publication metadata and dates. Pre-change protected fingerprint 4576:c294cf72; created_at 2026-10-11T21:26:22.701Z; updated_at 2026-10-12T17:33:17.120Z.
+
+Next: after CI/merge/Worker deployment, confirm the hosted JPEG, live metadata and unchanged protected row, then read the completed classification artifact. Continue public-source verification for `some-meetings-end-in-goodbye-sinhala-reflection` if it still needs a poster. Keep every comedy/parody topic, draft, owner edit, removed Dilscoop and protected Saiyaara/Summer media unchanged; keep Portainer automatic deployment disabled and make no redundant full Google inspection batch.
+
 ## 2026-10-13: Animal Compassion source poster deployed; accurate inventory classification
 
 PR 139 merged as 9c78a19936b2b7dd93c43ae7922934762e1daa54 after CI 38387746320 passed 257 Node tests, four Python tests, Worker compilation, workflow/Compose checks and deployment/audit syntax. Worker deployment 38387863721 succeeded and applied guarded migration 0032. Portainer run 38387863666 validated and its read-only preflight succeeded; production and optional deploy jobs stayed skipped.

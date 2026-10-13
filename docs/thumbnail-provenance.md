@@ -1,5 +1,13 @@
 # Editorial cover provenance
 
+## Trust Yourself — original public source poster
+
+`public/review-covers/trust-yourself-source-poster-v1.jpg` is the exact public JPEG backdrop poster belonging to Lakmal Suranjith's Facebook video 273200312546873, reached through record 151's saved share URL. Public browser playback, the creator, Public visibility marker, Sinhala self-confidence caption and displayed 12 April 2024 source date were checked on 13 October 2026. The player reports 18.553 seconds. The source contains a cinematic animal/person image and English motivational captions; no movie identity, cast, real animal event or audio analysis is asserted.
+
+Downloaded only the main video's original poster image, not the video or an end screen. The unaltered JPEG is 539×960, 52,816 bytes; SHA-256 `c2629d09ac06a9d9ab902363d4a9810e5f4ec68f822fea666d61539f7b5b80c6`. It retains the source's exact existing composition and text (including its original wording). This is source artwork, not generated imagery or an invented reconstruction. No expiring CDN URL is saved in the repository.
+
+Migration 0033 changes only record 151's known HTML thumbnail when its source, original cover, owner-edit timestamp, publication state and category still match. Protected-field fingerprint before deployment: `4576:c294cf72`; original created_at `2026-10-11T21:26:22.701Z` and updated_at `2026-10-12T17:33:17.120Z` must remain unchanged. Verify the hosted JPEG and every other production field after CI/merge/deployment.
+
 ## Animal Compassion — original public source poster
 
 `public/review-covers/animal-compassion-source-poster-v1.jpg` is the original public JPEG poster displayed behind the main video on Anil Oskar's Facebook video 382088081635044. Public browser playback, creator attribution, the Public visibility marker and the source post's displayed 25 June 2024 date were checked on 13 October 2026. The video player reports 113.5 seconds. A short portion was viewed; no full-video/audio verification, rescue outcome, animal identity or religious interpretation is asserted.
