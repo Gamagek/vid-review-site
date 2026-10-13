@@ -1,5 +1,11 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 13 October 2026: Ānāpānasati source poster verified
+
+The next non-comedy placeholder, published record 44 `facebook-discovery`, was verified directly from its saved public Facebook source. The share URL resolves to reel 1986667352042256, attributed to `වටිනා ධර්ම ලිපි,දේශනා බණ Dharma Articles,Dhamma Sermons`, with Public visibility, a bilingual Theravada Vipassana/breath-awareness caption and a 20.011-second player. Facebook exposes its own exact 1280×720 Open Graph JPEG; the 64,004-byte poster was downloaded and visually checked. It is the source's meditation portrait, not a browser screenshot, end screen, generated scene or full-video copy. No participant identity, medical result or guaranteed spiritual outcome is asserted.
+
+Guarded migration 0036 fills only the exact matching still-null thumbnail. All existing source fields, substantial multilingual review/SEO text, publication state, owner edits and original dates remain unchanged. Pre-deployment created_at is `2026-09-27T18:01:49.145Z`; updated_at is `2026-09-27T18:58:50.569Z`. Next: pass regression tests and Worker compilation, publish through PR/CI, verify the exact D1 field delta and hosted image, then read only the resulting zero-inspection audit. Continue with non-comedy record 45 only after direct source verification; keep all comedy/parody records and drafts untouched.
+
 ## 13 October 2026: two more exact Facebook source posters deployed
 
 PR 143 merged as ce3a075d273fa2b5b84dc4695e93930e83513c72 after CI 38402803909 passed 258 Node tests, four Python tests, workflow/Compose checks, Worker compilation and script syntax. Worker deployment 38402958452 succeeded and applied guarded migration 0034. Production record 150 changed only `thumbnail_url`; every other D1 field, including created_at `2026-10-11T21:26:22.701Z` and updated_at `2026-10-12T17:43:44.501Z`, is byte-for-byte unchanged. Live canonical, index/follow robots and absolute Open Graph image are correct.

@@ -1,5 +1,13 @@
 # Editorial cover provenance
 
+## Master Ānāpānasati Meditation — original public source poster
+
+`public/review-covers/anapanasati-source-poster-v1.jpg` is the exact public Open Graph JPEG poster exposed by the saved Facebook source for published record 44. The share URL resolves to reel 1986667352042256. Public playback, Public visibility, the creator attribution `වටිනා ධර්ම ලිපි,දේශනා බණ Dharma Articles,Dhamma Sermons`, and the bilingual caption about Theravada Vipassana, breath awareness and present-moment observation were checked on 13 October 2026. The player reports 20.011 seconds. No full-video or audio analysis, participant identity, medical benefit, guaranteed outcome or broader doctrinal claim is asserted.
+
+The unaltered source poster was downloaded from the reel's own `og:image`, not captured from the player or an end screen. It is a 1280×720 JPEG, 64,004 bytes; SHA-256 `da90dc0f4067c0b409da8a2854b7bda8b1deca140ae25be9b591db59243ccdd7`. It shows the source's landscape meditation portrait without added labels or generated content. No expiring Facebook CDN URL is stored in the application or migration.
+
+Migration 0036 fills only record 44's still-null thumbnail when its exact source, owner-edit timestamp, publication state and category still match. It leaves both site dates, substantial multilingual review, description, SEO fields, source and owner edits unchanged. Pre-deployment created_at is `2026-09-27T18:01:49.145Z`; updated_at is `2026-09-27T18:58:50.569Z`.
+
 ## Are You in the Right Place? — original public source poster
 
 `public/review-covers/right-place-source-poster-v1.jpg` is the exact public Open Graph JPEG poster exposed by the Buddha Puthun Facebook video 1695142117940360, reached through published record 161's saved share URL. Public playback, the creator attribution, visible Sinhala title `හරි තැනද බලන්න..`, displayed 17 June 2024 source date and a 21.167-second player were checked on 13 October 2026. The source page and poster show an athletics track and the source's own Sinhala overlay; no full-video, audio, participant identity, race result or broader life-lesson claim is asserted from that short verification.
