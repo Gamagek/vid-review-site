@@ -6,7 +6,7 @@
 
 The poster was downloaded directly from the source page's `og:image`, not captured from the player or an end screen. The unaltered JPEG is 1080×1350, 150,638 bytes; SHA-256 `5e583b630c593f9e0e6ddce0bf118f0cf34583e57f950e2fc9abc38a801752e0`. Existing source text remains part of the original artwork. No generated scene, third-party substitute or expiring Facebook CDN URL is stored in the application or migration.
 
-Migration 0035 changes only record 161's known Facebook HTML thumbnail when its exact source, original cover, owner-edit timestamp, publication state and category still match. It leaves both site dates, substantial multilingual review, description, SEO fields, source and owner edits unchanged. Pre-deployment protected-field fingerprint is `4183:65e532bd`, excluding only the thumbnail and normal activity counters; created_at is `2026-10-11T21:26:22.701Z` and updated_at is `2026-10-12T09:21:09.802Z`.
+Migration 0035 changes only record 161's known Facebook HTML thumbnail when its exact source, original cover, owner-edit timestamp, publication state and category still match. PR 144 / Worker deployment 38404230122 published it. Actual audit 38404316029 / artifact 11818350637 verifies HTTP 200 image/jpeg, 150,638 bytes, and live canonical/absolute image metadata is correct. D1 comparison confirms every other field is unchanged; protected fingerprint `4183:65e532bd`, created_at `2026-10-11T21:26:22.701Z` and updated_at `2026-10-12T09:21:09.802Z` remain identical.
 
 ## Some Meetings End in Goodbye — original public source poster
 
