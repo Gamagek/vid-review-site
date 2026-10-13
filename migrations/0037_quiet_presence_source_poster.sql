@@ -7,5 +7,8 @@ WHERE id = 45 AND slug = 'facebook-discovery-5c11fe'
   AND primary_category = 'Music'
   AND subcategory = 'Lo-Fi & Relaxation'
   AND source_url = 'https://www.facebook.com/share/r/1TcfXsB2Zi/'
-  AND thumbnail_url LIKE 'https://scontent-%fbcdn.net/v/t15.5256-10/723675293_1323146676617213_4937719645709367254_n.jpg?%'
+  -- Avoid D1's bounded LIKE implementation for long signed provider URLs.
+  AND substr(thumbnail_url, 1, 17) = 'https://scontent-'
+  AND instr(thumbnail_url, '.fbcdn.net/') > 17
+  AND instr(thumbnail_url, '/v/t15.5256-10/723675293_1323146676617213_4937719645709367254_n.jpg?') > 0
   AND updated_at = '2026-09-30T17:54:22.518Z';
