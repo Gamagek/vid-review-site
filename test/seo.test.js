@@ -390,9 +390,9 @@ test("Facebook sitemap, watch page, topic and directory share a crawlable stable
 test("curated watch schema attributes the review and never calls a landing page a video file", async () => {
   const context = createContext();
   context.sqlite.prepare(`INSERT INTO videos
-    (slug,title,source_url,source_page_url,media_type,primary_category,subcategory,description,thumbnail_url,published)
+    (slug,title,source_url,media_type,primary_category,subcategory,description,thumbnail_url,published)
     VALUES ('external-review', 'Reviewed outdoor scene', 'https://videos.example.com/watch/123',
-    'https://videos.example.com/watch/123', 'raw', 'Funny & Comedy', 'Skits & Sketches',
+    'raw', 'Funny & Comedy', 'Skits & Sketches',
     'A written independent review.', 'https://vid.best/review-covers/real.jpg', 1)`).run();
   const html = await (await request(context, 'https://vid.best/watch/external-review')).text();
   const json = JSON.parse(html.match(/<script\b[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/s)[1]);
