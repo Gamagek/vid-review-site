@@ -1,12 +1,20 @@
 # Editorial cover provenance
 
+## Are You in the Right Place? — original public source poster
+
+`public/review-covers/right-place-source-poster-v1.jpg` is the exact public Open Graph JPEG poster exposed by the Buddha Puthun Facebook video 1695142117940360, reached through published record 161's saved share URL. Public playback, the creator attribution, visible Sinhala title `හරි තැනද බලන්න..`, displayed 17 June 2024 source date and a 21.167-second player were checked on 13 October 2026. The source page and poster show an athletics track and the source's own Sinhala overlay; no full-video, audio, participant identity, race result or broader life-lesson claim is asserted from that short verification.
+
+The poster was downloaded directly from the source page's `og:image`, not captured from the player or an end screen. The unaltered JPEG is 1080×1350, 150,638 bytes; SHA-256 `5e583b630c593f9e0e6ddce0bf118f0cf34583e57f950e2fc9abc38a801752e0`. Existing source text remains part of the original artwork. No generated scene, third-party substitute or expiring Facebook CDN URL is stored in the application or migration.
+
+Migration 0035 changes only record 161's known Facebook HTML thumbnail when its exact source, original cover, owner-edit timestamp, publication state and category still match. It leaves both site dates, substantial multilingual review, description, SEO fields, source and owner edits unchanged. Pre-deployment protected-field fingerprint is `4183:65e532bd`, excluding only the thumbnail and normal activity counters; created_at is `2026-10-11T21:26:22.701Z` and updated_at is `2026-10-12T09:21:09.802Z`.
+
 ## Some Meetings End in Goodbye — original public source poster
 
 `public/review-covers/some-meetings-source-poster-v1.jpg` is the exact public Open Graph JPEG poster exposed by Sanju Doni's Facebook reel 297960563374326, which is the saved source for published record 150. Public browser playback, Sanju Doni attribution, the Public visibility marker and the Sinhala caption about some meetings ending in separation were checked on 13 October 2026. The player reports 21.804 seconds. No full-video, audio, speaker-identity or narrative-outcome claim is asserted.
 
 The original poster was downloaded directly from the reel's `og:image`, not captured from the player or an end screen. The unaltered JPEG is 720×1280, 51,906 bytes; SHA-256 `53d962a271111ed1d923635060984bb9ccd9a4571ef7e6c5f8000e29dddb121d`. It shows the source's own vertical portrait frame without added labels or generated content. No expiring Facebook CDN URL is stored in the application or migration.
 
-Migration 0034 changes only record 150's known Facebook HTML thumbnail when its exact source, original cover, owner-edit timestamp, publication state and category still match. It leaves both dates, the substantial multilingual review, description, SEO fields, source and all owner edits unchanged. Pre-deployment protected-field fingerprint is `3811:eeb7c566`, excluding only the thumbnail and normal activity counters; created_at is `2026-10-11T21:26:22.701Z` and updated_at is `2026-10-12T17:43:44.501Z`.
+Migration 0034 changes only record 150's known Facebook HTML thumbnail when its exact source, original cover, owner-edit timestamp, publication state and category still match. PR 143 / Worker deployment 38402958452 published it. Actual audit 38403042499 / artifact 11817025104 verifies HTTP 200 image/jpeg, 51,906 bytes, and live canonical/absolute image metadata is correct. Every other D1 field remains identical; protected fingerprint `3811:eeb7c566`, created_at `2026-10-11T21:26:22.701Z` and updated_at `2026-10-12T17:43:44.501Z` are unchanged.
 
 ## Trust Yourself — original public source poster
 
