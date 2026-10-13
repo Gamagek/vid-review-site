@@ -1,4 +1,5 @@
 const PREVIEW_DELAY_MS = 450;
+const FACEBOOK_PREVIEW_DELAY_MS = 0;
 const PREVIEW_VISIBILITY = 0.62;
 const ACTIVE_SWITCH_MARGIN = 0.14;
 const ACTIVE_MIN_VISIBILITY = 0.08;
@@ -75,6 +76,11 @@ function decorateVideoCards() {
 
     if (card.dataset.videoProvider === "facebook") {
       mountFacebookFacade(card);
+      // Start the shared SDK request as soon as a Facebook tile is rendered.
+      // The page still mounts only one official player at a time, but a
+      // side-by-side YouTube tile can no longer consume the whole warm-up
+      // window before Facebook has even begun loading.
+      if (previewsAllowed() && isNearViewport(card)) void window.VidBestFacebookPreview?.preload?.();
       media.addEventListener("pointerenter", () => schedulePreview(card));
       media.addEventListener("focus", () => schedulePreview(card));
       // Review text can be taller than the phone viewport. Autoplay follows
@@ -207,15 +213,18 @@ function chooseVisibleCandidate() {
       previewState.visibility.delete(card);
       continue;
     }
-    if (ratio >= PREVIEW_VISIBILITY && canPreview(card) && ratio > bestScore) {
+    const score = previewScore(card, ratio);
+    if (ratio >= PREVIEW_VISIBILITY && canPreview(card) && score > bestScore) {
       bestCard = card;
-      bestScore = ratio;
+      bestScore = score;
     }
   }
 
+  const activeScore = previewState.activeCard ? previewScore(previewState.activeCard, activeRatio) : 0;
+
   if (previewState.activeCard && (
     activeRatio < ACTIVE_MIN_VISIBILITY
-    || (bestCard && bestCard !== previewState.activeCard && bestScore > activeRatio + ACTIVE_SWITCH_MARGIN)
+    || (bestCard && bestCard !== previewState.activeCard && bestScore > activeScore + ACTIVE_SWITCH_MARGIN)
   )) {
     stopPreview(previewState.activeCard);
   }
@@ -225,6 +234,13 @@ function chooseVisibleCandidate() {
   }
 }
 
+function previewScore(card, ratio) {
+  // Facebook needs a shared SDK bootstrap while YouTube embeds can begin in a
+  // single iframe. Give a visible Facebook tile priority so a neighbouring
+  // YouTube tile does not leave it on the facade indefinitely.
+  return ratio + (card?.dataset?.videoProvider === "facebook" ? 1 : 0);
+}
+
 function schedulePreview(card) {
   if (!card?.isConnected || !previewsAllowed() || !canPreview(card)) return;
   if (previewState.activeCard === card || previewState.candidateCard === card) return;
@@ -232,7 +248,11 @@ function schedulePreview(card) {
   previewState.candidateCard = card;
   card.classList.add("preview-pending");
   card.querySelector(".preview-status").textContent = "Preview loading…";
-  previewState.timer = window.setTimeout(() => startPreview(card), card.dataset.videoProvider === "facebook" ? 120 : PREVIEW_DELAY_MS);
+  if (card.dataset.videoProvider === "facebook") void window.VidBestFacebookPreview?.preload?.();
+  previewState.timer = window.setTimeout(
+    () => startPreview(card),
+    card.dataset.videoProvider === "facebook" ? FACEBOOK_PREVIEW_DELAY_MS : PREVIEW_DELAY_MS,
+  );
 }
 
 function cancelCandidate(card = null) {

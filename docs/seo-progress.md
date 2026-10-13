@@ -1,5 +1,11 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 2026-10-13: Facebook preview start priority
+
+Mobile evidence showed a fully visible Facebook tile remaining on its facade while a neighbouring YouTube tile owned the homepage's single active preview slot. The official Facebook player itself was working; cross-provider arbitration prevented it from starting. Facebook tiles now request the shared SDK as soon as a near-viewport card is rendered, start without the former 120 ms application delay, and receive visible-card priority over an adjacent one-step iframe provider. The existing one-active-preview limit, Data Saver and reduced-motion controls, offscreen pause, cached player reuse and owner poster behavior remain in place.
+
+Local validation: 251 Node regression tests passed, including a new mixed Facebook/YouTube viewport case; Worker dry-run compilation passed. After CI/merge/deployment, verify on the live two-column mobile grid that a Facebook tile begins muted playback without a tap even when the YouTube tile beside it is already eligible. Then continue source verification for non-comedy record 159, Animal Compassion / Anil Oskar, and the remaining broken posters. Do not infer any Google index-count change from this playback-only release.
+
 ## 2026-10-13: Progress cover and Googlebot review-sitemap access verified
 
 PR 132 merged as 79f04ed6c3f2cfed68152fd6c3588316702605ae. CI 38360675130 passed; Worker deployment 38360876265 succeeded and applied guarded migration 0031. Regression baseline is 250 Node tests, four Python tests, Worker compilation, workflow expressions, Compose validation and deployment/Search Console syntax. Portainer run 38360876196 validated; all preflight/deploy/optional jobs stayed skipped.

@@ -46,6 +46,25 @@ test("Facebook poster appears immediately; a visible tile starts its muted offic
   assert.equal(h.scope.testState.activeCard, h.card);
 });
 
+test("a visible Facebook tile starts before a neighbouring YouTube preview", () => {
+  const h = facade();
+  const status = { textContent: "" };
+  const youtube = {
+    isConnected: true,
+    dataset: {
+      videoProvider: "youtube",
+      videoEmbed: "https://www.youtube-nocookie.com/embed/example",
+    },
+    classList: { add() {}, remove() {} },
+    querySelector(selector) { return selector === ".preview-status" ? status : null; },
+  };
+  h.scope.testState.visibility.set(youtube, 0.95);
+  h.scope.testState.visibility.set(h.card, 0.75);
+  h.scope.chooseVisibleCandidate();
+  assert.equal(h.scope.testState.candidateCard, h.card);
+  assert.equal(h.timers.size, 1);
+});
+
 test("scrolling out destroys the Facebook player and restores its instant poster, ready for re-entry", () => {
   const h = facade();
   h.scope.mountFacebookDirectPlayer(h.card);
