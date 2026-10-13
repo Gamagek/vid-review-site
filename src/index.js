@@ -2993,7 +2993,7 @@ function verifiedVideoFileUrl(value, base) {
   try {
     const url = new URL(String(value || ""), base);
     if (!["https:", "http:"].includes(url.protocol) || url.username || url.password) return "";
-    return /\\.(?:mp4|m4v|webm|ogv|mov)$/i.test(url.pathname) ? url.toString() : "";
+    return /\.(?:mp4|m4v|webm|ogv|mov)$/i.test(url.pathname) ? url.toString() : "";
   } catch { return ""; }
 }
 
