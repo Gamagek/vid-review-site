@@ -20,13 +20,44 @@ function facade({ saveData = false, reducedMotion = false } = {}) {
     classList: { add() {}, remove() {} }, getBoundingClientRect() { return { top: 0, bottom: 216 }; },
     querySelector(name) { return { ".tile-media": media, ".preview-surface": surface, ".media-fallback": fallback, ".preview-status": status, ".tile-media > img": cover }[name] || surface.querySelector(name); } };
   media.closest = () => card;
-  const timers = new Map(); let nextTimer = 0;
-  const scope = { document: { hidden: false, addEventListener() {}, querySelectorAll() { return [card]; }, createElement: element },
-    window: { innerHeight: 800, setTimeout(fn) { timers.set(++nextTimer, fn); return nextTimer; }, clearTimeout(id) { timers.delete(id); } },
+  const cards = [card], timers = new Map(), timerDelays = new Map(); let nextTimer = 0;
+  const scope = { document: { hidden: false, addEventListener() {}, querySelectorAll() { return cards; }, createElement: element },
+    window: { innerHeight: 800, setTimeout(fn, delay) { timers.set(++nextTimer, fn); timerDelays.set(nextTimer, delay); return nextTimer; }, clearTimeout(id) { timers.delete(id); timerDelays.delete(id); } },
     navigator: { connection: { saveData } }, matchMedia() { return { matches: reducedMotion }; }, URL, URLSearchParams, location: { origin: "https://vid.best" } };
   runInNewContext(source + "\nthis.testState = previewState;", scope);
   scope.mountFacebookFacade(card);
-  return { surface, fallback, status, media, card, scope, timers };
+  function addCard(id = "163") {
+    const nextSurface = element(), nextMedia = element(), nextStatus = element(), nextFallback = element();
+    const next = { ...card, dataset: { ...card.dataset, videoId: id, videoSource: "https://www.facebook.com/reel/" + id },
+      querySelector(name) { return { ".tile-media": nextMedia, ".preview-surface": nextSurface, ".media-fallback": nextFallback, ".preview-status": nextStatus, ".tile-media > img": cover }[name] || nextSurface.querySelector(name); } };
+    delete next.dataset.previewReady;
+    delete next.dataset.facebookPlayerMounted;
+    delete next.dataset.facebookSurfaceBound;
+    nextMedia.closest = () => next;
+    cards.push(next);
+    scope.mountFacebookFacade(next);
+    return { card: next, surface: nextSurface, media: nextMedia, status: nextStatus };
+  }
+  function runTimer(delay) {
+    const id = [...timerDelays].find(([id, ms]) => ms === delay && timers.has(id))?.[0];
+    assert.ok(id, "expected timer " + delay);
+    const fn = timers.get(id); timers.delete(id); timerDelays.delete(id); fn();
+  }
+  return { surface, fallback, status, media, card, scope, timers, timerDelays, addCard, runTimer };
+}
+
+function installSdk(h) {
+  const mounts = [], callbacks = new Map();
+  h.scope.window.VidBestFacebookPreview = {
+    preload() {},
+    mount(surface, options) {
+      const host = h.scope.document.createElement('div'); host.className = 'facebook-sdk-player'; surface.children.push(host);
+      const controller = { plays: 0, pauses: 0, destroyed: false, play() { this.plays++; }, pause() { this.pauses++; }, destroy() { this.destroyed = true; surface.children = surface.children.filter(node => node !== host); } };
+      mounts.push({ surface, options, controller, host }); callbacks.set(surface, options.onState);
+      return controller;
+    },
+  };
+  return { mounts, callbacks };
 }
 
 test("Facebook poster appears immediately; a visible tile starts its muted official player without a tap", () => {
@@ -144,4 +175,73 @@ test("Facebook readiness preserves the poster until playback and re-entry reuses
   assert.equal(plays,1);
   callback('playing');
   assert.equal(poster.hidden,true);
+});
+
+test("equal viewport notifications cannot steal a focused Facebook player while it is loading", () => {
+  const h = facade(), second = h.addCard(); installSdk(h);
+  h.scope.decorateVideoCards();
+  h.scope.handleVisibility([{ target: h.media, isIntersecting: true, intersectionRatio: 0.9 }, { target: second.media, isIntersecting: true, intersectionRatio: 0.9 }]);
+  h.runTimer(0);
+  second.media.listeners.get('focusin')(); h.runTimer(0);
+  h.scope.chooseVisibleCandidate();
+  assert.equal(h.scope.testState.activeCard, second.card);
+  assert.equal(h.scope.testState.candidateCard, null);
+  assert.equal(h.scope.testState.facebookRotationTimer, null);
+});
+
+test("hover warms and starts the requested tile instead of the first equally visible card", () => {
+  const h = facade(), second = h.addCard(); const sdk = installSdk(h);
+  h.scope.decorateVideoCards();
+  h.scope.handleVisibility([{ target: h.media, isIntersecting: true, intersectionRatio: 1 }, { target: second.media, isIntersecting: true, intersectionRatio: 1 }]); h.runTimer(0);
+  sdk.callbacks.get(h.surface)('ready');
+  assert.equal(sdk.mounts.length, 2);
+  assert.equal(sdk.mounts[1].options.autoplay, false);
+  sdk.callbacks.get(second.surface)('ready');
+  assert.notEqual(second.surface.children[0].hidden, true);
+  second.media.listeners.get('pointerenter')({ pointerType: 'mouse' }); h.runTimer(0);
+  assert.equal(sdk.mounts.length, 2);
+  assert.equal(sdk.mounts[1].controller.plays, 1);
+  h.scope.chooseVisibleCandidate();
+  assert.equal(h.scope.testState.activeCard, second.card);
+  assert.equal(h.scope.testState.candidateCard, null);
+});
+
+test("mobile visible Facebook tiles get short turns without simultaneous playback or full-grid mounts", () => {
+  const h = facade(), second = h.addCard(), third = h.addCard('164'); const sdk = installSdk(h);
+  h.scope.handleVisibility([h.card, second.card, third.card].map(target => ({ target, isIntersecting: true, intersectionRatio: 1 }))); h.runTimer(0);
+  sdk.callbacks.get(h.surface)('ready'); sdk.callbacks.get(h.surface)('playing');
+  assert.equal(sdk.mounts.length, 2);
+  h.runTimer(6500); h.runTimer(0);
+  assert.equal(h.scope.testState.activeCard, second.card);
+  assert.equal(sdk.mounts[0].controller.pauses, 1);
+  sdk.callbacks.get(second.surface)('playing');
+  assert.equal(h.scope.testState.facebookControllers.size, 2);
+  assert.equal(sdk.mounts[0].controller.destroyed, true);
+  assert.equal(sdk.mounts[2].options.autoplay, false);
+  h.runTimer(6500); h.runTimer(0);
+  assert.equal(h.scope.testState.activeCard, third.card);
+  assert.equal(sdk.mounts[1].controller.pauses, 1);
+});
+
+test("a stalled autoplay yields to another visible tile without an automatic retry loop", () => {
+  const h = facade(), second = h.addCard(); const sdk = installSdk(h);
+  h.scope.handleVisibility([h.card, second.card].map(target => ({ target, isIntersecting: true, intersectionRatio: 1 }))); h.runTimer(0);
+  sdk.callbacks.get(h.surface)('blocked'); h.runTimer(1000); h.runTimer(0);
+  assert.equal(h.scope.testState.activeCard, second.card);
+  sdk.callbacks.get(second.surface)('playing');
+  assert.equal(h.scope.testState.facebookRotationTimer, null);
+  assert.equal(h.scope.testState.facebookUnavailable.has(h.card), true);
+});
+
+test("explicit sound cancels automatic rotation; hiding the page cancels the queued turn", () => {
+  const h = facade(), second = h.addCard(); const sdk = installSdk(h);
+  h.scope.handleVisibility([h.card, second.card].map(target => ({ target, isIntersecting: true, intersectionRatio: 1 }))); h.runTimer(0);
+  sdk.callbacks.get(h.surface)('playing');
+  h.surface.children[1].listeners.get('click')({ preventDefault() {}, stopPropagation() {} });
+  assert.equal(h.scope.testState.soundCard, h.card);
+  assert.equal(h.scope.testState.facebookRotationTimer, null);
+  h.scope.document.hidden = true; h.scope.stopPreview();
+  assert.equal(h.scope.testState.activeCard, null);
+  assert.equal(h.scope.testState.facebookRotationTimer, null);
+  assert.equal(h.scope.testState.soundCard, null);
 });
