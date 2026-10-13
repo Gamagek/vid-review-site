@@ -271,7 +271,7 @@ function categoryPage(category, rows, total) {
   <footer class="site-footer">
     <a class="brand small" href="/"><span class="brand-mark">V</span><span>Vid.Best</span></a>
     <p>Video review and discovery, designed for curiosity.</p>
-    <span><a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a></span>
+    <span><a href="/about">About</a> · <a href="/editorial">Editorial</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></span>
   </footer>
 </body>
 </html>`;
@@ -397,11 +397,11 @@ async function videoIndexPage(request, env) {
     return `<article class="video-tile glass-panel">${image}<div class="tile-content"><div class="tile-badges"><span class="badge">${escapeHtml(row.primary_category || "Video")}</span><span class="badge secondary">${escapeHtml(row.subcategory || "")}</span></div><h2><a class="tile-title" href="${escapeHtml(url)}">${escapeHtml(row.title)}</a></h2><p class="tile-description">${escapeHtml(description)}</p></div></article>`;
   }).join("");
 
-  return htmlResponse(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>All Video Reviews, Tutorials &amp; Discoveries | Vid.Best</title><meta name="description" content="Browse published Vid.Best video reviews, tutorials and discoveries with permanent watch pages."><meta name="robots" content="index,follow,max-image-preview:large,max-video-preview:-1,max-snippet:-1"><link rel="canonical" href="${escapeHtml(canonical)}"><meta property="og:type" content="website"><meta property="og:site_name" content="Vid.Best"><meta property="og:title" content="All Video Reviews, Tutorials &amp; Discoveries | Vid.Best"><meta property="og:url" content="${escapeHtml(canonical)}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"><script type="application/ld+json">${jsonForHtml(schema)}</script></head><body><header class="site-header compact"><a class="brand" href="/" aria-label="Vid.Best homepage"><span class="brand-mark">V</span><span>Vid.Best</span></a><a class="button ghost" href="/">Explore all</a></header><main><section class="section-pad"><div class="section-heading"><div><p class="eyebrow">Permanent video library</p><h1>All published videos</h1></div><p>Every listed title links directly to a permanent Vid.Best watch page.</p></div><div class="video-grid">${links}</div>${pagination}</section></main><footer class="site-footer"><a class="brand small" href="/"><span class="brand-mark">V</span><span>Vid.Best</span></a><p>Video review and discovery, designed for curiosity.</p><span><a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a></span></footer></body></html>`);
+  return htmlResponse(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>All Video Reviews, Tutorials &amp; Discoveries | Vid.Best</title><meta name="description" content="Browse published Vid.Best video reviews, tutorials and discoveries with permanent watch pages."><meta name="robots" content="index,follow,max-image-preview:large,max-video-preview:-1,max-snippet:-1"><link rel="canonical" href="${escapeHtml(canonical)}"><meta property="og:type" content="website"><meta property="og:site_name" content="Vid.Best"><meta property="og:title" content="All Video Reviews, Tutorials &amp; Discoveries | Vid.Best"><meta property="og:url" content="${escapeHtml(canonical)}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"><script type="application/ld+json">${jsonForHtml(schema)}</script></head><body><header class="site-header compact"><a class="brand" href="/" aria-label="Vid.Best homepage"><span class="brand-mark">V</span><span>Vid.Best</span></a><a class="button ghost" href="/">Explore all</a></header><main><section class="section-pad"><div class="section-heading"><div><p class="eyebrow">Permanent video library</p><h1>All published videos</h1></div><p>Every listed title links directly to a permanent Vid.Best watch page.</p></div><div class="video-grid">${links}</div>${pagination}</section></main><footer class="site-footer"><a class="brand small" href="/"><span class="brand-mark">V</span><span>Vid.Best</span></a><p>Video review and discovery, designed for curiosity.</p><span><a href="/about">About</a> · <a href="/editorial">Editorial</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></span></footer></body></html>`);
 }
 
 async function pagesSitemap() {
-  const body = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${escapeXml(CANONICAL_ORIGIN + "/")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/videos")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/privacy")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/terms")}</loc></url></urlset>`;
+  const body = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${escapeXml(CANONICAL_ORIGIN + "/")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/videos")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/privacy")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/terms")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/about")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/editorial")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/contact")}</loc></url></urlset>`;
   return new Response(body, {
     headers: standardHeaders("application/xml; charset=utf-8", "public, max-age=900")
   });
@@ -555,7 +555,7 @@ const seoWorker = {
 
     if (["GET", "HEAD"].includes(request.method)) {
       const normalizedPath = url.pathname === "/index.html" ? "/"
-        : /^\/(?:videos|privacy|terms|category\/[^/]+|watch\/[^/]+)\/$/.test(url.pathname)
+        : /^\/(?:videos|privacy|terms|about|editorial|contact|category\/[^/]+|watch\/[^/]+)\/$/.test(url.pathname)
           ? url.pathname.slice(0, -1) : url.pathname;
       if (normalizedPath !== url.pathname) {
         url.pathname = normalizedPath;
