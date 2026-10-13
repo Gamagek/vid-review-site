@@ -18,7 +18,7 @@ function facade({ saveData = false, reducedMotion = false } = {}) {
   const cover = { complete: true, naturalWidth: 384 };
   const card = { isConnected: true, dataset: { videoId: "162", videoProvider: "facebook", videoTitle: "Outdoor challenge", videoSource: "https://www.facebook.com/reel/123?tracking=private", videoThumbnail: "/facebook-previews/tiny.jpg" },
     classList: { add() {}, remove() {} }, getBoundingClientRect() { return { top: 0, bottom: 216 }; },
-    querySelector(name) { return { ".tile-media": media, ".preview-surface": surface, ".media-fallback": fallback, ".preview-status": status, ".tile-media > img": cover }[name] || null; } };
+    querySelector(name) { return { ".tile-media": media, ".preview-surface": surface, ".media-fallback": fallback, ".preview-status": status, ".tile-media > img": cover }[name] || surface.querySelector(name); } };
   media.closest = () => card;
   const timers = new Map(); let nextTimer = 0;
   const scope = { document: { hidden: false, addEventListener() {}, querySelectorAll() { return [card]; }, createElement: element },
@@ -101,4 +101,28 @@ test("Facebook watch and permalink links keep their identity when tracking is re
       }
     }
   }
+});
+
+test("Facebook readiness preserves the poster until playback and re-entry reuses the same official player", () => {
+  const h=facade();
+  let mounts=0, plays=0, pauses=0, callback;
+  h.scope.window.VidBestFacebookPreview={mount(surface,options){
+    mounts++; callback=options.onState;
+    const host=h.scope.document.createElement('div');host.className='facebook-sdk-player';surface.children.push(host);
+    return {play(){plays++;},pause(){pauses++;},destroy(){throw Error('Scrolling alone must not destroy a reusable player');}};
+  }};
+  const poster=h.surface.children[0];
+  h.scope.mountFacebookDirectPlayer(h.card);
+  callback('ready');
+  assert.notEqual(poster.hidden,true);
+  callback('playing');
+  assert.equal(poster.hidden,true);
+  h.scope.stopPreview(h.card);
+  assert.equal(pauses,1);
+  assert.equal(poster.hidden,false);
+  h.scope.mountFacebookDirectPlayer(h.card);
+  assert.equal(mounts,1);
+  assert.equal(plays,1);
+  callback('playing');
+  assert.equal(poster.hidden,true);
 });

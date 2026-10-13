@@ -49,3 +49,24 @@ test("teardown pauses, unsubscribes and ignores late SDK messages for removed pr
   ready({ type: "video", id: host.id, instance: h.instance });
   assert.equal(h.calls.at(-1), "pause");
 });
+
+test("a scroll pause before SDK readiness prevents offscreen playback until resumed", async () => {
+  const h=setup();
+  h.controller.pause();
+  await Promise.resolve();
+  const host=h.container.children[0];
+  h.sdkEvents.get('xfbml.ready')({type:'video',id:host.id,instance:h.instance});
+  assert.deepEqual(h.calls,['parse','mute','pause']);
+  h.controller.play();
+  assert.deepEqual(h.calls.slice(-2),['mute','play']);
+});
+
+test("teardown removes SDK event subscription handles", async () => {
+  const h=setup();let removals=0;
+  h.instance.subscribe=()=>({removeListener(){removals++;}});
+  await Promise.resolve();
+  const host=h.container.children[0];
+  h.sdkEvents.get('xfbml.ready')({type:'video',id:host.id,instance:h.instance});
+  h.controller.destroy();
+  assert.equal(removals,3);
+});

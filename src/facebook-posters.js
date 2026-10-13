@@ -8,6 +8,7 @@ function fingerprint(value) {
 function facebookCdnImage(value) {
   try {
     const url = new URL(value);
+    if (url.username || url.password || url.port) return "";
     const host = url.hostname.toLowerCase();
     return url.protocol === "https:" && (host === "fbcdn.net" || host.endsWith(".fbcdn.net") || host === "facebook.com" || host.endsWith(".facebook.com"))
       ? url.toString() : "";

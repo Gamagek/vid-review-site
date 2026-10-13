@@ -19,6 +19,7 @@ const previewState = {
   timer: null,
   visibility: new Map(),
   observer: null,
+  warmObserver: null,
   activeCleanup: null,
   tiktokMetadataRequested: new Set(),
   facebookControllers: new Map(),
@@ -36,6 +37,14 @@ function initializePreviews() {
       threshold: [0, 0.25, PREVIEW_VISIBILITY, 1],
       rootMargin: "-5% 0px -5%",
     });
+    previewState.warmObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting || !previewsAllowed()) continue;
+        const card = entry.target.closest?.(".video-tile");
+        if (card?.dataset.videoProvider === "facebook") void window.VidBestFacebookPreview?.preload?.();
+        previewState.warmObserver.unobserve(entry.target);
+      }
+    }, { rootMargin: "250px 0px", threshold: 0 });
   }
   decorateVideoCards();
   void loadCachedTikTokFacadePreviews();
@@ -43,13 +52,20 @@ function initializePreviews() {
     if (document.hidden) stopPreview();
     else chooseVisibleCandidate();
   });
-  window.addEventListener("pagehide", () => stopPreview());
+  window.addEventListener("pagehide", () => {
+    stopPreview();
+    for (const controller of previewState.facebookControllers.values()) controller.destroy();
+    previewState.facebookControllers.clear();
+  });
   document.addEventListener("fullscreenchange", chooseVisibleCandidate);
   document.addEventListener("webkitfullscreenchange", chooseVisibleCandidate);
 }
 
 function decorateVideoCards() {
   if (previewState.activeCard && !previewState.activeCard.isConnected) stopPreview();
+  for (const [card, controller] of previewState.facebookControllers) {
+    if (!card.isConnected) { controller.destroy(); previewState.facebookControllers.delete(card); }
+  }
   document.querySelectorAll(".video-tile:not([data-preview-ready])").forEach((card) => {
     card.dataset.previewReady = "true";
     const media = card.querySelector(".tile-media");
@@ -64,6 +80,7 @@ function decorateVideoCards() {
       // Review text can be taller than the phone viewport. Autoplay follows
       // the actual video rectangle, rather than the whole review card.
       previewState.observer?.observe(media);
+      previewState.warmObserver?.observe(media);
       return;
     }
 
@@ -215,7 +232,7 @@ function schedulePreview(card) {
   previewState.candidateCard = card;
   card.classList.add("preview-pending");
   card.querySelector(".preview-status").textContent = "Preview loading…";
-  previewState.timer = window.setTimeout(() => startPreview(card), PREVIEW_DELAY_MS);
+  previewState.timer = window.setTimeout(() => startPreview(card), card.dataset.videoProvider === "facebook" ? 120 : PREVIEW_DELAY_MS);
 }
 
 function cancelCandidate(card = null) {
@@ -337,6 +354,22 @@ function stopPreview(card = null, statusMessage = "") {
   const active = previewState.activeCard;
   if (!active) return;
   const provider = active.dataset.videoProvider;
+  const facebook = provider === "facebook" && previewState.facebookControllers.get(active);
+  if (facebook?.pause && active.isConnected) {
+    facebook.pause();
+    active.querySelector(".facebook-sdk-player")?.setAttribute("hidden", "");
+    const poster = active.querySelector(".facebook-facade-poster");
+    if (poster) poster.hidden = false;
+    const play = active.querySelector(".facebook-facade-play");
+    if (play) { play.classList.remove("facebook-sound-toggle"); play.textContent = "▶"; play.setAttribute("aria-label", "Play Facebook video"); }
+    active.classList.remove("preview-playing");
+    delete active.dataset.facebookPlayerMounted;
+    previewState.activeCard = null;
+    previewState.activeCleanup = null;
+    const status = active.querySelector(".preview-status");
+    if (status) status.textContent = "Muted preview when visible · Tap for sound";
+    return;
+  }
   previewState.activeCleanup?.();
   previewState.activeCleanup = null;
   active.querySelector(".preview-surface video")?.pause();
@@ -425,7 +458,7 @@ function mountFacebookFacade(card) {
     event.preventDefault();
     event.stopPropagation();
     const controller = previewState.facebookControllers.get(card);
-    if (controller) controller.play({ sound: true });
+    if (controller && previewState.activeCard === card) controller.play({ sound: true });
     else mountFacebookDirectPlayer(card, true);
   };
   play.addEventListener("click", activate);
@@ -457,6 +490,20 @@ function mountFacebookDirectPlayer(card, sound = false) {
   const poster = surface.querySelector(".facebook-facade-poster");
   const play = surface.querySelector(".facebook-facade-play");
 
+  const cached = previewState.facebookControllers.get(card);
+  if (cached) {
+    surface.querySelector(".facebook-sdk-player")?.removeAttribute("hidden");
+    if (status) status.textContent = "Loading muted Facebook preview…";
+    cached.play({ sound });
+    return;
+  }
+  // Keep only the current and previous official player; no grid-wide iframe burst.
+  while (previewState.facebookControllers.size >= 2) {
+    const [oldCard, oldController] = previewState.facebookControllers.entries().next().value;
+    oldController.destroy();
+    previewState.facebookControllers.delete(oldCard);
+  }
+
   if (window.VidBestFacebookPreview) {
     const source = new URL(embedUrl).searchParams.get("href");
     const controller = window.VidBestFacebookPreview.mount(surface, {
@@ -465,8 +512,8 @@ function mountFacebookDirectPlayer(card, sound = false) {
       onState(value) {
         if (previewState.activeCard !== card) return;
         card.dataset.facebookPlayback = value;
-        if (value === "ready" || value === "playing" || value === "paused" || value === "ended") {
-          if (poster) poster.hidden = true;
+        if (value === "playing" || value === "paused" || value === "ended") {
+          if (poster && value === "playing") poster.hidden = true;
           if (play) {
             play.classList.add("facebook-sound-toggle");
             play.textContent = value === "playing" ? "♫" : "▶";
@@ -477,7 +524,9 @@ function mountFacebookDirectPlayer(card, sound = false) {
           : value === "loading" ? "Loading muted Facebook preview…" : "Tap to play on Facebook player";
       },
       onError() {
+        previewState.facebookControllers.delete(card);
         if (previewState.activeCard !== card) return;
+        previewState.activeCleanup = null;
         mountFacebookIframeFallback(card, surface, embedUrl);
       },
     });

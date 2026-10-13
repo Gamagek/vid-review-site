@@ -1,0 +1,13 @@
+# Facebook publish-time tile previews
+
+Publishing a Facebook record now queues preview preparation durably in D1. The first attempt starts in the existing Worker background context, without waiting for provider metadata in the save response. Existing 15-minute maintenance runs retry pending work, up to four attempts, with a D1 lease preventing concurrent duplicate requests. Drafts are not prepared. The status is visible in the admin library and checked through an authenticated, read-only status endpoint.
+
+Preparation stores a public canonical player URL and an available source poster in the existing R2 thumbnail cache. Homepage hydration reads only saved D1 state; it does not call Facebook. Repeated editorial saves do not reset the provider request budget. Source/thumbnail guards prevent old work from attaching to a changed record. Neither the preparation module nor its migration changes review text, SEO fields, the source, an owner's cover, publication state or video dates.
+
+Owner-uploaded local video files automatically receive a real small source-frame thumbnail when no custom image was selected. Capture happens locally in the admin browser, retains the video's aspect ratio within 384×216, and releases its temporary local URL. Saving waits for this bounded capture/upload. Browser capture never reads a cross-origin Facebook iframe or downloads the embedded source video.
+
+Home tiles warm the shared official Facebook SDK near the viewport, start muted playback after a 120 ms visibility delay, and retain the poster until `startedPlaying`. Only one tile actively plays; the current and previous official players can be reused after scrolling, with a two-player limit. Offscreen/hidden playback is paused and SDK subscriptions are removed on destruction. Data Saver, reduced motion and slow connections keep explicit playback controls.
+
+`ready` means the public player URL is prepared and either a source poster has been saved or an owner-supplied cover exists. It does not establish that Facebook will allow autoplay in every visitor's browser. Missing public metadata, private/unavailable videos, provider restrictions and browser autoplay rules can still require a custom thumbnail or a tap in the official player. The admin reports `retry`, `needs_poster` or `needs_source`; it does not fabricate a frame or report playback that has not started. Full Facebook videos remain in the official embedded player.
+
+Migration 0030 creates only the auxiliary preparation table and index. The previous Worker can safely run with this extra table if a rollback is needed. Portainer, production containers, media routes and Access policies are outside this change.
