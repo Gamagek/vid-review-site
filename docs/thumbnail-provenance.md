@@ -6,7 +6,7 @@
 
 The unaltered source poster was downloaded from the reel's own `og:image`, not captured from the player or an end screen. It is a 1280×720 JPEG, 64,004 bytes; SHA-256 `da90dc0f4067c0b409da8a2854b7bda8b1deca140ae25be9b591db59243ccdd7`. It shows the source's landscape meditation portrait without added labels or generated content. No expiring Facebook CDN URL is stored in the application or migration.
 
-Migration 0036 fills only record 44's still-null thumbnail when its exact source, owner-edit timestamp, publication state and category still match. It leaves both site dates, substantial multilingual review, description, SEO fields, source and owner edits unchanged. Pre-deployment created_at is `2026-09-27T18:01:49.145Z`; updated_at is `2026-09-27T18:58:50.569Z`.
+Migration 0036 fills only record 44's still-null thumbnail when its exact source, owner-edit timestamp, publication state and category still match. PR 146 / Worker deployment 38435933144 published it. Actual audit 38436029567 / artifact 11833601159 verifies HTTP 200 image/jpeg, 64,004 bytes. D1 comparison confirms the thumbnail is the only changed field; both site dates, substantial multilingual review, description, SEO fields, source and owner edits are identical. created_at remains `2026-09-27T18:01:49.145Z`; updated_at remains `2026-09-27T18:58:50.569Z`.
 
 ## Are You in the Right Place? — original public source poster
 
