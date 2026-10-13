@@ -386,3 +386,41 @@ test("Facebook sitemap, watch page, topic and directory share a crawlable stable
   assert.match(robots, /Allow: \/api\/instagram\/thumbnail\n/);
   assert.deepEqual(context.sqlite.prepare('SELECT * FROM videos ORDER BY id').all(), before);
 });
+
+test("curated watch schema attributes the review and never calls a landing page a video file", async () => {
+  const context = createContext();
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug,title,source_url,source_page_url,media_type,primary_category,subcategory,description,thumbnail_url,published)
+    VALUES ('external-review', 'Reviewed outdoor scene', 'https://videos.example.com/watch/123',
+    'https://videos.example.com/watch/123', 'raw', 'Funny & Comedy', 'Skits & Sketches',
+    'A written independent review.', 'https://vid.best/review-covers/real.jpg', 1)`).run();
+  const html = await (await request(context, 'https://vid.best/watch/external-review')).text();
+  const json = JSON.parse(html.match(/<script\\b[^>]*type="application\\/ld\\+json"[^>]*>(.*?)<\\/script>/s)[1]);
+  const video = json['@graph'].find(item => item['@type'] === 'VideoObject');
+  const page = json['@graph'].find(item => item['@type'] === 'WebPage');
+  assert.equal(video.contentUrl, undefined);
+  assert.equal(video.uploadDate, undefined, 'the review creation date is not the original video upload date');
+  assert.equal(video.publisher, undefined, 'curator is not the original video publisher');
+  assert.equal(video.interactionStatistic, undefined, 'page visits cannot be claimed as verified video plays');
+  assert.equal(page.isBasedOn, 'https://videos.example.com/watch/123');
+  assert.equal(page.publisher['@id'], 'https://vid.best#organization');
+  assert.match(html, /Open original source/);
+  const sitemap = await (await request(context, 'https://vid.best/sitemaps/videos-1.xml')).text();
+  const entry = sitemap.match(/<url><loc>https:\\/\\/vid.best\\/watch\\/external-review<\\/loc>[\\s\\S]*?<\\/url>/)[0];
+  assert.doesNotMatch(entry, /<video:video>|<video:content_loc>/);
+});
+
+test("only real video-file URLs become contentUrl and sitemap content_loc", async () => {
+  const context = createContext();
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug,title,source_url,media_type,primary_category,subcategory,description,thumbnail_url,published)
+    VALUES ('direct-file', 'Hosted MP4 review', 'https://cdn.example.com/clip.mp4?token=test',
+    'raw', 'Technology', 'Web Development', 'A real MP4 review',
+    'https://vid.best/review-covers/real.jpg', 1)`).run();
+  const html = await (await request(context, 'https://vid.best/watch/direct-file')).text();
+  const json = JSON.parse(html.match(/<script\\b[^>]*type="application\\/ld\\+json"[^>]*>(.*?)<\\/script>/s)[1]);
+  const video = json['@graph'].find(item => item['@type'] === 'VideoObject');
+  assert.equal(video.contentUrl, 'https://cdn.example.com/clip.mp4?token=test');
+  const xml = await (await request(context, 'https://vid.best/sitemaps/videos-1.xml')).text();
+  assert.match(xml, /<video:content_loc>https:\\/\\/cdn.example.com\\/clip.mp4\\?token=test<\\/video:content_loc>/);
+});
