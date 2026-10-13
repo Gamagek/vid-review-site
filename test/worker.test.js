@@ -1437,8 +1437,8 @@ test("uses the current request hostname for Twitch playback", async () => {
 test("stores administrator-verified source metadata for non-YouTube providers", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
-    `INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, thumbnail_url, published)
-     VALUES ('manual-metadata', 'Manual metadata', 'https://vimeo.com/76979871', 'raw', 'Technology', 'Web Development', 'https://example.com/thumb.jpg', 1)`,
+    `INSERT INTO videos (slug, title, source_url, embed_url, media_type, primary_category, subcategory, thumbnail_url, published)
+     VALUES ('manual-metadata', 'Manual metadata', 'https://vimeo.com/76979871', 'https://player.vimeo.com/video/76979871', 'raw', 'Technology', 'Web Development', 'https://example.com/thumb.jpg', 1)`,
   ).run();
   await refreshSourceMetadata(1, "https://vimeo.com/76979871", context.env, {
     source_published_at: "2013-10-15",
