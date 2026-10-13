@@ -2,6 +2,7 @@ import app, { processAuthorizedCacheJobs, processTikTokOEmbedBackfill, processFa
 import { backfillFacebookPreviewJobs } from "./facebook-preview-jobs.js";
 import { processAdminTikTokCacheJobs } from "./tiktok-cache-jobs.js";
 import { processTikTokThumbnailJobs } from "./tiktok-thumbnail-cache.js";
+import { backfillYoutubeMetadata } from "./youtube-metadata-backfill.js";
 export { isLikelyCrawler } from "./crawlers.js";
 
 const EXTERNAL_VIDEO_HOSTS = new Set([
@@ -609,6 +610,10 @@ async function fetchHandler(request, env, ctx) {
 }
 
 async function scheduledHandler(controller, env, ctx) {
+  // Populate missing original YouTube dates only when a restricted API key exists.
+  // One bounded batch request per cron, never a provider call per homepage visitor.
+  ctx.waitUntil(backfillYoutubeMetadata(env, { limit: 20 })
+    .catch(() => console.warn("Scheduled YouTube publication metadata preparation deferred")));
   ctx.waitUntil((async () => {
     await backfillFacebookPreviewJobs(env, 12);
     return processFacebookPreviewJobs(env, { limit: 2 });
