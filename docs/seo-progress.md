@@ -1,5 +1,15 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 13 October 2026: full Google snapshot and Some Meetings source poster prepared
+
+Latest completed audit 38395699743 / artifact 11814005438 was downloaded and read from current main 5053a13e1ad895632bb1eb9a6a1635a4d977ad3e. It checked 156 published reviews and 170 public pages with zero technical failures and two editorial/demo warnings. Thumbnail inventory is 130 non-placeholder HTTP successes, 12 known title-artwork placeholders and 14 provider HTTP failures. Google OAuth/property access succeeded. The root sitemap was last downloaded at 2026-10-13T11:28:03.743Z and the review sitemap at 2026-10-13T11:28:06.769Z; both remain pending with zero errors/warnings.
+
+This audit performed a complete read-only URL Inspection snapshot for all 156 reviews: 95 are `Discovered - currently not indexed`, 61 are `URL is unknown to Google`, zero report indexed and zero report crawled/not-indexed. These are stored Google states, not indexing requests. Do not run another full inspection batch today. The four-review increase since the prior audit was external owner activity; this task published no draft or test record.
+
+Published record 150, `some-meetings-end-in-goodbye-sinhala-reflection`, still had a known title-artwork placeholder. Its exact saved Facebook reel plays publicly with Sanju Doni attribution, Public visibility, a Sinhala separation/reflection caption and a 21.804-second player. Facebook exposes the reel's own 720×1280 Open Graph JPEG poster. The exact 51,906-byte source poster was downloaded and visually checked; it is not a player screenshot, end screen, generated scene or full-video copy. Guarded migration 0034 replaces only the exact matching HTML-page thumbnail. All text, source/publication metadata, owner edits and dates stay unchanged; pre-change protected fingerprint `3811:eeb7c566`, created_at `2026-10-11T21:26:22.701Z`, updated_at `2026-10-12T17:43:44.501Z`.
+
+Next: run regression tests and Worker compilation, publish through PR/CI, verify the guarded D1 migration and hosted image, then read the completed post-deployment audit without another inspection batch. Continue the non-comedy placeholder queue from the resulting artifact. Keep Funny & Comedy/parody topics, drafts, substantial reviews, Saiyaara/Summer media, removed Dilscoop and Portainer production deployment unchanged.
+
 ## Latest verified checkpoint — 13 October 2026: two original posters and honest inventory
 
 Completed PRs 139–141: record 159 Animal Compassion and record 151 Trust Yourself now use their own original public Facebook JPEG posters, with source captions/watermarks preserved and no generated scenes or full-video copies. PR 139 merged as 9c78a19936b2b7dd93c43ae7922934762e1daa54; PR 140 as 00e1c99fa8953fc9205cac42f9d27a80c610668a; PR 141 as 3bbc9a8a5013d735806bbc8837eebffdc10088d9. Worker deployments 38387863721, 38388731160 and 38389580152 succeeded. Final CI 38389403714 passed 258 Node tests, four Python tests, workflow expressions, Compose validation, Worker compilation and script syntax.

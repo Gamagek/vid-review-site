@@ -1,5 +1,13 @@
 # Editorial cover provenance
 
+## Some Meetings End in Goodbye — original public source poster
+
+`public/review-covers/some-meetings-source-poster-v1.jpg` is the exact public Open Graph JPEG poster exposed by Sanju Doni's Facebook reel 297960563374326, which is the saved source for published record 150. Public browser playback, Sanju Doni attribution, the Public visibility marker and the Sinhala caption about some meetings ending in separation were checked on 13 October 2026. The player reports 21.804 seconds. No full-video, audio, speaker-identity or narrative-outcome claim is asserted.
+
+The original poster was downloaded directly from the reel's `og:image`, not captured from the player or an end screen. The unaltered JPEG is 720×1280, 51,906 bytes; SHA-256 `53d962a271111ed1d923635060984bb9ccd9a4571ef7e6c5f8000e29dddb121d`. It shows the source's own vertical portrait frame without added labels or generated content. No expiring Facebook CDN URL is stored in the application or migration.
+
+Migration 0034 changes only record 150's known Facebook HTML thumbnail when its exact source, original cover, owner-edit timestamp, publication state and category still match. It leaves both dates, the substantial multilingual review, description, SEO fields, source and all owner edits unchanged. Pre-deployment protected-field fingerprint is `3811:eeb7c566`, excluding only the thumbnail and normal activity counters; created_at is `2026-10-11T21:26:22.701Z` and updated_at is `2026-10-12T17:43:44.501Z`.
+
 ## Trust Yourself — original public source poster
 
 `public/review-covers/trust-yourself-source-poster-v1.jpg` is the exact public JPEG backdrop poster belonging to Lakmal Suranjith's Facebook video 273200312546873, reached through record 151's saved share URL. Public browser playback, the creator, Public visibility marker, Sinhala self-confidence caption and displayed 12 April 2024 source date were checked on 13 October 2026. The player reports 18.553 seconds. The source contains a cinematic animal/person image and English motivational captions; no movie identity, cast, real animal event or audio analysis is asserted.
