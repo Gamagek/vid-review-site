@@ -91,7 +91,7 @@ test("homepage cache-only lookup does not block on provider network", async () =
     assert.equal(await readFacebookPoster(env, row, () => { throw new Error("No remote metadata"); }, { cacheOnly: true }), null);
     const placeholder = facebookPlaceholderResponse({ title: "Broken <thumbnail> & a review" });
     assert.equal(placeholder.status, 200);
-    assert.match(placeholder.headers.get("Content-Type"), /image\\/svg\\+xml/);
+    assert.match(placeholder.headers.get("Content-Type"), /image\/svg\+xml/);
     const svg = await placeholder.text();
     assert.match(svg, /Broken &lt;thumbnail&gt; &amp; a review/);
     assert.doesNotMatch(svg, /<thumbnail>/);
