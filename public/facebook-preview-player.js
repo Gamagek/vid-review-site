@@ -37,12 +37,12 @@
     return sdkPromise;
   }
 
-  function mount(container, { source, title, onState = () => {}, onError = () => {} }) {
+  function mount(container, { source, title, autoplay = true, onState = () => {}, onError = () => {} }) {
     const host = document.createElement("div");
     host.id = "vidbest-facebook-video-" + ++serial;
     host.className = "fb-video facebook-sdk-player";
     host.setAttribute("data-href", source);
-    host.setAttribute("data-autoplay", "true");
+    host.setAttribute("data-autoplay", String(autoplay));
     host.setAttribute("data-show-text", "false");
     host.setAttribute("data-allowfullscreen", "true");
     host.setAttribute("data-lazy", "false");
@@ -55,9 +55,10 @@
     let fb;
     let readyHandler;
     let soundRequested = false;
-    let pausedRequested = false;
+    let pausedRequested = !autoplay;
+    let playbackTimer;
     const subscriptions = [];
-    const timeout = window.setTimeout(() => fail(), 9000);
+    const timeout = window.setTimeout(() => fail(), 15000);
 
     function state(value) {
       if (!live) return;
@@ -76,22 +77,29 @@
       pausedRequested = false;
       soundRequested ||= sound;
       if (!instance) return;
+      window.clearTimeout(playbackTimer);
+      playbackTimer = window.setTimeout(() => {
+        if (live && !pausedRequested && host.dataset.facebookPlayback !== "playing") state("blocked");
+      }, 9000);
       try {
         if (soundRequested) instance.unmute();
         else instance.mute();
         instance.play();
-      } catch { state("paused"); }
+      } catch { state("blocked"); }
     }
     function pause() {
       if (!live) return;
       pausedRequested = true;
       soundRequested = false;
+      window.clearTimeout(playbackTimer);
+      host.dataset.facebookPlayback = "paused";
       try { instance?.mute(); instance?.pause(); } catch {}
     }
     function destroy() {
       if (!live) return;
       live = false;
       window.clearTimeout(timeout);
+      window.clearTimeout(playbackTimer);
       try { instance?.pause(); } catch {}
       for (const [event, handler, subscription] of subscriptions) {
         try {
@@ -121,6 +129,10 @@
         framePermissions();
         for (const [event, value] of [["startedPlaying", "playing"], ["paused", "paused"], ["finishedPlaying", "ended"]]) {
           const handler = () => {
+            if (value === "playing") {
+              window.clearTimeout(playbackTimer);
+              if (pausedRequested) { pause(); return; }
+            }
             state(value);
             if (value === "ended" && !pausedRequested) play();
           };
