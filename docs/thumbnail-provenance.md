@@ -6,7 +6,7 @@
 
 Downloaded only the main video's original poster image, not the video or an end screen. The unaltered JPEG is 539×960, 52,816 bytes; SHA-256 `c2629d09ac06a9d9ab902363d4a9810e5f4ec68f822fea666d61539f7b5b80c6`. It retains the source's exact existing composition and text (including its original wording). This is source artwork, not generated imagery or an invented reconstruction. No expiring CDN URL is saved in the repository.
 
-Migration 0033 changes only record 151's known HTML thumbnail when its source, original cover, owner-edit timestamp, publication state and category still match. Protected-field fingerprint before deployment: `4576:c294cf72`; original created_at `2026-10-11T21:26:22.701Z` and updated_at `2026-10-12T17:33:17.120Z` must remain unchanged. Verify the hosted JPEG and every other production field after CI/merge/deployment.
+Migration 0033 changes only record 151's known HTML thumbnail when its source, original cover, owner-edit timestamp, publication state and category still match. PR 141 and Worker deployment 38389580152 published it; actual completed audit 38389649520 / artifact 11808091543 verifies HTTP 200 image/jpeg, 52,816 bytes. It renders correctly and live canonical/absolute image metadata is correct. Every other production field is unchanged, protected fingerprint `4576:c294cf72`; original created_at `2026-10-11T21:26:22.701Z` and updated_at `2026-10-12T17:33:17.120Z` remain identical.
 
 ## Animal Compassion — original public source poster
 
