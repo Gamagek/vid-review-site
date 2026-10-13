@@ -92,6 +92,7 @@ test("homepage cache-only lookup does not block on provider network", async () =
     const placeholder = facebookPlaceholderResponse({ title: "Broken <thumbnail> & a review" });
     assert.equal(placeholder.status, 200);
     assert.match(placeholder.headers.get("Content-Type"), /image\/svg\+xml/);
+    assert.equal(placeholder.headers.get("X-VidBest-Poster-Kind"), "placeholder");
     const svg = await placeholder.text();
     assert.match(svg, /Broken &lt;thumbnail&gt; &amp; a review/);
     assert.doesNotMatch(svg, /<thumbnail>/);

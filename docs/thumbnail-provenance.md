@@ -6,7 +6,7 @@
 
 The exact 680×850 poster was downloaded from the main video's own backdrop image and visually checked. It shows an antlered animal in water with the source's existing Sinhala captions and watermark. These captions are retained as part of the original source artwork, not independently endorsed factual claims. This is not a generated illustration or a browser/player screenshot. JPEG bytes remain unaltered: 61,020 bytes; SHA-256 `60b4afec6a886d07f5d5c321b9d04abcca34552ba6edf6cac7ac1bbda51f501f`. No expiring CDN URL is committed or logged.
 
-Guarded migration 0032 changes only record 159's known HTML-page thumbnail when its slug, publication state, media/category, source and original updated_at still match. Owner covers, editorial content, publication metadata and both dates remain unchanged. Pre-change protected-field fingerprint: `4917:7a861ed4`, excluding only thumbnail and activity counters. Verify the hosted JPEG, live metadata and this fingerprint after deployment before marking the poster published.
+Guarded migration 0032 changes only record 159's known HTML-page thumbnail when its slug, publication state, media/category, source and original updated_at still match. Owner covers, editorial content, publication metadata and both dates remain unchanged. Protected-field fingerprint before and after deployment: `4917:7a861ed4`, excluding only thumbnail and activity counters. PR 139 / Worker deployment 38387863721 published it; actual audit 38387938204 / artifact 11807492811 confirms HTTP 200 image/jpeg, 61,020 bytes. Live canonical and absolute image metadata are correct, and the JPEG renders with its original captions/watermark intact.
 
 ## Past, Present & Progress — symbolic editorial illustration
 
