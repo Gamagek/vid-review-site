@@ -1,6 +1,6 @@
 # Vid.Best indexing and thumbnail work queue
 
-## 13 October 2026: Some Meetings deployed; Right Place source poster prepared
+## 13 October 2026: two more exact Facebook source posters deployed
 
 PR 143 merged as ce3a075d273fa2b5b84dc4695e93930e83513c72 after CI 38402803909 passed 258 Node tests, four Python tests, workflow/Compose checks, Worker compilation and script syntax. Worker deployment 38402958452 succeeded and applied guarded migration 0034. Production record 150 changed only `thumbnail_url`; every other D1 field, including created_at `2026-10-11T21:26:22.701Z` and updated_at `2026-10-12T17:43:44.501Z`, is byte-for-byte unchanged. Live canonical, index/follow robots and absolute Open Graph image are correct.
 
@@ -8,9 +8,11 @@ Completed zero-inspection post-deployment audit 38403042499 / artifact 118170251
 
 Portainer run 38402958457 passed validation and read-only preflight; both production deploy jobs stayed skipped. No automatic flag, container, persistent data, Access/email policy or routing change.
 
-Next non-comedy placeholder is published record 161, `are-you-in-the-right-place-sinhala-reflection`. Its saved share URL resolves to Buddha Puthun video 1695142117940360, publicly playable with creator attribution, visible Sinhala title, displayed 17 June 2024 source date and a 21.167-second player. Facebook exposes its own 1080×1350 Open Graph JPEG showing the source athletics-track frame and original Sinhala overlay. The exact 150,638-byte poster was downloaded and visually checked; it is not a player screenshot, end screen, generated scene or full-video copy. Guarded migration 0035 replaces only the exact matching HTML-page thumbnail. All text, source/publication metadata, owner edits and dates stay unchanged; pre-change protected fingerprint `4183:65e532bd`, created_at `2026-10-11T21:26:22.701Z`, updated_at `2026-10-12T09:21:09.802Z`.
+PR 144 merged as 01bd75ae7c555e6156895d0721e6a192321063bd after CI 38404059409 passed. Worker deployment 38404230122 succeeded and applied guarded migration 0035. Published record 161, `are-you-in-the-right-place-sinhala-reflection`, now uses the exact source video's 1080×1350 Open Graph JPEG. Live canonical, index/follow robots and absolute Open Graph image are correct. D1 comparison confirms `thumbnail_url` is the only changed field; protected fingerprint `4183:65e532bd`, created_at `2026-10-11T21:26:22.701Z` and updated_at `2026-10-12T09:21:09.802Z` remain unchanged.
 
-Next: run regression tests and Worker compilation, publish through PR/CI, verify the guarded D1 migration and hosted image, then read only the resulting zero-inspection artifact. Continue with non-comedy records 44 or 45 only after direct source verification. Keep Funny & Comedy/parody topics, drafts, substantial reviews, Saiyaara/Summer media, removed Dilscoop and Portainer production deployment unchanged.
+Completed zero-inspection audit 38404316029 / artifact 11818350637 was downloaded and read: 156 published reviews, 170 public pages, zero technical failures, two editorial/demo warnings; 132 available non-placeholder images, 10 known title-artwork placeholders and 14 provider HTTP failures. The Right Place source poster is HTTP 200 image/jpeg, 150,638 bytes. Google OAuth/property access succeeded; root sitemap lastDownloaded `2026-10-13T13:15:09.176Z` and review sitemap lastDownloaded `2026-10-13T13:15:02.283Z`, both pending with zero errors/warnings. Inspection budget and count were zero; production writes were none. The latest actual index snapshot remains the earlier 156-review result: 95 discovered/not-indexed, 61 unknown and zero indexed.
+
+Portainer run 38404230006 passed validation and read-only preflight; production and optional deploy jobs stayed skipped. Next task: direct public-source verification for non-comedy record 44, `facebook-discovery` (Ānāpānasati meditation), before selecting its exact source poster or a clearly labelled evidence-based illustration. Record 45 is the following non-comedy candidate. Do not edit the eight remaining reaction/comedy/parody entries, drafts, substantial reviews, Saiyaara/Summer media or removed Dilscoop; do not repeat today's full Google inspection batch.
 
 ## Latest verified checkpoint — 13 October 2026: two original posters and honest inventory
 
