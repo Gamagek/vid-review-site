@@ -1,5 +1,9 @@
 # Editorial cover provenance
 
+## 14 October 2026: processed-sitemap diagnostic preserves all posters
+
+PR 157 changes only Search Console audit behavior, tests and connection documentation; it adds no images and changes no saved thumbnail, source, review, date or publication state. Its completed no-submission audit 38536561106 / artifact 11880142553 retains the same 164 published thumbnail URLs and availability states: 142 available, 14 provider HTTP failures and eight protected reaction/comedy/parody placeholders. Google's processed review sitemap reports 20 warnings, but the Sitemaps API does not identify their types or affected URLs and the private report requires Google sign-in. Do not equate this aggregate warning count with failed posters, rejected content or indexed-page coverage. Resolve the detailed warning evidence before selecting a poster/metadata repair; preserve accurate owner assets and protected media.
+
 ## 14 October 2026: latest completed inventory remains unchanged
 
 Audit 38519467793 / artifact 11873236640 checks the same 164 published review URLs and thumbnail availability states as artifact 11857731946: 142 available images, 14 provider HTTP failures (13 TikTok 403s and Dilscoop's 404), and eight protected reaction/comedy/parody placeholders. No cover, source frame, illustration, media URL, saved thumbnail, review, date or publication-state change was made in this checkpoint. Current main's owner-requested PR 155 adds only the official AdSense `ads.txt`; it does not replace a poster. Continue from a new non-protected failure or verified source evidence rather than replacing accurate owner assets or working around provider controls. The sitemap's newer Google download timestamp is separate crawl-discovery evidence and does not establish image relevance or indexed-page coverage.
