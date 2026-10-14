@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import catalog from '../content/daily-weekly-best/catalog.json' with {type:'json'};
 import seoEdge from '../src/seo-edge.js';
-import {dailyWeeklyBestPaths} from '../src/daily-weekly-best.js';
+import {dailyWeeklyBestPaths,dailyWeeklyBestResponse} from '../src/daily-weekly-best.js';
+import {verifyEditorialAssets} from '../scripts/verify-daily-weekly-best-assets.mjs';
 import {renderMarkdown,build} from '../scripts/build-daily-weekly-best.mjs';
 import {publishEditorialDiscovery} from '../scripts/publish-daily-weekly-best.mjs';
 import {verifyEditorialSources} from '../scripts/verify-daily-weekly-best-sources.mjs';
@@ -38,7 +39,7 @@ test('canonical aliases redirect and unknown editorial routes never become the h
     const response=await seoEdge.fetch(new Request(origin+'/daily-weekly-best/films'+suffix),assetsEnv(),{});
     assert.equal(response.status,301);assert.equal(response.headers.get('location'),origin+'/daily-weekly-best/films');
   }
-  for(const path of ['/daily-weekly-best/private','/daily-weekly-best/films/extra','/daily-weekly-bests']){
+  for(const path of ['/daily-weekly-best/private','/daily-weekly-best/films/extra']){
     const response=await seoEdge.fetch(new Request(origin+path),assetsEnv(),{});
     assert.equal(response.status,404);assert.match(response.headers.get('x-robots-tag'),/noindex/);
   }
@@ -46,6 +47,21 @@ test('canonical aliases redirect and unknown editorial routes never become the h
   assert.equal(denied.status,405);
   const query=await seoEdge.fetch(new Request(origin+'/daily-weekly-best?tracking=example'),assetsEnv(),{});
   assert.equal(query.status,200);assert.equal(query.headers.get('x-robots-tag'),'noindex,follow');
+});
+
+test('editorial route boundaries leave sibling CSS and other assets to the existing static handler',async()=>{
+  const css=await readFile(new URL('../public/daily-weekly-best.css',import.meta.url),'utf8');
+  let assetRequests=0;
+  const env={ASSETS:{fetch:async()=>{assetRequests++;return new Response(css,{headers:{'content-type':'text/css'}});}}};
+  for(const path of ['/daily-weekly-best.css?v=20261015-1','/styles.css','/daily-weekly-bests','/daily-weekly-best-other.js']){
+    assert.equal(await dailyWeeklyBestResponse(new Request(origin+path),env),null);
+  }
+  for(const method of ['GET','HEAD']){
+    const response=await seoEdge.fetch(new Request(origin+'/daily-weekly-best.css?v=20261015-1',{method}),env,{});
+    assert.equal(response.status,200);assert.match(response.headers.get('content-type'),/^text\/css/);
+    assert.equal(await response.text(),method==='HEAD'?'':css);
+  }
+  assert.equal(assetRequests,2);
 });
 
 test('home exposes just the footer access link and keeps editorial selections out of its main grid',async()=>{
@@ -144,4 +160,24 @@ test('source verification rejects HTML masquerading as a successful poster and n
   assert.equal(result.status,'failed');assert.equal(result.records.length,10);
   assert.ok(result.records.every(row=>!row.verified&&row.error==='source_poster_unavailable'));
   assert.doesNotMatch(JSON.stringify(result),/private-sentinel/);
+});
+
+test('deployed editorial asset verification checks actual CSS and exact cover bytes without credentials',async()=>{
+  const fetchImpl=async(url,options)=>{
+    assert.equal(options.headers,undefined);assert.equal(options.redirect,'manual');
+    const path=new URL(url).pathname;
+    return new Response(await readFile(new URL('../public'+path,import.meta.url)),{headers:{'content-type':path.endsWith('.css')?'text/css':'image/webp'}});
+  };
+  const valid=await verifyEditorialAssets({fetchImpl});
+  assert.equal(valid.status,'success');assert.equal(valid.records.length,11);
+  assert.ok(valid.records.every(row=>row.verified));
+  const invalid=await verifyEditorialAssets({fetchImpl:async(url,options)=>url.includes('.css')?new Response('<html>private-sentinel</html>',{headers:{'content-type':'text/html'}}):fetchImpl(url,options)});
+  assert.equal(invalid.status,'failed');assert.equal(invalid.records[0].error,'editorial_asset_unavailable');
+  assert.doesNotMatch(JSON.stringify(invalid),/private-sentinel/);
+  const changed=await verifyEditorialAssets({fetchImpl:async(url,options)=>{
+    const response=await fetchImpl(url,options);
+    if(url.endsWith('/resistance-illustrated-v1.webp')){const data=Buffer.from(await response.arrayBuffer());data[data.length-1]^=1;return new Response(data,{headers:{'content-type':'image/webp'}});}
+    return response;
+  }});
+  assert.equal(changed.status,'failed');assert.equal(changed.records.find(row=>row.path.includes('resistance')).error,'editorial_asset_content_mismatch');
 });

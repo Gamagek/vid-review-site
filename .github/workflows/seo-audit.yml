@@ -73,6 +73,11 @@ jobs:
       - name: Audit published thumbnail HTTP availability without credentials
         run: node scripts/thumbnail-audit.mjs
 
+      - name: Verify deployed editorial stylesheet and exact cover bytes
+        # A push audit can precede deployment; verify these assets only after deployment or on a daily/manual check.
+        if: ${{ github.event_name != 'push' }}
+        run: node scripts/verify-daily-weekly-best-assets.mjs
+
       - name: Audit public pages and synchronize Search Console when configured
         if: ${{ !inputs.thumbnails_only }}
         run: node scripts/search-console-audit.mjs
@@ -119,5 +124,6 @@ jobs:
             daily-weekly-best-google-report.json
             daily-weekly-best-google-summary.txt
             daily-weekly-best-source-report.json
+            daily-weekly-best-asset-report.json
           if-no-files-found: error
           retention-days: 14

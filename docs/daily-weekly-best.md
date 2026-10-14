@@ -23,3 +23,9 @@ The ordinary daily audit continues to use its bounded quota. An explicit new pub
 The local public-source poster fetch returned HTTP 200 `text/html` (195 bytes), not image bytes, and is not recorded as successful image verification. Post-deployment Actions checks verify actual JPEG responses before Google publication. The local Wrangler dev listener failed with `uv_interface_addresses`; tests and Worker dry-run compilation succeeded, and actual deployed HTTP responses remain a separate required verification. These limits are not reasons to copy provider media or bypass controls.
 
 Portainer auto deployment remains paused. This feature adds no migration, container, volume, Access/email policy, gateway route or frontend credential.
+
+## Verified initial publication
+
+PR 160, CI 38630136450 / 38630365755 and Worker deployment 38630365814 completed successfully. Publication audit 38630516160 / artifact 11925703709 verified all fourteen public pages, ten exact official oEmbed identities/embeds and ten real JPEG source posters. Google accepted the root/new editorial sitemap at 20:18 UTC on 14 October (15 October in Sri Lanka); immediate processing was pending, and exactly ten new stored statuses were inspected: six discovered, four unknown, zero indexed. This does not establish that Google has crawled or indexed the new reviews. The ordinary post-deployment audit is still read-only with zero inspections.
+
+Live QA identified a stylesheet filename colliding with the page-prefix matcher. The corrected matcher leaves sibling files to Static Assets. `verify-daily-weekly-best-assets.mjs` performs credential-free reads of the stylesheet and ten hosted covers, verifies content types and exact reviewed bytes, and writes its own safe artifact. It runs after deployment or on daily/manual checks, not in the pre-deployment push diagnostic. The source/Google first-publication steps remain separately opt-in and are not retriggered by this repair.
