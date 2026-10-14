@@ -1,5 +1,9 @@
 # Editorial cover provenance
 
+## 14 October 2026: scheduled full Inspection leaves poster inventory unchanged
+
+Scheduled audit 38544800730 / artifact 11884717890 inspected 164 published review URLs and independently checked the same thumbnail inventory: 142 available, 14 provider HTTP failures and eight protected reaction/comedy/parody placeholders. It generated no covers and changed no assets, saved thumbnails, sources, reviews, dates or publication states. Google discovery/status changes are not evidence that a poster should be replaced. Diagnostic attempt 2 of run 38536561106 / artifact 11886684288 confirms that Google has processed the latest submission and the 20 review sitemap warnings persist, without another submission or URL Inspection. Do not equate those warnings with specific posters without the detailed report. Preserve owner assets, protected Saiyaara/Summer media and the excluded comedy entries.
+
 ## 14 October 2026: processed-sitemap diagnostic preserves all posters
 
 PR 157 changes only Search Console audit behavior, tests and connection documentation; it adds no images and changes no saved thumbnail, source, review, date or publication state. Its completed no-submission audit 38536561106 / artifact 11880142553 retains the same 164 published thumbnail URLs and availability states: 142 available, 14 provider HTTP failures and eight protected reaction/comedy/parody placeholders. Google's processed review sitemap reports 20 warnings, but the Sitemaps API does not identify their types or affected URLs and the private report requires Google sign-in. Do not equate this aggregate warning count with failed posters, rejected content or indexed-page coverage. Resolve the detailed warning evidence before selecting a poster/metadata repair; preserve accurate owner assets and protected media.
