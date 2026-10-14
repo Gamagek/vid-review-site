@@ -21,7 +21,8 @@
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" href="/styles.css?v=20261013-publish-preview">
   <link rel="stylesheet" href="/home-player.css">
-  <script src="/app.js" defer></script>
+  <script src="/library-support.js?v=20261015-library" defer></script>
+  <script src="/app.js?v=20261015-library" defer></script>
   <script src="/tiktok-preview-service.js?v=20261008-cache2" defer></script>
   <script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>
   <script src="/facebook-preview-player.js?v=20261014-warm-player" defer></script>
@@ -307,11 +308,13 @@
 
       <div id="empty-state" class="empty-state glass-panel" hidden>
         <div class="empty-icon">◇</div>
-        <h3>No videos found</h3>
+        <h3 id="empty-title">No videos found</h3>
 
         <p id="empty-message">
           Try a broader category or a different search phrase.
         </p>
+
+        <button id="retry-library" class="button primary" type="button" hidden>Retry video library</button>
 
         <button
           id="request-discovery"
@@ -328,6 +331,9 @@
           role="status"
         ></p>
       </div>
+
+      <p class="form-status"><a href="/videos">Browse the complete video directory</a></p>
+      <noscript><p>The video directory and review pages are available without JavaScript.</p></noscript>
 
       <div class="load-more-wrap">
         <button

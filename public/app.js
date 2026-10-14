@@ -7,6 +7,9 @@ const state = {
   total: 0,
   carouselIndex: 0,
   carouselTimer: null,
+  requestId: 0,
+  loading: false,
+  retryReset: true,
 };
 
 const elements = {
@@ -20,6 +23,8 @@ const elements = {
   grid: document.querySelector("#video-grid"),
   emptyState: document.querySelector("#empty-state"),
   emptyMessage: document.querySelector("#empty-message"),
+  emptyTitle: document.querySelector("#empty-title"),
+  retryLibrary: document.querySelector("#retry-library"),
   requestDiscovery: document.querySelector("#request-discovery"),
   requestDiscoveryStatus: document.querySelector("#request-discovery-status"),
   loadMore: document.querySelector("#load-more"),
@@ -35,17 +40,77 @@ const elements = {
 document.addEventListener("DOMContentLoaded", initialize);
 
 async function initialize() {
+  document.dispatchEvent(new CustomEvent("vidbest:library-started"));
   bindEvents();
   restoreFiltersFromUrl();
+  // Optional discovery sections must never gate the main library.
+  await Promise.all([
+    loadCategories().catch(() => {
+      elements.categorySelect.disabled = true;
+      elements.subcategorySelect.disabled = true;
+      elements.categoryChips.textContent = "Categories are temporarily unavailable. You can still search the library below.";
+    }),
+    loadFeatured().catch(() => {
+      state.featured = [];
+      renderCarousel("Featured videos are temporarily unavailable");
+    }),
+    loadVideos({ reset: true }),
+  ]);
+}
+
+async function loadCategories() {
+  const response = await api("/api/categories?version=14");
+  if (!response.categories || typeof response.categories !== "object" || Array.isArray(response.categories)) {
+    throw requestError("response", "Category data is temporarily unavailable.");
+  }
+  state.categories = response.categories;
+  if (!Object.prototype.hasOwnProperty.call(state.categories, "Other")) state.categories.Other = ["Other"];
+  populateCategoryControls();
+}
+
+function replaceContent(element, ...children) {
+  if (typeof element.replaceChildren === "function") {
+    element.replaceChildren(...children);
+    return;
+  }
+  while (element.firstChild) element.removeChild(element.firstChild);
+  children.forEach(child => element.appendChild(child));
+}
+
+function requestError(code, message) {
+  const error = new Error(message);
+  error.code = code;
+  return error;
+}
+
+function validateVideoList(result) {
+  if (!result || !Array.isArray(result.videos) || !result.pagination ||
+      typeof result.pagination.total !== "number" || !Number.isFinite(result.pagination.total) || result.pagination.total < 0 ||
+      result.videos.some(video => !video || !Number.isFinite(Number(video.id)) ||
+        typeof video.slug !== "string" || typeof video.title !== "string")) {
+    throw requestError("response", "The server returned an invalid video response. Please retry.");
+  }
+  return result;
+}
+
+function showLibraryError(error, reset) {
+  const code = error.code || "unavailable";
+  const network = code === "network" || code === "timeout";
+  elements.emptyTitle.textContent = code === "compatibility" ? "Browser support required" : network ? "Connection problem" : "Video library unavailable";
+  elements.emptyMessage.textContent = error.message || "The video library is temporarily unavailable. Please retry.";
+  elements.emptyState.hidden = false;
+  elements.retryLibrary.hidden = code === "compatibility";
+  elements.resultSummary.textContent = reset ? (network ? "Could not connect to the video library." : "The video library is temporarily unavailable.") : `${state.videos.length} videos loaded; more could not be loaded.`;
+  state.retryReset = reset;
+  updateDiscoveryRequestAction(false);
+  elements.loadMore.hidden = true;
+}
+
+function scrollToLibrary() {
   try {
-    const response = await api("/api/categories?version=14");
-    state.categories = response.categories || {};
-    if (!Object.hasOwn(state.categories, "Other")) state.categories.Other = ["Other"];
-    populateCategoryControls();
-    await Promise.all([loadFeatured(), loadVideos({ reset: true })]);
+    document.querySelector("#discover").scrollIntoView({ behavior: "smooth", block: "start" });
   } catch (error) {
-    elements.resultSummary.textContent = error.message;
-    showEmpty("The video library is temporarily unavailable.");
+    document.querySelector("#discover").scrollIntoView();
   }
 }
 
@@ -55,16 +120,22 @@ function bindEvents() {
     loadVideos({ reset: true });
   });
   elements.categorySelect.addEventListener("change", () => {
+    delete elements.categorySelect.dataset.pending;
+    delete elements.subcategorySelect.dataset.pending;
     populateSubcategories(elements.categorySelect.value);
   });
+  elements.subcategorySelect.addEventListener("change", () => { delete elements.subcategorySelect.dataset.pending; });
   elements.clearFilters.addEventListener("click", () => {
     elements.filterForm.reset();
+    delete elements.categorySelect.dataset.pending;
+    delete elements.subcategorySelect.dataset.pending;
     elements.subcategorySelect.innerHTML = '<option value="">All subcategories</option>';
     elements.subcategorySelect.disabled = true;
     updateActiveChip("");
     loadVideos({ reset: true });
   });
   elements.loadMore.addEventListener("click", () => loadVideos({ reset: false }));
+  elements.retryLibrary.addEventListener("click", () => loadVideos({ reset: state.retryReset }));
   elements.carouselPrevious.addEventListener("click", () => moveCarousel(-1));
   elements.carouselNext.addEventListener("click", () => moveCarousel(1));
   elements.carousel.addEventListener("pointerenter", stopCarouselTimer);
@@ -87,7 +158,7 @@ function populateCategoryControls() {
   const pendingCategory = elements.categorySelect.dataset.pending || "";
   const chipColors = ["#8b6cff", "#35dcff", "#ff6ea9", "#5ee7a4", "#ffc86b", "#4ba8ff"];
 
-  Object.keys(state.categories).forEach((category, index) => {
+  Object.keys(state.categories).filter(category => Array.isArray(state.categories[category])).forEach((category, index) => {
     const option = document.createElement("option");
     option.value = category;
     option.textContent = category;
@@ -99,19 +170,23 @@ function populateCategoryControls() {
     chip.textContent = category;
     chip.style.setProperty("--chip-color", chipColors[index % chipColors.length]);
     chip.addEventListener("click", () => {
+      delete elements.categorySelect.dataset.pending;
+      delete elements.subcategorySelect.dataset.pending;
       elements.categorySelect.value = category;
       populateSubcategories(category);
       updateActiveChip(category);
       loadVideos({ reset: true });
-      document.querySelector("#discover").scrollIntoView({ behavior: "smooth", block: "start" });
+      scrollToLibrary();
     });
     elements.categoryChips.append(chip);
   });
 
-  if (pendingCategory && Object.hasOwn(state.categories, pendingCategory)) {
+  if (pendingCategory && Object.prototype.hasOwnProperty.call(state.categories, pendingCategory)) {
     elements.categorySelect.value = pendingCategory;
     populateSubcategories(pendingCategory, elements.subcategorySelect.dataset.pending || "");
     updateActiveChip(pendingCategory);
+    delete elements.categorySelect.dataset.pending;
+    delete elements.subcategorySelect.dataset.pending;
   }
 }
 
@@ -136,17 +211,17 @@ function updateActiveChip(category) {
 }
 
 async function loadFeatured() {
-  let result = await api("/api/videos?featured=1&sort=trending&limit=7");
-  if (!result.videos?.length) result = await api("/api/videos?sort=trending&limit=7");
+  let result = validateVideoList(await api("/api/videos?featured=1&sort=trending&limit=7"));
+  if (!result.videos.length) result = validateVideoList(await api("/api/videos?sort=trending&limit=7"));
   state.featured = result.videos || [];
   state.carouselIndex = 0;
   renderCarousel();
   startCarouselTimer();
 }
 
-function renderCarousel() {
-  elements.carousel.replaceChildren();
-  elements.carouselDots.replaceChildren();
+function renderCarousel(errorMessage = "") {
+  replaceContent(elements.carousel);
+  replaceContent(elements.carouselDots);
   if (!state.featured.length) {
     const empty = document.createElement("article");
     empty.className = "featured-card active";
@@ -158,9 +233,9 @@ function renderCarousel() {
     const copy = document.createElement("div");
     copy.className = "featured-card-content";
     const title = document.createElement("h2");
-    title.textContent = "Your featured reviews will appear here";
+    title.textContent = errorMessage || "Your featured reviews will appear here";
     const text = document.createElement("p");
-    text.textContent = "Open the publisher console and mark a video as Featured.";
+    text.textContent = errorMessage ? "Explore the video library below." : "Explore the library for published video reviews.";
     copy.append(title, text);
     empty.append(fallback, copy);
     elements.carousel.append(empty);
@@ -244,7 +319,7 @@ function updateCarousel() {
 
 function startCarouselTimer() {
   stopCarouselTimer();
-  if (state.featured.length > 1 && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  if (state.featured.length > 1 && (typeof matchMedia !== "function" || !matchMedia("(prefers-reduced-motion: reduce)").matches)) {
     state.carouselTimer = setInterval(() => moveCarousel(1), 6500);
   }
 }
@@ -255,10 +330,17 @@ function stopCarouselTimer() {
 }
 
 async function loadVideos({ reset }) {
+  if (!reset && state.loading) return;
+  const requestId = ++state.requestId;
+  state.loading = true;
+  elements.emptyState.hidden = true;
+  elements.retryLibrary.hidden = true;
+  elements.retryLibrary.disabled = true;
   if (reset) {
     state.offset = 0;
     state.videos = [];
-    elements.grid.replaceChildren(videoSkeleton(), videoSkeleton(), videoSkeleton());
+    replaceContent(elements.grid, videoSkeleton(), videoSkeleton(), videoSkeleton());
+    elements.resultSummary.textContent = "Loading video reviews…";
   }
   elements.loadMore.disabled = true;
   const params = new URLSearchParams({
@@ -267,32 +349,42 @@ async function loadVideos({ reset }) {
     sort: elements.sortSelect.value,
   });
   if (elements.searchInput.value.trim()) params.set("q", elements.searchInput.value.trim());
-  if (elements.categorySelect.value) params.set("category", elements.categorySelect.value);
-  if (elements.subcategorySelect.value) params.set("subcategory", elements.subcategorySelect.value);
+  const category = elements.categorySelect.value || elements.categorySelect.dataset.pending || "";
+  const subcategory = elements.subcategorySelect.value || elements.subcategorySelect.dataset.pending || "";
+  if (category) params.set("category", category);
+  if (subcategory) params.set("subcategory", subcategory);
 
   try {
-    const result = await api(`/api/videos?${params}`);
-    const incoming = result.videos || [];
-    state.total = Number(result.pagination?.total || 0);
+    const result = validateVideoList(await api(`/api/videos?${params}`));
+    if (requestId !== state.requestId) return;
+    const incoming = result.videos;
+    state.total = Number(result.pagination.total);
     state.videos.push(...incoming);
     state.offset += incoming.length;
     renderVideoGrid();
     syncUrl();
   } catch (error) {
-    if (reset) elements.grid.replaceChildren();
-    showEmpty(error.message);
+    if (requestId !== state.requestId) return;
+    if (reset) replaceContent(elements.grid);
+    showLibraryError(error, reset);
   } finally {
-    elements.loadMore.disabled = false;
+    if (requestId === state.requestId) {
+      state.loading = false;
+      elements.loadMore.disabled = false;
+      elements.retryLibrary.disabled = false;
+    }
   }
 }
 
 function renderVideoGrid() {
-  elements.grid.replaceChildren();
+  replaceContent(elements.grid);
   state.videos.forEach((video) => elements.grid.append(buildVideoCard(video)));
   document.dispatchEvent(new CustomEvent("vidbest:grid-rendered"));
   const shown = state.videos.length;
   elements.resultSummary.textContent = state.total === 1 ? "1 curated video" : `${state.total.toLocaleString()} curated videos`;
   elements.emptyState.hidden = shown > 0;
+  elements.emptyTitle.textContent = "No videos found";
+  elements.retryLibrary.hidden = true;
   if (shown === 0) {
     elements.emptyMessage.textContent = elements.searchInput.value.trim()
       ? "This video is not reviewed yet. You can ask the publisher to add it."
@@ -346,7 +438,7 @@ function buildVideoCard(video) {
 
   card.querySelectorAll("[data-reaction]").forEach((button) => {
     const type = button.dataset.reaction;
-    button.querySelector("span").textContent = formatNumber(video.reactions?.[type] || 0);
+    button.querySelector("span").textContent = formatNumber(video.reactions && video.reactions[type] || 0);
     button.addEventListener("click", () => react(video.id, type, card));
   });
   card.querySelector(".interest-button").addEventListener("click", () => saveInterest(video.id, card));
@@ -424,14 +516,6 @@ async function saveInterest(videoId, card) {
   }
 }
 
-function showEmpty(message, allowDiscoveryRequest = false) {
-  elements.grid.replaceChildren();
-  elements.emptyState.hidden = false;
-  elements.emptyMessage.textContent = message;
-  updateDiscoveryRequestAction(allowDiscoveryRequest);
-  elements.loadMore.hidden = true;
-}
-
 function updateDiscoveryRequestAction(allow) {
   const query = elements.searchInput.value.trim();
   elements.requestDiscovery.hidden = !allow || query.length < 3;
@@ -461,16 +545,19 @@ async function submitDiscoveryRequest() {
 function syncUrl() {
   const params = new URLSearchParams();
   if (elements.searchInput.value.trim()) params.set("q", elements.searchInput.value.trim());
-  if (elements.categorySelect.value) params.set("category", elements.categorySelect.value);
-  if (elements.subcategorySelect.value) params.set("subcategory", elements.subcategorySelect.value);
+  const category = elements.categorySelect.value || elements.categorySelect.dataset.pending || "";
+  const subcategory = elements.subcategorySelect.value || elements.subcategorySelect.dataset.pending || "";
+  if (category) params.set("category", category);
+  if (subcategory) params.set("subcategory", subcategory);
   if (elements.sortSelect.value !== "newest") params.set("sort", elements.sortSelect.value);
-  history.replaceState(null, "", params.size ? `?${params}` : location.pathname);
+  const query = params.toString();
+  try { history.replaceState(null, "", query ? `?${query}` : location.pathname); } catch (error) { /* Browser privacy restrictions do not hide loaded records. */ }
 }
 
 function surpriseMe() {
   const pool = state.videos.length ? state.videos : state.featured;
   if (!pool.length) {
-    document.querySelector("#discover").scrollIntoView({ behavior: "smooth" });
+    scrollToLibrary();
     return;
   }
   const video = pool[Math.floor(Math.random() * pool.length)];
@@ -478,12 +565,40 @@ function surpriseMe() {
 }
 
 async function api(url, options = {}) {
-  const response = await fetch(url, options);
-  const text = await response.text();
-  let payload;
-  try { payload = text ? JSON.parse(text) : {}; } catch { payload = {}; }
-  if (!response.ok) throw new Error(payload.error || `Request failed with HTTP ${response.status}`);
-  return payload;
+  if (typeof fetch !== "function") throw requestError("compatibility", "This browser cannot load the interactive library. Use the video directory below or update your browser.");
+  const read = !options.method || options.method.toUpperCase() === "GET";
+  const requestOptions = Object.assign({}, options);
+  if (read) requestOptions.cache = "no-store";
+  const controller = read && typeof AbortController === "function" ? new AbortController() : null;
+  if (controller) requestOptions.signal = controller.signal;
+  let timer;
+  const request = (async () => {
+    let response;
+    try { response = await fetch(url, requestOptions); }
+    catch (error) { throw requestError("network", "Could not connect to Vid.Best. Check your connection and retry."); }
+    let text;
+    try { text = await response.text(); }
+    catch (error) { throw requestError("network", "The connection ended before the response arrived. Please retry."); }
+    let payload;
+    try { payload = text ? JSON.parse(text) : {}; }
+    catch (error) {
+      throw requestError("response", response.ok ? "The server returned an invalid response. Please retry." : `Video request failed (HTTP ${response.status}). Please retry.`);
+    }
+    if (!response.ok) throw requestError("http", payload && payload.error || `Request failed with HTTP ${response.status}. Please retry.`);
+    return payload;
+  })();
+  try {
+    if (!read) return await request;
+    const timeout = new Promise((resolve, reject) => {
+      timer = setTimeout(() => {
+        reject(requestError("timeout", "The video request timed out. Check your connection and retry."));
+        if (controller) controller.abort();
+      }, 15000);
+    });
+    return await Promise.race([request, timeout]);
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+  }
 }
 
 function setStatus(element, message, type = "") {
@@ -492,10 +607,14 @@ function setStatus(element, message, type = "") {
 }
 
 function formatNumber(value) {
-  return new Intl.NumberFormat(undefined, { notation: Number(value) >= 1000 ? "compact" : "standard", maximumFractionDigits: 1 }).format(Number(value) || 0);
+  const number = Number(value) || 0;
+  try { return new Intl.NumberFormat(undefined, { notation: number >= 1000 ? "compact" : "standard", maximumFractionDigits: 1 }).format(number); }
+  catch (error) { return String(number); }
 }
 
 function formatDate(value) {
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "Recently" : new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(date);
+  if (Number.isNaN(date.getTime())) return "Date unavailable";
+  try { return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(date); }
+  catch (error) { return date.toISOString().slice(0, 10); }
 }

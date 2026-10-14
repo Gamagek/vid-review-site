@@ -94,7 +94,10 @@ function htmlResponse(html, status = 200, robots = "index,follow,max-image-previ
 
 function redirectToCanonical(request) {
   const url = new URL(request.url);
-  const target = new URL(url.pathname + url.search, CANONICAL_ORIGIN).toString();
+  const targetUrl = new URL(CANONICAL_ORIGIN);
+  targetUrl.pathname = url.pathname;
+  targetUrl.search = url.search;
+  const target = targetUrl.toString();
   return new Response(null, {
     status: 301,
     headers: {
@@ -551,7 +554,7 @@ const seoWorker = {
     const url = new URL(request.url);
     const hostname = url.hostname.toLowerCase();
 
-    if (LEGACY_HOSTS.has(hostname) && ["GET", "HEAD"].includes(request.method)) {
+    if ((LEGACY_HOSTS.has(hostname) || (hostname === "vid.best" && url.protocol === "http:")) && ["GET", "HEAD"].includes(request.method)) {
       return redirectToCanonical(request);
     }
 
