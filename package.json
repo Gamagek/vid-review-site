@@ -9,7 +9,8 @@
     "seo:audit": "node scripts/search-console-audit.mjs",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "check": "node --check scripts/bootstrap-legacy-d1.mjs && wrangler deploy --dry-run --outdir .wrangler-dry-run",
+    "check": "node --check scripts/bootstrap-legacy-d1.mjs && node scripts/build-daily-weekly-best.mjs --check && wrangler deploy --dry-run --outdir .wrangler-dry-run",
+    "editorial:build": "node scripts/build-daily-weekly-best.mjs",
     "db:migrate:local": "wrangler d1 migrations apply video-reviews-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply video-reviews-db --remote",
     "db:list": "wrangler d1 migrations list video-reviews-db --remote"

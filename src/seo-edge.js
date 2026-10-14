@@ -1,6 +1,7 @@
 import { signedLegacyV5Page } from "./legacy-v5-signer.js";
 import edgeWorker from "./edge.js";
 import { facebookPosterUrl } from "./facebook-posters.js";
+import { dailyWeeklyBestResponse, dailyWeeklyBestSitemap } from "./daily-weekly-best.js";
 
 const CANONICAL_ORIGIN = "https://vid.best";
 const LEGACY_HOSTS = new Set(["home.vid.best", "www.vid.best"]);
@@ -330,7 +331,8 @@ async function combinedSitemap(env) {
     : "";
   const pagesEntry = `<sitemap><loc>${escapeXml(CANONICAL_ORIGIN + "/sitemaps/pages.xml")}</loc></sitemap>`;
 
-  const body = `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${pagesEntry}${videoSitemaps}${categoryEntry}</sitemapindex>`;
+  const editorialEntry = `<sitemap><loc>${CANONICAL_ORIGIN}/sitemaps/daily-weekly-best.xml</loc></sitemap>`;
+  const body = `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${pagesEntry}${videoSitemaps}${categoryEntry}${editorialEntry}</sitemapindex>`;
   return new Response(body, {
     status: 200,
     headers: standardHeaders("application/xml; charset=utf-8", "public, max-age=900")
@@ -552,6 +554,12 @@ const seoWorker = {
     if (LEGACY_HOSTS.has(hostname) && ["GET", "HEAD"].includes(request.method)) {
       return redirectToCanonical(request);
     }
+
+    if (url.pathname === "/sitemaps/daily-weekly-best.xml" && ["GET", "HEAD"].includes(request.method)) {
+      return dailyWeeklyBestSitemap();
+    }
+    const editorial = await dailyWeeklyBestResponse(request, env);
+    if (editorial) return editorial;
 
     if (["GET", "HEAD"].includes(request.method)) {
       const normalizedPath = url.pathname === "/index.html" ? "/"

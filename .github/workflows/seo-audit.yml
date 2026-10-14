@@ -83,6 +83,16 @@ jobs:
           GOOGLE_SEARCH_CONSOLE_SUBMIT_SITEMAPS: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' && inputs.submit_sitemaps) && 'true' || 'false' }}
           # Daily/manual audits inspect URLs; deployment/push diagnostics use zero inspections.
           GOOGLE_SEARCH_CONSOLE_INSPECTIONS: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && '200' || '0' }}
+      - name: Verify original editorial video identities and source JPEG posters
+        if: ${{ github.event_name == 'workflow_run' && contains(github.event.workflow_run.head_commit.message, '[daily-weekly-best-publish]') }}
+        run: node scripts/verify-daily-weekly-best-sources.mjs
+      - name: Submit verified new editorial pages through supported Search Console APIs
+        # The publication commit deliberately opts in once; ordinary diagnostics do not resubmit.
+        if: ${{ github.event_name == 'workflow_run' && contains(github.event.workflow_run.head_commit.message, '[daily-weekly-best-publish]') }}
+        run: node scripts/publish-daily-weekly-best.mjs
+        env:
+          GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_SEARCH_CONSOLE_PROPERTY: ${{ vars.GOOGLE_SEARCH_CONSOLE_PROPERTY || 'sc-domain:vid.best' }}
       - name: Publish concise indexing summary
         if: ${{ always() }}
         shell: bash
@@ -92,6 +102,9 @@ jobs:
           fi
           if [ -f seo-audit-summary.txt ]; then
             cat seo-audit-summary.txt >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f daily-weekly-best-google-summary.txt ]; then
+            cat daily-weekly-best-google-summary.txt >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Save credential-free technical and indexing reports
         if: ${{ always() }}
@@ -103,5 +116,8 @@ jobs:
             thumbnail-audit-summary.txt
             seo-audit-report.json
             seo-audit-summary.txt
+            daily-weekly-best-google-report.json
+            daily-weekly-best-google-summary.txt
+            daily-weekly-best-source-report.json
           if-no-files-found: error
           retention-days: 14

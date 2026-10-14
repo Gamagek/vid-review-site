@@ -1,5 +1,28 @@
 # Editorial cover provenance
 
+## 15 October 2026: ten independent Daily Weekly Best illustrations
+
+Built-in imagegen generated ten distinct symbolic editorial covers, each visibly labelled `Illustrated editorial cover • Vid.Best`. Every output was visually reviewed and retained; full compositions were resized without cropping and encoded as 1279×720 WebP. These are not official posters, actor portraits, video frames, game screenshots or reconstructed scenes. They are used only for the new separate editorial pages and do not replace any existing owner/source poster, protected comedy entry or media route. The original source upload dates remain separate from new article dates. VideoObject uses the exact source video's original poster address, subject to the post-deployment JPEG verification, rather than asserting that the illustration is a video frame.
+
+Shared prompt: `Use case: illustration-story. Landscape 16:9 editorial website thumbnail for Vid.Best, preferably 1536x864 pixels. [Distinct symbolic subject below.] Rich hand-painted editorial illustration with tactile paper texture and bold, uncluttered composition that reads at a small tile size. Large areas of elegant negative space. It is purely symbolic illustration, never a video frame, official poster or reconstruction of a film scene. No recognizable characters, people, copyrighted logos, dates, rankings, event scores, or studio branding. Exact small readable footer text: Illustrated editorial cover • Vid.Best. No other text.`
+
+All final assets are in `public/daily-weekly-covers/`:
+
+| File | Article/theme and distinct prompt subject | Bytes | SHA-256 |
+| --- | --- | ---: | --- |
+| school-illustrated-v1.webp | Harry Potter adaptation: luminous blank book, gold stars, abstract doorway; midnight blue and warm light | 209142 | a39ba8028715edaad0d63ce290b8874760ca52abaf20d2dc119a5c2cc74069e4 |
+| witches-illustrated-v1.webp | Hexed family premise: intertwined violet/amber ribbons in abstract teal leaves | 243150 | c2f988972a5c64c7f05e0ce51304a95bb69f642694e32c1ebbe0a14896a37dfe |
+| quest-illustrated-v1.webp | Gollum production preview: brass compass, blank map, golden light on moss; uncertain journey | 213306 | 908afe148b06e9d24ad5e526d41f6478592f1a171913ab7417df22c8015cad23 |
+| desert-illustrated-v1.webp | Dune power/consequence essay: geometric crown and long shadow across painted dunes | 155458 | 786d0c0e9658e9ce2a64991f9b8821832c9a9ab3c7a413f2f4d14f000368d386 |
+| heroes-illustrated-v1.webp | Avengers ensemble preview: coloured beams around an abstract cracked clock; no numerals | 154412 | b724552748456ac74275f6f05f9a2682743517a76bf5686d3990e03f62b7a23f |
+| fighter-illustrated-v1.webp | Street Fighter adaptation: empty training wraps and generic arcade joystick in blue/red light | 185586 | 84c3bc9e03f52df74d94f41491f757e48f6dbd9ed1aae6498b6e43c730737a0f |
+| resistance-illustrated-v1.webp | Ranabaali essay: woven cloth, grain bowl and imagined rural sunrise; dignified resilience | 268852 | e0ac3df4e10b63b5fbf6029be33c04c09e2d0e544056c4d1cd09ba4f3e826cd7 |
+| epic-illustrated-v1.webp | Ramayana adaptation: decorative bow, blank manuscript, lotus forms and sunrise; no deity | 223964 | 258dfc8c787a748c4e1cb942af278a6b60a46e996cb58a04614df95ed16a9163 |
+| macao-illustrated-v1.webp | NBA viewing guide: basketball and imagined city-light skyline; not Macao photography | 255500 | e9a04f36730e36b6fc8bca18845270414d5a0b7648d3cf9d2b80dbe06d2a9bf9 |
+| simulation-illustrated-v1.webp | NBA 2K27 feature essay: ball blending into geometric grid beside generic controller | 235690 | 4a26b1c43332b7768e182b07b41ef9d26286d884d041d030a03b79cf442a5832 |
+
+Source identities, original timestamps, evidence limits and official links are recorded in `content/daily-weekly-best/catalog.json` and displayed on each page. Initial franchise-specific generation did not produce a usable asset; only the ten safe symbolic outputs above are selected. No private/signed provider image URL or copied trailer is stored. Local YouTube poster checks returned HTML and are explicitly unverified; the publication Actions step must confirm real JPEG bytes and matching official oEmbed identities before any supported Google submission.
+
 ## 14 October 2026: scheduled full Inspection leaves poster inventory unchanged
 
 Scheduled audit 38544800730 / artifact 11884717890 inspected 164 published review URLs and independently checked the same thumbnail inventory: 142 available, 14 provider HTTP failures and eight protected reaction/comedy/parody placeholders. It generated no covers and changed no assets, saved thumbnails, sources, reviews, dates or publication states. Google discovery/status changes are not evidence that a poster should be replaced. Diagnostic attempt 2 of run 38536561106 / artifact 11886684288 confirms that Google has processed the latest submission and the 20 review sitemap warnings persist, without another submission or URL Inspection. Do not equate those warnings with specific posters without the detailed report. Preserve owner assets, protected Saiyaara/Summer media and the excluded comedy entries.
