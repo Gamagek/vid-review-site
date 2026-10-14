@@ -246,3 +246,112 @@ test('private or unrelated sitemap targets are rejected before Google authentica
     assert.equal(authenticated,false);assert.equal(result.status,'failed');assert.doesNotMatch(JSON.stringify(result),/sentinel/);
   }
 });
+
+test('diagnostics read root and review processing without changing submissions or spending inspection quota', async () => {
+  const calls = [], progress = [];
+  const child = ORIGIN + '/sitemaps/videos-1.xml';
+  const result = await syncSearchConsole([ORIGIN + '/watch/a'], {
+    secret: 'configured', budget: 0, submitSitemaps: false, reviewSitemaps: [child, child],
+    getToken: async () => 'private-token-sentinel', wait: noop, progress: message => progress.push(message),
+    fetchImpl: async (url, options) => {
+      calls.push({ url, method: options.method || 'GET' });
+      assert.equal(options.method, undefined);
+      if (!url.includes('/sitemaps/')) return json({ permissionLevel: 'siteOwner' });
+      return json({ path: decodeURIComponent(url.split('/sitemaps/')[1]), isPending: false,
+        lastSubmitted: '2026-10-14T05:59:57.224Z', lastDownloaded: '2026-10-14T06:00:00Z',
+        errors: '0', warnings: '0', contents: [{ indexed: 'private-sentinel' }] });
+    },
+  });
+  assert.equal(result.status, 'success');
+  assert.equal(result.sitemapMode, 'read_only');
+  assert.equal(result.sitemapSubmitted, false);
+  assert.equal(result.sitemapProcessing.isPending, false);
+  assert.equal(result.sitemapProcessing.lastSubmitted, '2026-10-14T05:59:57.224Z');
+  assert.equal(result.reviewSitemaps.length, 1);
+  assert.equal(result.reviewSitemaps[0].submitted, false);
+  assert.equal(result.inspectionBudget, 0);
+  assert.deepEqual(result.inspections, []);
+  assert.equal(calls.length, 3);
+  assert.ok(calls.every(call => call.method === 'GET' && !call.url.includes('urlInspection') && !call.url.includes('indexing.googleapis')));
+  assert.doesNotMatch(JSON.stringify(result) + progress.join('\n'), /private-sentinel|private-token-sentinel|accepted by Google/);
+  const text = summary({ publicAuditStatus: 'success', pages: [], errors: [], searchConsole: result });
+  assert.match(text, /Google sitemap mode: read_only/);
+  assert.match(text, /Sitemap submitted to Google: false/);
+  assert.match(text, /Review sitemap status checks: 1; submitted: 0/);
+});
+
+test('an unregistered diagnostic sitemap stays unverified without a fallback submission', async () => {
+  const methods = [];
+  const result = await syncSearchConsole([], {
+    secret: 'configured', budget: 0, submitSitemaps: false,
+    reviewSitemaps: [ORIGIN + '/sitemaps/videos-1.xml'], getToken: async () => 'test-token', wait: noop,
+    fetchImpl: async (url, options) => {
+      methods.push(options.method || 'GET');
+      return url.includes('/sitemaps/') ? json({ private: 'private-sentinel' }, 404) : json({ permissionLevel: 'siteFullUser' });
+    },
+  });
+  assert.equal(result.status, 'success');
+  assert.equal(result.sitemapSubmitted, false);
+  for (const state of [result.sitemapProcessing, result.reviewSitemaps[0].processing]) {
+    assert.deepEqual(state, { status: 'not_verified', error: 'google_sitemap_status_http_404' });
+    assert.equal(state.errors, undefined);
+  }
+  assert.ok(methods.every(method => method === 'GET'));
+  assert.doesNotMatch(JSON.stringify(result), /private-sentinel/);
+});
+
+test('invalid submission mode fails before credentials or Google calls and never leaks input', async () => {
+  for (const submitSitemaps of [null, 1, 'false', 'private-sentinel']) {
+    let called = false;
+    const result = await syncSearchConsole([], {
+      secret: 'configured', submitSitemaps, getToken: async () => { called = true; },
+      fetchImpl: async () => { called = true; }, wait: noop,
+    });
+    assert.equal(called, false);
+    assert.equal(result.status, 'failed');
+    assert.equal(result.error, 'invalid_sitemap_submission_mode');
+    assert.equal(result.sitemapSubmitted, false);
+    assert.doesNotMatch(JSON.stringify(result), /private-sentinel/);
+  }
+});
+
+test('stored URL Inspection reads can run independently of sitemap submission', async () => {
+  const methods = [], review = ORIGIN + '/watch/a';
+  const result = await syncSearchConsole([review], {
+    secret: 'configured', budget: 1, submitSitemaps: false, getToken: async () => 'test-token', wait: noop,
+    fetchImpl: async (url, options) => {
+      methods.push(options.method || 'GET');
+      if (options.method === 'POST') {
+        assert.equal(url, 'https://searchconsole.googleapis.com/v1/urlInspection/index:inspect');
+        assert.equal(JSON.parse(options.body).inspectionUrl, review);
+        return json({ inspectionResult: { indexStatusResult: { verdict: 'NEUTRAL', coverageState: 'Discovered - currently not indexed' } } });
+      }
+      return url.includes('/sitemaps/') ? json({ path: ORIGIN + '/sitemap.xml', isPending: false }) : json({ permissionLevel: 'siteOwner' });
+    },
+  });
+  assert.equal(result.status, 'success');
+  assert.equal(result.sitemapSubmitted, false);
+  assert.equal(result.inspections.length, 1);
+  assert.equal(result.inspections[0].url, review);
+  assert.deepEqual(methods, ['GET', 'GET', 'POST']);
+});
+
+test('the complete public audit forwards diagnostic mode while keeping authentication out of public requests', async () => {
+  const publicFake = publicSite(), googleMethods = [];
+  const report = await runAudit({
+    secret: 'configured', budget: 0, submitSitemaps: false, getToken: async () => 'test-token', wait: noop,
+    fetchImpl: async (url, options) => {
+      if (url.startsWith(ORIGIN + '/')) return publicFake.fetchImpl(url, options);
+      googleMethods.push(options.method || 'GET');
+      return url.includes('/sitemaps/') ? json({ path: decodeURIComponent(url.split('/sitemaps/')[1]), isPending: false }) : json({ permissionLevel: 'siteOwner' });
+    },
+  });
+  assert.equal(report.publicAuditStatus, 'success');
+  assert.equal(report.searchConsole.status, 'success');
+  assert.equal(report.searchConsole.sitemapMode, 'read_only');
+  assert.equal(report.searchConsole.sitemapSubmitted, false);
+  assert.equal(report.searchConsole.reviewSitemaps[0].submitted, false);
+  assert.ok(publicFake.calls.every(call => ['GET', 'HEAD'].includes(call.method)));
+  assert.ok(googleMethods.every(method => method === 'GET'));
+  assert.equal(report.productionWrites, false);
+});

@@ -15,6 +15,10 @@ on:
         description: Check published thumbnails without calling Google APIs
         type: boolean
         default: false
+      submit_sitemaps:
+        description: Resubmit the public root and review sitemaps to Google
+        type: boolean
+        default: false
   workflow_run:
     workflows: [Deploy]
     types: [completed]
@@ -75,7 +79,9 @@ jobs:
         env:
           GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON }}
           GOOGLE_SEARCH_CONSOLE_PROPERTY: ${{ vars.GOOGLE_SEARCH_CONSOLE_PROPERTY || 'sc-domain:vid.best' }}
-          # Daily/manual audits inspect URLs; repeated deployments only read sitemap processing state.
+          # Only the daily audit or an explicit manual request resubmits sitemaps.
+          GOOGLE_SEARCH_CONSOLE_SUBMIT_SITEMAPS: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' && inputs.submit_sitemaps) && 'true' || 'false' }}
+          # Daily/manual audits inspect URLs; deployment/push diagnostics use zero inspections.
           GOOGLE_SEARCH_CONSOLE_INSPECTIONS: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && '200' || '0' }}
       - name: Publish concise indexing summary
         if: ${{ always() }}
