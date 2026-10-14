@@ -39,16 +39,30 @@ successful Google submission or indexing.
    defaults to **sc-domain:vid.best**.
 6. Run **Review indexing audit** at
    <https://github.com/Gamagek/vid-review-site/actions/workflows/seo-audit.yml>.
-   Verify **Search Console: success**, **Sitemap submitted to Google: true**,
-   and the stored inspection results in the artifact.
+   For this first connection or an intentional resubmission, select
+   **submit_sitemaps**. Verify **Search Console: success**, the sitemap
+   processing diagnostics, and the stored inspection results in the artifact.
+   **Sitemap submitted to Google: true** appears only when submission was requested.
 
-The script requests only the Search Console OAuth scope, verifies Full/Owner
-property access, submits **https://vid.best/sitemap.xml**, and reads stored Google
-index information for up to 200 published review URLs per run. Larger libraries
+The script requests only the Search Console OAuth scope and verifies Full/Owner
+property access. The daily audit submits **https://vid.best/sitemap.xml** and its
+discovered review sitemaps, then reads stored Google index information for up to
+200 published review URLs. Manual audits read the same stored information and
+resubmit sitemaps only when **submit_sitemaps** is selected. Larger libraries
 rotate deterministically across days. Calls are paced, bounded and stop on
 quota/authentication failures. No quota circumvention or account rotation is used.
 Technical audit failures prevent sitemap submission until the public pages pass.
 The script never logs credentials, Google error bodies or authenticated URLs.
+
+Deployment and audit-script push diagnostics read the existing Google sitemap
+status with GET requests. They use zero URL Inspections and do not submit the
+sitemaps again before observing their processing state. Reports distinguish
+**Google sitemap mode: read_only**, the actual number of submissions, and
+Google's unchanged submission/download timestamps. A missing status stays
+**not_verified**; diagnostic mode never submits a missing sitemap as a fallback.
+For a local status-only audit, set **GOOGLE_SEARCH_CONSOLE_SUBMIT_SITEMAPS=false**
+and **GOOGLE_SEARCH_CONSOLE_INSPECTIONS=0**. CLI submission remains enabled by
+default for compatibility; the workflow selects its mode explicitly.
 
 ## What the automation can and cannot establish
 
@@ -106,6 +120,9 @@ Use the **[seo-only]** marker in the SEO release's merge title. It allows the
 normal tested Cloudflare Worker release while skipping Portainer preflight and
 stack write jobs. It does not change the Portainer production deployment flag,
 Cloudflare Access policies, gateway routing, containers or persistent volumes.
+Audit-script/workflow changes that need no Worker release can instead use
+**[read-only-preflight]**. Their direct push audit still verifies the new diagnostic
+code, while Worker deployment and Portainer production writes remain skipped.
 
 ## Primary references
 

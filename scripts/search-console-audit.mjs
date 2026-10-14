@@ -215,7 +215,7 @@ async function readSitemapProcessing(fetchImpl, property, sitemap, headers, wait
   } catch (error) { return {status:'not_verified',error:safeCode(error)}; }
 }
 
-export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:vid.best', budget = 200,
+export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:vid.best', budget = 200, submitSitemaps = true,
   reviewSitemaps = [], fetchImpl = globalThis.fetch, wait = delay, now = Date.now(), getToken = googleAccessToken,
   progress = () => {} } = {}) {
   const result = { status: secret ? 'pending' : 'not_configured', authenticated: false,
@@ -224,6 +224,8 @@ export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:v
   let stage = 'authenticate';
   try {
     if (!['sc-domain:vid.best', ORIGIN + '/'].includes(site)) throw new AuditError('invalid_search_console_property');
+    if (typeof submitSitemaps !== 'boolean') throw new AuditError('invalid_sitemap_submission_mode');
+    result.sitemapMode = submitSitemaps ? 'submit' : 'read_only';
     const maps = [...new Set(reviewSitemaps.map(publicUrl))];
     if (maps.length > 10 || maps.some(url => !/^https:\/\/vid\.best\/sitemaps\/videos-[1-9]\d*\.xml$/.test(url))) throw new AuditError('invalid_review_sitemap');
 
@@ -240,23 +242,29 @@ export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:v
     if (!['siteOwner', 'siteFullUser'].includes(info.permissionLevel)) throw new AuditError('search_console_full_access_required');
     result.propertyVerified = true;
     progress('Full or Owner Search Console property access verified.');
-    stage = 'submit_sitemap';
-    const submit = await request(fetchImpl, property + '/sitemaps/' + encodeURIComponent(SITEMAP), { method: 'PUT', headers }, wait);
-    if (!submit.ok) { await submit.body?.cancel(); throw new AuditError('google_sitemap_http_' + submit.status); }
-    await submit.body?.cancel();
-    result.sitemapSubmitted = true;
-    progress('Published sitemap accepted by Google.');
+    if (submitSitemaps) {
+      stage = 'submit_sitemap';
+      const submit = await request(fetchImpl, property + '/sitemaps/' + encodeURIComponent(SITEMAP), { method: 'PUT', headers }, wait);
+      if (!submit.ok) { await submit.body?.cancel(); throw new AuditError('google_sitemap_http_' + submit.status); }
+      await submit.body?.cancel();
+      result.sitemapSubmitted = true;
+      progress('Published sitemap accepted by Google.');
+    } else progress('Sitemap submissions disabled; reading existing Google processing status.');
     // Acceptance is not proof that Google downloaded the index or its children.
+    stage = 'read_sitemap_status';
     result.sitemapProcessing = await readSitemapProcessing(fetchImpl, property, SITEMAP, headers, wait);
     result.reviewSitemaps = [];
-    stage = 'submit_review_sitemaps';
     for (const sitemap of maps) {
-      const response = await request(fetchImpl, property + '/sitemaps/' + encodeURIComponent(sitemap), {method:'PUT',headers}, wait);
-      if (!response.ok) { await response.body?.cancel(); throw new AuditError('google_review_sitemap_http_' + response.status); }
-      await response.body?.cancel();
+      if (submitSitemaps) {
+        stage = 'submit_review_sitemaps';
+        const response = await request(fetchImpl, property + '/sitemaps/' + encodeURIComponent(sitemap), {method:'PUT',headers}, wait);
+        if (!response.ok) { await response.body?.cancel(); throw new AuditError('google_review_sitemap_http_' + response.status); }
+        await response.body?.cancel();
+      }
+      stage = 'read_review_sitemap_status';
       const processing = await readSitemapProcessing(fetchImpl, property, sitemap, headers, wait);
-      result.reviewSitemaps.push({url:sitemap,submitted:true,processing});
-      progress('Review sitemap accepted by Google; processing: ' + processing.status + '; pending: ' + (processing.isPending ?? 'not_verified') + '; last downloaded: ' + (processing.lastDownloaded || 'not_reported') + '.');
+      result.reviewSitemaps.push({url:sitemap,submitted:submitSitemaps,processing});
+      progress('Review sitemap ' + (submitSitemaps ? 'submitted' : 'status read') + '; processing: ' + processing.status + '; pending: ' + (processing.isPending ?? 'not_verified') + '; last downloaded: ' + (processing.lastDownloaded || 'not_reported') + '.');
     }
     stage = 'inspect_index_status';
     const reviews = [...new Set(urls.map(publicUrl).filter(url => new URL(url).pathname.startsWith('/watch/')))].sort();
@@ -295,7 +303,7 @@ export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:v
 }
 
 export async function runAudit({ fetchImpl = globalThis.fetch, wait = delay, secret = '',
-  site, budget, now = Date.now(), getToken, progress = () => {} } = {}) {
+  site, budget, submitSitemaps = true, now = Date.now(), getToken, progress = () => {} } = {}) {
   const report = { generatedAt: new Date(now).toISOString(), productionWrites: false, errors: [], pages: [] };
   try {
     progress('Starting public crawlability checks.');
@@ -337,7 +345,7 @@ export async function runAudit({ fetchImpl = globalThis.fetch, wait = delay, sec
     report.publicAuditStatus = !report.errors.length && !report.failedPages ? 'success' : 'failed';
     progress('Public checks complete: ' + report.publicAuditStatus + '; pages checked: ' + report.pages.length + '.');
     report.searchConsole = report.publicAuditStatus === 'success'
-      ? await syncSearchConsole(discovered.urls, { secret, site, budget, now, fetchImpl, wait, getToken, progress,
+      ? await syncSearchConsole(discovered.urls, { secret, site, budget, submitSitemaps, now, fetchImpl, wait, getToken, progress,
           reviewSitemaps: discovered.maps.map(map => map.url).filter(url => /\/sitemaps\/videos-\d+\.xml$/.test(url)) })
       : { status: 'skipped_public_audit_failed', sitemapSubmitted: false, inspections: [] };
   } catch (error) { report.errors.push(safeCode(error)); report.publicAuditStatus = 'failed'; }
@@ -357,6 +365,7 @@ export function summary(report) {
     'Search Console: ' + (google?.status || 'not_run'),
     'Google OAuth authentication: ' + (google?.authenticated ? 'success' : 'not_verified'),
     'Search Console property access: ' + (google?.propertyVerified ? 'verified' : 'not_verified'),
+    google?.sitemapMode ? 'Google sitemap mode: ' + google.sitemapMode : '',
     'Sitemap submitted to Google: ' + Boolean(google?.sitemapSubmitted),
     google?.sitemapProcessing ? 'Google sitemap processing: ' + google.sitemapProcessing.status
       + '; pending: ' + (google.sitemapProcessing.isPending ?? 'not_verified')
@@ -365,7 +374,9 @@ export function summary(report) {
       + '; warnings: ' + (google.sitemapProcessing.warnings ?? 'not_reported') : '',
     google?.sitemapProcessing?.error ? 'Sitemap processing diagnostic: ' + google.sitemapProcessing.error : '',
 
-    google?.reviewSitemaps?.length ? 'Review sitemaps submitted separately: ' + google.reviewSitemaps.length + '; processing: ' + JSON.stringify(google.reviewSitemaps.map(row => row.processing)) : '',
+    google?.reviewSitemaps?.length ? 'Review sitemap status checks: ' + google.reviewSitemaps.length
+      + '; submitted: ' + google.reviewSitemaps.filter(row => row.submitted).length
+      + '; processing: ' + JSON.stringify(google.reviewSitemaps.map(row => row.processing)) : '',
     'Stored Google index inspections: ' + (google?.inspections?.length || 0) + '; PASS: ' + indexed,
     google?.inspections?.length ? 'Stored Google coverage: discovered/not indexed: ' + coverageCount('Discovered - currently not indexed')
       + '; unknown to Google: ' + coverageCount('URL is unknown to Google')
@@ -377,10 +388,12 @@ export function summary(report) {
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  const submissionMode = process.env.GOOGLE_SEARCH_CONSOLE_SUBMIT_SITEMAPS ?? 'true';
   const report = await runAudit({
     secret: process.env.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON || '',
     site: process.env.GOOGLE_SEARCH_CONSOLE_PROPERTY || 'sc-domain:vid.best',
     budget: process.env.GOOGLE_SEARCH_CONSOLE_INSPECTIONS || 200,
+    submitSitemaps: submissionMode === 'true' ? true : submissionMode === 'false' ? false : submissionMode,
     progress: message => console.log('[SEO audit] ' + message),
   });
   await writeFile('seo-audit-report.json', JSON.stringify(report, null, 2) + '\n');
