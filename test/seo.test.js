@@ -98,6 +98,28 @@ test("redirects www to the canonical origin", async () => {
   assert.equal(response.headers.get("Location"), "https://vid.best/");
 });
 
+test("HTTP public pages redirect to HTTPS with their path and query intact", async () => {
+  const context = createContext();
+  for (const method of ["GET", "HEAD"]) {
+    const response = await request(context, "http://vid.best/watch/example?q=music&utm_source=owner", { method });
+    assert.equal(response.status, 301);
+    assert.equal(response.headers.get("Location"), "https://vid.best/watch/example?q=music&utm_source=owner");
+    assert.equal(await response.text(), "");
+  }
+});
+
+test("canonical redirects cannot treat a double-slash path as another hostname", async () => {
+  const context = createContext();
+  for (const origin of ["http://vid.best", "https://home.vid.best", "https://www.vid.best"]) {
+    const response = await request(context, origin + "//outside.example/path?item=1");
+    assert.equal(response.status, 301);
+    const target = new URL(response.headers.get("Location"));
+    assert.equal(target.origin, "https://vid.best");
+    assert.equal(target.pathname, "//outside.example/path");
+    assert.equal(target.search, "?item=1");
+  }
+});
+
 test("homepage query/filter URLs are noindex while the root remains crawlable", async () => {
   const context = createContext();
   const response = await request(context, "https://vid.best/?q=technology&sort=trending");
