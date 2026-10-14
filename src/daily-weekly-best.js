@@ -10,7 +10,8 @@ export function dailyWeeklyBestSitemap() {
 }
 export async function dailyWeeklyBestResponse(request,env) {
   const url=new URL(request.url);
-  if(!url.pathname.startsWith(PREFIX))return null;
+  // Sibling assets such as /daily-weekly-best.css belong to Static Assets.
+  if(url.pathname!==PREFIX&&url.pathname!==PREFIX+'.html'&&!url.pathname.startsWith(PREFIX+'/'))return null;
   if(!['GET','HEAD'].includes(request.method))return new Response(null,{status:405,headers:{Allow:'GET, HEAD','X-Robots-Tag':'noindex'}});
   const path=url.pathname.replace(/\.html$|\/$/,'');
   if(!known.has(path))return new Response('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Editorial page not found | Vid.Best</title></head><body><h1>Editorial page not found</h1><a href="/daily-weekly-best">Browse Daily Weekly Best</a></body></html>',{status:404,headers:{'Content-Type':'text/html; charset=utf-8','X-Robots-Tag':'noindex,follow','Cache-Control':'public, max-age=60'}});
