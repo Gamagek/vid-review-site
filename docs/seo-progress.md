@@ -1,5 +1,17 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 14 October 2026: review sitemap downloaded again; inventory unchanged
+
+Current main `3ed4a924b11588b4b09c809ac5588bb7ace77a0e` contains the owner's official AdSense `ads.txt` change from PR 155. Its Worker deployment 38519407504 and CI 38519407448 succeeded. No application, source, editorial, date, thumbnail or publication-state change is proposed by this checkpoint.
+
+Latest completed audit 38519467793 / artifact 11873236640 was downloaded and read, together with the complete audit job log (115705612987). It verified 164 published reviews and 181 public pages with zero technical failures, two existing editorial/demo warnings and no missing internal review links. The thumbnail inventory has the same published URLs and availability states as artifact 11857731946: 142 available images, 14 provider HTTP failures (13 TikTok 403s and Dilscoop's 404) and eight protected reaction/comedy/parody placeholders. Preserve owner/source posters and do not treat provider availability fluctuations as authority to replace source metadata.
+
+Google OAuth/property access passed. The root sitemap lastDownloaded advanced to `2026-10-13T23:13:25.645Z`; the review sitemap advanced to `2026-10-13T23:13:28.048Z` (14 October at 04:43:28 in Sri Lanka). Both are still pending with zero errors/warnings. This is evidence that Google fetched the submitted sitemap again, not that it crawled or indexed every listed review. This audit's URL Inspection budget/count were zero and production writes were none. The latest completed scheduled full Inspection remains run 38395699743 from 13 October: 156 reviews, 95 discovered/not-indexed, 61 unknown and zero indexed; the eight newer reviews remain outside that snapshot. No redundant full inspection or extra sitemap submission was triggered here.
+
+Cloudflare adaptive request groups for `2026-10-13T23:15:00Z`–`2026-10-14T06:50:00Z`, filtered to vid.best, eyeball requests, Googlebot user-agent AND verified Search Engine Crawler, returned root sitemap (1), review sitemap (1) and robots (3), all HTTP 200. No watch-page group appeared in the sample; this does not establish a universal crawl block or content rejection. Latest Portainer run 38519407429 passed validation and read-only preflight; production and optional deployment jobs remained skipped.
+
+Next task: read the next completed scheduled full Inspection artifact for actual review crawl/index movement, including the eight newer owner-published reviews. Act on any new non-protected thumbnail failure if the inventory changes. Preserve the eight protected placeholders, Saiyaara/Summer media/routing and substantial owner content; do not work around provider controls, change Portainer's disabled deployment flag or make an empty production deployment for sitemap resubmission.
+
 ## 14 October 2026: Facebook preview selection and bounded warm-up
 
 The owner's homepage screenshot and live UI investigation show that a source poster alone does not establish mini-player playback. Outdoor Challenge emitted the official `startedPlaying` event, while selecting the adjacent Right Place tile was interrupted during loading by a fresh viewport callback selecting another card. The scheduler lacked an explicit hover/focus priority and could replace an active player despite the intended switch margin; only the chosen first tile could monopolize an equally visible row.
