@@ -3,6 +3,7 @@ import { createHash, createPrivateKey, createSign } from 'node:crypto';
 import { writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import editorialCatalog from '../content/daily-weekly-best/catalog.json' with { type: 'json' };
 
 const ORIGIN = 'https://vid.best';
 const SITEMAP = ORIGIN + '/sitemap.xml';
@@ -12,6 +13,8 @@ const USER_AGENT = 'VidBest-SEO-Audit/1.0 (owner crawlability monitoring)';
 const MAX_BYTES = 2 * 1024 * 1024;
 const MAX_URLS = 1000;
 const MAX_SITEMAPS = 50;
+const editorialReviews = new Set(editorialCatalog.reviews.map(item => '/daily-weekly-best/' + item.slug));
+const isReviewUrl = url => new URL(url).pathname.startsWith('/watch/') || editorialReviews.has(new URL(url).pathname);
 
 class AuditError extends Error {
   constructor(code) { super(code); this.code = code; }
@@ -27,7 +30,7 @@ const delay = ms => new Promise(done => setTimeout(done, ms));
 export function publicUrl(value) {
   let url;
   try { url = new URL(value, ORIGIN); } catch { throw new AuditError('unsafe_public_url'); }
-  const safePath = /^\/(?:$|robots\.txt$|sitemap\.xml$|sitemaps\/[a-z0-9-]+\.xml$|videos$|privacy$|terms$|about$|editorial$|contact$|category\/[a-z0-9-]+$|watch\/[^/]+$)/.test(url.pathname);
+  const safePath = /^\/(?:$|robots\.txt$|sitemap\.xml$|sitemaps\/[a-z0-9-]+\.xml$|videos$|privacy$|terms$|about$|editorial$|contact$|daily-weekly-best(?:\/[a-z0-9-]+)?$|category\/[a-z0-9-]+$|watch\/[^/]+$)/.test(url.pathname);
   const safeQuery = !url.search || (url.pathname === '/videos' && /^\?page=[1-9]\d{0,4}$/.test(url.search));
   if (url.origin !== ORIGIN || url.username || url.password || url.hash || !safePath || !safeQuery) throw new AuditError('unsafe_public_url');
   return url.href;
@@ -162,8 +165,10 @@ async function auditPage(url, robots, fetchImpl, wait) {
       try { page.links.push(publicUrl(attribute(match[0], 'href'))); } catch { /* Exclude source/admin/action links. */ }
     }
     page.links = [...new Set(page.links)];
-    if (new URL(url).pathname.startsWith('/watch/')) {
-      const review = plain(html.match(/<section\b[^>]*class=["'][^"']*\breview-copy\b[^"']*["'][^>]*>([\s\S]*?)<\/section>/i)?.[1] || '');
+    if (isReviewUrl(url)) {
+      const review = plain(new URL(url).pathname.startsWith('/watch/')
+        ? html.match(/<section\b[^>]*class=["'][^"']*\breview-copy\b[^"']*["'][^>]*>([\s\S]*?)<\/section>/i)?.[1] || ''
+        : html.match(/<div\b[^>]*class=["'][^"']*\bdwb-prose\b[^"']*["'][^>]*>([\s\S]*?)<\/div>/i)?.[1] || '');
       page.reviewWords = review.split(/\s+/).filter(Boolean).length;
       page.reviewHash = createHash('sha256').update(review).digest('hex');
       if (!review) page.errors.push('review_text_missing_from_html');
@@ -227,7 +232,7 @@ export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:v
     if (typeof submitSitemaps !== 'boolean') throw new AuditError('invalid_sitemap_submission_mode');
     result.sitemapMode = submitSitemaps ? 'submit' : 'read_only';
     const maps = [...new Set(reviewSitemaps.map(publicUrl))];
-    if (maps.length > 10 || maps.some(url => !/^https:\/\/vid\.best\/sitemaps\/videos-[1-9]\d*\.xml$/.test(url))) throw new AuditError('invalid_review_sitemap');
+    if (maps.length > 10 || maps.some(url => !/^https:\/\/vid\.best\/sitemaps\/(?:videos-[1-9]\d*|daily-weekly-best)\.xml$/.test(url))) throw new AuditError('invalid_review_sitemap');
 
     progress('Google credentials configured; requesting OAuth access.');
     const token = await getToken(secret, { fetchImpl, wait, now });
@@ -267,7 +272,7 @@ export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:v
       progress('Review sitemap ' + (submitSitemaps ? 'submitted' : 'status read') + '; processing: ' + processing.status + '; pending: ' + (processing.isPending ?? 'not_verified') + '; last downloaded: ' + (processing.lastDownloaded || 'not_reported') + '.');
     }
     stage = 'inspect_index_status';
-    const reviews = [...new Set(urls.map(publicUrl).filter(url => new URL(url).pathname.startsWith('/watch/')))].sort();
+    const reviews = [...new Set(urls.map(publicUrl).filter(isReviewUrl))].sort();
     const limit = Math.min(200, Math.max(0, Number.isFinite(Number(budget)) ? Number(budget) : 200));
     const offset = Math.floor(now / 86400000) * limit % Math.max(1, reviews.length);
     const selected = reviews.slice(offset).concat(reviews.slice(0, offset)).slice(0, limit);
@@ -317,6 +322,7 @@ export async function runAudit({ fetchImpl = globalThis.fetch, wait = delay, sec
     const discovered = await discover(fetchImpl, wait);
     report.sitemaps = discovered.maps;
     report.discoveredReviewCount = discovered.urls.filter(url => new URL(url).pathname.startsWith('/watch/')).length;
+    report.discoveredEditorialReviewCount = discovered.urls.filter(url => editorialReviews.has(new URL(url).pathname)).length;
     progress('Sitemap discovery complete; published reviews: ' + report.discoveredReviewCount + '.');
     const pending = [...discovered.urls], visited = new Set();
     while (pending.length) {
@@ -331,7 +337,7 @@ export async function runAudit({ fetchImpl = globalThis.fetch, wait = delay, sec
       }
     }
     const links = new Set(report.pages.flatMap(page => page.links || []));
-    report.unlinkedReviews = discovered.urls.filter(url => new URL(url).pathname.startsWith('/watch/') && !links.has(url));
+    report.unlinkedReviews = discovered.urls.filter(url => isReviewUrl(url) && !links.has(url));
     if (report.unlinkedReviews.length) report.errors.push('review_urls_missing_from_html_links');
     const hashes = new Map();
     for (const page of report.pages) {
@@ -346,7 +352,7 @@ export async function runAudit({ fetchImpl = globalThis.fetch, wait = delay, sec
     progress('Public checks complete: ' + report.publicAuditStatus + '; pages checked: ' + report.pages.length + '.');
     report.searchConsole = report.publicAuditStatus === 'success'
       ? await syncSearchConsole(discovered.urls, { secret, site, budget, submitSitemaps, now, fetchImpl, wait, getToken, progress,
-          reviewSitemaps: discovered.maps.map(map => map.url).filter(url => /\/sitemaps\/videos-\d+\.xml$/.test(url)) })
+          reviewSitemaps: discovered.maps.map(map => map.url).filter(url => /\/sitemaps\/(?:videos-\d+|daily-weekly-best)\.xml$/.test(url)) })
       : { status: 'skipped_public_audit_failed', sitemapSubmitted: false, inspections: [] };
   } catch (error) { report.errors.push(safeCode(error)); report.publicAuditStatus = 'failed'; }
   return report;
@@ -359,6 +365,7 @@ export function summary(report) {
   return [
     'Vid.Best public SEO audit: ' + report.publicAuditStatus,
     'Published review URLs discovered: ' + (report.discoveredReviewCount || 0),
+    'Separate editorial review URLs discovered: ' + (report.discoveredEditorialReviewCount || 0),
     'Pages checked: ' + report.pages.length + '; technical failures: ' + (report.failedPages || 0),
     report.errors.length ? 'Audit errors: ' + report.errors.join(', ') : '',
     'Editorial warnings: ' + report.pages.filter(page => page.warnings.length).length,
