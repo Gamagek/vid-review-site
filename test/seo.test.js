@@ -506,3 +506,10 @@ test("homepage includes the owner's AdSense account verification meta tag", () =
   const html = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
   assert.match(html, /<head>[\s\S]*?<meta name="google-adsense-account" content="ca-pub-4485257027995607">[\s\S]*?<\/head>/);
 });
+
+
+test("homepage includes the authorized async AdSense loader once", () => {
+  const html = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
+  const scripts = html.match(/<script async src="https:\/\/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-4485257027995607" crossorigin="anonymous"><\/script>/g) || [];
+  assert.equal(scripts.length, 1);
+});
