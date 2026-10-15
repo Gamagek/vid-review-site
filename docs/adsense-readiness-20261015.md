@@ -2,6 +2,12 @@
 
 This is the read-only production baseline and proposed repair report. It records verified engineering findings and editorial screening concerns. AdSense approval and Google indexing remain external decisions. The supplied AdSense screenshot specifically reports **“Site down or unavailable”**; the cause of that historical reviewer access failure has not been established by this session.
 
+## Verified production follow-up — 15 October 2026
+
+The original baseline/proposal below is historical: PR 163's compatibility and request-isolation repair has since merged and deployed. Current main is `edffcf7fb296c81962485204483c47f68ce48d79`; active Worker version `40434b5b-46d2-4e2e-bc5b-1c059eb33462` serves 100% traffic. Deploy 38692589023 passed 300 Node tests and applied no migrations. Latest audit 38692650456 / artifact 11953080663 was downloaded/read: 201 public pages pass, with no missing review links, and CSS/all ten editorial covers match the reviewed bytes. Its Google step is read-only with zero inspections and no submissions; it does not establish a current indexed-page total.
+
+Live desktop Chrome verification confirms 170 curated videos, 18 library cards, seven featured cards and a hidden empty/error state. Daily Weekly Best remains a footer-only homepage link and its hub, film branch, full article and contents anchors render correctly. The Hexed original embed explicitly reports a country restriction in this browser; its original-source link remains visible. No global playback guarantee or physical Samsung/Firefox/Edge/mobile-device test is claimed. The existing editorial queue, copyright/privacy decisions and actual Google reviewer-access cause remain unresolved. Portainer production/optional deployments remain skipped. This follow-up changes no application code or production data and submits no AdSense review.
+
 ## Production baseline
 
 - Repository main: `b78d647462527a5001c928ccda0176c82cf69fd1` (documentation-only, deployment intentionally skipped).
