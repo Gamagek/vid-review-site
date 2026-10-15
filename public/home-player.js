@@ -847,6 +847,23 @@ async function loadCachedTikTokFacadePreviews() {
   }
 }
 
+function ownedTikTokCover(card) {
+  // Do not let late provider metadata erase a deliberately selected local cover.
+  // Protected media and comedy keep their existing presentation path.
+  const slug = card.dataset.videoSlug;
+  const category = card.querySelector(".category-badge");
+  if (slug === "saiyaara-a-cinematic-romance" || slug === "summer-inverted-7332342275151760642"
+    || category && category.textContent.trim() === "Funny & Comedy") return "";
+  const value = card.dataset.videoThumbnail || "";
+  if (!value) return "";
+  try {
+    const url = new URL(value, location.origin);
+    return url.origin === location.origin && !url.username && !url.password && !url.search && !url.hash
+      && /^\/review-covers\/[a-z0-9_-]+\.(?:jpe?g|png|webp|avif)$/i.test(url.pathname)
+      ? url.href : "";
+  } catch { return ""; }
+}
+
 function renderTikTokFacade(card) {
   const surface = card.querySelector(".preview-surface");
   const status = card.querySelector(".preview-status");
@@ -863,12 +880,13 @@ function renderTikTokFacade(card) {
   placeholder.className = "tiktok-microlink-placeholder";
   placeholder.textContent = "TikTok";
   imageWrap.append(placeholder);
-  const previewImage = card.dataset.tiktokThumbnail || card.dataset.tiktokPoster;
+  const ownedCover = ownedTikTokCover(card);
+  const previewImage = ownedCover || card.dataset.tiktokThumbnail || card.dataset.tiktokPoster;
   if (previewImage) {
     const image = document.createElement("img");
     image.src = previewImage;
     image.alt = "";
-    image.loading = "lazy";
+    image.loading = ownedCover && isNearViewport(card) ? "eager" : "lazy";
     image.decoding = "async";
     image.addEventListener("load", () => imageWrap.classList.add("has-image"), { once: true });
     image.addEventListener("error", () => image.remove(), { once: true });

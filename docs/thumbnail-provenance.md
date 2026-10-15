@@ -1,5 +1,13 @@
 # Editorial cover provenance
 
+## 15 October 2026: record 12 publication and visible-tile verification boundary
+
+PR 166 / merge `c4b9e5045fd58b5ed6b74f9b7f814c9d86fb2dd1` and Deploy 38711810098 published the Meri Aashiqui illustration; active Worker version `c46d4f7e-ea0f-4eab-88ee-d8e26efe4779` was independently confirmed. The exact public WebP, API, Open Graph image and video sitemap pass. D1 before/after fingerprints prove only that record's `thumbnail_url` changed; original dates, text, source/player/cache fields and all other 173 records are identical. No new source imagery or video copy was added.
+
+Live Chrome separately shows the homepage TikTok renderer still selects an unloaded cached provider image despite the saved cover. The homepage-only priority fix uses existing approved same-origin `/review-covers/` assets and keeps late provider metadata from replacing them. Near-viewport local images are eager; offscreen ones remain lazy. It generates no additional images and does not modify protected Saiyaara/Summer/comedy paths, active players, Facebook scheduling or provider metadata. The watch-page preview-card priority remains a separately identified follow-up, not an asserted completion. Verify live tile rendering after the follow-up deployment before claiming visible success.
+
+Opened post-deployment artifact 11960877913 from audit 38711894798: record 12 is HTTP 200 `image/webp` / 122,154 bytes. Inventory is 149 available / 13 failures / eight protected placeholders: the repaired TikTok poster is offset by Dilscoop's fluctuating poster now returning 404. The thirteen failures are twelve TikTok 403s plus that YouTube 404, not thirteen remaining TikTok failures. No replacement or source-restoration claim is made for the copyright-removed Dilscoop video.
+
 ## 15 October 2026: Meri Aashiqui Tum Se Hi symbolic cover (record 12)
 
 Existing published record 12 (`tiktok-discovery`) identifies Meri Aashiqui Tum Se Hi and the saved public source [@rorozya/video/7622472784039415061](https://www.tiktok.com/@rorozya/video/7622472784039415061). The [official Colors TV series description](https://www.colorstv.com/us/shows/meri-aashiqui-tum-se-hi/), checked 15 October, independently confirms the broad childhood-friends/romance theme. No fresh fan-edit frame, episode, audio or original poster was verified. The previous official oEmbed attempt timed out; it was not repeated or bypassed. The illustration is based only on the verified subject, not an assertion about unseen footage or redistribution rights.
