@@ -1,5 +1,13 @@
 # Editorial cover provenance
 
+## 15 October 2026: actual tile cover confirmed; preserve illustration/source distinction
+
+PR 167 / merge `59b69d37281d09fd0450984b0bd3d7362fc4c61e`, Deploy 38713384908 and independently verified Worker version `1f562048-8e00-4f45-ae82-3212a8639368` complete the homepage cover-priority repair. Live desktop Chrome confirms record 12 uses the exact approved local WebP at 1279×720, eager near the viewport, with loaded `has-image` state and no iframe/video created in its tile. Cached TikTok metadata no longer replaces this cover. D1 fingerprints still prove only its one thumbnail field changed; all other fields/records remain intact.
+
+The final caption refinement explicitly displays `Illustrated cover · not a video frame` for the known versioned illustrated-cover filename convention, because the normal provider overlay can cover the label baked into the art. Real local source posters are not relabelled. This changes no artwork, provider metadata, video, player/source/cache route, date, review, rights flag or protected item. The full prompt, built-in generation mode, asset path, bytes and SHA-256 remain in the record-12 provenance entry below. Local Node tests now total 314 with the source-poster/illustration distinction covered.
+
+Latest opened deployment artifact 11961935284 / audit 38713481333 verifies record 12 as HTTP 200 WebP / 122,154 bytes and all eleven separate editorial assets. Inventory is 149 available / twelve HTTP failures / one network-unverified / eight protected placeholders. Eleven TikTok requests return 403; Dilscoop's poster returns 404; protected Saiyaara is network-unverified, not successful. No rejected screenshot, fabricated footage, source-video copy, bot-control workaround or protected-asset replacement was used. The separate watch-page preview-card still prefers cached provider imagery despite correct Open Graph metadata; that is the next explicitly bounded UI task, not a claimed playback repair.
+
 ## 15 October 2026: record 12 publication and visible-tile verification boundary
 
 PR 166 / merge `c4b9e5045fd58b5ed6b74f9b7f814c9d86fb2dd1` and Deploy 38711810098 published the Meri Aashiqui illustration; active Worker version `c46d4f7e-ea0f-4eab-88ee-d8e26efe4779` was independently confirmed. The exact public WebP, API, Open Graph image and video sitemap pass. D1 before/after fingerprints prove only that record's `thumbnail_url` changed; original dates, text, source/player/cache fields and all other 173 records are identical. No new source imagery or video copy was added.

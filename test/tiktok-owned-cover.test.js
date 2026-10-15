@@ -46,6 +46,7 @@ test('a saved local TikTok cover appears before cached metadata without loading 
   h.scope.renderTikTokFacade(h.card);
   assert.equal(h.image().src, approved);
   assert.equal(h.image().loading, 'eager');
+  assert.equal(h.surface.children[0].children[2].children[0].textContent, 'Illustrated cover · not a video frame');
   h.image().trigger('load');
   assert.equal(h.surface.children[0].children[0].classList.contains('has-image'), true);
   assert.equal(h.requests(), 0);
@@ -67,6 +68,13 @@ test('offscreen saved TikTok covers remain lazy', () => {
   h.scope.renderTikTokFacade(h.card);
   assert.equal(h.image().src, approved);
   assert.equal(h.image().loading, 'lazy');
+});
+
+test('real local source posters are not relabelled as illustrations', () => {
+  const h = harness({ thumbnail: '/review-covers/verified-source-poster.jpg' });
+  h.scope.renderTikTokFacade(h.card);
+  assert.equal(h.image().src, 'https://vid.best/review-covers/verified-source-poster.jpg');
+  assert.equal(h.surface.children[0].children[2].children[0].textContent, 'TikTok · tap to load one player');
 });
 
 test('cover priority refuses external, credentialed, private-path and signed or non-image targets', () => {
@@ -121,5 +129,5 @@ test('late metadata never remounts an active TikTok player', () => {
 
 test('homepage versions the changed TikTok cover renderer', () => {
   const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
-  assert.match(html, /\/home-player\.js\?v=20261015-owned-tiktok-cover/);
+  assert.match(html, /\/home-player\.js\?v=20261015-owned-tiktok-cover-label/);
 });

@@ -898,9 +898,11 @@ function renderTikTokFacade(card) {
 
   const providerRow = document.createElement("span");
   providerRow.className = "tiktok-microlink-provider";
-  providerRow.textContent = card.dataset.tiktokCacheReady === "1"
-    ? "TikTok preview · tap for details"
-    : "TikTok · tap to load one player";
+  providerRow.textContent = ownedCover && /-illustrated-v\d+\.(?:jpe?g|png|webp|avif)$/i.test(ownedCover)
+    ? "Illustrated cover · not a video frame"
+    : card.dataset.tiktokCacheReady === "1"
+      ? "TikTok preview · tap for details"
+      : "TikTok · tap to load one player";
 
   const author = document.createElement("span");
   author.className = "tiktok-microlink-author";
