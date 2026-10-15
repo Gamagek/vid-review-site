@@ -467,3 +467,36 @@ test("trust pages are readable, discoverable, and respond through the public Wor
   const contact = readFileSync(new URL("../public/contact.html", import.meta.url), "utf8");
   assert.match(contact, /mailto:info@vid\.best/);
 });
+
+test('the TikTok editorial cover is shared by server-rendered review and sitemap without changing dates or source', async () => {
+  const context = createContext();
+  context.sqlite.exec(readFileSync(new URL('../migrations/0018_tiktok_oembed_cache.sql', import.meta.url), 'utf8'));
+  const source = 'https://www.tiktok.com/@rorozya/video/7622472784039415061';
+  const poster = 'https://vid.best/review-covers/meri-aashiqui-illustrated-v1.webp';
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug,title,source_url,media_type,primary_category,subcategory,description,review_text,thumbnail_url,published,created_at,updated_at)
+    VALUES ('cover-review','Meri Aashiqui Tum Se Hi',?,'tiktok','Entertainment, Movies & Games','Movie Trailers',
+    'Original owner description','Original owner review',?,1,'2026-09-22T10:53:05.021Z','2026-09-22T20:10:20.017Z')`)
+    .run(source, poster);
+  const before = context.sqlite.prepare("SELECT * FROM videos WHERE slug='cover-review'").get();
+  const response = await request(context, 'https://vid.best/watch/cover-review', {headers: {'User-Agent': 'Googlebot'}});
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.ok(html.includes(poster));
+  assert.match(html, /Original owner review/);
+  assert.match(html, /<link rel="canonical" href="https:\/\/vid\.best\/watch\/cover-review">/);
+  assert.doesNotMatch(html, /Last updated/i);
+  const graph = JSON.parse(html.match(/<script\b[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/s)[1])['@graph'];
+  const page = graph.find(item => item['@type'] === 'WebPage');
+  assert.equal(page.primaryImageOfPage, poster);
+  assert.equal(page.isBasedOn, source);
+  assert.equal(page.datePublished, before.created_at);
+  assert.equal(page.dateModified, before.updated_at);
+  assert.equal(graph.find(item => item['@type'] === 'VideoObject'), undefined,
+    'a new editorial illustration must not invent the missing source upload date');
+  const xml = await (await request(context, 'https://vid.best/sitemaps/videos-1.xml')).text();
+  const entry = xml.match(/<url><loc>https:\/\/vid.best\/watch\/cover-review<\/loc>[\s\S]*?<\/url>/)[0];
+  assert.ok(entry.includes('<video:thumbnail_loc>' + poster + '</video:thumbnail_loc>'));
+  assert.ok(entry.includes('<lastmod>2026-09-22T20:10:20.017Z</lastmod>'));
+  assert.deepEqual(context.sqlite.prepare("SELECT * FROM videos WHERE slug='cover-review'").get(), before);
+});
