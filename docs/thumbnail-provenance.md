@@ -1,5 +1,22 @@
 # Editorial cover provenance
 
+## 15 October 2026: Meri Aashiqui Tum Se Hi symbolic cover (record 12)
+
+Existing published record 12 (`tiktok-discovery`) identifies Meri Aashiqui Tum Se Hi and the saved public source [@rorozya/video/7622472784039415061](https://www.tiktok.com/@rorozya/video/7622472784039415061). The [official Colors TV series description](https://www.colorstv.com/us/shows/meri-aashiqui-tum-se-hi/), checked 15 October, independently confirms the broad childhood-friends/romance theme. No fresh fan-edit frame, episode, audio or original poster was verified. The previous official oEmbed attempt timed out; it was not repeated or bypassed. The illustration is based only on the verified subject, not an assertion about unseen footage or redistribution rights.
+
+Built-in imagegen (new image; no reference image, no CLI fallback) produced an abstract coral/gold intertwined-thread composition. It contains no actors, copied footage, official poster or platform/studio logo. The visible text explicitly says `ILLUSTRATED EDITORIAL COVER` and `Not a video frame • Vid.Best`. The full composition was visually reviewed, then mechanically resized without cropping and encoded as WebP using ImageMagick. Final project path: `public/review-covers/meri-aashiqui-illustrated-v1.webp`; dimensions **1279×720**; bytes **122154**; SHA-256 **051b38eeb37b41c230778e8f74cec4e0a537926bd1087a1f13495a307a6a6ef0**. The original generated PNG is retained in scratch; production uses only the optimized project asset.
+
+Final generation prompt (verbatim):
+
+> Use case: illustration-story.
+> Asset type: 16:9 editorial review thumbnail for Vid.Best, 1536x864.
+> Primary request: a unique symbolic cover for the existing review titled Meri Aashiqui Tum Se Hi. The verified series theme is childhood friendship becoming love amid emotional obstacles. This is an original illustration about that broad theme, NOT a depiction of any specific footage.
+> Subject and style: two flowing threads, one deep coral and one warm gold, gently intertwining across an abstract indigo paper landscape. Express connection and longing through graceful curves and hand-painted texture, with one warm luminous focal point. Sophisticated, bold, clean editorial illustration that remains legible on a small dark-theme video tile.
+> Text (verbatim): "MERI AASHIQUI" and "TUM SE HI" in large, elegant, highly readable cream serif type. Include a clearly readable compact label "ILLUSTRATED EDITORIAL COVER" and a second line "Not a video frame • Vid.Best" within the image, inset well away from the edges.
+> Constraints: purely symbolic abstract art, no people, faces, actors, recognizable characters, stills, screenshots, official poster layout, platform or studio logos, play icons, fabricated scenery, episode details, dates, rankings, quotes, or claims of video observations. Avoid tiny decorative text and clutter. Ensure the illustration label remains inside a central 16:9 safe area.
+
+Migration 0038 replaces only the exact audited provider-image path for record 12, with saved identity/title/category/source/date guards; it stores no signed or tracking query strings. A read-only production guard check matches exactly that one row. Four new migration/asset tests and one server-rendered SEO/sitemap regression pass. Original source/player/cache routes, substantial owner text, SEO copy, dates, drafts, engagement, protected comedy and Saiyaara/Summer remain intact. PR/CI/deployment and public-byte verification must complete before calling the repair published. A working editorial cover does not establish source playback or Google indexing.
+
 ## 15 October 2026: current inventory and live cover verification
 
 Latest completed audit 38692650456 / artifact 11953080663 was downloaded and opened. It checks all 170 published library thumbnails: 149 available images, 13 TikTok CDN HTTP 403s and eight protected title-art placeholders. The separate editorial asset report verifies the exact reviewed CSS and ten illustrated covers. Live Chrome now confirms the Daily Weekly Best two-column hub, film branch and loaded Hexed cover; the earlier stylesheet defect is no longer observed. The Hexed official embed reports a country restriction in this browser, which neither invalidates its illustrative cover nor establishes worldwide video availability.
