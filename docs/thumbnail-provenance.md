@@ -1,5 +1,11 @@
 # Editorial cover provenance
 
+## 15 October 2026: current inventory and live cover verification
+
+Latest completed audit 38692650456 / artifact 11953080663 was downloaded and opened. It checks all 170 published library thumbnails: 149 available images, 13 TikTok CDN HTTP 403s and eight protected title-art placeholders. The separate editorial asset report verifies the exact reviewed CSS and ten illustrated covers. Live Chrome now confirms the Daily Weekly Best two-column hub, film branch and loaded Hexed cover; the earlier stylesheet defect is no longer observed. The Hexed official embed reports a country restriction in this browser, which neither invalidates its illustrative cover nor establishes worldwide video availability.
+
+Dilscoop's poster is HTTP 200 JPEG / 8,304 bytes in this report despite its previously confirmed source copyright removal. Keep source availability separate from poster availability; no video restoration, rights clearance or successful playback is inferred. Saiyaara/Summer and comedy/parody assets remain untouched. Record 12's original TikTok oEmbed verification timed out; no new frame, poster or observed scene was obtained. Its possible future cover must be source-verified or clearly labelled as an illustration based on verified context. No images were generated, replaced, downloaded from removed sources or added by this checkpoint, and no owner content/date/media route was changed.
+
 ## 15 October 2026: ten independent Daily Weekly Best illustrations
 
 Built-in imagegen generated ten distinct symbolic editorial covers, each visibly labelled `Illustrated editorial cover • Vid.Best`. Every output was visually reviewed and retained; full compositions were resized without cropping and encoded as 1279×720 WebP. These are not official posters, actor portraits, video frames, game screenshots or reconstructed scenes. They are used only for the new separate editorial pages and do not replace any existing owner/source poster, protected comedy entry or media route. The original source upload dates remain separate from new article dates. VideoObject uses the exact source video's original poster address, subject to the post-deployment JPEG verification, rather than asserting that the illustration is a video frame.
