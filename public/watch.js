@@ -66,12 +66,34 @@ function initializeTikTokPreviewCard() {
   const title = card.querySelector("[data-tiktok-card-title]");
   const author = card.querySelector("[data-tiktok-card-author]");
   const description = card.querySelector("[data-tiktok-card-description]");
+  const kicker = card.querySelector(".tiktok-preview-card-kicker");
+  const ownedCover = (() => {
+    const value = image?.dataset.tiktokOwnedCover;
+    if (!value) return "";
+    try {
+      const cover = new URL(value, location.origin);
+      return cover.origin === location.origin && !cover.username && !cover.password &&
+        !cover.search && !cover.hash &&
+        /^\/review-covers\/[a-z0-9_-]+\.(?:jpe?g|png|webp|avif)$/i.test(cover.pathname)
+        ? cover.href : "";
+    } catch { return ""; }
+  })();
+  let ownedCoverFailed = false;
 
   if (image) {
-    image.addEventListener("error", () => {
+    const recoverImage = () => {
+      if (ownedCover && image.src === ownedCover) {
+        ownedCoverFailed = true;
+        image.removeAttribute("data-tiktok-owned-cover");
+        image.style.objectFit = "";
+        if (kicker) kicker.textContent = "TikTok preview";
+      }
       const fallback = image.dataset.tiktokFallback || "";
       if (fallback && image.src !== new URL(fallback, location.origin).href) image.src = fallback;
-    });
+    };
+    image.addEventListener("error", recoverImage);
+    // An image error can precede deferred script initialization.
+    if (ownedCover && image.complete && image.naturalWidth === 0) recoverImage();
   }
 
   const seed = () => ({
@@ -93,7 +115,7 @@ function initializeTikTokPreviewCard() {
     if (title && payload.title) title.textContent = payload.title;
     if (author && payload.author_name) author.textContent = payload.author_name;
     if (description && payload.description) description.textContent = payload.description;
-    if (image && payload.thumbnail_url) image.src = payload.thumbnail_url;
+    if (image && payload.thumbnail_url && (!ownedCover || ownedCoverFailed)) image.src = payload.thumbnail_url;
   }).catch(() => {
     // The server-rendered cached card remains fully usable if metadata refresh fails.
   });
