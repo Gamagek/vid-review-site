@@ -1,5 +1,13 @@
 # Editorial cover provenance
 
+## 15 October 2026: watch-page cover selection repair (no new media)
+
+The separate watch-page metadata card still used its cached p16 provider image despite record 12's approved same-origin illustration being present in saved/Open Graph data. A targeted server/client priority fix uses only validated same-origin `/review-covers/` raster assets, retains them after metadata refresh, shows their complete composition with `object-fit:contain`, and explicitly labels versioned illustrations `Illustrated cover · not a video frame`. Existing real source posters are not called illustrations. Failed covers release their label/contain override and use the existing finite fallback; protected comedy, Saiyaara and Summer keep their former paths. This changes no asset bytes, saved thumbnail, original date, review, source identity, provider route, hosting-rights flag, player or metadata request count.
+
+The full record-12 generation prompt, built-in generation mode, 1279×720 dimensions, 122,154 bytes and SHA-256 remain below. No new imagery, video copies, end-screen captures, provider workaround or footage observations were introduced. Nine new Worker/SQLite/browser-VM regressions and the existing suite total 325 passing Node tests; actual live watch rendering remains a post-deployment verification requirement, not a pre-merge success claim.
+
+Current D1 has 175 saved /171 published records after owner-created YouTube record 187. Latest completed artifact 11967255451 still inventories the earlier 170 publications (149 available, twelve TikTok 403s, Dilscoop 404 and eight protected placeholders); do not call it a complete current 171-thumbnail check. No fresh full Google Inspection was repeated. Next: verify this renderer through PR/CI/Worker and real browser, open the next completed inventory, then consider record 81 only with verified context and the existing no-unauthorized-rehosting boundary.
+
 ## 15 October 2026: current-production illustration label and completed inventory verified
 
 PRs 166–168 are merged. Fresh main `3cd46989018020b72c272835d9c4b9065f832064` includes the owner's subsequent AdSense-only PR 169; no owner change was overwritten. Current Cloudflare Worker version is `95c95f13-b1f1-4265-85d6-0342848bf9fd` at 100% after Deploy 38723628495. Fresh desktop Chrome shows record 12's exact selected 1279×720 local cover and the explicit `Illustrated cover · not a video frame` caption, with zero iframe/video elements in that tile. Cached TikTok metadata does not replace its cover. The illustration, full generation prompt, bytes/hash and original-date/single-field preservation evidence remain unchanged below. No new image or source footage was created, copied or rehosted in this final verification.

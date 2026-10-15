@@ -3110,7 +3110,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   ${video.provider === "tiktok" ? '<script src="/tiktok-preview-service.js?v=20261008-cache2" defer></script>' : ""}
   ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>' : ""}
-  <script src="/watch.js?v=20261008-2" defer></script>
+  <script src="/watch.js?v=20261015-owned-cover" defer></script>
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261008-gateway1">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-cache2" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
@@ -3223,6 +3223,19 @@ function watchDisplayTitle(video) {
   return video.title;
 }
 
+function ownedTikTokWatchCover(video, origin) {
+  if (video.slug === "saiyaara-a-cinematic-romance" ||
+      video.slug === "summer-inverted-7332342275151760642" ||
+      video.primary_category === "Funny & Comedy" || !video.thumbnail_url) return "";
+  try {
+    const cover = new URL(video.thumbnail_url, origin);
+    return cover.origin === origin && !cover.username && !cover.password &&
+      !cover.search && !cover.hash &&
+      /^\/review-covers\/[a-z0-9_-]+\.(?:jpe?g|png|webp|avif)$/i.test(cover.pathname)
+      ? cover.href : "";
+  } catch { return ""; }
+}
+
 function renderMedia(video, playbackOrigin, viewer = false) {
   const provider = String(video.provider || "").toLowerCase();
 
@@ -3273,14 +3286,17 @@ function renderMedia(video, playbackOrigin, viewer = false) {
       260,
       "Preview details are cached by Vid.Best. Choose Play to check video availability.",
     );
-    const imageUrl = preview.thumbnail_url || `/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`;
+    // Keep the selected, reviewed cover separate from provider-cached metadata.
+    const ownedCover = ownedTikTokWatchCover(video, playbackOrigin);
+    const imageUrl = ownedCover || preview.thumbnail_url || `/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`;
+    const illustratedCover = /-illustrated-v\d+\.(?:jpe?g|png|webp|avif)$/i.test(ownedCover);
     return `<article class="tiktok-preview-card" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-source="${escapeHtml(video.source_url)}" data-tiktok-player-mode="metadata-card">
       <button type="button" class="tiktok-preview-card-media" data-tiktok-show-preview aria-label="Play TikTok video in popup">
-        <img class="tiktok-preview-card-image" src="${escapeHtml(imageUrl)}" data-tiktok-fallback="/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}" alt="" loading="eager" decoding="async">
+        <img class="tiktok-preview-card-image" src="${escapeHtml(imageUrl)}"${ownedCover ? ` data-tiktok-owned-cover="${escapeHtml(ownedCover)}" style="object-fit:contain"` : ""} data-tiktok-fallback="/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}" alt="" loading="eager" decoding="async">
         <span class="tiktok-preview-card-play" aria-hidden="true">▶</span>
       </button>
       <div class="tiktok-preview-card-body">
-        <span class="tiktok-preview-card-kicker">TikTok preview</span>
+        <span class="tiktok-preview-card-kicker">${illustratedCover ? "Illustrated cover · not a video frame" : "TikTok preview"}</span>
         <strong data-tiktok-card-title>${escapeHtml(previewTitle)}</strong>
         <span class="tiktok-preview-card-author" data-tiktok-card-author>${escapeHtml(previewAuthor)}</span>
         <p data-tiktok-card-description>${escapeHtml(previewDescription)}</p>
