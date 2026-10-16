@@ -36,6 +36,23 @@ export function publicUrl(value) {
   return url.href;
 }
 
+// Discovery hints are returned by the same stored Inspection, never fetched.
+// Keep only bounded, canonical public site links; external/private/signed links
+// and missing fields must not become fabricated discovery or no-crawl claims.
+function publicDiscoveryUrls(values, sitemapOnly = false) {
+  const urls = new Set();
+  for (const value of values.slice(0, 100)) {
+    if (typeof value !== 'string' || value.length > 2048) continue;
+    try {
+      const url = publicUrl(new URL(value).href);
+      if (sitemapOnly && !url.endsWith('.xml')) continue;
+      urls.add(url);
+      if (urls.size === 20) break;
+    } catch { /* Omit unsupported routes and credentials, not their raw values. */ }
+  }
+  return [...urls];
+}
+
 async function boundedText(response) {
   if (Number(response.headers.get('content-length')) > MAX_BYTES) {
     await response.body?.cancel();
@@ -297,6 +314,10 @@ export async function syncSearchConsole(urls, { secret = '', site = 'sc-domain:v
       for (const field of ['googleCanonical', 'userCanonical']) {
         if (state[field]) { try { row[field] = publicUrl(state[field]); } catch { row[field] = 'outside_canonical_public_routes'; } }
       }
+      if (['CRAWLING_USER_AGENT_UNSPECIFIED', 'DESKTOP', 'MOBILE'].includes(state.crawledAs)) row.crawledAs = state.crawledAs;
+      for (const field of ['sitemap', 'referringUrls']) {
+        if (Array.isArray(state[field])) row[field] = publicDiscoveryUrls(state[field], field === 'sitemap');
+      }
       result.inspections.push(row);
       if (result.inspections.length % 10 === 0 || result.inspections.length === selected.length) {
         progress('Google inspections completed: ' + result.inspections.length + '/' + selected.length + '.');
@@ -360,10 +381,14 @@ export async function runAudit({ fetchImpl = globalThis.fetch, wait = delay, sec
 
 export function summary(report) {
   const google = report.searchConsole;
-  const indexed = google?.inspections?.filter(row => row.verdict === 'PASS').length || 0;
-  const coverageCount = state => google?.inspections?.filter(row => row.coverageState === state).length || 0;
+  const inspections = google?.inspections || [];
+  const indexed = inspections.filter(row => row.verdict === 'PASS').length;
+  const coverageCount = state => inspections.filter(row => row.coverageState === state).length;
+  const total = Number.isInteger(google?.totalReviews) && google.totalReviews >= inspections.length ? google.totalReviews : null;
+  const complete = google?.status === 'success' && total === inspections.length;
   return [
     'Vid.Best public SEO audit: ' + report.publicAuditStatus,
+    report.generatedAt ? 'Report generated: ' + report.generatedAt : '',
     'Published review URLs discovered: ' + (report.discoveredReviewCount || 0),
     'Separate editorial review URLs discovered: ' + (report.discoveredEditorialReviewCount || 0),
     'Pages checked: ' + report.pages.length + '; technical failures: ' + (report.failedPages || 0),
@@ -384,10 +409,19 @@ export function summary(report) {
     google?.reviewSitemaps?.length ? 'Review sitemap status checks: ' + google.reviewSitemaps.length
       + '; submitted: ' + google.reviewSitemaps.filter(row => row.submitted).length
       + '; processing: ' + JSON.stringify(google.reviewSitemaps.map(row => row.processing)) : '',
-    'Stored Google index inspections: ' + (google?.inspections?.length || 0) + '; PASS: ' + indexed,
-    google?.inspections?.length ? 'Stored Google coverage: discovered/not indexed: ' + coverageCount('Discovered - currently not indexed')
+    inspections.length ? 'Stored Google index inspections: ' + inspections.length + '; PASS within inspected URLs: ' + indexed
+      : 'Stored Google index inspections: 0; indexed status: not rechecked in this run',
+    inspections.length ? 'Inspected review coverage: ' + inspections.length + '/' + (total ?? 'unknown')
+      + '; ' + (complete ? 'complete review set at report time' : 'partial or unknown review set')
+      + '; not a site-wide indexed-page count' : '',
+    inspections.length ? 'Stored Google coverage: discovered/not indexed: ' + coverageCount('Discovered - currently not indexed')
       + '; unknown to Google: ' + coverageCount('URL is unknown to Google')
       + '; crawled/not indexed: ' + coverageCount('Crawled - currently not indexed') : '',
+    inspections.length ? 'Stored Google crawl evidence in inspected URLs: lastCrawlTime recorded: '
+      + inspections.filter(row => row.lastCrawlTime).length
+      + '; public sitemap association retained: ' + inspections.filter(row => row.sitemap?.length).length
+      + '; public referring URL retained: ' + inspections.filter(row => row.referringUrls?.length).length : '',
+    inspections.length ? 'Discovery hints are bounded, filtered Google-reported links; absent hints do not prove no discovery or crawl.' : '',
     google?.error ? 'Google stage: ' + google.stage + '; error: ' + google.error : '',
     google?.status === 'not_configured' ? 'Required GitHub Actions secret: GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON' : '',
     'Production writes: none. URL Inspection reads stored index status; it does not request indexing.',
