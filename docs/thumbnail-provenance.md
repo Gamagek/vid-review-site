@@ -1,5 +1,11 @@
 # Editorial cover provenance
 
+## 16 October 2026: existing brand icon reused, no thumbnail/artwork change
+
+The confirmed legacy `/favicon.ico`404 is addressed in a separate asset-only repair: exact `/favicon.ico /favicon.svg 301` in `public/_redirects`. Existing first-party `public/favicon.svg` remains byte-for-byte unchanged (**364 bytes**, SHA-256 **`7440bc4da504d2ca4a9ea33be2a557efb58c86f378c971a5a11a44f1c73eed92`**). This is a brand-icon alias, not a new video thumbnail, source poster, generated image or copied/rehosted media. No D1/R2/provider/rights/review/date/player change; no protected item or draft touched.
+
+Four regressions, the full Node suite, editorial build check and Wrangler4.124.0 dry-run pass. Actual local Worker/Assets tests verify GET/HEAD301 and SVG200/exactbytes without production bindings; no physical browser/instant-preview assertion. Latest completed inventory38843812380 remains **161 available /11 HTTP failures /eight protected placeholders**. Source30 and protected/removed-source items remain explicitly unresolved; exact Google warning details are not inferred from icon availability. Production verification and final checkpoint are required after PR/CI/merge; full details are in `docs/seo-progress.md`.
+
 ## 16 October 2026: record-32 symbolic cover live; exact bytes and illustration label verified
 
 PR [176](https://github.com/Gamagek/vid-review-site/pull/176), merge **`1f10114ca561dc443b54f3e5913c71d5758afbd2`**, deployed through run **38843750141** with only guarded migration0040. Worker **`6b7210be-2e86-49d6-affc-7460ab0cb261`** serves100%; CI independently passes **336 Node /four Python tests /Worker dry-run**. Record32 now selects the original first-party symbolic illustration in public API, server watch image, Open Graph and sitemap; the explicit illustration label is visible in delivered HTML. No runtime/player/source-cache/R2/media-copy change.
