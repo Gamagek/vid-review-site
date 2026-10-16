@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-16T14:20:45.575Z",
+  "generatedAt": "2026-10-16T14:29:44.184Z",
   "inputMode": "live_public_api",
-  "observedAt": "2026-10-16T14:20:45.575Z",
+  "observedAt": "2026-10-16T14:29:44.184Z",
   "productionWrites": false,
   "scope": "published library review bodies and listing descriptions; excludes category/listing-page overlap",
   "limitation": "Screening signals only. No AI detection, external plagiarism check, footage verification, Google status or AdSense eligibility score.",
   "counts": {
     "records": 180,
-    "flagged": 77,
-    "genericListingIntros": 61,
+    "flagged": 74,
+    "genericListingIntros": 58,
     "repeatedParagraphGroups": 1
   },
   "repeatedParagraphs": [
@@ -422,10 +422,8 @@
       "slug": "past-present-progress-smart-ict",
       "category": "Social Media & Trending",
       "protectedTopic": false,
-      "contentSha256": "bdd189f50d6ea4f43dab940bff2301eebcafc70d33a2c298280bca85b708277c",
-      "flags": [
-        "generic_listing_intro"
-      ]
+      "contentSha256": "012e12f7e1fc0d6ff733b91795c9ecfd6fbb867e6e47ff81e8a680654cefe203",
+      "flags": []
     },
     {
       "id": 151,
@@ -442,10 +440,8 @@
       "slug": "some-meetings-end-in-goodbye-sinhala-reflection",
       "category": "Social Media & Trending",
       "protectedTopic": false,
-      "contentSha256": "6a998345d9ff9abe0d95302c39d2989c8ab839bdef57687438efba664805d858",
-      "flags": [
-        "generic_listing_intro"
-      ]
+      "contentSha256": "c1b93567c8a3c5d3c8b82773d073cdd11d23293b53021014b9693c3952a2db3f",
+      "flags": []
     },
     {
       "id": 149,
@@ -460,10 +456,8 @@
       "slug": "nature-is-power-sinhala-earth-reflection",
       "category": "Social Media & Trending",
       "protectedTopic": false,
-      "contentSha256": "996f6710e9489e9a1fe8662cc4e8a7c70fae57369febfb5266564888e96f19d2",
-      "flags": [
-        "generic_listing_intro"
-      ]
+      "contentSha256": "5634c2fa645a6da77b95d2d9bb9a62acb9bdd824ed580e506763c4324135ae8f",
+      "flags": []
     },
     {
       "id": 144,
@@ -1621,14 +1615,33 @@
       "flags": []
     }
   ],
-  "plannedBatch": {
+  "completedBatches": [
+    {
+      "recordIds": [
+        145,
+        150,
+        152
+      ],
+      "pullRequest": 184,
+      "mergeCommit": "76a90f44ce5373fd9a4e3a08ea73a6b56d0790e4",
+      "workerVersion": "4bee9e8d-3c89-4009-b056-fab522316a58",
+      "status": "deployed_and_live_verified",
+      "preservedHeadings": 13,
+      "protectedSha256": "8aabfba00aea9bd94d10838d4171b41838ccbf1fca8ff4c5df79d6a3a7f5e54d",
+      "liveVerifiedAt": "2026-10-16T14:31:26Z"
+    }
+  ],
+  "topicHolds": {
     "recordIds": [
-      145,
-      150,
-      152
+      139,
+      142,
+      143,
+      153,
+      155,
+      156,
+      157,
+      158
     ],
-    "status": "awaiting_CI_and_deployment",
-    "expectedGenericListingIntros": 58,
-    "verification": "Compare the post-release public audit and exact text; do not infer completion from a planned patch."
+    "reason": "Protected Facebook comedy topics: retain existing thumbnails and review text under the current instruction. The per-record protectedTopic flag tests category only and is not authorization to edit other comedy topics."
   }
 }

@@ -1,5 +1,11 @@
 # Source-based editorial quality: 16 October 2026
 
+## Verified publication
+
+PR184 merged76a90f44 after exact-head CI38915681459/job117022401133 passes353Node/fourPython/dry-run. Deploy38915878684/job117023084545 applied only0041 and published Worker4bee9e8d at100%; independently read14:29UTC. The intended three description/review pairs match exactly, and184saved/180published plus the protected all-record digest remain unchanged. Fresh body-free public screening14:29:44UTC confirms61→58generic listing openings and77→74flagged candidates. All13headings, both title fields, dates, sources, covers and other metadata are retained. Actual post-release audit38915969811/artifact12051948788 checks211pages/zero failures; map processing is complete with16October downloads/zeroerrors/library20warnings. Zero inspections/submissions in that diagnostic do not recheck indexed status. Portainer privileged jobs all skip. The preparatory evidence below is retained as dated history; completed queue is in docs/editorial-quality-queue.json.
+
+Normal live checks at14:31:26UTC verify all three watch pagesHTTP200, exact new public API text, every new paragraph present in server-delivered visible HTML, unchanged metadata/current title formatting and self-canonicals. Publicwww root and robots return Cloudflare301 to the corresponding apex path.
+
 ## Evidence and scope
 
 Pinned main: `9b1da0b9a731e9d360afb1fd426c116dcc2d3e9b`. Read both existing checkpoints, PR182 deployment38875436830/job116889244559 and the actual latest completed audit38879718292/job116903257078/artifact12037264139 before editing. Artifact ZIP SHA256 `a46ed361c4eb2820ae9c52eb6e24c6c9cd64b74e50bea33f09e1d537fe50cd2c` matches the downloaded archive. It checks211publicpages with zero technical failures/unlinked reviews. Its full190review URL Inspection snapshot completed16October09:42UTC:146discovered/not indexed,44unknown,0PASS and no stored lastCrawlTime. This is the inspected review set, not a whole-site indexed count or proof that content was rejected. Newly submitted maps report pending/zeroerrors/zerowarnings with15October downloads; this does not establish that the previous20warnings were resolved by fresh processing. No further inspections or sitemap submissions were requested here.
