@@ -1,5 +1,9 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 16 October 2026: bounded Sia source-context correction prepared
+
+Read current main d0e55a0, both checkpoints, editorial queue, completed audit38915969811 and full stored190review snapshot38879718292. Only published Music193.description/review_text are eligible for guarded0042: replace generic listing copy, add primary-source film/creator context and qualify unverified popularity/universal psychological-response claims. Opening title, four headings/order, original scene/audio paragraphs, all SEO/media/date fields and other records remain intact. No fresh source footage/audio is claimed: the official Sia page/credits verified, while the muted player stayed0:00. See `docs/sia-source-context-20261016.md` and exact manifest for sources, evidence holds and tests. Local359Node/focused6/editorial validation/Worker dry-run/Python syntax pass; fourPython await CI. D1 remains184saved/180published, protected SHA256 `acc7c16822d0f14a81308282a2b67cfe9596fda9214e33568000dc96c320dfb8`, and exact guard matches one row. Require CI/PR/merge/deployment/live verification; not yet published. No image/thumbnail/player/runtime/security/Portainer change, protected comedy/draft/Saiyaara/Summer edit or repeat Google inspection/submission. Next verify release and refresh the queue;193’s unverified original scene/audio assertions remain a separate hold.
+
 ## 16 October 2026: PR184 deployed; three source-based reviews verified
 
 PR[184](https://github.com/Gamagek/vid-review-site/pull/184) merged `76a90f44ce5373fd9a4e3a08ea73a6b56d0790e4`, reviewed head327ae5ea, after CI38915681459/job117022401133 passes353Node/fourPython/editorial validation/Worker dry-run. Main CI38915878584 and Deploy38915878684/job117023084545 succeed. Only guarded0041 was pending/applied; deployment now `e7f7cf12-ed77-4897-9b8c-e7f8c91bee08`, active Worker `4bee9e8d-3c89-4009-b056-fab522316a58`100% from14:27:46UTC.
