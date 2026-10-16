@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-16",
+  "scope": "Only description and review_text for published Music review193. Preserve opening title, all four numbered headings/order, original visual/audio paragraphs, SEO/media/date fields and every other record. This bounded pass does not verify the original scene/audio assertions.",
+  "sourceEvidence": [
+    {
+      "url": "https://www.youtube.com/watch?v=h6Ol3eprKiw",
+      "checkedOn": "2026-10-16",
+      "verified": "Official Artist Channel Sia; exact saved lyric-video title/ID; visible description credits Greg Kurstin and Chisel Pixel production, directed by Lior Molcho. No source-video download.",
+      "limits": "Muted playback attempts remained at 0:00/3:42 with a black player. No fresh footage/audio observation; original scene/audio assertions remain a separate review task. Public metadata/credits are not playback or rights proof."
+    },
+    {
+      "url": "https://sony.mediaroom.com/2016-11-18-NEVER-GIVE-UP-From-Lion-Soundtrack-by-SIA",
+      "publishedAt": "2016-11-18",
+      "verified": "Sony Classical release announcement: Sia performance, Greg Kurstin production, song written for Lion; film synopsis identifies Saroo's train separation and adult search for family."
+    },
+    {
+      "url": "https://www.grammy.com/news/2018-grammy-nominations-best-song-written-visual-media-roundup/",
+      "publishedAt": "2017-12-28",
+      "verified": "Recording Academy's 2018 nominee roundup credits Sia Furler and Greg Kurstin for Never Give Up and embeds the saved h6Ol3eprKiw video. Nomination, not an award-win or universal audience-response claim."
+    }
+  ],
+  "records": [
+    {
+      "id": 193,
+      "before": {
+        "id": 193,
+        "slug": "sia-never-give-up-from-the-lion-soundtrack-lyric-video",
+        "title": "🎶🦁 Sia - Never Give Up (from the Lion Soundtrack) [Lyric Video]",
+        "source_url": "https://youtu.be/h6Ol3eprKiw?si=Emuu-VWz4q-PHRWP",
+        "embed_url": "https://www.youtube-nocookie.com/embed/h6Ol3eprKiw?rel=0&playsinline=1&enablejsapi=1&origin=https%3A%2F%2Fvid.best",
+        "media_type": "youtube",
+        "r2_key": null,
+        "primary_category": "Music",
+        "subcategory": "Music Videos",
+        "seo_title": "Sia - Never Give Up! 🎶🦁 Official Music Video & Movie Soundtrack Deep",
+        "seo_description": "Watch our deep dive into Sia's powerful anthem \"Never Give Up\" from the movie Lion! 🛤️ We analyze its emotional resilience, railway lyric video aesthetics, and viral anthem mechan",
+        "seo_tags": "[\"sia never give up\",\"never give up lion soundtrack\",\"sia official lyric video\",\"inspirational movie songs\",\"empowering pop anthems\",\"survival and resilience music\",\"emotional pop songs analysis\",\"lion movie theme song\",\"music video storytelling breakdown\"]",
+        "thumbnail_url": "https://i.ytimg.com/vi/h6Ol3eprKiw/hqdefault.jpg",
+        "featured": 0,
+        "trending": 1,
+        "published": 1,
+        "created_at": "2026-10-15T18:07:48.273Z",
+        "updated_at": "2026-10-15T18:07:48.273Z",
+        "source_page_url": null,
+        "redistribution_certified": 0,
+        "redistribution_certified_at": null,
+        "cache_source_url": null,
+        "cache_status": "none",
+        "cache_error": null,
+        "cache_attempts": 0,
+        "cache_next_attempt_at": null,
+        "cached_at": null,
+        "description": "Discover the inspiring story behind Sia's legendary movie soundtrack hit \"Never Give Up\"! 🎶🦁 In this fresh, deeply analytical review, we explore the emotional depth of the track tied to the film Lion. We dive into the psychology of relentless perseverance, the stark black-and-white railway station visuals, and how hypnotic percussive beats create an unstoppable anthem of survival. Hit play to feel the strength of this modern masterpiece! 🎶🦁🛤️✨",
+        "review_text": "🦁🎶 Music Video & Anthem Deep Dive: Sia’s Empowering Masterpiece \"Never Give Up\" (from the Motion Picture Lion) 🛤️✨\n\n​💪 1. The Architecture of Perseverance & Cinematic Triumph\nSia’s powerful anthem \"Never Give Up,\" featured in the moving biographical film Lion, is a masterclass in emotional resilience and vocal intensity. Built on a pulsing electronic rhythm blended with tribal percussion, the song captures the harrowing psychological journey of survival, isolation, and the refusal to succumb to despair. Rather than relying on a traditional pop structure, it moves like a breathless sprint toward redemption.\n\n​🚂 2. Visual Storytelling: The Railway Metaphor & Two-Sided Identity\nThe official lyric video creates a haunting, cinematic atmosphere by using stark black-and-white visual staging inside a mysterious, misty train station. Two young dancers wearing Sia's signature black-and-white bob wigs sprint desperately along the tracks and weathered boxcars. Stenciled words painted directly onto the railway sleepers and train metal visually reinforce the song's core themes of overcoming haunting pasts and fighting to find a way home.\n\n​⚡ 3. The Psychology of the Anthemic Hook\nThe track thrives on hypnotic repetition and rising tension. The pre-chorus builds intense momentum before erupting into the iconic, soaring hook that repeats the song's defiant core message: refusing to stay down when life knocks you to the ground. This rhythmic build delivers a profound emotional release, making the listener feel an urgent sense of courage and unbreakable willpower.\n\n​🌟 4. Cultural Impact & Emotional Longevity\nAmassing hundreds of millions of views, \"Never Give Up\" transcends standard movie tie-in tracks by serving as a universal anthem for anyone facing insurmountable odds. Its haunting melodies, combined with a message of relentless hope, ensure that it remains a timeless classic of modern cinematic pop culture!"
+      },
+      "after": {
+        "description": "Sia’s official lyric video for “Never Give Up” sits alongside Lion’s story of separation and the search for home. This review considers why that context makes its encouragement more specific than a motivational slogan, while separating an emotional response from a promise of recovery.",
+        "review_text": "🦁🎶 Music Video & Anthem Deep Dive: Sia’s Empowering Masterpiece \"Never Give Up\" (from the Motion Picture Lion) 🛤️✨\n\n​💪 1. The Architecture of Perseverance & Cinematic Triumph\nSia’s powerful anthem \"Never Give Up,\" featured in the moving biographical film Lion, is a masterclass in emotional resilience and vocal intensity. Built on a pulsing electronic rhythm blended with tribal percussion, the song captures the harrowing psychological journey of survival, isolation, and the refusal to succumb to despair. Rather than relying on a traditional pop structure, it moves like a breathless sprint toward redemption.\n\nSony Classical’s release announcement identifies the song as written specifically for Lion and credits Greg Kurstin as producer. Its synopsis describes Saroo’s separation from his family after a train journey and his search for them as an adult. That context gives the perseverance theme a particular object: finding home, not winning an unspecified contest. It also makes the song a companion to a longer story, rather than a substitute for the film.\n\n​🚂 2. Visual Storytelling: The Railway Metaphor & Two-Sided Identity\nThe official lyric video creates a haunting, cinematic atmosphere by using stark black-and-white visual staging inside a mysterious, misty train station. Two young dancers wearing Sia's signature black-and-white bob wigs sprint desperately along the tracks and weathered boxcars. Stenciled words painted directly onto the railway sleepers and train metal visually reinforce the song's core themes of overcoming haunting pasts and fighting to find a way home.\n\nThe original upload credits a Chisel Pixel production, directed by Lior Molcho, with cinematography by Danit Sigler. These are the credited makers of the video; the film’s story and the lyric video’s imagery should not be treated as interchangeable documentary evidence.\n\n​⚡ 3. The Psychology of the Anthemic Hook\nThe track thrives on hypnotic repetition and rising tension. The pre-chorus builds intense momentum before erupting into the iconic, soaring hook that repeats the song's defiant core message: refusing to stay down when life knocks you to the ground. That sense of release is one possible response, not a psychological effect the song can guarantee. Encouragement can be welcome without making a listener who still feels discouraged seem to have missed the point.\n\n​🌟 4. Cultural Impact & Emotional Longevity\nThe Recording Academy included the song among its 2018 Best Song Written For Visual Media nominees, crediting Sia Furler and Greg Kurstin as songwriters. That is evidence of recognition for a song written for the screen, not a measure of how every listener responds. Its message of relentless hope can be read as a strength, but calling it universal would leave too little room for different experiences.\n\nFor a viewer deciding where to begin, the lyric video offers an entry point to the song; Lion provides the fuller context for the family separation behind its soundtrack connection. A resilience-themed playlist and a film discussion ask different things of the same track. Treating it as encouragement rather than a promise of recovery leaves room to enjoy it without asking a pop song to resolve the difficulties it evokes."
+      }
+    }
+  ],
+  "remainingReview": "Original section1 audio/structure and section2 scene/color assertions have not been independently re-verified. Keep them on the evidence queue; do not claim this bounded pass certifies the whole review."
+}
