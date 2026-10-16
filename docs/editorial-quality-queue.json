@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-10-16T17:34:20.830Z",
+  "generatedAt": "2026-10-16T17:49:52.872Z",
   "inputMode": "live_public_api",
-  "observedAt": "2026-10-16T17:34:20.830Z",
+  "observedAt": "2026-10-16T17:49:52.872Z",
   "productionWrites": false,
   "scope": "published library review bodies and listing descriptions; excludes category/listing-page overlap",
   "limitation": "Screening signals only. No AI detection, external plagiarism check, footage verification, Google status or AdSense eligibility score.",
   "counts": {
-    "records": 180,
-    "flagged": 73,
+    "records": 181,
+    "flagged": 74,
     "genericListingIntros": 57,
     "repeatedParagraphGroups": 1
   },
@@ -21,6 +21,16 @@
     }
   ],
   "records": [
+    {
+      "id": 198,
+      "slug": "monkey-gives-woman-a-flower-until-jealous-partner-attacks-viral-zoo-comedy-breakdown",
+      "category": "Funny & Comedy",
+      "protectedTopic": true,
+      "contentSha256": "386d6bcfe2b02caf20a4061bcfba3ae28c0dce6ceba71ffd7ae3ee1c9b29eef2",
+      "flags": [
+        "claim_needs_source_review"
+      ]
+    },
     {
       "id": 196,
       "slug": "lotr-the-fellowship-of-the-ring-music-only",
@@ -1672,7 +1682,50 @@
       "task": "Verify official source identity, existing wording and source-backed context before a bounded Music review improvement; generic intro and claim screening flags are candidates, not confirmed defects. Retain exact headings, SEO/media/dates/owner guards. No edit made in this run."
     },
     {
-      "task": "Consume the next ordinary zero-inspection diagnostic that includes thumbnail bodySignature/bodySha256; compare response evidence without changing owner posters or treating signatures as visual/rights/playback proof. Do not launch a redundant full audit."
+      "recordId": 193,
+      "task": "Keep original section1 audio/form and section2 scene/color/dancer claims held until actual source viewing/listening is available. Source identity/credits alone do not verify them. No stalled-player retry loop."
+    },
+    {
+      "task": "Normal future audit should compare actual body hashes/statuses against38942314937; no redundant full audit or same-day Google Inspection. Preserve all protected comedy including newly published198, eight existing Facebook holds and source30/removal/Saiyaara/Summer/owner edits."
+    }
+  ],
+  "dataSnapshot": {
+    "observedAt": "2026-10-16T17:48:11.553Z",
+    "saved": 185,
+    "published": 181,
+    "newUnrelatedPublishedRecord": 198,
+    "originalSavedRows": 184,
+    "originalProtectedSha256": "acc7c16822d0f14a81308282a2b67cfe9596fda9214e33568000dc96c320dfb8",
+    "comparison": "Exclude only new publication198,193's two intended text fields and activity counters. No owner publication or protected comedy record was modified."
+  },
+  "completedDiagnostics": [
+    {
+      "pullRequest": 187,
+      "reviewedHead": "aeb1c556d014cb4697369c40a8a2b921dd1fdb97",
+      "mergeCommit": "a899f9330b05acba075c30865fbba4f6d81f5d32",
+      "ciRun": 38942137010,
+      "nodeTests": 365,
+      "pythonTests": 4,
+      "workerDeployment": "skipped;449c5103 remains100%",
+      "auditRun": 38942314937,
+      "artifactId": 12062429783,
+      "archiveSha256": "5e5eeb137d9661f2c951444d6343df3ebb95c55c76d23213b7f4b1064a6bf4a1",
+      "reportGeneratedAt": "2026-10-16T17:47:09.848Z",
+      "pages": 212,
+      "technicalFailures": 0,
+      "unlinkedReviews": 0,
+      "publishedThumbnails": 181,
+      "headerMatchingCompleteHashes": 171,
+      "thumbnailCounts": {
+        "ok": 163,
+        "http_error": 10,
+        "placeholder": 8
+      },
+      "googleInspections": 0,
+      "googleSubmissions": 0,
+      "indexedStatus": "not rechecked; use dated full190URL snapshot, not current191review coverage",
+      "remainingLibrarySitemapWarnings": 20,
+      "limits": "Header/hash evidence is not decoding, visual relevance, rights or playback proof. Dilscoop's unchanged8304byteJPEG returned200 again; this is external availability variance, not a source/media repair."
     }
   ]
 }
