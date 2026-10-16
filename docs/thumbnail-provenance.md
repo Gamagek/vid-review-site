@@ -1,5 +1,11 @@
 # Editorial cover provenance
 
+## 16 October 2026: reporting evidence improvement only; no media replacement
+
+Current main27ce86e and completed audit38854027911 were reread; inventory remains **180thumbnails /161available /11HTTP failures /eight protected placeholders**. Source30 still lacks independently verified scene context; no repeat failed-provider probe, invented scene/cover, protected-item edit or guessed Dilscoop poster. Existing record32 illustration and source81 poster are retained; no new image/video, source copy, R2 object, review/date/source/cache/rights field changed.
+
+The independent diagnostic improvement in `scripts/search-console-audit.mjs` removes ambiguous PASS0 reporting when zero Inspections were performed and retains bounded public discovery hints returned by a future ordinary authorized Inspection. No extra Google/provider requests or permission expansion; missing/filtered hints are not proof of no discovery/crawl. Five new tests (25focused/345Node total), editorial validation and Wrangler4.124.0 dry-run pass. Exact production all-record non-counter fingerprint remains unchanged at07:04UTC16October; evidence and next task are in `docs/seo-progress.md`. Publish/test through the existing CI/push diagnostic using both skip flags, with no Worker/Portainer/migration release. This is report accuracy, not a new indexed-count or thumbnail repair claim.
+
 ## 16 October 2026: brand icon alias deployed; published thumbnail inventory unchanged
 
 PR [178](https://github.com/Gamagek/vid-review-site/pull/178), merge **`0c8f549a69de814c48e162fd824eb12e8c52a4a6`**, deployed through38853973632 to independently verified Worker **`7259695e-6355-4141-9d4e-3bd6767f8d38`**100%. Actual live GET/HEAD `/favicon.ico`301 followed `/favicon.svg`200; existing364byte SVG SHA-256 **`7440bc4da504d2ca4a9ea33be2a557efb58c86f378c971a5a11a44f1c73eed92`** unchanged. CI passes **340Node/fourPython/dry-run**. No new art, source copy, video thumbnail/R2 change, database migration or review/date/player/rights modification. All184saved/180published non-counter data match the unchanged baseline; Portainer privileged jobs all skip.

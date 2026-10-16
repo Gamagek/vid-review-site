@@ -278,6 +278,8 @@ test('diagnostics read root and review processing without changing submissions o
   assert.match(text, /Google sitemap mode: read_only/);
   assert.match(text, /Sitemap submitted to Google: false/);
   assert.match(text, /Review sitemap status checks: 1; submitted: 0/);
+  assert.match(text, /indexed status: not rechecked in this run/);
+  assert.doesNotMatch(text, /PASS:|PASS within|Stored Google coverage:/);
 });
 
 test('an unregistered diagnostic sitemap stays unverified without a fallback submission', async () => {
@@ -354,4 +356,84 @@ test('the complete public audit forwards diagnostic mode while keeping authentic
   assert.ok(publicFake.calls.every(call => ['GET', 'HEAD'].includes(call.method)));
   assert.ok(googleMethods.every(method => method === 'GET'));
   assert.equal(report.productionWrites, false);
+});
+
+test('zero inspections never become a zero indexed count, including missing credentials and failures', () => {
+  for (const status of ['success', 'not_configured', 'skipped_public_audit_failed', 'failed', undefined]) {
+    const text = summary({ publicAuditStatus: 'success', pages: [], errors: [],
+      searchConsole: status ? { status, inspections: [], totalReviews: 190, inspectionBudget: 0 } : undefined });
+    assert.match(text, /Stored Google index inspections: 0; indexed status: not rechecked in this run/);
+    assert.doesNotMatch(text, /PASS:|PASS within|Stored Google coverage:|Inspected review coverage:/);
+  }
+});
+
+test('inspection summaries separate a complete review set from partial, failed or historical samples', () => {
+  const inspections = [
+    { verdict: 'PASS', lastCrawlTime: '2026-10-15T12:00:00Z', sitemap: [ORIGIN + '/sitemaps/videos-1.xml'], referringUrls: [ORIGIN + '/videos'] },
+    { verdict: 'NEUTRAL', coverageState: 'Discovered - currently not indexed' },
+  ];
+  for (const [status, totalReviews, scope] of [
+    ['success', 2, 'complete review set at report time'], ['success', 190, 'partial or unknown review set'],
+    ['failed', 2, 'partial or unknown review set'], ['success', undefined, 'partial or unknown review set'],
+  ]) {
+    const text = summary({ publicAuditStatus: 'success', pages: [], errors: [], generatedAt: '2026-10-15T09:28:11.597Z',
+      searchConsole: { status, inspections, totalReviews } });
+    assert.match(text, /Report generated: 2026-10-15T09:28:11.597Z/);
+    assert.match(text, /Stored Google index inspections: 2; PASS within inspected URLs: 1/);
+    assert.ok(text.includes(scope + '; not a site-wide indexed-page count'));
+    assert.match(text, /lastCrawlTime recorded: 1; public sitemap association retained: 1; public referring URL retained: 1/);
+    assert.match(text, /absent hints do not prove no discovery or crawl/);
+  }
+});
+
+async function storedDiscoveryFixture(state) {
+  const calls = [];
+  const result = await syncSearchConsole([ORIGIN + '/watch/a'], {
+    secret: 'configured', budget: 1, submitSitemaps: false, getToken: async () => 'private-token-sentinel', wait: noop,
+    fetchImpl: async (url, options) => {
+      calls.push({ url, method: options.method || 'GET' });
+      if (options.method === 'POST') return json({ inspectionResult: { indexStatusResult: state } });
+      return url.includes('/sitemaps/') ? json({ path: ORIGIN + '/sitemap.xml', isPending: false }) : json({ permissionLevel: 'siteOwner' });
+    },
+  });
+  assert.equal(result.status, 'success');
+  assert.deepEqual(calls.map(x => x.method), ['GET', 'GET', 'POST']);
+  assert.equal(calls.at(-1).url, 'https://searchconsole.googleapis.com/v1/urlInspection/index:inspect');
+  return result;
+}
+
+test('stored Inspection retains supported public discovery hints without fetching them or leaking private URLs', async () => {
+  const result = await storedDiscoveryFixture({ verdict: 'NEUTRAL', crawledAs: 'MOBILE',
+    sitemap: [ORIGIN + '/sitemaps/videos-1.xml', ORIGIN + '/sitemaps/videos-1.xml', ORIGIN + '/watch/not-a-sitemap',
+      ORIGIN + '/sitemap.xml?sig=private-sentinel', 'https://external.example/sitemap.xml', '/sitemap.xml'],
+    referringUrls: [ORIGIN + '/', ORIGIN + '/videos', ORIGIN + '/videos', ORIGIN + '/watch/public-review',
+      ORIGIN + '/api/account/verify?token=private-sentinel', ORIGIN + '/admin',
+      'https://user:private-sentinel@vid.best/watch/a', 'https://external.example/watch/private-sentinel',
+      ORIGIN + '/watch/a?sig=private-sentinel', ORIGIN + '/watch/a#private-sentinel', null, 42],
+  });
+  assert.equal(result.inspections[0].crawledAs, 'MOBILE');
+  assert.deepEqual(result.inspections[0].sitemap, [ORIGIN + '/sitemaps/videos-1.xml']);
+  assert.deepEqual(result.inspections[0].referringUrls, [ORIGIN + '/', ORIGIN + '/videos', ORIGIN + '/watch/public-review']);
+  assert.doesNotMatch(JSON.stringify(result), /private-sentinel|external\.example|private-token/);
+  assert.equal(result.inspections[0].lastCrawlTime, undefined);
+});
+
+test('discovery hints remain bounded and deduplicated rather than expanding report or request budgets', async () => {
+  const result = await storedDiscoveryFixture({ crawledAs: 'DESKTOP',
+    sitemap: Array.from({ length: 150 }, (_, i) => ORIGIN + '/sitemaps/videos-' + (i + 1) + '.xml'),
+    referringUrls: Array.from({ length: 150 }, (_, i) => ORIGIN + '/watch/review-' + i),
+  });
+  assert.equal(result.inspections[0].crawledAs, 'DESKTOP');
+  assert.equal(result.inspections[0].sitemap.length, 20);
+  assert.equal(result.inspections[0].referringUrls.length, 20);
+  assert.equal(result.inspectionBudget, 1);
+  assert.equal(result.sitemapSubmitted, false);
+});
+
+test('missing or malformed Google discovery fields are not invented as evidence', async () => {
+  for (const state of [{ verdict: 'NEUTRAL' }, { crawledAs: 'private-sentinel', sitemap: 'private-sentinel', referringUrls: {} }]) {
+    const result = await storedDiscoveryFixture(state);
+    for (const key of ['crawledAs', 'sitemap', 'referringUrls', 'lastCrawlTime']) assert.equal(Object.hasOwn(result.inspections[0], key), false);
+    assert.doesNotMatch(JSON.stringify(result), /private-sentinel/);
+  }
 });
