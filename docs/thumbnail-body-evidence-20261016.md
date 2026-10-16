@@ -1,5 +1,15 @@
 # Bounded thumbnail-byte evidence — 16 October 2026
 
+## Published diagnostic and actual runner verification
+
+PR187 merged `a899f9330b05acba075c30865fbba4f6d81f5d32`, reviewed headaeb1c556, after CI38942137010/job117112136616 passes365Node/fourPython/editorial validation/dry-run. Deploy38942314996 skips; Worker449c5103 stays100%. Main CI38942314892 passes; Portainer validation117112747392 passes and privileged117112913188/117112913483/117112914842/117112916549 all skip.
+
+Actual automatic push audit38942314937/artifact12062429783, ZIP SHA256 `5e5eeb137d9661f2c951444d6343df3ebb95c55c76d23213b7f4b1064a6bf4a1`, generated17:47:09UTC/completed17:48:58UTC, checks212pages/zero technical failures/unlinked reviews. Current181thumbnails:163ok/10HTTPerrors/eight protected placeholders,171matching complete header/hash responses, zero MIME mismatch/unrecognized responses. Sia’s unchangedJPEG is18012bytes/SHA256 `cd92d11179837b9162d4b7d089c792c523eb39721c0bc97f32918284f0eab7b5`. These remain header/byte observations, not full decoding, visual/rights/playback or Google indexing proof. Dilscoop’s unchanged8304byteJPEG is200 again; no source/poster/rights repair is claimed.
+
+An unrelated new Funny & Comedy record198 appeared during verification; it remains untouched. D1 is185saved/181published. Excluding only new198, all original184rows retain the expected protected digest;193’s exact new text remains unchanged. The body-free queue now covers181records at17:49:52UTC (57generic intros/74screening candidates). No draft was published or comedy record changed by this work. Google0Inspections/0submissions retains the separately dated190URL snapshot, not coverage of the new191review set. Maps stay processed/zeroerrors/library20warnings.
+
+This first ordinary diagnostic has been consumed; do not run it redundantly. The final checkpoint records the completed result and next Music192/source-verification task. Earlier pre-publication instructions below remain dated history, not outstanding merge/deployment work.
+
 ## Confirmed diagnostic gap and correction
 
 The existing public thumbnail audit accepted a non-empty response labelled with an allowed image MIME type. It did not fingerprint the body or verify its header, so a server returning HTML with an image Content-Type could be counted as available. This is a confirmed code-level coverage gap, not evidence that any current production provider actually returned such a body.
