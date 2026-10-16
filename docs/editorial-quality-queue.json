@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-16T14:29:44.184Z",
+  "generatedAt": "2026-10-16T17:34:20.830Z",
   "inputMode": "live_public_api",
-  "observedAt": "2026-10-16T14:29:44.184Z",
+  "observedAt": "2026-10-16T17:34:20.830Z",
   "productionWrites": false,
   "scope": "published library review bodies and listing descriptions; excludes category/listing-page overlap",
   "limitation": "Screening signals only. No AI detection, external plagiarism check, footage verification, Google status or AdSense eligibility score.",
   "counts": {
     "records": 180,
-    "flagged": 74,
-    "genericListingIntros": 58,
+    "flagged": 73,
+    "genericListingIntros": 57,
     "repeatedParagraphGroups": 1
   },
   "repeatedParagraphs": [
@@ -56,10 +56,8 @@
       "slug": "sia-never-give-up-from-the-lion-soundtrack-lyric-video",
       "category": "Music",
       "protectedTopic": false,
-      "contentSha256": "605fa00ec93f3908639ea389c692ab5553a1b2df6764ff912836a1c5450f1281",
-      "flags": [
-        "generic_listing_intro"
-      ]
+      "contentSha256": "fab92ca09b8208305257eea367bfe1b45c557002a97230b03fe3064101e44cb9",
+      "flags": []
     },
     {
       "id": 192,
@@ -1629,6 +1627,21 @@
       "preservedHeadings": 13,
       "protectedSha256": "8aabfba00aea9bd94d10838d4171b41838ccbf1fca8ff4c5df79d6a3a7f5e54d",
       "liveVerifiedAt": "2026-10-16T14:31:26Z"
+    },
+    {
+      "recordIds": [
+        193
+      ],
+      "pullRequest": 186,
+      "reviewedHead": "68f4b29c91078799d8c080f8fd89e8a1ac070a87",
+      "mergeCommit": "a66f516f8b5ac6d8abe67843e7fa4526129e5314",
+      "workerVersion": "449c5103-6ca8-4bc0-95d1-cc764a8f1500",
+      "status": "bounded_source_context_deployed_and_live_verified",
+      "preservedHeadings": 4,
+      "protectedSha256": "acc7c16822d0f14a81308282a2b67cfe9596fda9214e33568000dc96c320dfb8",
+      "textSha256": "fab92ca09b8208305257eea367bfe1b45c557002a97230b03fe3064101e44cb9",
+      "liveVerifiedAt": "2026-10-16T17:34:14.959Z",
+      "remainingEvidenceHold": "Original section1 audio/form and section2 scene/color/dancer assertions were preserved, not independently re-verified; the source player remained at0:00. This is not whole-review certification."
     }
   ],
   "topicHolds": {
@@ -1643,5 +1656,23 @@
       158
     ],
     "reason": "Protected Facebook comedy topics: retain existing thumbnails and review text under the current instruction. The per-record protectedTopic flag tests category only and is not authorization to edit other comedy topics."
-  }
+  },
+  "manualEvidenceHolds": [
+    {
+      "recordId": 193,
+      "reason": "Fresh official source identity and credits verified16October; source player did not progress beyond0:00. Preserve the original first/second section paragraphs until footage/audio can actually be inspected. Do not reattempt stalled playback in a loop or infer scene/audio from metadata.",
+      "notAnIndexingOrPolicyVerdict": true
+    }
+  ],
+  "nextTasks": [
+    {
+      "recordId": 192,
+      "slug": "rachel-platten-fight-song-official-music-video-anthem-deep-dive",
+      "sourceId": "xo1VInw-SKc",
+      "task": "Verify official source identity, existing wording and source-backed context before a bounded Music review improvement; generic intro and claim screening flags are candidates, not confirmed defects. Retain exact headings, SEO/media/dates/owner guards. No edit made in this run."
+    },
+    {
+      "task": "Consume the next ordinary zero-inspection diagnostic that includes thumbnail bodySignature/bodySha256; compare response evidence without changing owner posters or treating signatures as visual/rights/playback proof. Do not launch a redundant full audit."
+    }
+  ]
 }
