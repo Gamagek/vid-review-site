@@ -91,11 +91,34 @@ test("redirects the legacy home subdomain to the canonical origin", async () => 
   assert.equal(response.headers.get("Location"), "https://vid.best/watch/example");
 });
 
-test("redirects www to the canonical origin", async () => {
+test("www GET and HEAD redirect public paths and queries before accessing any production binding", async () => {
+  const unavailable = () => { throw new Error("Canonical redirects must not need data or assets"); };
+  const context = createContext({ DB: { prepare: unavailable }, ASSETS: { fetch: unavailable } });
+  for (const method of ["GET", "HEAD"]) {
+    for (const path of ["/", "/robots.txt", "/ads.txt", "/sitemap.xml", "/privacy", "/daily-weekly-best/films", "/watch/a%20review?topic=music%26film&page=2"]) {
+      const response = await request(context, "https://www.vid.best" + path, { method });
+      assert.equal(response.status, 301);
+      assert.equal(response.headers.get("Location"), "https://vid.best" + path);
+      assert.equal(await response.text(), "");
+    }
+  }
+});
+
+test("server-rendered Unicode and escaped review titles remain present without client-side JavaScript", async () => {
   const context = createContext();
-  const response = await request(context, "https://www.vid.best/");
-  assert.equal(response.status, 301);
-  assert.equal(response.headers.get("Location"), "https://vid.best/");
+  const row = context.sqlite.prepare("SELECT id, slug, views FROM videos WHERE published = 1 ORDER BY id LIMIT 1").get();
+  context.sqlite.prepare("UPDATE videos SET title = ?, seo_title = ? WHERE id = ?")
+    .run("✨ Learning & friendship — <a new perspective>", "✨ Learning & friendship — <a new perspective>", row.id);
+  const response = await request(context, "https://vid.best/watch/" + row.slug, {
+    headers: { "User-Agent": "VidBest-SEO-Audit/1.0" },
+  });
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  const titles = [...html.matchAll(/<title[^>]*>([\s\S]*?)<\/title>/gi)];
+  assert.equal(titles.length, 1);
+  assert.match(titles[0][1], /✨ Learning &amp; friendship — &lt;a new perspective&gt;/);
+  assert.ok(html.includes('rel="canonical" href="https://vid.best/watch/' + row.slug + '"'));
+  assert.equal(context.sqlite.prepare("SELECT views FROM videos WHERE id = ?").get(row.id).views, row.views);
 });
 
 test("HTTP public pages redirect to HTTPS with their path and query intact", async () => {

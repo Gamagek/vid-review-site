@@ -1,5 +1,11 @@
 # Daily Weekly Best: original editorial value, 16 October 2026
 
+## Verified release
+
+PR[182](https://github.com/Gamagek/vid-review-site/pull/182) merged `6593c7ac650c1ba24f31761d1d848e030a0fec8b`, exact-head CI38875235351 passes345Node/fourPython/dry-run. Deploy38875436830 succeeds with no pending migrations, Worker `06d1f5bb-f9e6-4dc4-aee1-a59c296826b3`100%. All ten live articles return200 and match the reviewed prose exactly, with matching complete JSON-LD/headings/canonicals. Existing Cloudflare Insights injection explains whole-response byte differences. D1 remains184saved/180published with unchanged non-counter hash `551fd88e1dd6f9669287d134d44b873e3b223155d47af0ade676ee897da85284`; no data/cover/player/date/owner-edit change.
+
+Completed audit38875505796/artifact12034679403, generated16October08:42:57UTC, independently verifies211pages/alltitles/zero technical failures and unchanged editorial assets; zero Google submissions/Inspections. The user's later Siteliner PDF and actual www configuration gap are separately investigated in `docs/canonical-host-evidence-20261016.md`; this content release does not falsely claim to fix or explain every earlier scanner result. Its original pre-release scope/evidence below is retained as dated audit history.
+
 ## Scope and evidence
 
 User-directed content edit, preserving the existing review structure. Baseline main: `39da8df129150fed5ade4188b644299f8c8a7d06`. Read all ten Markdown reviews, their metadata, generator, tests, current SEO/provenance checkpoints and latest completed audit 38865351879. That diagnostic covers 211 public pages with zero technical failures; it made zero Google Inspections/submissions and is not a new indexed-page count.
