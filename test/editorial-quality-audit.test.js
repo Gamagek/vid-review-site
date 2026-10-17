@@ -29,6 +29,31 @@ test('private URLs and complete text are not included in a screening report', ()
   assert.throws(() => auditEditorial([row(1, {published: 0})]), /Invalid/);
 });
 
+test('popularity screening includes plural views and streams without rewriting source text', () => {
+  for (const review_text of ['Surpassing 700 million views.', 'Amassing hundreds of millions of views.',
+    'Accumulating tens of millions of streams.', 'Over one billion streams.', '2 BILLION VIEWS.',
+    'The claim of millions of views is disputed.']) {
+    const source = [row(191, {review_text}), row(999, {primary_category: 'Funny & Comedy', review_text: 'Three million streams.'})];
+    const saved = structuredClone(source);
+    const report = auditEditorial(source);
+    assert.equal(report.screeningVersion, 2);
+    assert.deepEqual(report.records[0].flags, ['claim_needs_source_review'], review_text);
+    assert.deepEqual(report.records[1].flags, ['claim_needs_source_review']);
+    assert.equal(report.records[1].protectedTopic, true);
+    assert.deepEqual(source, saved);
+    assert.ok(!JSON.stringify(report).includes(review_text));
+    assert.match(report.limitation, /Screening signals only/);
+  }
+});
+
+test('popularity screening avoids incidental million/billion or streaming terminology', () => {
+  for (const review_text of ['The title is A Million Dreams.', 'A billion stars in the artwork.',
+    'The producer views streaming as distribution.', 'Thoughts of millions; views differ.',
+    'The stream flows under a bridge.']) {
+    assert.deepEqual(auditEditorial([row(1, {review_text})]).records[0].flags, [], review_text);
+  }
+});
+
 test('failed and incomplete library requests never become a successful empty inventory', async () => {
   await assert.rejects(readPublishedLibrary(async () => new Response('{}', {status: 503})), /503/);
   await assert.rejects(readPublishedLibrary(async () => Response.json({videos: [], pagination: {total: 1, offset: 0, limit: 48}})), /Incomplete/);

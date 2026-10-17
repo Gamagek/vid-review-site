@@ -22,7 +22,9 @@ export function auditEditorial(rows) {
     if (!row.description.trim()) flags.push('missing_listing_description');
     if (!row.review_text.trim()) flags.push('missing_review_body');
     if (genericIntro.test(row.description)) flags.push('generic_listing_intro');
-    if (/\b(?:million views|scientifically proven|dopamine|cortisol|neuroscience|true story)\b/i.test(row.review_text)) flags.push('claim_needs_source_review');
+    // Candidate screening only: singular/plural view and stream claims need dated sources too.
+    // A match is not a falsehood/policy verdict, including when an author quotes or questions a count.
+    if (/\b(?:(?:millions?|billions?)(?:\s+of)?\s+(?:views|streams)|scientifically proven|dopamine|cortisol|neuroscience|true story)\b/i.test(row.review_text)) flags.push('claim_needs_source_review');
     for (const part of row.review_text.split(/\n\s*\n/)) {
       const normalized = normalize(part);
       if (normalized.split(' ').length < 20) continue;
@@ -42,6 +44,7 @@ export function auditEditorial(rows) {
   const repeatedIds = new Set(repeatedParagraphs.flatMap(group => group.recordIds));
   for (const row of records) if (repeatedIds.has(row.id)) row.flags.push('shared_review_paragraph');
   return {
+    screeningVersion: 2,
     productionWrites: false,
     scope: 'published library review bodies and listing descriptions; excludes category/listing-page overlap',
     limitation: 'Screening signals only. No AI detection, external plagiarism check, footage verification, Google status or AdSense eligibility score.',

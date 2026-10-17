@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-17T23:13:27.445Z",
+  "generatedAt": "2026-10-17T23:22:24.205Z",
   "inputMode": "live_public_api",
-  "observedAt": "2026-10-17T23:13:27.445Z",
+  "observedAt": "2026-10-17T23:22:24.205Z",
   "productionWrites": false,
   "scope": "published library review bodies and listing descriptions; excludes category/listing-page overlap",
   "limitation": "Screening signals only. No AI detection, external plagiarism check, footage verification, Google status or AdSense eligibility score.",
   "counts": {
     "records": 200,
-    "flagged": 85,
-    "genericListingIntros": 57,
+    "flagged": 92,
+    "genericListingIntros": 56,
     "repeatedParagraphGroups": 1
   },
   "repeatedParagraphs": [
@@ -49,6 +49,21 @@
       "textSha256": "fab92ca09b8208305257eea367bfe1b45c557002a97230b03fe3064101e44cb9",
       "liveVerifiedAt": "2026-10-16T17:34:14.959Z",
       "remainingEvidenceHold": "Original section1 audio/form and section2 scene/color/dancer assertions were preserved, not independently re-verified; the source player remained at0:00. This is not whole-review certification."
+    },
+    {
+      "recordIds": [
+        192
+      ],
+      "pullRequest": 189,
+      "reviewedHead": "06cfc32479d8b203ecc42fb42d8cb037f387f19e",
+      "mergeCommit": "702dc21d5d2647dc5a180d80836abcc2cc97751b",
+      "workerVersion": "9ebbb2df-8662-488d-8fd2-e4ff602478e2",
+      "status": "bounded_source_context_deployed_and_live_verified",
+      "preservedHeadings": 4,
+      "protectedSha256": "45e1e35b5f414e4ea4b59f08b27d7bbfe9118d58ed429e97c0a73b6b86fbc946",
+      "textSha256": "40a7341be263c349b4d3745914d3d5d27fb55f2a1b2d87b0e08a6ae05658962b",
+      "liveVerifiedAt": "2026-10-17T23:19:51.164Z",
+      "remainingEvidenceHold": "Original section1/section3 audio-form descriptions and section2 notebook/stairs/car/coast/forest/bonfire scene assertions have not been independently re-verified. Keep an explicit manual evidence hold; this is a bounded context/claim correction, not whole-review certification."
     }
   ],
   "topicHolds": {
@@ -78,28 +93,32 @@
   ],
   "nextTasks": [
     {
-      "recordId": 192,
-      "task": "Finish exact-head CI, migration preimage/pending checks, reviewed PR merge and existing Worker release. Verify all204 saved records excluding only these two text fields/counters, live SSR/API/meta and both dates. Prepared only."
-    },
-    {
       "recordId": 191,
       "slug": "randall-wahran-official-track-festival-anthem-deep-dive",
-      "task": "After192 live verification, verify official source identity and primary context for the next non-protected generic-intro candidate. No footage/audio claims without observation; do not assume indexed."
+      "sourceId": "-Q0BR72Aq4Q",
+      "task": "Next bounded Music candidate: verify exact official source identity and primary evidence before correcting generic listing/popularity claims. Dharma's official sound-pack page corroborates artist/title/components only, not exact source-video visuals/audio/sample origin or rights. No191edit made; preserve title/headings/order/SEO/source/media/dates and owner preimages.",
+      "preparationSource": "https://www.dharmaworldwide.com/product/wahran-sound-pack/",
+      "sourceMetadataLimit": "Exact public YouTube search fetch failed17October; not proof of removal or platform denial."
     },
     {
-      "task": "Preserve192/193 original scene/audio evidence holds, protected comedy and all eight Facebook cover holds. Consume ordinary post-release zero-inspection diagnostic rather than repeating Google calls; compare actual image bytes/statuses without treating availability as rights/playback proof."
+      "recordIds": [
+        192,
+        193
+      ],
+      "task": "Original scene/audio statements remain manual evidence holds, not whole-review certification. No repeated stalled-player retry or inference from metadata."
+    },
+    {
+      "task": "The first post-release zero-inspection audit39078548051 is consumed. Maps processed17October08:53UTC/0errors/library20aggregatewarnings remain. On normal future diagnostics compare actual changes; retain dated200URL stored-index snapshot1PASS/133Discovered/66unknown until a later authorized full snapshot. Do not spend redundant Inspection quota, submit AdSense or change protected/provider/security/owner/draft/Portainer state."
     }
   ],
   "dataSnapshot": {
-    "observedAt": "2026-10-17T23:13:27.445Z",
+    "observedAt": "2026-10-17T23:19:49.551Z",
     "saved": 204,
     "published": 200,
-    "newUnrelatedPublishedRecord": 198,
-    "originalSavedRows": 184,
-    "originalProtectedSha256": "acc7c16822d0f14a81308282a2b67cfe9596fda9214e33568000dc96c320dfb8",
-    "comparison": "Exclude only new publication198,193's two intended text fields and activity counters. No owner publication or protected comedy record was modified.",
     "protectedSha256": "45e1e35b5f414e4ea4b59f08b27d7bbfe9118d58ed429e97c0a73b6b86fbc946",
-    "excludes": "Activity counters and only192.description/review_text. No production mutation during investigation."
+    "excludes": "Activity counters and only192.description/review_text; both intended fields separately verified by exact text hash.",
+    "targetTextSha256": "40a7341be263c349b4d3745914d3d5d27fb55f2a1b2d87b0e08a6ae05658962b",
+    "verificationWrites": false
   },
   "completedDiagnostics": [
     {
@@ -129,6 +148,38 @@
       "indexedStatus": "not rechecked; use dated full190URL snapshot, not current191review coverage",
       "remainingLibrarySitemapWarnings": 20,
       "limits": "Header/hash evidence is not decoding, visual relevance, rights or playback proof. Dilscoop's unchanged8304byteJPEG returned200 again; this is external availability variance, not a source/media repair."
+    },
+    {
+      "screeningVersion": 2,
+      "task": "Expand popularity source-review candidates to plural million/billion views/streams",
+      "status": "implemented_and_regression_tested_read_only",
+      "observedAt": "2026-10-17T23:22:24.205Z",
+      "beforeCriteria": {
+        "flagged": 84,
+        "genericListingIntros": 56,
+        "records": 200
+      },
+      "afterCriteria": {
+        "records": 200,
+        "flagged": 92,
+        "genericListingIntros": 56,
+        "repeatedParagraphGroups": 1
+      },
+      "additionalClaimFlagRecordIds": [
+        206,
+        191,
+        131,
+        103,
+        87,
+        84,
+        81,
+        78,
+        67,
+        49,
+        47
+      ],
+      "contentHashesChanged": 0,
+      "productionWrites": false
     }
   ],
   "records": [
@@ -240,7 +291,9 @@
       "category": "Funny & Comedy",
       "protectedTopic": true,
       "contentSha256": "3423c17cc8fee11b1530ae02c5b9a9f394ce6713937ec3c1428a1207dd6a1e7f",
-      "flags": []
+      "flags": [
+        "claim_needs_source_review"
+      ]
     },
     {
       "id": 205,
@@ -359,11 +412,8 @@
       "slug": "rachel-platten-fight-song-official-music-video-anthem-deep-dive",
       "category": "Music",
       "protectedTopic": false,
-      "contentSha256": "6a5ff4859b0af035f73d2f7cfb0f673d446fffc2d646d91a1bde3e00724a874c",
-      "flags": [
-        "generic_listing_intro",
-        "claim_needs_source_review"
-      ]
+      "contentSha256": "40a7341be263c349b4d3745914d3d5d27fb55f2a1b2d87b0e08a6ae05658962b",
+      "flags": []
     },
     {
       "id": 191,
@@ -372,7 +422,8 @@
       "protectedTopic": false,
       "contentSha256": "0fa1cf19d99e5da34448e3d727689670f6ecdb4963e0f6a528f3d72110af252d",
       "flags": [
-        "generic_listing_intro"
+        "generic_listing_intro",
+        "claim_needs_source_review"
       ]
     },
     {
@@ -852,7 +903,9 @@
       "category": "Music",
       "protectedTopic": false,
       "contentSha256": "787d2ea1ddc6ccb9065f122213aac86887204a39159312519b72831dd4bafa9d",
-      "flags": []
+      "flags": [
+        "claim_needs_source_review"
+      ]
     },
     {
       "id": 130,
@@ -1084,7 +1137,9 @@
       "category": "Music",
       "protectedTopic": false,
       "contentSha256": "948e9b0b270d4ee3b106c7f852956bc1f25549858d7d42caf02edfd5aa609abb",
-      "flags": []
+      "flags": [
+        "claim_needs_source_review"
+      ]
     },
     {
       "id": 102,
@@ -1224,7 +1279,9 @@
       "category": "Music",
       "protectedTopic": false,
       "contentSha256": "25c46b313e877679828db3ec3febba8358e612488dbedb49fd74305cec2901dd",
-      "flags": []
+      "flags": [
+        "claim_needs_source_review"
+      ]
     },
     {
       "id": 86,
@@ -1250,7 +1307,9 @@
       "category": "Funny & Comedy",
       "protectedTopic": true,
       "contentSha256": "786d93dc2597d4653d07ddf1c14702ca317be9a826019338e18d426138f4950a",
-      "flags": []
+      "flags": [
+        "claim_needs_source_review"
+      ]
     },
     {
       "id": 83,
@@ -1276,7 +1335,9 @@
       "category": "Social Media & Trending",
       "protectedTopic": false,
       "contentSha256": "4a25d9cfc2530b37e673e4df4aa08148a21cc1ba3c5f546da24b85d768a1782c",
-      "flags": []
+      "flags": [
+        "claim_needs_source_review"
+      ]
     },
     {
       "id": 80,
@@ -1303,7 +1364,8 @@
       "protectedTopic": true,
       "contentSha256": "3e79a8b3fa9b37e8bb3b7a001dfedac30b9298324a269f65c12192b23741e7d3",
       "flags": [
-        "generic_listing_intro"
+        "generic_listing_intro",
+        "claim_needs_source_review"
       ]
     },
     {
@@ -1382,7 +1444,9 @@
       "category": "Funny & Comedy",
       "protectedTopic": true,
       "contentSha256": "49e2c5b38e113edb07ec448fb85c0badba272f4e7169f924c198a246eb53209e",
-      "flags": []
+      "flags": [
+        "claim_needs_source_review"
+      ]
     },
     {
       "id": 66,
@@ -1530,7 +1594,8 @@
       "protectedTopic": true,
       "contentSha256": "c54cc8ad5be2385b500e6d01229ee7355f074e43f74742d969b5848c58405028",
       "flags": [
-        "generic_listing_intro"
+        "generic_listing_intro",
+        "claim_needs_source_review"
       ]
     },
     {
@@ -1547,7 +1612,9 @@
       "category": "Music",
       "protectedTopic": false,
       "contentSha256": "f9db79c7efb57050bb877fc94e54c254ec7c3805aa5daea5c76dbc38b6b10ac5",
-      "flags": []
+      "flags": [
+        "claim_needs_source_review"
+      ]
     },
     {
       "id": 46,
@@ -1908,21 +1975,7 @@
       "flags": []
     }
   ],
-  "preparedBatches": [
-    {
-      "recordIds": [
-        192
-      ],
-      "status": "prepared_not_published",
-      "manifest": "content/editorial-quality/2026-10-17-fight-song.json",
-      "migration": "0043_fight_song_source_context.sql",
-      "baselineProtectedSha256": "45e1e35b5f414e4ea4b59f08b27d7bbfe9118d58ed429e97c0a73b6b86fbc946",
-      "baselineSaved": 204,
-      "baselinePublished": 200,
-      "guardVerifiedAt": "2026-10-17T23:14:11.111Z",
-      "matchingPreimages": 1
-    }
-  ],
+  "preparedBatches": [],
   "googleSnapshot": {
     "runId": 39018934414,
     "generatedAt": "2026-10-17T08:51:41.157Z",
@@ -1936,5 +1989,27 @@
     "indexedReview": "https://vid.best/watch/best-comedy-compilation-ultimate-try-not-to-laugh-viral-pranks",
     "protectedIndexedTopic": true,
     "scopeLimit": "Dated stored-Inspection review set, not a whole-site indexed count. Current library200+editorials10 is larger than the190+10 audited set; no new Inspection made."
+  },
+  "screeningVersion": 2,
+  "latestPublicAudit": {
+    "runId": 39078548051,
+    "artifactId": 12117652693,
+    "zipSha256": "8d4ee00e0813b90ebb075546d950944d9dabcc6bee2fb9191838d0e9876b8979",
+    "generatedAt": "2026-10-17T23:19:20.205Z",
+    "pages": 231,
+    "technicalFailures": 0,
+    "libraryReviews": 200,
+    "editorialReviews": 10,
+    "thumbnailCounts": {
+      "ok": 181,
+      "http_error": 11,
+      "placeholder": 8
+    },
+    "matchingImageBodies": 189,
+    "inspections": 0,
+    "sitemapSubmissions": 0,
+    "sitemapsProcessed": true,
+    "lastDownloaded": "2026-10-17T08:53:42.627Z",
+    "libraryWarnings": 20
   }
 }
