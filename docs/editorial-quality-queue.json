@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-10-16T17:49:52.872Z",
+  "generatedAt": "2026-10-17T23:13:27.445Z",
   "inputMode": "live_public_api",
-  "observedAt": "2026-10-16T17:49:52.872Z",
+  "observedAt": "2026-10-17T23:13:27.445Z",
   "productionWrites": false,
   "scope": "published library review bodies and listing descriptions; excludes category/listing-page overlap",
   "limitation": "Screening signals only. No AI detection, external plagiarism check, footage verification, Google status or AdSense eligibility score.",
   "counts": {
-    "records": 181,
-    "flagged": 74,
+    "records": 200,
+    "flagged": 85,
     "genericListingIntros": 57,
     "repeatedParagraphGroups": 1
   },
@@ -20,7 +20,292 @@
       ]
     }
   ],
+  "completedBatches": [
+    {
+      "recordIds": [
+        145,
+        150,
+        152
+      ],
+      "pullRequest": 184,
+      "mergeCommit": "76a90f44ce5373fd9a4e3a08ea73a6b56d0790e4",
+      "workerVersion": "4bee9e8d-3c89-4009-b056-fab522316a58",
+      "status": "deployed_and_live_verified",
+      "preservedHeadings": 13,
+      "protectedSha256": "8aabfba00aea9bd94d10838d4171b41838ccbf1fca8ff4c5df79d6a3a7f5e54d",
+      "liveVerifiedAt": "2026-10-16T14:31:26Z"
+    },
+    {
+      "recordIds": [
+        193
+      ],
+      "pullRequest": 186,
+      "reviewedHead": "68f4b29c91078799d8c080f8fd89e8a1ac070a87",
+      "mergeCommit": "a66f516f8b5ac6d8abe67843e7fa4526129e5314",
+      "workerVersion": "449c5103-6ca8-4bc0-95d1-cc764a8f1500",
+      "status": "bounded_source_context_deployed_and_live_verified",
+      "preservedHeadings": 4,
+      "protectedSha256": "acc7c16822d0f14a81308282a2b67cfe9596fda9214e33568000dc96c320dfb8",
+      "textSha256": "fab92ca09b8208305257eea367bfe1b45c557002a97230b03fe3064101e44cb9",
+      "liveVerifiedAt": "2026-10-16T17:34:14.959Z",
+      "remainingEvidenceHold": "Original section1 audio/form and section2 scene/color/dancer assertions were preserved, not independently re-verified; the source player remained at0:00. This is not whole-review certification."
+    }
+  ],
+  "topicHolds": {
+    "recordIds": [
+      139,
+      142,
+      143,
+      153,
+      155,
+      156,
+      157,
+      158
+    ],
+    "reason": "Protected Facebook comedy topics: retain existing thumbnails and review text under the current instruction. The per-record protectedTopic flag tests category only and is not authorization to edit other comedy topics."
+  },
+  "manualEvidenceHolds": [
+    {
+      "recordId": 193,
+      "reason": "Fresh official source identity and credits verified16October; source player did not progress beyond0:00. Preserve the original first/second section paragraphs until footage/audio can actually be inspected. Do not reattempt stalled playback in a loop or infer scene/audio from metadata.",
+      "notAnIndexingOrPolicyVerdict": true
+    },
+    {
+      "recordId": 192,
+      "reason": "Original section1/section3 audio-form descriptions and section2 notebook/stairs/car/coast/forest/bonfire scene assertions have not been independently re-verified. Keep an explicit manual evidence hold; this is a bounded context/claim correction, not whole-review certification.",
+      "notAnIndexingOrPolicyVerdict": true
+    }
+  ],
+  "nextTasks": [
+    {
+      "recordId": 192,
+      "task": "Finish exact-head CI, migration preimage/pending checks, reviewed PR merge and existing Worker release. Verify all204 saved records excluding only these two text fields/counters, live SSR/API/meta and both dates. Prepared only."
+    },
+    {
+      "recordId": 191,
+      "slug": "randall-wahran-official-track-festival-anthem-deep-dive",
+      "task": "After192 live verification, verify official source identity and primary context for the next non-protected generic-intro candidate. No footage/audio claims without observation; do not assume indexed."
+    },
+    {
+      "task": "Preserve192/193 original scene/audio evidence holds, protected comedy and all eight Facebook cover holds. Consume ordinary post-release zero-inspection diagnostic rather than repeating Google calls; compare actual image bytes/statuses without treating availability as rights/playback proof."
+    }
+  ],
+  "dataSnapshot": {
+    "observedAt": "2026-10-17T23:13:27.445Z",
+    "saved": 204,
+    "published": 200,
+    "newUnrelatedPublishedRecord": 198,
+    "originalSavedRows": 184,
+    "originalProtectedSha256": "acc7c16822d0f14a81308282a2b67cfe9596fda9214e33568000dc96c320dfb8",
+    "comparison": "Exclude only new publication198,193's two intended text fields and activity counters. No owner publication or protected comedy record was modified.",
+    "protectedSha256": "45e1e35b5f414e4ea4b59f08b27d7bbfe9118d58ed429e97c0a73b6b86fbc946",
+    "excludes": "Activity counters and only192.description/review_text. No production mutation during investigation."
+  },
+  "completedDiagnostics": [
+    {
+      "pullRequest": 187,
+      "reviewedHead": "aeb1c556d014cb4697369c40a8a2b921dd1fdb97",
+      "mergeCommit": "a899f9330b05acba075c30865fbba4f6d81f5d32",
+      "ciRun": 38942137010,
+      "nodeTests": 365,
+      "pythonTests": 4,
+      "workerDeployment": "skipped;449c5103 remains100%",
+      "auditRun": 38942314937,
+      "artifactId": 12062429783,
+      "archiveSha256": "5e5eeb137d9661f2c951444d6343df3ebb95c55c76d23213b7f4b1064a6bf4a1",
+      "reportGeneratedAt": "2026-10-16T17:47:09.848Z",
+      "pages": 212,
+      "technicalFailures": 0,
+      "unlinkedReviews": 0,
+      "publishedThumbnails": 181,
+      "headerMatchingCompleteHashes": 171,
+      "thumbnailCounts": {
+        "ok": 163,
+        "http_error": 10,
+        "placeholder": 8
+      },
+      "googleInspections": 0,
+      "googleSubmissions": 0,
+      "indexedStatus": "not rechecked; use dated full190URL snapshot, not current191review coverage",
+      "remainingLibrarySitemapWarnings": 20,
+      "limits": "Header/hash evidence is not decoding, visual relevance, rights or playback proof. Dilscoop's unchanged8304byteJPEG returned200 again; this is external availability variance, not a source/media repair."
+    }
+  ],
   "records": [
+    {
+      "id": 217,
+      "slug": "five-legend-full-adventure-fantasy-movie-in-english-hollywood-movie-lauren-esposito-gabi-s",
+      "category": "Entertainment, Movies & Games",
+      "protectedTopic": false,
+      "contentSha256": "c107d3de630d67541c4905ddbf3ea9a7ee03df8e5db6fdd8dc93febb5dcee767",
+      "flags": [
+        "claim_needs_source_review"
+      ]
+    },
+    {
+      "id": 216,
+      "slug": "ratatouille-english-full-movie-the-movie-of-the-game-with-remy-the-master-chef-rat",
+      "category": "Entertainment, Movies & Games",
+      "protectedTopic": false,
+      "contentSha256": "1afb19bdfb65a0fa0ccc52ddf73ec35f804a67134cce469030d6e02600ca6ad4",
+      "flags": [
+        "claim_needs_source_review"
+      ]
+    },
+    {
+      "id": 215,
+      "slug": "faunutland-family-fantasy-adventure-free-movie",
+      "category": "Entertainment, Movies & Games",
+      "protectedTopic": false,
+      "contentSha256": "263d6695ea427c4ffb955d1c1c36931e248fb0425accc7c2dbb9b54f61b13e65",
+      "flags": [
+        "claim_needs_source_review"
+      ]
+    },
+    {
+      "id": 214,
+      "slug": "avatar-full-movie-2025-pandora-world-superhero-fxl-fantasy-movies-2025-in-english-game-movie",
+      "category": "Entertainment, Movies & Games",
+      "protectedTopic": false,
+      "contentSha256": "02c7677738115e7b6bd7d08964ef1aeef0bc50415362416b995e922dc821e32e",
+      "flags": [
+        "claim_needs_source_review"
+      ]
+    },
+    {
+      "id": 213,
+      "slug": "she-gave-birth-to-a-dragon-mother-s-monster-2026-full-fantasy-movie-4k",
+      "category": "Entertainment, Movies & Games",
+      "protectedTopic": false,
+      "contentSha256": "bce966dc2ae6bb8fc16bf81da5a2cd36b317dbbed42155b699418bc9224ff52e",
+      "flags": [
+        "claim_needs_source_review"
+      ]
+    },
+    {
+      "id": 212,
+      "slug": "apologising-after-a-fight-apologising-after-a-fight-rohit-kanupriya-viral-floor-slide-couple-comedy-",
+      "category": "Funny & Comedy",
+      "protectedTopic": true,
+      "contentSha256": "44735a40b7b946e719d7f4636b75d716622e462afb9313bde64d6927659b7aff",
+      "flags": [
+        "claim_needs_source_review"
+      ]
+    },
+    {
+      "id": 211,
+      "slug": "very-funny-animal-clever-warthog-tricks-cheetah-with-a-dust-cloud-u-turn-milton-matini-funny-animal-",
+      "category": "Funny & Comedy",
+      "protectedTopic": true,
+      "contentSha256": "24e1a788b5ad9d1d34dc3579e82c8daa76b93206a85599dc7c4fc13800eadaa9",
+      "flags": []
+    },
+    {
+      "id": 210,
+      "slug": "man-pranked-by-giant-shark-cutout-in-a-pond-17m-view-viral-water-scare-comedy-show",
+      "category": "Funny & Comedy",
+      "protectedTopic": true,
+      "contentSha256": "de762f5e811f9c8def73a1d1cb8ae979084972e3869d6fb7956c4b3587218669",
+      "flags": [
+        "claim_needs_source_review"
+      ]
+    },
+    {
+      "id": 209,
+      "slug": "headlights-alan-walker-aesthetic-sunset-travel-showcase-golden-hour-adventure-shor-lyrics-aesthetic-",
+      "category": "Music",
+      "protectedTopic": false,
+      "contentSha256": "31c73371e66728d9aa94f34c1019a7aa5828b04f71a78d917e0bbd63f2a98795",
+      "flags": []
+    },
+    {
+      "id": 208,
+      "slug": "tom-holland-zendaya-jacob-react-to-6-crazy-viral-twists-backflipping-bull-helicopter-golfer-prank-fa",
+      "category": "Funny & Comedy",
+      "protectedTopic": true,
+      "contentSha256": "1d6ee2be6ccc3ed4d5fb1659e226af33b3e985da4292a5d5587aa1f78ae1d257",
+      "flags": []
+    },
+    {
+      "id": 207,
+      "slug": "spider-man-in-real-life-prank",
+      "category": "Social Media & Trending",
+      "protectedTopic": false,
+      "contentSha256": "b56d462340d46f69924b74ef0a449fa10bd7b03a5cd8bddd6eeb57a74bdd331d",
+      "flags": []
+    },
+    {
+      "id": 206,
+      "slug": "interrogation-room-face-off-mr-bean-live-action-tv",
+      "category": "Funny & Comedy",
+      "protectedTopic": true,
+      "contentSha256": "3423c17cc8fee11b1530ae02c5b9a9f394ce6713937ec3c1428a1207dd6a1e7f",
+      "flags": []
+    },
+    {
+      "id": 205,
+      "slug": "very-special-trending-funny-comedy-video-2023-amazing-comedy-video-2023-ep-194-by-beenfuntv",
+      "category": "Funny & Comedy",
+      "protectedTopic": true,
+      "contentSha256": "be966fd3523789faea07e862ba1c3968ff166c3f19f383cb6cc2b5563880d1fd",
+      "flags": []
+    },
+    {
+      "id": 204,
+      "slug": "tui-tui-comedy-video-tui-tui-best-funny-video-2022-by-busy-fun-ltd",
+      "category": "Funny & Comedy",
+      "protectedTopic": true,
+      "contentSha256": "645e1f90e23ae8feadea90d0ec0740046b5c3c570d1877ec7b893d16885f4daa",
+      "flags": [
+        "claim_needs_source_review"
+      ]
+    },
+    {
+      "id": 203,
+      "slug": "the-ramp-roadster-tesla-roadster-drives-upside-down-flips-mid-air-the-ramp-spacex-cold-gas-thruster-",
+      "category": "Environment & Sustainability",
+      "protectedTopic": false,
+      "contentSha256": "3214ab10c99270116d9e95ec25f8a03fad4f0395861c26f5cdc3def76d32f39a",
+      "flags": []
+    },
+    {
+      "id": 202,
+      "slug": "savage-couple-pranks-cake-fails-viral-comedy-show",
+      "category": "Funny & Comedy",
+      "protectedTopic": true,
+      "contentSha256": "9635ac64fa9411f2aef92077ed814a9e1dc84560ddddb6d878f1132f8c163dd9",
+      "flags": [
+        "claim_needs_source_review"
+      ]
+    },
+    {
+      "id": 201,
+      "slug": "man-returns-dropped-cash-after-seeing-a-cardboard-police-cutout-183m-view-viral-street-prank-review",
+      "category": "Funny & Comedy",
+      "protectedTopic": true,
+      "contentSha256": "5a5bac5cffc410b4c8a016e51967ea4025cedf35c0358478b799d2bd7495553b",
+      "flags": [
+        "claim_needs_source_review"
+      ]
+    },
+    {
+      "id": 200,
+      "slug": "hilarious-viral-clips-walking-tree-angry-dishwashing-dog-car-alarm-dance",
+      "category": "Funny & Comedy",
+      "protectedTopic": true,
+      "contentSha256": "10282822afea6c93e444cb7a548e86e509918d88013b378bdac20d2e3e9fb4b7",
+      "flags": [
+        "claim_needs_source_review"
+      ]
+    },
+    {
+      "id": 199,
+      "slug": "ranking-funniest-robot-fails-from-grandma-s-cane-karma-to-crazy-track-crashes",
+      "category": "Funny & Comedy",
+      "protectedTopic": true,
+      "contentSha256": "153e8ff07dc3de19cb27564194ec624784d604a6a698fcdd8e2215b9e2d342ea",
+      "flags": []
+    },
     {
       "id": 198,
       "slug": "monkey-gives-woman-a-flower-until-jealous-partner-attacks-viral-zoo-comedy-breakdown",
@@ -1623,109 +1908,33 @@
       "flags": []
     }
   ],
-  "completedBatches": [
+  "preparedBatches": [
     {
       "recordIds": [
-        145,
-        150,
-        152
+        192
       ],
-      "pullRequest": 184,
-      "mergeCommit": "76a90f44ce5373fd9a4e3a08ea73a6b56d0790e4",
-      "workerVersion": "4bee9e8d-3c89-4009-b056-fab522316a58",
-      "status": "deployed_and_live_verified",
-      "preservedHeadings": 13,
-      "protectedSha256": "8aabfba00aea9bd94d10838d4171b41838ccbf1fca8ff4c5df79d6a3a7f5e54d",
-      "liveVerifiedAt": "2026-10-16T14:31:26Z"
-    },
-    {
-      "recordIds": [
-        193
-      ],
-      "pullRequest": 186,
-      "reviewedHead": "68f4b29c91078799d8c080f8fd89e8a1ac070a87",
-      "mergeCommit": "a66f516f8b5ac6d8abe67843e7fa4526129e5314",
-      "workerVersion": "449c5103-6ca8-4bc0-95d1-cc764a8f1500",
-      "status": "bounded_source_context_deployed_and_live_verified",
-      "preservedHeadings": 4,
-      "protectedSha256": "acc7c16822d0f14a81308282a2b67cfe9596fda9214e33568000dc96c320dfb8",
-      "textSha256": "fab92ca09b8208305257eea367bfe1b45c557002a97230b03fe3064101e44cb9",
-      "liveVerifiedAt": "2026-10-16T17:34:14.959Z",
-      "remainingEvidenceHold": "Original section1 audio/form and section2 scene/color/dancer assertions were preserved, not independently re-verified; the source player remained at0:00. This is not whole-review certification."
+      "status": "prepared_not_published",
+      "manifest": "content/editorial-quality/2026-10-17-fight-song.json",
+      "migration": "0043_fight_song_source_context.sql",
+      "baselineProtectedSha256": "45e1e35b5f414e4ea4b59f08b27d7bbfe9118d58ed429e97c0a73b6b86fbc946",
+      "baselineSaved": 204,
+      "baselinePublished": 200,
+      "guardVerifiedAt": "2026-10-17T23:14:11.111Z",
+      "matchingPreimages": 1
     }
   ],
-  "topicHolds": {
-    "recordIds": [
-      139,
-      142,
-      143,
-      153,
-      155,
-      156,
-      157,
-      158
-    ],
-    "reason": "Protected Facebook comedy topics: retain existing thumbnails and review text under the current instruction. The per-record protectedTopic flag tests category only and is not authorization to edit other comedy topics."
-  },
-  "manualEvidenceHolds": [
-    {
-      "recordId": 193,
-      "reason": "Fresh official source identity and credits verified16October; source player did not progress beyond0:00. Preserve the original first/second section paragraphs until footage/audio can actually be inspected. Do not reattempt stalled playback in a loop or infer scene/audio from metadata.",
-      "notAnIndexingOrPolicyVerdict": true
-    }
-  ],
-  "nextTasks": [
-    {
-      "recordId": 192,
-      "slug": "rachel-platten-fight-song-official-music-video-anthem-deep-dive",
-      "sourceId": "xo1VInw-SKc",
-      "task": "Verify official source identity, existing wording and source-backed context before a bounded Music review improvement; generic intro and claim screening flags are candidates, not confirmed defects. Retain exact headings, SEO/media/dates/owner guards. No edit made in this run."
-    },
-    {
-      "recordId": 193,
-      "task": "Keep original section1 audio/form and section2 scene/color/dancer claims held until actual source viewing/listening is available. Source identity/credits alone do not verify them. No stalled-player retry loop."
-    },
-    {
-      "task": "Normal future audit should compare actual body hashes/statuses against38942314937; no redundant full audit or same-day Google Inspection. Preserve all protected comedy including newly published198, eight existing Facebook holds and source30/removal/Saiyaara/Summer/owner edits."
-    }
-  ],
-  "dataSnapshot": {
-    "observedAt": "2026-10-16T17:48:11.553Z",
-    "saved": 185,
-    "published": 181,
-    "newUnrelatedPublishedRecord": 198,
-    "originalSavedRows": 184,
-    "originalProtectedSha256": "acc7c16822d0f14a81308282a2b67cfe9596fda9214e33568000dc96c320dfb8",
-    "comparison": "Exclude only new publication198,193's two intended text fields and activity counters. No owner publication or protected comedy record was modified."
-  },
-  "completedDiagnostics": [
-    {
-      "pullRequest": 187,
-      "reviewedHead": "aeb1c556d014cb4697369c40a8a2b921dd1fdb97",
-      "mergeCommit": "a899f9330b05acba075c30865fbba4f6d81f5d32",
-      "ciRun": 38942137010,
-      "nodeTests": 365,
-      "pythonTests": 4,
-      "workerDeployment": "skipped;449c5103 remains100%",
-      "auditRun": 38942314937,
-      "artifactId": 12062429783,
-      "archiveSha256": "5e5eeb137d9661f2c951444d6343df3ebb95c55c76d23213b7f4b1064a6bf4a1",
-      "reportGeneratedAt": "2026-10-16T17:47:09.848Z",
-      "pages": 212,
-      "technicalFailures": 0,
-      "unlinkedReviews": 0,
-      "publishedThumbnails": 181,
-      "headerMatchingCompleteHashes": 171,
-      "thumbnailCounts": {
-        "ok": 163,
-        "http_error": 10,
-        "placeholder": 8
-      },
-      "googleInspections": 0,
-      "googleSubmissions": 0,
-      "indexedStatus": "not rechecked; use dated full190URL snapshot, not current191review coverage",
-      "remainingLibrarySitemapWarnings": 20,
-      "limits": "Header/hash evidence is not decoding, visual relevance, rights or playback proof. Dilscoop's unchanged8304byteJPEG returned200 again; this is external availability variance, not a source/media repair."
-    }
-  ]
+  "googleSnapshot": {
+    "runId": 39018934414,
+    "generatedAt": "2026-10-17T08:51:41.157Z",
+    "inspectedReviewUrls": 200,
+    "reviewCoverageAtReportTime": "200/200",
+    "pass": 1,
+    "discoveredNotIndexed": 133,
+    "unknown": 66,
+    "crawledNotIndexed": 0,
+    "lastCrawlTime": "2026-10-17T04:12:13Z",
+    "indexedReview": "https://vid.best/watch/best-comedy-compilation-ultimate-try-not-to-laugh-viral-pranks",
+    "protectedIndexedTopic": true,
+    "scopeLimit": "Dated stored-Inspection review set, not a whole-site indexed count. Current library200+editorials10 is larger than the190+10 audited set; no new Inspection made."
+  }
 }

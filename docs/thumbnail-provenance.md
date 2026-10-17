@@ -1,5 +1,9 @@
 # Editorial cover provenance
 
+## 17 October 2026: Fight Song original poster preserved; dated image inventory consumed
+
+Actual completed audit39018934414/artifact12096641002, matching ZIP SHA256 `3bb997fc62eebc29b30229190f2aad0f01a848da24bf7b5921d60b770bffa937`, checks190published posters:171HTTPavailable/11HTTPerrors/eight protected title-artwork placeholders.192/xo1VInw-SKc keeps its exact original hqdefault.jpg:200image/jpeg/17052bytes/header-match/SHA256 `34761394820a051b62f6d5fd7e79c0eee99d7d06de1eb3966ffb88421d1caef1`. This context-only review correction changes no poster, image bytes, source/embed/cache/rights or R2. No extra provider request or replacement. Byte availability is not visual/source/rights/playback/indexing proof. Muted source player remained0:00/3:25;192original scene/audio claims are separately held. Eleven failures include10TikTok403s (protected topics/Saiyaara/Summer/source30 holds) and Dilscoop108hq2/hqdefault404; do not bypass restrictions or turn prior intermittent bytes into a rights/playback claim. All eight protected Facebook comic covers and custom owner media remain unchanged. Details: `docs/fight-song-source-context-20261017.md`; consume ordinary post-release audit for newer records, not redundant provider probes.
+
 ## 16 October 2026: byte-evidence audit completed; new publication preserved
 
 PR[187](https://github.com/Gamagek/vid-review-site/pull/187), reviewed headaeb1c556/merge `a899f9330b05acba075c30865fbba4f6d81f5d32`, passes exact-head CI38942137010/job117112136616:365Node/fourPython/editorial validation/Worker dry-run. Main CI38942314892 succeeds; Deploy38942314996 skips. Active Worker449c5103 remains100%, same4ce91ea5 deployment; all privileged Portainer38942315001 jobs skip. This is a read-only diagnostic improvement, not another Worker or migration release.
