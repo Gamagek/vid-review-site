@@ -203,7 +203,7 @@
       "task": "45retainedscene/sound/Buddhist associations and186/191/192/193original audio/visual/cultural descriptions remain manual evidence holds despite bounded accuracy/context corrections. Preserve substantial owner prose and accurate public limits; no metadata→footage/clinical/lineage conclusion, stalled-player retry loop, protected comedy/draft/provider/security change."
     },
     {
-      "task": "Completed 39122325651 artifact consumed: 231 pages / zero technical failures, zero Inspections/submissions, processed maps / zero errors / existing 20 library warnings, 18 October 09:11 UTC downloads. Dated 39114196048 sample remains 200/210 reviews: two PASS / 156 Discovered / 42 unknown; both PASS are protected comedy, unchanged. Requested TikTok player is merged/deployed; actual provider frame shows overload-protect triggered, so playback remains unverified and retries stopped. Resume next independent published Titli135 task, not a provider retry or same-day full Inspection."
+      "task": "Completed39125781112 artifact consumed:231pages/zero technical failures, zero Inspections/submissions, maps processed/zero errors/existing20library warnings and unchanged18October09:11UTCdownloads. Dated39114196048sample remains200/210reviews:twoPASS/156Discovered/42unknown, bothPASSprotected comedy untouched. Requested metadata replay cache PR200 is deployed and verified with productionJS/syntheticDOM/one actual API200 for three lifecycles, no TikTok player request or playback claim. Resume next independent Titli135 task; do not retry provider restrictions or repeat same-day full Inspection."
     }
   ],
   "dataSnapshot": {
@@ -2140,11 +2140,11 @@
   },
   "screeningVersion": 3,
   "latestPublicAudit": {
-    "runId": 39122325651,
-    "artifactId": 12134882237,
-    "zipSha256": "852bdd4bf7af1d58b824abd4e68623b12beec79cb7c8f6108ee96f4e5a63ba27",
-    "generatedAt": "2026-10-18T11:13:11.323Z",
-    "artifactCreatedAt": "2026-10-18T11:15:17Z",
+    "runId": 39125781112,
+    "artifactId": 12135908326,
+    "zipSha256": "052363e661f39f6cde989bcb0717595b92ff393b14040e0bc8b42dc509e49a10",
+    "generatedAt": "2026-10-18T12:04:37.472Z",
+    "artifactCreatedAt": "2026-10-18T12:06:43Z",
     "pages": 231,
     "technicalFailures": 0,
     "libraryReviews": 200,
@@ -2233,33 +2233,68 @@
       },
       "evidenceFile": "docs/tiktok-zero-request-integration-20261018.md",
       "nextTask": "Resume published Titli135 source-context work after fresh owner preimages; all six headings, substantial prose, SEO title, media and dates preserved. Do not retry provider playback just because this checkpoint merges."
-    }
-  ],
-  "preparedPlayerIntegrations": [
+    },
     {
+      "kind": "metadata_replay_cache",
       "recordId": 18,
       "sourceId": "7603012203595320584",
-      "status": "replay_metadata_cache_implemented_and_locally_tested",
       "checkedOn": "2026-10-18",
+      "pullRequest": 200,
+      "reviewedHead": "25c1f62731f12fc4f05e6d138d4bb389fe501a0e",
+      "mergeCommit": "db44e82e6c4f9e16be38f343980b23ab204fbc8e",
+      "exactHeadCiRun": 39125633181,
+      "mainCiRun": 39125735911,
       "tests": {
-        "localNode": 412,
+        "node": 412,
+        "python": 4,
         "editorialValidation": "pass",
-        "workerDryRun": "pass",
-        "python": "require exact-head CI"
+        "workerDryRun": "pass"
       },
-      "behavior": "One shared pending lookup per source; successful public metadata reused for30minutes; same-open-player Play guard. Known API429 takes priority over cache. No video/audio cache, polling, server proxy, backend/config/media/owner-field edits or quota bypass.",
-      "dataPreflight": {
-        "allNonCounterFieldsSha256": "0cfd948043b91847fe4ff442ceba1921235ae2910de38fc6a927b682e65e1736",
-        "hashCheckedAt": "2026-10-18T11:57:18.426Z",
+      "deployRun": 39125735909,
+      "workerVersion": "aa55179e-5f71-411d-9c84-9576470d6f7e",
+      "workerPercentage": 100,
+      "deploymentId": "5283904b-e308-46ad-a1c1-ff15a3457f8a",
+      "deploymentCreatedAt": "2026-10-18T12:04:17.153102Z",
+      "migrationsApplied": 0,
+      "portainer": {
+        "runId": 39125735918,
+        "validation": "success",
+        "privilegedJobs": "all four skipped",
+        "automaticFlag": "unchanged"
+      },
+      "metadataTtlMinutes": 30,
+      "requestReuseVerification": {
+        "checkedAt": "2026-10-18T12:06:11.049Z",
+        "mode": "production JavaScript with synthetic DOM and real owner-API request; not browser playback",
+        "syntheticDocumentLifecycles": 3,
+        "actualMetadataApiRequests": 1,
+        "metadataHttpStatus": 200,
+        "samePageReuse": true,
+        "sessionRestoreReuse": true,
+        "tiktokScriptIframeVideoRequests": 0,
+        "playbackAttempted": false,
+        "quotaExhaustionAttempted": false
+      },
+      "liveAssetVerification": {
+        "checkedAt": "2026-10-18T12:05:47.096Z",
+        "vidBestReads": 9,
+        "exactAssets": 5,
+        "serverVisibleOwnerParagraphs": 5,
+        "sourceCanonicalOriginalDates": "unchanged",
+        "ownerApiPlayerCalls": 0,
+        "browserFirstPaint": "new broker/service scripts, zero iframes/official scripts"
+      },
+      "preservation": {
+        "checkedAt": "2026-10-18T12:05:43.071Z",
         "saved": 204,
         "published": 200,
-        "countsAndMigrationsCheckedAt": "2026-10-18T11:58:37.997Z",
-        "pendingMigrations": 0,
+        "allNonCounterVideoFieldsSha256": "0cfd948043b91847fe4ff442ceba1921235ae2910de38fc6a927b682e65e1736",
+        "targetListingReviewSeoDescriptionSha256": "b3f5eeea29b02562dddbae401bb3f688cc40e807bcadc640aa95f04ff28377a5",
         "verificationWrites": 0
       },
-      "limit": "Supplied nested TikTok429/overload responses are separate from owner API allowance. Official embed/video requests remain; do not claim playback or restriction fixed.",
+      "limits": "Only public metadata reused. Known API429 overrides saved success; direct isolated-browser caller/Retry-After remain authoritative. No rawHTML/signedURLs/video/audio cache or generalCSP/backend/media/owner-field changes. Official TikTok player/video requests and reported provider429 remain separate; no release playback probe or workaround.",
       "evidenceFile": "docs/tiktok-replay-cache-20261018.md",
-      "nextTask": "Verify exact-head CI, release, live replay count and preserved owner data; next independent editorial task remains Titli135 with existing structure/content/media/dates preserved."
+      "nextTask": "Published Titli135 source-context work after fresh owner preimages, preserving six headings/substantial prose/SEOtitle/media/dates and all evidence holds."
     }
   ]
 }
