@@ -101,14 +101,23 @@
     return target.href;
   }
 
+  function cachePlayerUrl(value) {
+    const share = parse(value);
+    if (!share || share.id !== "7603012203595320584" || share.username !== "sujicomedyedit_007") return null;
+    const target = new URL("/api/tiktok/oembed-player", location.origin);
+    target.searchParams.set("url", share.url);
+    return target.href;
+  }
+
   function observeGateway(frame, value, callback) {
     const share = parse(value);
-    const origin = new URL(GATEWAY_WATCH).origin;
-    const states = new Set(["preparing", "cached", "playing", "paused", "ended", "error"]);
+    const cachePlayer = Boolean(cachePlayerUrl(value));
+    const origin = cachePlayer ? location.origin : new URL(GATEWAY_WATCH).origin;
+    const states = new Set(cachePlayer ? ["loading", "error"] : ["preparing", "cached", "playing", "paused", "ended", "error"]);
     const listener = (event) => {
       const data = event.data;
       if (!share || !frame.contentWindow || event.source !== frame.contentWindow || event.origin !== origin ||
-          data?.channel !== "vidbest-gateway" || data.video_id !== share.id || !states.has(data.state)) return;
+          data?.channel !== (cachePlayer ? "vidbest-tiktok-oembed" : "vidbest-gateway") || data.video_id !== share.id || !states.has(data.state)) return;
       callback({ state: data.state, message: typeof data.message === "string" ? data.message.slice(0, 400) : "" });
     };
     window.addEventListener("message", listener);
@@ -193,11 +202,11 @@
       status.textContent = "The tab is inactive.";
       return;
     }
-    const target = gatewayWatchUrl(share.url);
+    const target = cachePlayerUrl(share.url) || gatewayWatchUrl(share.url);
     if (!target) return;
     const frame = document.createElement("iframe");
     frame.className = "tiktok-official-player-v1";
-    frame.title = "TikTok gateway video by @" + share.username;
+    frame.title = (cachePlayerUrl(share.url) ? "Official TikTok video by @" : "TikTok gateway video by @") + share.username;
     frame.loading = "eager";
     frame.referrerPolicy = "no-referrer";
     frame.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
@@ -258,6 +267,9 @@
     requestAnimationFrame(() => {
       if (dialog.open && activePreview === token) mountGatewayPlayer(dialog, share, token);
     });
+    // The separate cache player handles the selected video's details. Do not
+    // also refresh the old gateway, which would defeat zero-request reuse.
+    if (cachePlayerUrl(share.url)) return true;
     void getMetadata(share.url).then((payload) => {
       if (!dialog.open || activePreview !== token) return;
       title.textContent = payload.title || payload.caption || seed.title || "TikTok video";
@@ -271,5 +283,5 @@
     return true;
   }
 
-  window.VidBestTikTok = Object.freeze({ parse, getMetadata, gatewayWatchUrl, observeGateway, showPreview });
+  window.VidBestTikTok = Object.freeze({ parse, getMetadata, gatewayWatchUrl, cachePlayerUrl, observeGateway, showPreview });
 })();

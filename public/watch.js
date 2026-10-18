@@ -110,6 +110,8 @@ function initializeTikTokPreviewCard() {
     });
   });
 
+  // The opt-in cached oEmbed player fetches only after a deliberate Play click.
+  if (card.dataset.tiktokZeroRequest === "1") return;
   void api.getMetadata(share.url).then((payload) => {
     if (!card.isConnected) return;
     if (title && payload.title) title.textContent = payload.title;

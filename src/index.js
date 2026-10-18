@@ -1,5 +1,6 @@
 import { parseInstagramUrl } from "../public/instagram-utils.js";
 import { isLikelyCrawler } from "./crawlers.js";
+import { tikTokZeroRequestPlayer } from "./tiktok-zero-request-cache.js";
 import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStatus } from "./tiktok-cache-jobs.js";
 import { tikTokCacheCandidate } from "./admin-tiktok-cache.js";
 import { isCachedTikTokThumbnail, thumbnailKey } from "./tiktok-thumbnail-cache.js";
@@ -214,6 +215,7 @@ async function route(request, env, ctx) {
   if (path === "/api/tiktok/embed" && request.method === "GET") {
     return tikTokEmbedModel(request, env);
   }
+  if (path === "/api/tiktok/oembed-player" && ["GET", "HEAD"].includes(request.method)) return tikTokZeroRequestPlayer(request);
   if (path === "/api/tiktok/cached-previews" && request.method === "GET") {
     return tikTokCachedPreviewBatch(request, env);
   }
@@ -3108,9 +3110,9 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css?v=20261008-saiyaara-fit4">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
-  ${video.provider === "tiktok" ? '<script src="/tiktok-preview-service.js?v=20261008-cache2" defer></script>' : ""}
+  ${video.provider === "tiktok" ? '<script src="/tiktok-preview-service.js?v=20261018-oembed-cache" defer></script>' : ""}
   ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>' : ""}
-  <script src="/watch.js?v=20261015-owned-cover" defer></script>
+  <script src="/watch.js?v=20261018-oembed-cache" defer></script>
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261008-gateway1">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-cache2" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
@@ -3290,7 +3292,8 @@ function renderMedia(video, playbackOrigin, viewer = false) {
     const ownedCover = ownedTikTokWatchCover(video, playbackOrigin);
     const imageUrl = ownedCover || preview.thumbnail_url || `/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`;
     const illustratedCover = /-illustrated-v\d+\.(?:jpe?g|png|webp|avif)$/i.test(ownedCover);
-    return `<article class="tiktok-preview-card" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-source="${escapeHtml(video.source_url)}" data-tiktok-player-mode="metadata-card">
+    const zeroRequestPlayer = tiktokId === "7603012203595320584" && extractTikTokUsername(video.source_url) === "sujicomedyedit_007";
+    return `<article class="tiktok-preview-card" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-source="${escapeHtml(video.source_url)}" data-tiktok-player-mode="metadata-card"${zeroRequestPlayer ? ' data-tiktok-zero-request="1"' : ""}>
       <button type="button" class="tiktok-preview-card-media" data-tiktok-show-preview aria-label="Play TikTok video in popup">
         <img class="tiktok-preview-card-image" src="${escapeHtml(imageUrl)}"${ownedCover ? ` data-tiktok-owned-cover="${escapeHtml(ownedCover)}" style="object-fit:contain"` : ""} data-tiktok-fallback="/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}" alt="" loading="eager" decoding="async">
         <span class="tiktok-preview-card-play" aria-hidden="true">▶</span>

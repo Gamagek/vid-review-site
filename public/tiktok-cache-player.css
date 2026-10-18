@@ -1,0 +1,8 @@
+html { color-scheme: dark; background: #070914; color: #e8efff; font: 14px/1.5 system-ui, sans-serif; }
+body { margin: 0; }
+main { padding: 12px; text-align: center; }
+a { color: #9edcff; }
+#cache-status { margin: 0 0 12px; }
+#tiktok-embed-host { display: grid; justify-items: center; }
+.tiktok-embed { width: 100%; max-width: 605px; min-width: 280px; margin: 0; }
+iframe { max-width: 100%; border: 0; }
