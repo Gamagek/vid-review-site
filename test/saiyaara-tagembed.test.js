@@ -12,7 +12,7 @@ test("Saiyaara uses supplied iframe URL and never injects the Tagembed SDK", () 
   assert.doesNotMatch(loader, /embed\.min\.js|tagembed-widget|player\/v1/);
   assert.match(loader, /allow", "autoplay; fullscreen; picture-in-picture; encrypted-media"/);
   assert.match(loader, /data-saiyaara-tagembed-host/);
-  assert.doesNotMatch(loader, /IntersectionObserver/);
+  assert.match(loader, /IntersectionObserver/);
   assert.match(loader, /mountTilePlayer\(host\)/);
   assert.match(loader, /tagembedTracked/);
   assert.match(styles, /saiyaara-tagembed-frame/);
@@ -25,11 +25,12 @@ test("homepage preserves a single Saiyaara mini tile on metadata refresh", () =>
   assert.match(home, /card\.classList\.contains\("saiyaara-tagembed-tile"\)/);
 });
 
-test("Saiyaara mini tile never requests Tagembed until Play; six-second backup stays opt-in", () => {
+test("Saiyaara mini tile waits for visibility/dwell or Play; six-second backup stays opt-in", () => {
   let iframeCount = 0;
   let timeout = null;
   const children = [];
   const host = {
+    addEventListener() {},
     isConnected: true,
     dataset: { saiyaaraPoster: "", saiyaaraSource: "https://www.tiktok.com/@creator/video/7669587518156705056" },
     classList: { add() {} },
@@ -46,6 +47,8 @@ test("Saiyaara mini tile never requests Tagembed until Play; six-second backup s
   };
   const document = {
     readyState: "complete",
+    hidden: false,
+    addEventListener() {},
     body: { dataset: { viewerEmbed: "0" } },
     querySelectorAll() { return []; },
     createElement(type) {
@@ -68,6 +71,7 @@ test("Saiyaara mini tile never requests Tagembed until Play; six-second backup s
   const context = {
     window: {
       addEventListener() {},
+      IntersectionObserver: function(cb) { this.observe = () => {}; this.disconnect = () => {}; },
       setTimeout(fn, ms) { if (ms === 6000) timeout = fn; return 10; },
       clearTimeout() {},
       VidBestTikTok: { parse(url) { return { url }; }, showPreview() {} },
@@ -132,5 +136,20 @@ test("Saiyaara preview starts from first-party poster, never the expired D1 sign
   assert.match(home, /VidBestSaiyaaraTagembed\?\.updatePoster\?\./);
   assert.match(styles, /saiyaara-preview-caption/);
   assert.match(styles, /\.saiyaara-tile-cover-poster\[hidden\]/);
-  assert.doesNotMatch(loader, /IntersectionObserver|rootMargin/);
+  assert.match(loader, /TILE_DWELL_MS = 1100/);
+  assert.match(loader, /TILE_VISIBLE_RATIO = 0\\.68/);
+});
+
+test("viewport auto preview is muted, delayed and limits requests to a single attempt", () => {
+  assert.match(loader, /TILE_DWELL_MS = 1100/);
+  assert.match(loader, /TILE_VISIBLE_RATIO = 0\.68/);
+  assert.match(loader, /host\.dataset\.tagembedAutoAttempted = "1"/);
+  assert.match(loader, /autoplay \? AUTO_IFRAME_URL : IFRAME_URL/);
+  assert.match(loader, /AUTO_IFRAME_URL = IFRAME_URL \+ "&autoplay=1&muted=1"/);
+  assert.match(loader, /network\?\.saveData/);
+  assert.match(loader, /prefers-reduced-motion: reduce/);
+  assert.match(loader, /if \(ratio < 0\.12 && activeTile === host\) stopTile\(host\)/);
+  assert.match(loader, /window\.addEventListener\("pagehide"/);
+  assert.match(loader, /if \(document\.hidden\) \{ cancelCandidate\(\); if \(activeTile\) stopTile\(activeTile\); \}/);
+  assert.match(loader, /if \(tile\) \{\s*const cover = host\.querySelector\("\.saiyaara-preview-cover"\)/);
 });
