@@ -1412,3 +1412,45 @@ html:has(body[data-video-slug="saiyaara-a-cinematic-romance"]) { overflow-x: cli
 .facebook-sdk-player > span, .facebook-sdk-player iframe { display: block !important; width: 100% !important; height: 100% !important; border: 0; }
 .facebook-facade-poster[hidden] { display: none; }
 .facebook-sound-toggle { inset: auto 10px 10px auto; transform: none; width: 34px; height: 34px; font-size: 18px; }
+
+/* Saiyaara TikTok: landscape tile contains the COMPLETE portrait widget at
+   the native 360x650 layout, scaled rather than cropped. A first-party poster
+   is the only content until Play is deliberately tapped. */
+.saiyaara-tagembed-tile .saiyaara-preview-cover .saiyaara-tile-cover-poster,
+.saiyaara-tagembed-tile .saiyaara-tagembed-poster {
+  object-fit: contain !important;
+  background: #060811;
+}
+.saiyaara-tagembed-tile .tile-media .preview-surface iframe.saiyaara-tagembed-frame {
+  position: absolute !important;
+  inset: auto !important;
+  top: 50% !important;
+  left: 50% !important;
+  display: block !important;
+  width: 360px !important;
+  min-width: 360px !important;
+  max-width: none !important;
+  height: 650px !important;
+  min-height: 650px !important;
+  transform: translate(-50%, -50%) scale(.35) !important;
+  transform-origin: center center !important;
+  border: 0 !important;
+  pointer-events: auto;
+}
+.saiyaara-tagembed-tile .saiyaara-tagembed-backup {
+  position: absolute;
+  z-index: 12;
+  right: 7px;
+  bottom: 7px;
+  max-width: calc(100% - 14px);
+  padding: 6px 9px;
+  color: #fff;
+  background: rgba(5,8,22,.94);
+  border: 1px solid rgba(255,255,255,.6);
+  border-radius: 7px;
+  font: 650 11px/1.2 system-ui, sans-serif;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.saiyaara-tagembed-tile .saiyaara-tagembed-backup[hidden] { display: none !important; }
+.saiyaara-tagembed-tile .saiyaara-tagembed-status { bottom: 39px; pointer-events: none; }
