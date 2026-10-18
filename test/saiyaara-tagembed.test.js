@@ -12,7 +12,8 @@ test("Saiyaara uses supplied iframe URL and never injects the Tagembed SDK", () 
   assert.doesNotMatch(loader, /embed\.min\.js|tagembed-widget|player\/v1/);
   assert.match(loader, /allow", "autoplay; fullscreen; picture-in-picture; encrypted-media"/);
   assert.match(loader, /data-saiyaara-tagembed-host/);
-  assert.match(loader, /rootMargin: "300px 0px"/);
+  assert.doesNotMatch(loader, /IntersectionObserver/);
+  assert.match(loader, /mountTilePlayer\(host\)/);
   assert.match(loader, /tagembedTracked/);
   assert.match(styles, /saiyaara-tagembed-frame/);
   assert.doesNotMatch(styles, /saiyaara-tagembed-overlay/);
@@ -24,28 +25,23 @@ test("homepage preserves a single Saiyaara mini tile on metadata refresh", () =>
   assert.match(home, /card\.classList\.contains\("saiyaara-tagembed-tile"\)/);
 });
 
-test("Saiyaara mini tile creates iframe only when it approaches viewport", () => {
-  let createCount = 0;
-  let intersectionCallback = null;
+test("Saiyaara mini tile never requests Tagembed until Play; six-second backup stays opt-in", () => {
+  let iframeCount = 0;
+  let timeout = null;
   const children = [];
-  const iframe = {
-    isConnected: false, className: "", dataset: {}, style: {},
-    setAttribute(key, value) { this[key] = value; },
-    getAttribute(key) { return this[key] || null; },
-    addEventListener() {},
-  };
   const host = {
     isConnected: true,
-    dataset: { saiyaaraPoster: "" },
+    dataset: { saiyaaraPoster: "", saiyaaraSource: "https://www.tiktok.com/@creator/video/7669587518156705056" },
     classList: { add() {} },
     append(node) { children.push(node); node.isConnected = true; },
     prepend(node) { children.unshift(node); node.isConnected = true; },
     querySelector(selector) {
-      return selector === "iframe.saiyaara-tagembed-frame"
-        ? children.find((node) => node.className === "saiyaara-tagembed-frame") || null
-        : selector === "[data-saiyaara-tagembed-status]"
-          ? children.find((node) => node.dataset?.saiyaaraTagembedStatus) || null
-          : null;
+      return children.find((node) =>
+        selector === "iframe.saiyaara-tagembed-frame" ? node.className === "saiyaara-tagembed-frame" :
+        selector === ".saiyaara-preview-cover" ? node.className === "saiyaara-preview-cover" :
+        selector === "[data-saiyaara-backup]" ? node.dataset?.saiyaaraBackup === "1" :
+        selector === "[data-saiyaara-tagembed-status]" ? node.dataset?.saiyaaraTagembedStatus === "1" : false
+      ) || null;
     },
   };
   const document = {
@@ -53,41 +49,54 @@ test("Saiyaara mini tile creates iframe only when it approaches viewport", () =>
     body: { dataset: { viewerEmbed: "0" } },
     querySelectorAll() { return []; },
     createElement(type) {
-      if (type === "iframe") { createCount++; return iframe; }
+      if (type === "iframe") iframeCount++;
+      const listeners = {};
       return {
-        dataset: {}, className: "", textContent: "", hidden: false,
-        setAttribute() {},
+        isConnected: false, dataset: {}, style: {}, className: "",
+        textContent: "", hidden: false,
+        setAttribute(key, value) { this[key] = value; },
+        getAttribute(key) { return this[key] || null; },
+        addEventListener(name, fn) { listeners[name] = fn; },
+        click() { listeners.click?.({ preventDefault() {}, stopPropagation() {} }); },
+        dispatch(name) { listeners[name]?.(); },
         append() {},
-        addEventListener() {},
+        focus() {},
+        remove() { this.isConnected = false; const i = children.indexOf(this); if (i >= 0) children.splice(i, 1); },
       };
     },
   };
   const context = {
     window: {
       addEventListener() {},
-      setTimeout() { return 10; },
+      setTimeout(fn, ms) { if (ms === 6000) timeout = fn; return 10; },
       clearTimeout() {},
+      VidBestTikTok: { parse(url) { return { url }; }, showPreview() {} },
     },
     document,
-    IntersectionObserver: function MockIntersectionObserver(callback) {
-      intersectionCallback = callback;
-      this.observe = () => {};
-      this.disconnect = () => {};
-    },
   };
-  context.window.IntersectionObserver = context.IntersectionObserver;
   runInNewContext(loader, context);
   const api = context.window.VidBestSaiyaaraTagembed;
-  assert.equal(api.mount(host, "tile"), undefined);
-  assert.equal(createCount, 0, "no iframe should preload before intersection");
+  assert.equal(api.mount(host, "tile"), true);
+  assert.equal(iframeCount, 0, "a ready poster must not spend a provider request");
   assert.equal(host.querySelector("iframe.saiyaara-tagembed-frame"), null);
-  intersectionCallback([{ isIntersecting: true }]);
-  assert.equal(createCount, 1);
-  assert.equal(iframe.src, api.iframeUrl);
   api.mount(host, "tile");
-  assert.equal(createCount, 1, "repeated tile setup should not add another iframe");
+  assert.equal(iframeCount, 0, "reinitializing cannot spend a widget view");
+  const cover = host.querySelector(".saiyaara-preview-cover");
+  assert.ok(cover);
+  cover.click();
+  assert.equal(iframeCount, 1);
+  const iframe = host.querySelector("iframe.saiyaara-tagembed-frame");
+  assert.equal(iframe.src, api.iframeUrl);
+  assert.equal(host.querySelector("[data-saiyaara-backup]").hidden, true);
+  iframe.dispatch("load");
+  assert.equal(host.querySelector("[data-saiyaara-backup]").hidden, true);
+  timeout();
+  assert.equal(host.querySelector("[data-saiyaara-backup]").hidden, false,
+    "load does not establish that cross-origin TikTok video is playing");
+  assert.equal(iframe.isConnected, true, "timer must not replace a potentially playing widget");
+  assert.match(styles, /scale\(\.35\)/);
+  assert.match(styles, /object-fit: contain !important/);
 });
-
 
 test("all three Saiyaara viewing surfaces use contained, touch-accessible embeds", () => {
   const viewer = readFileSync(new URL("../public/swipe-viewer.js", import.meta.url), "utf8");
