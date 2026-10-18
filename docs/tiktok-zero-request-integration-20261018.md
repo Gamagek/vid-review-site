@@ -1,5 +1,9 @@
 # Requested TikTok cached oEmbed integration
 
+## Replay request reduction follow-up
+
+The owner's later second/third-open reports identify redundant metadata lookups across isolated popup documents. The replay fix now shares pending lookups and reuses validated public metadata for 30 minutes, without storing video bytes or ignoring a known API 429. This supersedes the per-open metadata lookup described in the original release history below. Official TikTok iframe/video requests remain separate and can still be restricted. Exact scope, 412 local tests, data/migration preflight and release requirements: `docs/tiktok-replay-cache-20261018.md`.
+
 ## Final release verification — 18 October 2026
 
 The owner-requested player integration is merged and deployed. PR [197](https://github.com/Gamagek/vid-review-site/pull/197) merged as `f11dedb293240790f795e6dee3796b1c2d6049c7`; the observed official-script redirect correction, PR [198](https://github.com/Gamagek/vid-review-site/pull/198), merged as `9f9c732833fe06667963ba29b87a260fb6d12d00`. The latter changes only the isolated player's script CSP, plus its regression test and evidence checkpoints. General site CSP and unrelated players remain unchanged.

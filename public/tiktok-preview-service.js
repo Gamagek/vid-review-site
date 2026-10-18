@@ -1,5 +1,6 @@
 // TikTok cached metadata and the on-demand Cloudflare R2 player.
 (() => {
+  if (window.VidBestTikTok) return;
   const ORIGIN = "https://www.tiktok.com";
   const TTL = 5 * 60 * 1000;
   const pending = new Map();
@@ -92,6 +93,7 @@
   let activeFrame = null;
   let readyTimer = null;
   let stopObserving = null;
+  let activeSource = null;
 
   function gatewayWatchUrl(value) {
     const share = parse(value);
@@ -243,7 +245,9 @@
     frame.src = target;
     readyTimer = setTimeout(() => {
       readyTimer = null;
-      if (active()) status.textContent = "The player is taking longer to load. You can wait or close and reopen it.";
+      if (active()) status.textContent = cachePlayerUrl(share.url)
+        ? "TikTok's player has not reported playback. If it shows an error, please use the original source link. No automatic retry was made."
+        : "The player is taking longer to load. You can wait or close and reopen it.";
     }, PLAYER_TIMEOUT);
   }
 
@@ -251,8 +255,12 @@
     const share = parse(value);
     if (!share) return false;
     const dialog = ensureDialog();
+    // A second click on the same open player must not replace its iframe,
+    // repeat the metadata lookup or restart TikTok's official embed script.
+    if (cachePlayerUrl(share.url) && dialog.open && activeSource === share.url) return true;
     ++activePreview;
     cleanupEmbed(dialog);
+    activeSource = share.url;
     const token = activePreview;
     const title = dialog.querySelector("[data-tiktok-dialog-title]");
     const author = dialog.querySelector("[data-tiktok-dialog-author]");
