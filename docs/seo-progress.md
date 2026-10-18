@@ -1,5 +1,13 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 18 October 2026: separate sidebar illustration batch and image-discovery repair prepared
+
+Ten new built-in-imagegen conceptual illustrations (nine Facebook reviews and reference theme-song review4) preserve every source/owner poster and all review/date/SEO fields. Raster labels and page captions explicitly disclose AI-generated review illustration, not source footage. Source/title/slug association guards and byte/hash provenance are persisted. Root sitemap children are flattened to avoid unsupported nested indexes; the standalone image index is advertised in robots.txt. A containing grid keeps art beside the review rather than after its full-height related-links section.
+
+Read current main PR202/203 and completed audit39134241726/artifact12138698113 (matching archive87f98f10966e2b1a4838648a4875587e0569162c03d7381a3150f7e63a16b22d). Its dated231-page/0failure,181available/11error/eight-placeholder result used zero Inspections. Fresh D1 read at17:19:45.523UTC finds214saved/210published; independent owner publications are preserved. No migration, source-poster replacement or database/media write. 417Node regressions and Worker dry-run pass; exact-head CI/release/live verification are still pending. See `docs/image-sitemap-20261018.md`, `docs/review-image-queue.json` and `docs/review-illustration-prompts.json`.
+
+Next: verify release and exact ten live images, then continue the next source/theme-verified additive batch, up to ten. Preserve source-removal/Saiyaara/Summer/owner media, all editorial structure, protected-topic text, drafts, Portainer and security. No new Google indexing/approval claim.
+
 ## 18 October 2026: TikTok replay request reduction deployed and verified
 
 PR [200](https://github.com/Gamagek/vid-review-site/pull/200) / `db44e82e6c4f9e16be38f343980b23ab204fbc8e`, exact-head CI 39125633181, passes 412 Node / four Python tests, editorial validation and dry-run. Main CI succeeds. Deploy 39125735909 applies zero migrations and publishes Worker `aa55179e-5f71-411d-9c84-9576470d6f7e` at 100%. Portainer validation succeeds / all four privileged jobs skip. All 204 saved records' non-counter fields match the unchanged digest; 200 published and all original text/dates/media remain intact.

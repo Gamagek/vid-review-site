@@ -1,6 +1,7 @@
 import { signedLegacyV5Page } from "./legacy-v5-signer.js";
 import edgeWorker from "./edge.js";
 import { facebookPosterUrl } from "./facebook-posters.js";
+import { reviewIllustration } from "./review-illustrations.js";
 import { dailyWeeklyBestResponse, dailyWeeklyBestSitemap } from "./daily-weekly-best.js";
 
 const CANONICAL_ORIGIN = "https://vid.best";
@@ -333,7 +334,8 @@ async function combinedSitemap(env) {
     ? `<sitemap><loc>${escapeXml(CANONICAL_ORIGIN + "/sitemaps/categories.xml")}</loc></sitemap>`
     : "";
   const pagesEntry = `<sitemap><loc>${escapeXml(CANONICAL_ORIGIN + "/sitemaps/pages.xml")}</loc></sitemap>`;
-  const imagesEntry = `<sitemap><loc>${escapeXml(CANONICAL_ORIGIN + "/image-sitemap.xml")}</loc></sitemap>`;
+  // Google does not support sitemap indexes nested inside another index.
+  const imagesEntry = imageSitemapEntries(Number(row?.total || 0));
 
   const editorialEntry = `<sitemap><loc>${CANONICAL_ORIGIN}/sitemaps/daily-weekly-best.xml</loc></sitemap>`;
   const body = `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${pagesEntry}${videoSitemaps}${imagesEntry}${categoryEntry}${editorialEntry}</sitemapindex>`;
@@ -346,14 +348,17 @@ async function combinedSitemap(env) {
 // Separate image sitemap for externally embedded and owner-created review posters.
 // Each image belongs to the published canonical landing page, never an unpublished draft.
 const IMAGES_PER_SITEMAP = 500;
-async function imageSitemapIndex(env) {
-  const row = await env.DB.prepare(
-    "SELECT COUNT(*) AS total FROM videos WHERE published = 1 AND LENGTH(TRIM(COALESCE(thumbnail_url, ''))) > 0"
-  ).first();
-  const pages = Math.max(1, Math.ceil(Number(row?.total || 0) / IMAGES_PER_SITEMAP));
-  const entries = Array.from({ length: pages }, (_, index) =>
+function imageSitemapEntries(total) {
+  const pages = Math.max(1, Math.ceil(total / IMAGES_PER_SITEMAP));
+  return Array.from({ length: pages }, (_, index) =>
     `<sitemap><loc>${escapeXml(`${CANONICAL_ORIGIN}/sitemaps/images-${index + 1}.xml`)}</loc></sitemap>`
   ).join("");
+}
+async function imageSitemapIndex(env) {
+  const row = await env.DB.prepare(
+    "SELECT COUNT(*) AS total FROM videos WHERE published = 1"
+  ).first();
+  const entries = imageSitemapEntries(Number(row?.total || 0));
   return new Response(
     `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries}</sitemapindex>`,
     { headers: standardHeaders("application/xml; charset=utf-8", "public, max-age=900") }
@@ -375,17 +380,18 @@ async function imageSitemapPage(env, page) {
     return new Response("Image sitemap not found", { status: 404 });
   }
   const result = await env.DB.prepare(
-    `SELECT id, slug, title, media_type, source_url, thumbnail_url, updated_at
-     FROM videos WHERE published = 1 AND LENGTH(TRIM(COALESCE(thumbnail_url, ''))) > 0
+    `SELECT id, slug, title, published, media_type, source_url, thumbnail_url, updated_at
+     FROM videos WHERE published = 1
      ORDER BY id ASC LIMIT ? OFFSET ?`
   ).bind(IMAGES_PER_SITEMAP, (page - 1) * IMAGES_PER_SITEMAP).all();
   const rows = result.results || [];
   if (page > 1 && !rows.length) return new Response("Image sitemap not found", { status: 404 });
   const entries = rows.map((row) => {
-    const imageUrl = crawlableImageUrl(row);
-    if (!imageUrl) return "";
+    const illustration = reviewIllustration(row);
+    const imageUrls = [...new Set([crawlableImageUrl(row), illustration ? `${CANONICAL_ORIGIN}${illustration.path}` : ""].filter(Boolean))];
+    if (!imageUrls.length) return "";
     const canonical = `${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}`;
-    return `<url><loc>${escapeXml(canonical)}</loc><image:image><image:loc>${escapeXml(imageUrl)}</image:loc></image:image></url>`;
+    return `<url><loc>${escapeXml(canonical)}</loc>${imageUrls.map((imageUrl) => `<image:image><image:loc>${escapeXml(imageUrl)}</image:loc></image:image>`).join("")}</url>`;
   }).join("");
   return new Response(
     `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${entries}</urlset>`,
@@ -534,7 +540,9 @@ async function enrichWatchHtml(html, env) {
   const breadcrumbCategory = CATEGORY_BY_SLUG.get(decodeURIComponent(breadcrumbCategorySlug)) || "";
   if (breadcrumbCategory && !output.includes("vidbest-seo-breadcrumb")) {
     const nav = `<nav class="vidbest-seo-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true"> / </span><a href="${escapeHtml(categoryUrl(breadcrumbCategory))}">${escapeHtml(breadcrumbCategory)}</a></nav>`;
-    output = output.replace('<article class="watch-copy glass-panel">', `${nav}<article class="watch-copy glass-panel">`);
+    const reviewStart = output.includes('<div class="watch-review-body">')
+      ? '<div class="watch-review-body">' : '<article class="watch-copy glass-panel">';
+    output = output.replace(reviewStart, nav + reviewStart);
     output = output.replace("</head>", '<style id="vidbest-seo-breadcrumb-style">.vidbest-seo-breadcrumb{max-width:1200px;margin:12px auto 0;padding:0 24px;font-size:13px;opacity:.82}.vidbest-seo-breadcrumb a{text-decoration:none}.vidbest-seo-breadcrumb a:hover{text-decoration:underline}</style></head>');
   }
   const id = Number(output.match(/data-video-id="(\d+)"/)?.[1] || 0);
@@ -546,7 +554,8 @@ async function enrichWatchHtml(html, env) {
       ).bind(id, breadcrumbCategory).all();
       const links = (related.results || []).map(row => `<li><a href="${escapeHtml(`${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}`)}">${escapeHtml(row.title)}</a></li>`).join("");
       const section = `<section id="vidbest-related-reviews" class="related-panel glass-panel"><h2>More reviews to explore</h2><nav aria-label="Related video reviews"><ul>${links}</ul><a href="/videos">Browse all video reviews</a></nav></section>`;
-      output = output.replace('</article>', `</article>${section}`);
+      const reviewEnd = output.includes('</div><!-- review-body -->') ? '</div><!-- review-body -->' : '</article>';
+      output = output.replace(reviewEnd, reviewEnd + section);
     } catch {
       // Optional recommendations must not hide the review when unavailable.
     }
@@ -674,7 +683,7 @@ export default {
       response = await seoWorker.fetch(request, env, ctx);
     } catch (error) {
       const path = new URL(request.url).pathname;
-      if (!["GET", "HEAD"].includes(request.method) || !/^\/(?:videos|category\/[^/]+|sitemap\.xml|sitemaps\/[^/]+\.xml)$/.test(path)) throw error;
+      if (!["GET", "HEAD"].includes(request.method) || !/^\/(?:videos|category\/[^/]+|(?:image-)?sitemap\.xml|sitemaps\/[^/]+\.xml)$/.test(path)) throw error;
       console.error("Public SEO response unavailable");
       response = htmlResponse('<meta name="robots" content="noindex"><h1>Temporarily unavailable</h1>', 503, "noindex,follow");
       response.headers.set("Retry-After", "60");
