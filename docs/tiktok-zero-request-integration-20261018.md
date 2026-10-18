@@ -1,5 +1,9 @@
 # Requested TikTok cached oEmbed integration
 
+## Replay follow-up released
+
+PR 200 / `db44e82e6c4f9e16be38f343980b23ab204fbc8e` deploys metadata reuse and duplicate-Play guards as Worker `aa55179e-5f71-411d-9c84-9576470d6f7e`. 412 Node / four Python tests pass; owner fields are unchanged. Production-JS/synthetic-DOM replay verification makes one actual API200 request across three document lifecycles, without loading TikTok's script/player/video. This is not playback or provider-429 resolution. The authoritative final follow-up release, artifact and limits are in `docs/tiktok-replay-cache-20261018.md`; older sections below are dated history.
+
 ## Replay request reduction follow-up
 
 The owner's later second/third-open reports identify redundant metadata lookups across isolated popup documents. The replay fix now shares pending lookups and reuses validated public metadata for 30 minutes, without storing video bytes or ignoring a known API 429. This supersedes the per-open metadata lookup described in the original release history below. Official TikTok iframe/video requests remain separate and can still be restricted. Exact scope, 412 local tests, data/migration preflight and release requirements: `docs/tiktok-replay-cache-20261018.md`.

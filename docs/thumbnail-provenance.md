@@ -1,5 +1,11 @@
 # Editorial cover provenance
 
+## 18 October 2026: replay fix released without any poster or video-byte changes
+
+PR 200 / `db44e82e6c4f9e16be38f343980b23ab204fbc8e` / Worker `aa55179e-5f71-411d-9c84-9576470d6f7e` reduces browser metadata requests only. At 12:05:43.071 UTC all 204 saved video records' non-counter fields, including every source/poster/cache/rights/date/owner field, retain SHA-256 `0cfd948043b91847fe4ff442ceba1921235ae2910de38fc6a927b682e65e1736`; zero verification writes. No R2 object, video/audio, original poster, custom cover, signed URL or source-frame screenshot is copied or replaced.
+
+Actual completed audit 39125781112 / artifact 12135908326, ZIP `052363e661f39f6cde989bcb0717595b92ff393b14040e0bc8b42dc509e49a10`, has image report 12:04:36.932 UTC: 200 posters / 181 available / 11 HTTP errors / eight protected placeholders / 189 matching signatures/full hashes. No new visual/rights/playback/indexing conclusion follows. Controlled replay test uses production JS, synthetic DOM and one real metadata API200, with zero TikTok script/frame/video requests; it does not establish live provider playback. Preserve all Facebook/comedy/source30/Dilscoop/Saiyaara/Summer/custom media holds. Full release and next-task evidence: `docs/tiktok-replay-cache-20261018.md`.
+
 ## 18 October 2026: TikTok replay metadata cache adds no video or poster cache
 
 The owner-requested reopen fix caches only validated public ID/creator/caption metadata in the viewer's browser for 30 minutes. No source poster, signed image URL, source HTML, TikTok iframe response or video/audio bytes are copied or stored. D1/R2/source/embed/rights/custom cover fields remain untouched, and all 204 saved video records' non-counter digest still matches `0cfd948043b91847fe4ff442ceba1921235ae2910de38fc6a927b682e65e1736` at 11:57:18.426 UTC. The supplied rendered-frame screenshot is not a licensed source-frame asset or independent continuous playback/audio verification; it is not reused as artwork.

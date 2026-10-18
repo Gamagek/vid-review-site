@@ -1,5 +1,13 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 18 October 2026: TikTok replay request reduction deployed and verified
+
+PR [200](https://github.com/Gamagek/vid-review-site/pull/200) / `db44e82e6c4f9e16be38f343980b23ab204fbc8e`, exact-head CI 39125633181, passes 412 Node / four Python tests, editorial validation and dry-run. Main CI succeeds. Deploy 39125735909 applies zero migrations and publishes Worker `aa55179e-5f71-411d-9c84-9576470d6f7e` at 100%. Portainer validation succeeds / all four privileged jobs skip. All 204 saved records' non-counter fields match the unchanged digest; 200 published and all original text/dates/media remain intact.
+
+Live nine-read check 12:05:47.096 UTC verifies five exact assets, API/watch/player/sitemap 200, all five owner paragraphs, original canonical/schema dates and no pre-click player. Chrome first paint also loads the new broker/service with zero player/official-script instances. A controlled test with production JavaScript and a synthetic DOM at 12:06:11.049 UTC proves three document lifecycles / one actual metadata API200 request, including session restore. It loads **no TikTok script/frame/video** and is not browser-playback evidence. Official provider requests/429 remain separate; no media is copied, quota bypassed or further provider playback probe attempted.
+
+Completed audit 39125781112 / artifact 12135908326 has matching archive `052363e661f39f6cde989bcb0717595b92ff393b14040e0bc8b42dc509e49a10`: 231 pages / zero technical failures; 200 posters at 181 available / 11 HTTP errors / eight protected placeholders / 189 matching body signatures and hashes. Zero Inspections/submissions, processed maps / zero errors / existing 20 library warnings. The dated partial Google sample remains 200/210 reviews: two PASS / 156 Discovered / 42 unknown; protected indexed comedy unchanged. Full release/request-count/data/limits: `docs/tiktok-replay-cache-20261018.md`. Final five-doc checkpoint uses both skip flags; next Titli 135 source-context task remains unchanged.
+
 ## 18 October 2026: TikTok reopen metadata request fix tested
 
 Owner screenshots show source rendering followed by nested TikTok overload/429 while the metadata API still reports remaining requests. Main's isolated-document lifecycle was fetching metadata on each reopen. The bounded follow-up shares pending browser lookups, reuses validated public metadata for 30 minutes across popup opens, and prevents repeated Play calls from replacing the same open iframe. Known API 429 deadlines take priority over cached success; no polling, quota bypass, media copy, server proxy or general CSP change. Official TikTok player/video requests remain separate; reduced metadata traffic is not playback or overload-removal proof.
