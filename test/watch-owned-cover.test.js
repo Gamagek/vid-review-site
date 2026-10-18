@@ -97,7 +97,7 @@ test("an approved real local source poster is preserved and never called an illu
   assert.match(html, /class="tiktok-preview-card-kicker">TikTok preview/);
 });
 
-test("unapproved cover addresses do not change the provider-first path", async () => {
+test("unapproved cover addresses use durable first-party posters", async () => {
   for (const thumbnail of [null, "", "https://elsewhere.example/review-covers/cover.webp",
     "https://user:password@vid.best/review-covers/cover.webp", `${cover}?private=fixture`, `${cover}#fragment`,
     "/review-covers/cover.svg", "/media/uploads/cover.webp", "/review-covers/nested/cover.webp",
@@ -105,14 +105,14 @@ test("unapproved cover addresses do not change the provider-first path", async (
     const c = serverContext({ thumbnail });
     try {
       const html = await (await render(c)).text();
-      assert.ok(imageTag(html).includes(`src="${providerPoster}"`), String(thumbnail));
+      assert.ok(imageTag(html).includes(`src="${origin}${fallback}"`), String(thumbnail));
       assert.doesNotMatch(imageTag(html), /data-tiktok-owned-cover|object-fit:contain/);
       assert.doesNotMatch(html, /Illustrated cover · not a video frame/);
     } finally { c.sqlite.close(); }
   }
 });
 
-test("comedy, Summer and Saiyaara keep their existing presentation and player routes", async () => {
+test("comedy, Summer and Saiyaara keep their player routes with durable posters", async () => {
   for (const settings of [
     { category: "Funny & Comedy" },
     { slug: "summer-inverted-7332342275151760642" },
@@ -125,9 +125,9 @@ test("comedy, Summer and Saiyaara keep their existing presentation and player ro
       if (settings.slug === "saiyaara-a-cinematic-romance") {
         assert.match(html, /https:\/\/widget\.tagembed\.com\/2236794\?postId=5592899&amp;caption=1&amp;header=1/);
         assert.doesNotMatch(html, /class="tiktok-preview-card"/);
-      } else assert.ok(imageTag(html).includes(`src="${providerPoster}"`));
+      } else assert.ok(imageTag(html).includes(`src="${origin}${fallback}"`));
       const prepared = await (await render(c, "?viewer=1")).text();
-      assert.ok(imageTag(prepared).includes(`src="${providerPoster}"`));
+      assert.ok(imageTag(prepared).includes(`src="${origin}${fallback}"`));
       assert.doesNotMatch(prepared, /data-tiktok-owned-cover|<iframe|<video/);
     } finally { c.sqlite.close(); }
   }

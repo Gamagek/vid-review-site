@@ -88,7 +88,7 @@ test('cover priority refuses external, credentialed, private-path and signed or 
     h.card.dataset.tiktokThumbnail = cached;
     h.scope.renderTikTokFacade(h.card);
     assert.equal(h.scope.ownedTikTokCover(h.card), '');
-    assert.equal(h.image().src, cached);
+    assert.equal(h.image().src, '/api/tiktok/cached-poster?id=6718335390845095173');
     assert.equal(h.requests(), 0);
   }
   const h = harness({ thumbnail: '/review-covers/owner.webp' });
@@ -103,7 +103,7 @@ test('Saiyaara, Summer and comedy retain their existing cached-poster path', () 
     const h = harness(options);
     h.card.dataset.tiktokThumbnail = cached;
     h.scope.renderTikTokFacade(h.card);
-    assert.equal(h.image().src, cached);
+    assert.equal(h.image().src, '/api/tiktok/cached-poster?id=6718335390845095173');
     assert.equal(h.image().loading, 'lazy');
   }
 });
@@ -129,5 +129,5 @@ test('late metadata never remounts an active TikTok player', () => {
 
 test('homepage versions the changed TikTok cover renderer', () => {
   const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
-  assert.match(html, /\/home-player\.js\?v=20261019-saiyaara-poster/);
+  assert.match(html, /\/home-player\.js\?v=20261019-tiktok-poster/);
 });
