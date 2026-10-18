@@ -1,5 +1,13 @@
 # Editorial cover provenance
 
+## 18 October 2026: TikTok player release leaves every poster unchanged
+
+PR 197 / 198 and Worker `ad44f609-896e-4e00-bee5-be57a124404d` implement only the owner's requested player for source 7603012203595320584 and its isolated script-CSP correction. No poster, source/embed/cache/rights field, R2 object, owner cover, review text or date changed. Read-only 11:13:21.574 UTC verification preserves all non-counter fields of all 204 saved records, SHA-256 `0cfd948043b91847fe4ff442ceba1921235ae2910de38fc6a927b682e65e1736`. No new frame, video, source HTML or signed image URL was copied or committed.
+
+Consumed completed audit 39122325651 / artifact 12134882237, matching ZIP SHA-256 `852bdd4bf7af1d58b824abd4e68623b12beec79cb7c8f6108ee96f4e5a63ba27`; image report generated 11:13:10.719 UTC. All 200 published posters remain 181 HTTP-available / 11 HTTP errors / eight protected placeholders. The 189 complete image responses have matching header signatures and full-byte hashes. This is availability evidence, not new visual relevance, image rights, source playback or Google indexing verification. All protected comedy/Facebook/source30/Dilscoop/Saiyaara/Summer/custom-owner holds remain intact.
+
+Final browser check loads the official script and correct source iframe, but TikTok displays `overload-protect triggered` inside that frame. The player was closed and retries stopped; the cache result does not establish usable video/audio or justify replacing artwork. Full release, data and provider limits: `docs/tiktok-zero-request-integration-20261018.md`. Next Titli 135 source-context task does not authorize media replacement or edits to protected topics.
+
 ## 18October2026: requested source18cached oEmbed player; original posters preserved
 
 Owner-requested player-only integration verifies7603012203595320584/source creator through `/api/watch`200JSON and one `cache_0_request` repeat. All saved/custom posters, source/embed/cache/rights fields, R2 and source30/Dilscoop/Saiyaara/Summer/protected-topic holds are unchanged. No signed poster URL, source video/frame or upstream HTML is committed/rehosted. Official embed remains provider playback; cache availability is not frame/audio/rights/regional playback proof. Latest consumed39114196048/artifact12132281873:231pages/0technicalfailures,200posters181available/11errors/eight placeholders; this is not a repaired-poster claim. Full contract/limits/release record: `docs/tiktok-zero-request-integration-20261018.md`.
