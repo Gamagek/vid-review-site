@@ -18,7 +18,7 @@ export function tikTokZeroRequestPlayer(request) {
   return new Response(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><title>TikTok video | Vid.Best</title>
-<link rel="stylesheet" href="/tiktok-cache-player.css?v=20261018-1"><script src="/tiktok-cache-player.js?v=20261018-1" defer></script></head>
+<link rel="stylesheet" href="/tiktok-cache-player.css?v=20261018-1"><script src="/tiktok-oembed-cache.js?v=20261018-replay" defer></script><script src="/tiktok-cache-player.js?v=20261018-replay" defer></script></head>
 <body><main><p id="cache-status" role="status" aria-live="polite">Loading cached TikTok details…</p>
 <div id="tiktok-embed-host"></div><p><a id="tiktok-source" href="${source}" target="_blank" rel="noopener noreferrer">Open this video on TikTok</a></p>
 <noscript>Enable JavaScript to load TikTok's official embed, or follow the source link.</noscript></main></body></html>`, { headers: {

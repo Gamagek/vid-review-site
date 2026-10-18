@@ -5,6 +5,7 @@ import vm from "node:vm";
 import { tikTokZeroRequestPlayer } from "../src/tiktok-zero-request-cache.js";
 
 const code = readFileSync(new URL("../public/tiktok-cache-player.js", import.meta.url), "utf8");
+const brokerCode = readFileSync(new URL("../public/tiktok-oembed-cache.js", import.meta.url), "utf8");
 const service = readFileSync(new URL("../public/tiktok-preview-service.js", import.meta.url), "utf8");
 const source = "https://www.tiktok.com/@sujicomedyedit_007/video/7603012203595320584";
 const origin = "https://vid.best";
@@ -16,7 +17,14 @@ function success(extra = {}, metadata = {}) {
       html: '<blockquote data-video-id="7603012203595320584"></blockquote><script src="https://evil.example"></script>', ...metadata }, ...extra };
 }
 
-async function player(fetcher, storage = new Map()) {
+function broker(storage = new Map(), clock = Date) {
+  const window = {};
+  vm.runInNewContext(brokerCode, { window, URL, AbortController, TextDecoder, Date: clock, setTimeout, clearTimeout,
+    sessionStorage: { getItem: key => storage.get(key) || null, setItem: (key, value) => storage.set(key, value), removeItem: key => storage.delete(key) } });
+  return window.VidBestTikTokOEmbedCache;
+}
+
+async function player(fetcher, storage = new Map(), sharedBroker = broker(storage)) {
   const calls = [], scripts = [], messages = [];
   function element(tag) {
     return { tagName: tag.toUpperCase(), dataset: {}, children: [], attrs: {}, events: {},
@@ -32,14 +40,14 @@ async function player(fetcher, storage = new Map()) {
     createElement: element,
     body: { append(node) { assert.equal(node.tagName, "SCRIPT"); scripts.push(node); } },
   };
-  const context = { document, window: { parent: { postMessage(data, target) { messages.push({ data, target }); } } },
+  const context = { document, window: { parent: { VidBestTikTokOEmbedCache: sharedBroker, postMessage(data, target) { messages.push({ data, target }); } } },
     location: { origin }, URL, AbortSignal, TextDecoder,
     sessionStorage: { getItem: key => storage.get(key) || null, setItem: (key, value) => storage.set(key, value) },
     fetch: async (...args) => { calls.push(args); return fetcher(...args); },
   };
   vm.runInNewContext(code, context);
   await new Promise(resolve => setImmediate(resolve));
-  return { host, status, calls, scripts, messages };
+  return { host, status, calls, scripts, messages, context };
 }
 
 test("cached metadata constructs the exact official blockquote and loads embed.js once, without executing API HTML", async () => {
@@ -53,9 +61,9 @@ test("cached metadata constructs the exact official blockquote and loads embed.j
   assert.equal(quote.children[0].children[1].textContent, '<img src=x onerror="attack()">');
   assert.equal(h.scripts.length, 1); assert.equal(h.scripts[0].src, "https://www.tiktok.com/embed.js"); assert.equal(h.scripts[0].async, true);
   assert.ok(h.messages.every(x => x.target === origin && x.data.channel === "vidbest-tiktok-oembed"));
-  h.scripts[0].events.load(); assert.match(h.status.textContent, /Availability depends on TikTok/);
+  h.scripts[0].events.load(); assert.match(h.status.textContent, /may still be loading or unavailable/);
   assert.doesNotMatch(h.status.textContent, /playing|successfully played/i);
-  assert.match(h.status.textContent, /18 video requests left today/);
+  assert.match(h.status.textContent, /18 video requests left at the last lookup/);
 });
 
 test("daily20 and other429 show useful messages without an embed script, polling, alternate fetch or retries", async () => {
@@ -143,4 +151,85 @@ test("the official redirect CDN permission is confined to the isolated player", 
   const seo = readFileSync(new URL("../src/seo-edge.js", import.meta.url), "utf8");
   assert.equal(general.includes("sf16-website-login.neutral.ttwstatic.com"), false);
   assert.equal(seo.includes("sf16-website-login.neutral.ttwstatic.com"), false);
+});
+
+test("three separate player opens reuse one metadata lookup and never store API HTML or signed media", async () => {
+  const storage = new Map(), shared = broker(storage);
+  const first = await player(async () => Response.json(success({}, { thumbnail_url: "https://media.invalid/poster?signature=private-example" })), storage, shared);
+  const second = await player(async () => { throw new Error("A replay must use saved metadata"); }, storage, shared);
+  const third = await player(async () => { throw new Error("A replay must use saved metadata"); }, storage, shared);
+  assert.equal(first.calls.length + second.calls.length + third.calls.length, 1);
+  assert.equal(second.scripts.length, 1); assert.equal(third.scripts.length, 1);
+  second.scripts[0].events.load(); assert.match(second.status.textContent, /Reusing saved video details/);
+  assert.match(second.status.textContent, /last lookup/);
+  const serialized = JSON.stringify([...storage.values()]);
+  assert.doesNotMatch(serialized, /signature|thumbnail_url|<blockquote|evil\.example|private-example/);
+  assert.equal(JSON.parse([...storage.values()][0]).metadata.id, "7603012203595320584");
+  vm.runInNewContext(code, first.context);
+  assert.equal(first.calls.length, 1); assert.equal(first.scripts.length, 1, "duplicate client execution must not load another script");
+});
+
+test("simultaneous opens share the pending lookup rather than starting concurrent API requests", async () => {
+  const shared = broker(); let calls = 0, release;
+  const loading = new Promise(resolve => { release = resolve; });
+  const fetcher = async () => { calls++; await loading; return Response.json(success()); };
+  const jobs = Array.from({ length: 12 }, () => shared.lookup(source, fetcher));
+  assert.equal(calls, 1);
+  release();
+  const results = await Promise.all(jobs);
+  assert.equal(calls, 1); assert.ok(results.every(x => x.metadata.id === "7603012203595320584"));
+});
+
+test("a successful lookup survives a new document but expires after thirty minutes", async () => {
+  const storage = new Map(); let now = Date.now(), calls = 0;
+  class Clock extends Date { static now() { return now; } }
+  const fetcher = async () => { calls++; return Response.json(success()); };
+  await broker(storage, Clock).lookup(source, fetcher);
+  now += 10 * 60 * 1000;
+  const restored = await broker(storage, Clock).lookup(source, fetcher);
+  assert.equal(calls, 1); assert.equal(restored.reused, true);
+  now += 21 * 60 * 1000;
+  const renewed = await broker(storage, Clock).lookup(source, fetcher);
+  assert.equal(calls, 2); assert.equal(renewed.reused, false);
+});
+
+test("a known backend429 takes precedence over a previously successful cache entry", async () => {
+  const shared = broker(); let calls = 0;
+  const fetcher = async () => { calls++; return Response.json(success()); };
+  await shared.lookup(source, fetcher);
+  const different = source.replace("7603012203595320584", "7603012203595320585");
+  await assert.rejects(shared.lookup(different, async () => { calls++; return new Response("Limited", { status: 429, headers: { "Retry-After": "180" } }); }), { code: "limited" });
+  await assert.rejects(shared.lookup(source, fetcher), { code: "limited" });
+  assert.equal(calls, 2, "do not use prior metadata to ignore a known backend limit");
+});
+
+test("failed lookups have a finite retry deadline and reopens do not loop requests", async () => {
+  for (const failure of [async () => new Response("Busy", { status: 503, headers: { "Retry-After": "120" } }), async () => { throw new Error("aborted old frame"); }]) {
+    const shared = broker(); let calls = 0;
+    const fetcher = async () => { calls++; return failure(); };
+    await assert.rejects(shared.lookup(source, fetcher), { code: "unavailable" });
+    await assert.rejects(shared.lookup(source, fetcher), { code: "unavailable" });
+    assert.equal(calls, 1);
+  }
+});
+
+test("same-page replay still deduplicates when session storage is disabled", async () => {
+  const storage = { get() { throw new Error("disabled"); }, set() { throw new Error("disabled"); }, delete() { throw new Error("disabled"); } };
+  const shared = broker(storage); let calls = 0;
+  const fetcher = async () => { calls++; return Response.json(success()); };
+  await shared.lookup(source, fetcher);
+  const second = await shared.lookup(source, fetcher);
+  assert.equal(calls, 1); assert.equal(second.reused, true);
+});
+
+test("malformed saved metadata and a different creator never bypass source validation", async () => {
+  const storage = new Map(); let calls = 0;
+  const fetcher = async () => { calls++; return Response.json(success()); };
+  await broker(storage).lookup(source, fetcher);
+  const key = [...storage.keys()][0], entry = JSON.parse(storage.get(key));
+  entry.metadata.id = "7603012203595320585";
+  storage.set(key, JSON.stringify(entry));
+  await broker(storage).lookup(source, fetcher);
+  assert.equal(calls, 2);
+  await assert.rejects(broker().lookup(source.replace("sujicomedyedit_007", "someone_else"), fetcher), { code: "unavailable" });
 });

@@ -211,3 +211,55 @@ test("a slow gateway stays interactive without the false 15-minute lock, and cle
   assert.equal(createdFrames, 2, "manual reopen is not blocked by an invented cooldown");
   dialog.close();
 });
+
+test("repeated Play calls on the same open cached player keep one iframe and one listener", async () => {
+  const source = "https://www.tiktok.com/@sujicomedyedit_007/video/7603012203595320584";
+  const rafs = [], listeners = new Map(), selectors = new Map(), timers = new Map();
+  let dialog = null, frames = 0, nextTimer = 0, fetches = 0;
+  function element(tag) {
+    const events = new Map();
+    return { tagName: tag.toUpperCase(), children: [], contentWindow: {},
+      setAttribute(name, value) { this[name] = value; },
+      addEventListener(name, fn) { events.set(name, fn); },
+      append(...nodes) { this.children.push(...nodes); },
+      replaceChildren(...nodes) { this.children = nodes; },
+      trigger(name) { events.get(name)?.(); },
+    };
+  }
+  for (const key of ["[data-tiktok-embed-host]", "[data-tiktok-dialog-status]", "[data-tiktok-dialog-title]", "[data-tiktok-dialog-author]", "[data-tiktok-dialog-description]", ".tiktok-preview-dialog-close", "[data-tiktok-dialog-cancel]"]) selectors.set(key, element("div"));
+  const document = { hidden: false,
+    querySelector() { return dialog; }, addEventListener() {},
+    body: { append(node) { dialog = node; } },
+    createElement(tag) {
+      const el = element(tag);
+      if (tag === "iframe") frames++;
+      if (tag === "dialog") {
+        el.open = false; el.querySelector = key => selectors.get(key);
+        el.showModal = () => { el.open = true; };
+        el.close = () => { el.open = false; el.trigger("close"); };
+      }
+      return el;
+    },
+  };
+  const window = { addEventListener(name, fn) { listeners.set(name, fn); }, removeEventListener(name) { listeners.delete(name); } };
+  const context = { document, window, URL, location: { origin: "https://vid.best" },
+    requestAnimationFrame(fn) { rafs.push(fn); },
+    setTimeout(fn) { timers.set(++nextTimer, fn); return nextTimer; }, clearTimeout(id) { timers.delete(id); },
+    fetch() { fetches++; throw new Error("The old gateway must not be refreshed"); },
+  };
+  runInNewContext(code, context);
+  const api = window.VidBestTikTok;
+  await Promise.all(Array.from({ length: 10 }, () => api.showPreview(source)));
+  assert.equal(rafs.length, 1); rafs.shift()();
+  const host = selectors.get("[data-tiktok-embed-host]"), frame = host.children[0];
+  assert.equal(frames, 1); assert.equal(new URL(frame.src).pathname, "/api/tiktok/oembed-player");
+  await api.showPreview(source);
+  assert.equal(rafs.length, 0); assert.equal(frames, 1); assert.equal(host.children[0], frame);
+  assert.equal(listeners.has("message"), true); assert.equal(timers.size, 1); assert.equal(fetches, 0);
+  runInNewContext(code, context);
+  assert.equal(window.VidBestTikTok, api, "duplicate service execution cannot reset the active player");
+  dialog.close(); assert.equal(host.children.length, 0); assert.equal(listeners.has("message"), false);
+  await api.showPreview(source); rafs.shift()();
+  assert.equal(frames, 2, "closing still destroys playback; deliberate reopen creates a clean official player");
+  assert.equal(fetches, 0); dialog.close();
+});

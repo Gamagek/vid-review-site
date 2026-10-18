@@ -1,5 +1,11 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 18 October 2026: TikTok reopen metadata request fix tested
+
+Owner screenshots show source rendering followed by nested TikTok overload/429 while the metadata API still reports remaining requests. Main's isolated-document lifecycle was fetching metadata on each reopen. The bounded follow-up shares pending browser lookups, reuses validated public metadata for 30 minutes across popup opens, and prevents repeated Play calls from replacing the same open iframe. Known API 429 deadlines take priority over cached success; no polling, quota bypass, media copy, server proxy or general CSP change. Official TikTok player/video requests remain separate; reduced metadata traffic is not playback or overload-removal proof.
+
+412 local Node tests, 14-page editorial validation and Worker dry-run pass. All 204 saved video records' non-counter field digest remains `0cfd948043b91847fe4ff442ceba1921235ae2910de38fc6a927b682e65e1736`; 200 published, zero verification writes, no pending migrations. Require exact-head CI/four Python tests, `[seo-only]` merge, existing Worker release and live replay/data checks. No new Google Inspection or manual provider retry. Full evidence and final release checkpoint: `docs/tiktok-replay-cache-20261018.md`. Next independent editorial task stays Titli 135; no review/content/thumbnail/date/owner/Portainer/security changes.
+
 ## 18 October 2026: requested TikTok cache player released; provider playback restriction recorded
 
 PR [197](https://github.com/Gamagek/vid-review-site/pull/197) / `f11dedb293240790f795e6dee3796b1c2d6049c7` integrates the exact requested source through the owner's `/api/watch?url=...` contract. PR [198](https://github.com/Gamagek/vid-review-site/pull/198) / `9f9c732833fe06667963ba29b87a260fb6d12d00` permits the observed official embed-script redirect host only inside the isolated player. Exact-head CI 39122208565 passes **404 Node / four Python tests**, editorial validation and dry-run; main CI 39122285632 succeeds. Deploy 39122285668 applies zero migrations; Worker `ad44f609-896e-4e00-bee5-be57a124404d` is verified at 100%. Portainer validation passes and all four privileged jobs skip; its automatic flag is unchanged.

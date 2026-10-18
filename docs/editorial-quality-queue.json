@@ -2234,5 +2234,32 @@
       "evidenceFile": "docs/tiktok-zero-request-integration-20261018.md",
       "nextTask": "Resume published Titli135 source-context work after fresh owner preimages; all six headings, substantial prose, SEO title, media and dates preserved. Do not retry provider playback just because this checkpoint merges."
     }
+  ],
+  "preparedPlayerIntegrations": [
+    {
+      "recordId": 18,
+      "sourceId": "7603012203595320584",
+      "status": "replay_metadata_cache_implemented_and_locally_tested",
+      "checkedOn": "2026-10-18",
+      "tests": {
+        "localNode": 412,
+        "editorialValidation": "pass",
+        "workerDryRun": "pass",
+        "python": "require exact-head CI"
+      },
+      "behavior": "One shared pending lookup per source; successful public metadata reused for30minutes; same-open-player Play guard. Known API429 takes priority over cache. No video/audio cache, polling, server proxy, backend/config/media/owner-field edits or quota bypass.",
+      "dataPreflight": {
+        "allNonCounterFieldsSha256": "0cfd948043b91847fe4ff442ceba1921235ae2910de38fc6a927b682e65e1736",
+        "hashCheckedAt": "2026-10-18T11:57:18.426Z",
+        "saved": 204,
+        "published": 200,
+        "countsAndMigrationsCheckedAt": "2026-10-18T11:58:37.997Z",
+        "pendingMigrations": 0,
+        "verificationWrites": 0
+      },
+      "limit": "Supplied nested TikTok429/overload responses are separate from owner API allowance. Official embed/video requests remain; do not claim playback or restriction fixed.",
+      "evidenceFile": "docs/tiktok-replay-cache-20261018.md",
+      "nextTask": "Verify exact-head CI, release, live replay count and preserved owner data; next independent editorial task remains Titli135 with existing structure/content/media/dates preserved."
+    }
   ]
 }
