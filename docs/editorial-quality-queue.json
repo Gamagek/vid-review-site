@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-17T23:22:24.205Z",
+  "generatedAt": "2026-10-18T02:19:07.539Z",
   "inputMode": "live_public_api",
-  "observedAt": "2026-10-17T23:22:24.205Z",
+  "observedAt": "2026-10-18T02:19:07.539Z",
   "productionWrites": false,
   "scope": "published library review bodies and listing descriptions; excludes category/listing-page overlap",
   "limitation": "Screening signals only. No AI detection, external plagiarism check, footage verification, Google status or AdSense eligibility score.",
@@ -89,36 +89,40 @@
       "recordId": 192,
       "reason": "Original section1/section3 audio-form descriptions and section2 notebook/stairs/car/coast/forest/bonfire scene assertions have not been independently re-verified. Keep an explicit manual evidence hold; this is a bounded context/claim correction, not whole-review certification.",
       "notAnIndexingOrPolicyVerdict": true
+    },
+    {
+      "recordId": 191,
+      "reason": "Original section1 vocal/cultural/style assertions, section2 sweeping-stage-light/particle/movement/temporal claims and section3 audio/drop descriptions have not been independently re-verified. Retain explicit manual source listening/viewing review, including related cultural SEO wording; this bounded source-context pass does not certify them or the whole review.",
+      "notAnIndexingOrPolicyVerdict": true
     }
   ],
   "nextTasks": [
     {
       "recordId": 191,
-      "slug": "randall-wahran-official-track-festival-anthem-deep-dive",
-      "sourceId": "-Q0BR72Aq4Q",
-      "task": "Next bounded Music candidate: verify exact official source identity and primary evidence before correcting generic listing/popularity claims. Dharma's official sound-pack page corroborates artist/title/components only, not exact source-video visuals/audio/sample origin or rights. No191edit made; preserve title/headings/order/SEO/source/media/dates and owner preimages.",
-      "preparationSource": "https://www.dharmaworldwide.com/product/wahran-sound-pack/",
-      "sourceMetadataLimit": "Exact public YouTube search fetch failed17October; not proof of removal or platform denial."
+      "task": "Complete exact-head CI/fresh owner/pending guards, merge existing Worker deployment and verify only two intended text changes/all protected204records/liveSSR/API/dates/poster. Currently prepared only."
+    },
+    {
+      "recordId": 190,
+      "task": "After191live verification, inspect exact Headlights source/version identity and primary context before any bounded edit; do not assume official/artist-authorized version or fresh audio observation."
     },
     {
       "recordIds": [
+        191,
         192,
         193
       ],
-      "task": "Original scene/audio statements remain manual evidence holds, not whole-review certification. No repeated stalled-player retry or inference from metadata."
+      "task": "Preserved original audio/visual/cultural claims remain manual evidence holds. Do not reattempt stalled playback in loops, certify unseen footage, edit protected comedy or change provider/rights/security/draft/owner/Portainer state."
     },
     {
-      "task": "The first post-release zero-inspection audit39078548051 is consumed. Maps processed17October08:53UTC/0errors/library20aggregatewarnings remain. On normal future diagnostics compare actual changes; retain dated200URL stored-index snapshot1PASS/133Discovered/66unknown until a later authorized full snapshot. Do not spend redundant Inspection quota, submit AdSense or change protected/provider/security/owner/draft/Portainer state."
+      "task": "Consume normal post-release zero-Inspection audit; retain dated Google review snapshot until later authorized full report. No extra inspection/submission, provider retry or empty deployment."
     }
   ],
   "dataSnapshot": {
-    "observedAt": "2026-10-17T23:19:49.551Z",
+    "observedAt": "2026-10-18T02:16:21.442Z",
     "saved": 204,
     "published": 200,
-    "protectedSha256": "45e1e35b5f414e4ea4b59f08b27d7bbfe9118d58ed429e97c0a73b6b86fbc946",
-    "excludes": "Activity counters and only192.description/review_text; both intended fields separately verified by exact text hash.",
-    "targetTextSha256": "40a7341be263c349b4d3745914d3d5d27fb55f2a1b2d87b0e08a6ae05658962b",
-    "verificationWrites": false
+    "protectedSha256": "3238cb1c022d9ba73e6df9b3ddd5904f287989630785dcedcfb7b486e3e0026e",
+    "excludes": "Activity counters and only191.description/review_text. No investigation writes."
   },
   "completedDiagnostics": [
     {
@@ -1975,7 +1979,21 @@
       "flags": []
     }
   ],
-  "preparedBatches": [],
+  "preparedBatches": [
+    {
+      "recordIds": [
+        191
+      ],
+      "status": "prepared_not_published",
+      "manifest": "content/editorial-quality/2026-10-18-wahran.json",
+      "migration": "0044_wahran_source_context.sql",
+      "baselineProtectedSha256": "3238cb1c022d9ba73e6df9b3ddd5904f287989630785dcedcfb7b486e3e0026e",
+      "baselineSaved": 204,
+      "baselinePublished": 200,
+      "guardVerifiedAt": "2026-10-18T02:21:16.210Z",
+      "matchingPreimages": 1
+    }
+  ],
   "googleSnapshot": {
     "runId": 39018934414,
     "generatedAt": "2026-10-17T08:51:41.157Z",
