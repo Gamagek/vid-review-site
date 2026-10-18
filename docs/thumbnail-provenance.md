@@ -1,5 +1,9 @@
 # Editorial cover provenance
 
+## 18 October 2026: Quiet Presence original poster retained during accuracy-only review edit
+
+Queued45description/review/SEOdescription accuracy correction changes no image/source/embed/cache/rights/R2/custom media. Completed39100604325/artifact12126377543, matching archive `80656c521ca61e8edd544383cf597ca21aabd36138b1f1d9c7f76ae27bdbc8b7`, reconfirms exact205834byteJPEG/`b7d414ac4fbe5fbdd476952b12a58f21f58640e010d7cff2cf9765bae3ca4901`. Prior13October QuietPresence/Public/caption/source-poster verification is dated, not a new full video/audio/clinical result; currentprimaryfetchDisabledError adds no removal/bot/rights diagnosis or workaround. Preserve original poster and all protected Facebook/comedy/source30/Dilscoop/Saiyaara/Summer/owner media. No image generation/replacement/redundant provider audit. Details: `docs/quiet-presence-accuracy-20261018.md`.
+
 ## 18 October 2026: Flying unchanged JPEG confirmed after the editorial release
 
 PR193/9b3681d/Worker0654f310 edits only186's three evidenced text/metadata fields, no source/embed/poster/cache/rights/R2/custom media. Completed audit39100604325/artifact12126377543, matching archive `80656c521ca61e8edd544383cf597ca21aabd36138b1f1d9c7f76ae27bdbc8b7`, checks200posters181available/11HTTPerrors/eight protected placeholders,189matching headers/full-byte hashes. OriginalFlying48943byteJPEG remains `1975889fff7d2a5cc3eca3444b4ad26586922cf1da2322cf1619e2f434437115`. All204records' protected hash matches. No image generation/replacement/new provider download or playback/rights claim; no separate duplicate image audit.

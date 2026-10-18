@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-18T05:29:41.467Z",
+  "generatedAt": "2026-10-18T08:12:03.882Z",
   "inputMode": "live_public_api",
-  "observedAt": "2026-10-18T05:29:41.467Z",
+  "observedAt": "2026-10-18T08:12:03.882Z",
   "productionWrites": false,
   "scope": "published library review bodies and listing descriptions; excludes category/listing-page overlap",
   "limitation": "Screening signals only. No AI detection, external plagiarism check, footage verification, Google status or AdSense eligibility score.",
@@ -20,6 +20,29 @@
       ]
     }
   ],
+  "preparedBatch": {
+    "recordIds": [
+      45
+    ],
+    "status": "prepared_awaiting_exact_head_ci_and_verified_release",
+    "changedFields": [
+      "description",
+      "review_text",
+      "seo_description"
+    ],
+    "baselineObservedAt": "2026-10-18T08:11:09.716Z",
+    "protectedSha256": "ea491260ee5615ace441b3497770f368fd3ba63bc92c1fd1f5b91cccb8f0f7d8",
+    "guardFields": 29,
+    "preservedOwnerParagraphs": 3,
+    "preservedHeadings": 4,
+    "tests": {
+      "focused": 6,
+      "localNode": 393,
+      "pythonSyntax": "pass",
+      "workerDryRun": "pass",
+      "exactHeadCi": "required"
+    }
+  },
   "completedBatches": [
     {
       "recordIds": [
@@ -147,8 +170,9 @@
       "recordId": 45,
       "slug": "facebook-discovery-5c11fe",
       "sourceReelId": "3197508787117279",
-      "task": "Next bounded editorial source/accuracy task. Consult existing QuietPresence source/poster provenance, then recheck current preimages. Original universal heart-rate/stress-reduction claims conflict with already qualified owner paragraphs. Preserve opening/four headings/order/all substantial owner additions/source/poster/SEO titles/dates; make no new soundtrack/scene/clinical assertion from metadata. Existing source identity/poster evidence is dated13October, not a fresh audio observation.",
-      "preparationEvidence": "18October public body inspected; original source/poster provenance in docs/thumbnail-provenance.md. No45edit in this run."
+      "task": "45bounded accuracy correction prepared, not deployed.0046/manifest preserve opening/four headings/all3owner additions/originalsection2+3/SEOtitle/tags/dates/media; only3intended textfields change. Require exact-headCI/fresh29fieldguard/pending check/existingWorkerrelease/live204record verification/completedordinaryaudit. CurrentFacebookfetchDisabledError is not new footage/audio evidence or permission for a workaround.",
+      "preparationEvidence": "18October public body inspected; original source/poster provenance in docs/thumbnail-provenance.md. No45edit in this run.",
+      "status": "prepared_awaiting_exact_head_ci_and_verified_release"
     },
     {
       "recordId": 135,
