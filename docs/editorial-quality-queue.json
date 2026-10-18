@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-18T08:12:03.882Z",
+  "generatedAt": "2026-10-18T08:19:20.092Z",
   "inputMode": "live_public_api",
-  "observedAt": "2026-10-18T08:12:03.882Z",
+  "observedAt": "2026-10-18T08:19:20.092Z",
   "productionWrites": false,
   "scope": "published library review bodies and listing descriptions; excludes category/listing-page overlap",
   "limitation": "Screening signals only. No AI detection, external plagiarism check, footage verification, Google status or AdSense eligibility score.",
@@ -20,29 +20,6 @@
       ]
     }
   ],
-  "preparedBatch": {
-    "recordIds": [
-      45
-    ],
-    "status": "prepared_awaiting_exact_head_ci_and_verified_release",
-    "changedFields": [
-      "description",
-      "review_text",
-      "seo_description"
-    ],
-    "baselineObservedAt": "2026-10-18T08:11:09.716Z",
-    "protectedSha256": "ea491260ee5615ace441b3497770f368fd3ba63bc92c1fd1f5b91cccb8f0f7d8",
-    "guardFields": 29,
-    "preservedOwnerParagraphs": 3,
-    "preservedHeadings": 4,
-    "tests": {
-      "focused": 6,
-      "localNode": 393,
-      "pythonSyntax": "pass",
-      "workerDryRun": "pass",
-      "exactHeadCi": "required"
-    }
-  },
   "completedBatches": [
     {
       "recordIds": [
@@ -123,6 +100,28 @@
       "targetFieldsSha256": "328ae98a93843297f92d978cd414d64b31ca7bc3028a4be4235f56f52cd2658a",
       "liveVerifiedAt": "2026-10-18T05:28:12.029Z",
       "remainingEvidenceHold": "Original piano/chord/pad/texture assertions in sections1/2 have not been independently re-verified. Significant original music-description prose is retained and an explicit public fresh-listening/footage limitation is added; manual listening evidence is still needed. SEO title/tags, source media and both saved dates remain unchanged. This is a bounded accuracy/context correction, not whole-review certification."
+    },
+    {
+      "recordIds": [
+        45
+      ],
+      "pullRequest": 195,
+      "reviewedHead": "f9745cea6de6ff72d8494c7d998417a438541fb9",
+      "mergeCommit": "ccc16b1b12ea201ecdae874cf349ac43ccd84b21",
+      "workerVersion": "58242bd9-3e46-4b2f-b564-bfa8a6d4d741",
+      "status": "bounded_accuracy_correction_deployed_and_live_verified",
+      "changedFields": [
+        "description",
+        "review_text",
+        "seo_description"
+      ],
+      "seoException": "Replace unsupported healing/inner-peace outcome; preserve original SEO title/tags.",
+      "preservedHeadings": 4,
+      "preservedOwnerParagraphs": 3,
+      "protectedSha256": "ea491260ee5615ace441b3497770f368fd3ba63bc92c1fd1f5b91cccb8f0f7d8",
+      "targetFieldsSha256": "f84e06e2d074b70e1c76427b513b2291ebae2cb1507f1261e8f1e03f9c49fcb0",
+      "liveVerifiedAt": "2026-10-18T08:19:16.660Z",
+      "remainingEvidenceHold": "Original retained scene/sound assertions and Buddhist associations have not been independently re-verified in this pass. Preserve all three substantial owner-added qualifying paragraphs and the original section2/3 paragraphs. Public source/audio/footage and interpretation limits are explicit; this is not a whole-review or clinical/doctrinal certification. No source/media/SEO title/tags/date changes."
     }
   ],
   "topicHolds": {
@@ -161,23 +160,21 @@
     },
     {
       "recordId": 45,
-      "reason": "Newv3health-keyword candidate: original paragraphs promise lower heart rate/significant stress reduction, while existing owner context already limits healing/audio claims. Read prior13OctoberQuietPresence source/poster provenance and preserve those owner additions. Metadata/poster do not verify physiological outcomes or unheard soundtrack. No45content/media edit in this run.",
+      "reason": "Original retained scene/sound assertions and Buddhist associations have not been independently re-verified in this pass. Preserve all three substantial owner-added qualifying paragraphs and the original section2/3 paragraphs. Public source/audio/footage and interpretation limits are explicit; this is not a whole-review or clinical/doctrinal certification. No source/media/SEO title/tags/date changes.",
       "notAnIndexingOrPolicyVerdict": true
     }
   ],
   "nextTasks": [
     {
-      "recordId": 45,
-      "slug": "facebook-discovery-5c11fe",
-      "sourceReelId": "3197508787117279",
-      "task": "45bounded accuracy correction prepared, not deployed.0046/manifest preserve opening/four headings/all3owner additions/originalsection2+3/SEOtitle/tags/dates/media; only3intended textfields change. Require exact-headCI/fresh29fieldguard/pending check/existingWorkerrelease/live204record verification/completedordinaryaudit. CurrentFacebookfetchDisabledError is not new footage/audio evidence or permission for a workaround.",
-      "preparationEvidence": "18October public body inspected; original source/poster provenance in docs/thumbnail-provenance.md. No45edit in this run.",
-      "status": "prepared_awaiting_exact_head_ci_and_verified_release"
-    },
-    {
       "recordId": 135,
       "sourceId": "V8zXLMIjlcw",
-      "task": "Alternative source-identity preparation for published Music/Titli only if useful primary evidence is available. PublicAPI confirms saved ID and six headings, not official uploader/film location/audio/scene facts. No135edit, playback or primary-source certification in this run."
+      "task": "Next published Music135/Titli bounded listing/source-context task. Exact publisher page now verifies sourceID/title/performers/composer/Hindi+Tamil lyric credits; making page separately credits FarahKhan. Recheck fresh owner preimages before edits. Preserve six headings/order/substantial prose/SEOtitle/tags/IDs/dates/source/poster. No new audio, filming-location, scene, Sanskrit/Tamil meaning or musical-form observation from metadata; existing assertions still need evidence.",
+      "preparationSources": [
+        "https://www.tseries.com/videos/tseries/PL9bw4S5ePsEER6dV2jyn9SIPH_AWKZhQv/V8zXLMIjlcw",
+        "https://www.tseries.com/videos/tseries/PL9bw4S5ePsEH4rO3-BiW_LW9RloQ-4ZkV/vm4eWl7nvS4",
+        "https://music.apple.com/us/song/titli/1115905448"
+      ],
+      "preparationLimits": "Metadata only. The directYouTubefetch exposed footer/title only, not fresh player/channel/description evidence. Album catalogue3July2013 is not source-upload/site-publish date. Do not copy OneTwoThreeFour credits or equate music video/making/lyric/remix versions. No135public edit in this run."
     },
     {
       "recordIds": [
@@ -197,24 +194,25 @@
     },
     {
       "recordIds": [
+        45,
         186,
         191,
         192,
         193
       ],
-      "task": "Original piano/texture/audio/visual/cultural descriptions remain explicit manual evidence holds despite bounded context corrections. v3also flags qualified/rejected health wording, so lexical flags are not a new inaccuracy/policy verdict. No stalled-player retry loop or unsupported audio comparison."
+      "task": "45retainedscene/sound/Buddhist associations and186/191/192/193original audio/visual/cultural descriptions remain manual evidence holds despite bounded accuracy/context corrections. Preserve substantial owner prose and accurate public limits; no metadata→footage/clinical/lineage conclusion, stalled-player retry loop, protected comedy/draft/provider/security change."
     },
     {
-      "task": "Completed actual39100604325artifact is consumed. No newGoogleInspection/submission; maps processed/0errors/library20warnings and unchanged17Octdownloads. Retain dated17Oct200review snapshot1PASS/133Discovered/66unknown, not whole-site/current210coverage. Preserve all provider/comedy/draft/owner/Saiyaara/Summer/Portainer/security holds."
+      "task": "Completed39110941220artifact is consumed. No newGoogleInspection/submission; processedmaps0errors/library20warnings and unchanged17Octdownloads. Retain dated17Oct200review snapshot1PASS/133Discovered/66unknown, not currentwhole-site/210reviewcoverage. All original media/provider/comedy/owner/draft/security/Portainer holds remain."
     }
   ],
   "dataSnapshot": {
-    "observedAt": "2026-10-18T05:28:03.421Z",
+    "observedAt": "2026-10-18T08:19:09.853Z",
     "saved": 204,
     "published": 200,
-    "protectedSha256": "23f7d3626d9800aa384a3159a441849c82f55597488de5e6b38a29e57cfa04cb",
-    "excludes": "Activity counters and only186.description/review_text/seo_description; intended three fields checked separately.",
-    "targetFieldsSha256": "328ae98a93843297f92d978cd414d64b31ca7bc3028a4be4235f56f52cd2658a",
+    "protectedSha256": "ea491260ee5615ace441b3497770f368fd3ba63bc92c1fd1f5b91cccb8f0f7d8",
+    "excludes": "Activity counters and only45.description/review_text/seo_description; intended three fields checked separately.",
+    "targetFieldsSha256": "f84e06e2d074b70e1c76427b513b2291ebae2cb1507f1261e8f1e03f9c49fcb0",
     "verificationWrites": false
   },
   "completedDiagnostics": [
@@ -314,6 +312,19 @@
         "workerDryRun": "pass"
       },
       "limits": "Includes qualified/rejected/quoted claims. Normal relaxation labels alone do not trigger it. No medical/AI/plagiarism/policy/quality verdict or automatic rewrite;186stays flagged because the corrected text questions the claim, not because correction failed."
+    },
+    {
+      "status": "read_only_primary_source_preparation",
+      "recordId": 135,
+      "checkedOn": "2026-10-18",
+      "sources": [
+        "https://www.tseries.com/videos/tseries/PL9bw4S5ePsEER6dV2jyn9SIPH_AWKZhQv/V8zXLMIjlcw",
+        "https://www.tseries.com/videos/tseries/PL9bw4S5ePsEH4rO3-BiW_LW9RloQ-4ZkV/vm4eWl7nvS4",
+        "https://music.apple.com/us/song/titli/1115905448"
+      ],
+      "verified": "T-Series exact Titli page credits ChinmayiSripaada/GopiSunder,Vishal-Shekhar,AmitabhBhattacharya and TamillyricistsCharulathaMani/MadhumithaMani. Separate making page credits FarahKhan; AppleMusic identifies3July2013audio catalogue. No footage/audio comparison or edit.",
+      "limits": "Do not transfer OneTwoThreeFour credits, album/site/uploaddates or claim fresh scene/audio/filming-location observation. Distinct music-video/making/lyric/remix entries are not interchangeable.",
+      "productionWrites": false
     }
   ],
   "records": [
@@ -1761,7 +1772,7 @@
       "slug": "facebook-discovery-5c11fe",
       "category": "Music",
       "protectedTopic": false,
-      "contentSha256": "fcd910a9a1015356d5e9827a803b63545aff483b65db10c4ffa4f214f0434b64",
+      "contentSha256": "c0ed2bb3bd4f5ffa81fb297e9f2cecac77b672a1c88c0ce0a0b17addf9aa5cb4",
       "flags": [
         "health_claim_needs_source_review"
       ]
@@ -2126,11 +2137,11 @@
   },
   "screeningVersion": 3,
   "latestPublicAudit": {
-    "runId": 39100604325,
-    "artifactId": 12126377543,
-    "zipSha256": "80656c521ca61e8edd544383cf597ca21aabd36138b1f1d9c7f76ae27bdbc8b7",
-    "generatedAt": "2026-10-18T05:27:39.125Z",
-    "completedAt": "2026-10-18T05:29:29Z",
+    "runId": 39110941220,
+    "artifactId": 12130870548,
+    "zipSha256": "cec7449c78bca1d0d81afc39d8532c1ff0577f68adcf0fc806435473a7cb844c",
+    "generatedAt": "2026-10-18T08:18:47.201Z",
+    "completedAt": "2026-10-18T08:21:10Z",
     "pages": 231,
     "technicalFailures": 0,
     "libraryReviews": 200,

@@ -1,5 +1,27 @@
 # Quiet Presence45: bounded accuracy correction
 
+## Verified publication — PR195
+
+Reviewed head `f9745cea6de6ff72d8494c7d998417a438541fb9`, merge `ccc16b1b12ea201ecdae874cf349ac43ccd84b21`. Exact-headCI39110802006/job117626334280 passes393Node/fourPython/editorial validation/Worker dry-run; mainCI39110900397 succeeds. Deploy39110900394/job117626634712 applies only0046 at08:18:21UTC and releases Worker `58242bd9-3e46-4b2f-b564-bfa8a6d4d741`100%, deployment `c63011ed-c319-4f52-8406-8debcae823e3`08:18:25UTC. Fresh pre-merge08:17:49UTC ownerguard1row/only0046pending/0writes; historical0013ledger unchanged.
+
+D1 at08:19:09UTC retains204saved/200published, exact protected `ea491260ee5615ace441b3497770f368fd3ba63bc92c1fd1f5b91cccb8f0f7d8`/zero differing protected204rowhashes. Only45description/review/SEOdescription change; exactthree-field `f84e06e2d074b70e1c76427b513b2291ebae2cb1507f1261e8f1e03f9c49fcb0`. Live08:19:16UTC API/watch/sitemap200/all11serverblocks/opening/fourheadings/all3owner qualifyingparagraphs/originalsection2+3/SEOtitle/tags/source/embed/poster/canonical/schema/both originaldates preserved. Unsupported healingSEOdescription specifically corrected, not falsely reported as unchanged. Verification uses auditUA/no writes. Original scene/sound/Buddhist associations remain manual evidence holds with explicit public limits, not newly certified audio/footage/doctrine.
+
+Portainer39110910556 validation117626663662 succeeds; incident117626743623/preflight117626743857/optional117626743964/deploy117626744158 all skip. No privileged container/data/automaticflag/routing/security/Access/email change. No runtime/frontend/player/assets/config/dependencies/R2/comedy/draft/Saiyaara/Summer/source30/Dilscoop/owner-date edit.
+
+Consumed actual completed audit[39110941220](https://github.com/Gamagek/vid-review-site/actions/runs/39110941220)/job117626752114/artifact12130870548, generated08:18:47UTC/completed08:21:10UTC. ZIP SHA256 `cec7449c78bca1d0d81afc39d8532c1ff0577f68adcf0fc806435473a7cb844c` matches.231pages/200library+10editorialreviews/0technicalfailures/errors/unlinked. Demo/editorialwarnings2remain separate holds.200posters181available/11HTTPerrors/eight protected placeholders,189matching headers/full-byte hashes. Original45poster remains205834byteJPEG/`b7d414ac4fbe5fbdd476952b12a58f21f58640e010d7cff2cf9765bae3ca4901`; repository bytes also match. No poster replacement, fresh source-video playback or rights claim.
+
+Google0Inspections/0submissions; maps processed/0errors/library20aggregatewarnings with unchanged17October08:53UTC downloads. No new indexing/crawl/verifiedGooglebot observation. Retain dated17October200review snapshot1PASS/133Discovered/66unknown, not current whole-site/210review coverage. Protected indexedComedy is untouched. No AdSense access/review/application.
+
+Post-screening08:19:20UTC200records/92candidates/54generic intros/one protected96/97sharedgroup, same counts as before. Only45textpairhash changes;199others match.45still matches the health keyword because corrected prose explicitly questions outcomes. This is not evidence correction failed or a falsehood/policy/quality score. No word-count padding or detector targeting.
+
+## Independent primary-source preparation and next135task
+
+The earlier related-page Titli cross-link is now supplemented by [T-Series' exact V8zXLMIjlcw page](https://www.tseries.com/videos/tseries/PL9bw4S5ePsEER6dV2jyn9SIPH_AWKZhQv/V8zXLMIjlcw), checked18October. It identifies the saved full-video title, ChinmayiSripaada/GopiSunder, Vishal-Shekhar, AmitabhBhattacharya and TamillyricistsCharulathaMani/MadhumithaMani. [The separately labelled making page](https://www.tseries.com/videos/tseries/PL9bw4S5ePsEH4rO3-BiW_LW9RloQ-4ZkV/vm4eWl7nvS4) credits FarahKhan choreography. [AppleMusic's Titli catalogue](https://music.apple.com/us/song/titli/1115905448) identifies the performers and3July2013audio entry. The date is not a YouTube upload/site publish date.
+
+These are primary metadata/edition facts, not fresh footage/audio, filming-location, lyric-meaning or arrangement observations. DirectYouTubefetch exposed footer/title only; no current expanded description/channel/player/audio inspection. Do not use OneTwoThreeFour credits, assume a making/lyric/remix clip is the same source or adopt the publisher's popularity marketing. No135content/media/date edit in this run. Next135bounded source-context/listing pass must freshly recheck owner preimages and preserve allsix headings/order/substantial text/SEOtitle/dates/source/poster; original scene/audio/location assertions need separate evidence.
+
+Final checkpoint is four docs only with **both [read-only-preflight] [seo-only]** flags: no extra Worker/D1/privilegedPortainer/Google action. Require exact-headCI before merge and record actual follow-up workflow skips on its PR. Existing45/186/191/192/193manual and185/188/190retrieval/provider/comedy/owner/security holds remain. The baseline/preparation sections below are dated history, not an unfinished45release.
+
 ## Baseline and evidence — 18 October 2026 UTC
 
 Read main `0539429be3ae306b5cc3bbc87cb5e19b219e32fb`, both checkpoints/queue, actual Deploy39100565471/job117595801879 and completed audit39100604325/artifact12126377543. Archive SHA256 `80656c521ca61e8edd544383cf597ca21aabd36138b1f1d9c7f76ae27bdbc8b7` matches. Active Worker0654f310/100%, deployment9b04ad83;231pages/zero technical failures/unlinked reviews.200posters181available/11HTTPerrors/eight protected placeholders. No duplicate image audit or new Google calls.
