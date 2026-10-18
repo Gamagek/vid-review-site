@@ -536,3 +536,41 @@ test("homepage includes the authorized async AdSense loader once", () => {
   const scripts = html.match(/<script async src="https:\/\/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-4485257027995607" crossorigin="anonymous"><\/script>/g) || [];
   assert.equal(scripts.length, 1);
 });
+
+
+test("image sitemap and semantic review cover use canonical URLs and never list drafts", async () => {
+  const context = createContext();
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug,title,source_url,media_type,primary_category,subcategory,description,thumbnail_url,published)
+    VALUES ('image-map-public','A & B music review','https://video.example.org/a.mp4',
+      'raw','Music','Music Videos','A source review','https://vid.best/review-covers/real.webp',1)`).run();
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug,title,source_url,media_type,primary_category,subcategory,description,thumbnail_url,published)
+    VALUES ('image-map-draft','Draft image review','https://video.example.org/d.mp4',
+      'raw','Music','Music Videos','Unpublished content','https://vid.best/review-covers/draft.webp',0)`).run();
+
+  const root = await (await request(context, "https://vid.best/sitemap.xml")).text();
+  assert.match(root, /<loc>https:\/\/vid\.best\/image-sitemap\.xml<\/loc>/);
+  const imageIndex = await (await request(context, "https://vid.best/image-sitemap.xml")).text();
+  assert.match(imageIndex, /<loc>https:\/\/vid\.best\/sitemaps\/images-1\.xml<\/loc>/);
+  const images = await request(context, "https://vid.best/sitemaps/images-1.xml");
+  assert.equal(images.status, 200);
+  assert.match(images.headers.get("Content-Type"), /application\/xml/);
+  const xml = await images.text();
+  assert.match(xml, /xmlns:image="http:\/\/www\.google\.com\/schemas\/sitemap-image\/1\.1"/);
+  assert.match(xml, /<url><loc>https:\/\/vid\.best\/watch\/image-map-public<\/loc><image:image><image:loc>https:\/\/vid\.best\/review-covers\/real\.webp<\/image:loc><\/image:image><\/url>/);
+  assert.doesNotMatch(xml, /image-map-draft|draft\.webp/);
+
+  const videoXml = await (await request(context, "https://vid.best/sitemaps/videos-1.xml")).text();
+  assert.match(videoXml, /<image:loc>https:\/\/vid\.best\/review-covers\/real\.webp<\/image:loc>/);
+  const html = await (await request(context, "https://vid.best/watch/image-map-public")).text();
+  assert.match(html, /<figure class="watch-review-art glass-panel"/);
+  assert.match(html, /<img src="https:\/\/vid\.best\/review-covers\/real\.webp"/);
+  assert.match(html, /alt="A &amp; B music review — review preview image"/);
+
+  const head = await request(context, "https://vid.best/image-sitemap.xml", { method: "HEAD" });
+  assert.equal(head.status, 200);
+  assert.equal(await head.text(), "");
+  const notFound = await request(context, "https://vid.best/sitemaps/images-9999.xml");
+  assert.equal(notFound.status, 404);
+});
