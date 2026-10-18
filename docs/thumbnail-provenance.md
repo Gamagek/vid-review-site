@@ -1,5 +1,11 @@
 # Editorial cover provenance
 
+## 18 October 2026: Flying unchanged JPEG confirmed after the editorial release
+
+PR193/9b3681d/Worker0654f310 edits only186's three evidenced text/metadata fields, no source/embed/poster/cache/rights/R2/custom media. Completed audit39100604325/artifact12126377543, matching archive `80656c521ca61e8edd544383cf597ca21aabd36138b1f1d9c7f76ae27bdbc8b7`, checks200posters181available/11HTTPerrors/eight protected placeholders,189matching headers/full-byte hashes. OriginalFlying48943byteJPEG remains `1975889fff7d2a5cc3eca3444b4ad26586922cf1da2322cf1619e2f434437115`. All204records' protected hash matches. No image generation/replacement/new provider download or playback/rights claim; no separate duplicate image audit.
+
+Read-only health screening/source preparation changes no media. Next45/QuietPresence retains exact existing source poster/provenance205834bytes/`b7d414ac4fbe5fbdd476952b12a58f21f58640e010d7cff2cf9765bae3ca4901` verified13October, not fresh footage/audio/medical proof.185/188lookup limits are not broken-poster evidence or copying/access permission. All eight protected Facebook covers, comedy/owner/source30/Dilscoop/Saiyaara/Summer media and security stay unchanged. Details: `docs/flying-source-context-20261018.md`.
+
 ## 18 October 2026: Flying source poster retained during text-only accuracy pass
 
 Queued186correction changes only listing/review and the evidenced unsupported health-promise SEO description, not media. Completed audit39090050278 (matching archive `60bbee5cb8d16caab80995211c4b3cffdaa5769287b5db47abce00a4ada0556b`) records the original1ZYbU82GVz4/hqdefault.jpg as200image/jpeg/48943bytes/header-match, SHA256 `1975889fff7d2a5cc3eca3444b4ad26586922cf1da2322cf1619e2f434437115`. No additional provider probe/image creation/replacement or R2 change. Source audio/footage is not freshly inspected; availability/hash are not visual/rights/playback proof. Exact source/embed/poster/cache/rights fields and all custom/protected Facebook/source30/Dilscoop/Saiyaara/Summer media remain untouched. Eleven provider failures/eight protected placeholders stay separate holds. Details/release gate: `docs/flying-source-context-20261018.md`.

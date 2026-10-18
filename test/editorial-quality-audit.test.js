@@ -36,7 +36,7 @@ test('popularity screening includes plural views and streams without rewriting s
     const source = [row(191, {review_text}), row(999, {primary_category: 'Funny & Comedy', review_text: 'Three million streams.'})];
     const saved = structuredClone(source);
     const report = auditEditorial(source);
-    assert.equal(report.screeningVersion, 2);
+    assert.equal(report.screeningVersion, 3);
     assert.deepEqual(report.records[0].flags, ['claim_needs_source_review'], review_text);
     assert.deepEqual(report.records[1].flags, ['claim_needs_source_review']);
     assert.equal(report.records[1].protectedTopic, true);
@@ -50,6 +50,35 @@ test('popularity screening avoids incidental million/billion or streaming termin
   for (const review_text of ['The title is A Million Dreams.', 'A billion stars in the artwork.',
     'The producer views streaming as distribution.', 'Thoughts of millions; views differ.',
     'The stream flows under a bridge.']) {
+    assert.deepEqual(auditEditorial([row(1, {review_text})]).records[0].flags, [], review_text);
+  }
+});
+
+test('health screening covers listing/body/metadata and qualified discussions without changing records', () => {
+  for (const fields of [
+    {description: 'A melody that slows your heart rate.'},
+    {review_text: 'These notes produce restorative alpha waves.'},
+    {review_text: 'Beta brainwaves become theta brain waves.'},
+    {review_text: 'A claimed nervous-system reset is not established here.'},
+    {seo_description: 'The sounds induce deep sleep.'},
+    {review_text: 'NCCIH does not validate this track-specific brainwave claim.'},
+  ]) {
+    const source = [row(188, fields), row(999, {primary_category: 'Funny & Comedy', ...fields})];
+    const before = structuredClone(source);
+    const report = auditEditorial(source);
+    assert.deepEqual(report.records[0].flags, ['health_claim_needs_source_review'], JSON.stringify(fields));
+    assert.deepEqual(report.records[1].flags, ['health_claim_needs_source_review']);
+    assert.equal(report.records[1].protectedTopic, true);
+    assert.deepEqual(source, before);
+    assert.ok(report.records.every(r => /^[a-f0-9]{64}$/.test(r.contentSha256)));
+    assert.ok(!JSON.stringify(report).includes(Object.values(fields)[0]));
+    assert.match(report.limitation, /Screening signals only/);
+  }
+});
+
+test('health screening does not turn ordinary relaxation labels or incidental words into a verdict', () => {
+  for (const review_text of ['Soft piano for a quiet evening.', 'A song labelled sleep music.',
+    'A heartbeat motif in the title.', 'An alpha channel controls transparency.', 'The waves reach the shore.']) {
     assert.deepEqual(auditEditorial([row(1, {review_text})]).records[0].flags, [], review_text);
   }
 });

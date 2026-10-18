@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-18T05:19:05.849Z",
+  "generatedAt": "2026-10-18T05:29:41.467Z",
   "inputMode": "live_public_api",
-  "observedAt": "2026-10-18T05:19:05.849Z",
+  "observedAt": "2026-10-18T05:29:41.467Z",
   "productionWrites": false,
   "scope": "published library review bodies and listing descriptions; excludes category/listing-page overlap",
   "limitation": "Screening signals only. No AI detection, external plagiarism check, footage verification, Google status or AdSense eligibility score.",
   "counts": {
     "records": 200,
-    "flagged": 91,
-    "genericListingIntros": 55,
+    "flagged": 92,
+    "genericListingIntros": 54,
     "repeatedParagraphGroups": 1
   },
   "repeatedParagraphs": [
@@ -20,28 +20,6 @@
       ]
     }
   ],
-  "preparedBatch": {
-    "recordIds": [
-      186
-    ],
-    "status": "prepared_awaiting_exact_head_ci_and_verified_release",
-    "changedFields": [
-      "description",
-      "review_text",
-      "seo_description"
-    ],
-    "reasonForSeoDescriptionException": "Remove evidenced unsupported induce-deep-sleep health promise; preserve SEO title/tags and all dates/media.",
-    "baselineObservedAt": "2026-10-18T05:18:23.594Z",
-    "protectedSha256": "23f7d3626d9800aa384a3159a441849c82f55597488de5e6b38a29e57cfa04cb",
-    "guardFields": 29,
-    "tests": {
-      "localNode": 385,
-      "focused": 6,
-      "pythonSyntax": "pass",
-      "workerDryRun": "pass",
-      "exactHeadCi": "required"
-    }
-  },
   "completedBatches": [
     {
       "recordIds": [
@@ -101,6 +79,27 @@
       "textSha256": "deb20ce3c42536c1ce1fff3d62e5e091f7642629c15d1178443d3a82ca14fb9f",
       "liveVerifiedAt": "2026-10-18T02:26:29.240Z",
       "remainingEvidenceHold": "Original section1 vocal/cultural/style assertions, section2 sweeping-stage-light/particle/movement/temporal claims and section3 audio/drop descriptions have not been independently re-verified. Retain explicit manual source listening/viewing review, including related cultural SEO wording; this bounded source-context pass does not certify them or the whole review."
+    },
+    {
+      "recordIds": [
+        186
+      ],
+      "pullRequest": 193,
+      "reviewedHead": "8fdc9fd4822dc66c75011694ae030c07fc591a40",
+      "mergeCommit": "9b3681d3614cab96ed46b052ce54a074563e4f19",
+      "workerVersion": "0654f310-80d8-4291-88de-1ce6225acbb2",
+      "status": "bounded_accuracy_source_context_deployed_and_live_verified",
+      "changedFields": [
+        "description",
+        "review_text",
+        "seo_description"
+      ],
+      "seoException": "Remove unsupported induce-deep-sleep outcome; original SEO title/tags retained.",
+      "preservedHeadings": 4,
+      "protectedSha256": "23f7d3626d9800aa384a3159a441849c82f55597488de5e6b38a29e57cfa04cb",
+      "targetFieldsSha256": "328ae98a93843297f92d978cd414d64b31ca7bc3028a4be4235f56f52cd2658a",
+      "liveVerifiedAt": "2026-10-18T05:28:12.029Z",
+      "remainingEvidenceHold": "Original piano/chord/pad/texture assertions in sections1/2 have not been independently re-verified. Significant original music-description prose is retained and an explicit public fresh-listening/footage limitation is added; manual listening evidence is still needed. SEO title/tags, source media and both saved dates remain unchanged. This is a bounded accuracy/context correction, not whole-review certification."
     }
   ],
   "topicHolds": {
@@ -131,22 +130,41 @@
       "recordId": 191,
       "reason": "Original section1 vocal/cultural/style assertions, section2 sweeping-stage-light/particle/movement/temporal claims and section3 audio/drop descriptions have not been independently re-verified. Retain explicit manual source listening/viewing review, including related cultural SEO wording; this bounded source-context pass does not certify them or the whole review.",
       "notAnIndexingOrPolicyVerdict": true
+    },
+    {
+      "recordId": 186,
+      "reason": "Original piano/chord/pad/texture assertions in sections1/2 have not been independently re-verified. Significant original music-description prose is retained and an explicit public fresh-listening/footage limitation is added; manual listening evidence is still needed. SEO title/tags, source media and both saved dates remain unchanged. This is a bounded accuracy/context correction, not whole-review certification.",
+      "notAnIndexingOrPolicyVerdict": true
+    },
+    {
+      "recordId": 45,
+      "reason": "Newv3health-keyword candidate: original paragraphs promise lower heart rate/significant stress reduction, while existing owner context already limits healing/audio claims. Read prior13OctoberQuietPresence source/poster provenance and preserve those owner additions. Metadata/poster do not verify physiological outcomes or unheard soundtrack. No45content/media edit in this run.",
+      "notAnIndexingOrPolicyVerdict": true
     }
   ],
   "nextTasks": [
     {
-      "recordId": 186,
-      "slug": "flying-relaxing-sleep-music-for-meditation-stress-relief-relaxation-by-peder-b-helland",
-      "sourceId": "1ZYbU82GVz4",
-      "task": "186bounded accuracy/context correction is prepared, not deployed. Preserve original opening/four headings/order/retained piano-texture prose, SEO title/tags/source/poster/dates. Exact29field guard and intended three-field exception are captured in0045/manifest. Require exact-head CI, fresh pending/owner checks, existing Worker release, live/data verification and completed normal audit.",
-      "preparationSources": [
-        "https://soothingrelaxation.com/blogs/videos/flying-by-peder-b-helland",
-        "https://www.pederbhelland.com/en/music/albums/flying",
-        "https://soothingrelaxation.com/pages/about-soothing-relaxation",
-        "https://www.nccih.nih.gov/health/music-and-health-what-you-need-to-know"
+      "recordId": 45,
+      "slug": "facebook-discovery-5c11fe",
+      "sourceReelId": "3197508787117279",
+      "task": "Next bounded editorial source/accuracy task. Consult existing QuietPresence source/poster provenance, then recheck current preimages. Original universal heart-rate/stress-reduction claims conflict with already qualified owner paragraphs. Preserve opening/four headings/order/all substantial owner additions/source/poster/SEO titles/dates; make no new soundtrack/scene/clinical assertion from metadata. Existing source identity/poster evidence is dated13October, not a fresh audio observation.",
+      "preparationEvidence": "18October public body inspected; original source/poster provenance in docs/thumbnail-provenance.md. No45edit in this run."
+    },
+    {
+      "recordId": 135,
+      "sourceId": "V8zXLMIjlcw",
+      "task": "Alternative source-identity preparation for published Music/Titli only if useful primary evidence is available. PublicAPI confirms saved ID and six headings, not official uploader/film location/audio/scene facts. No135edit, playback or primary-source certification in this run."
+    },
+    {
+      "recordIds": [
+        188,
+        185
       ],
-      "limits": "Creator's exact embed corroborates source identity, not clinical effects; general music research is not proof of this track's claimed physiology. Do not adopt marketing view counts/sleep promises, rehost media or infer a listening comparison.",
-      "status": "prepared_awaiting_exact_head_ci_and_verified_release"
+      "sourceIds": [
+        "c1Xg2VsjDlo",
+        "Cc4GxDy0Ib8"
+      ],
+      "task": "Health-claim source holds.18October188exact source search empty/openOnlinefetchthrottled;185search empty/openDisabledError. These are retrieval limits, not evidence of removal, bot block or a wrong creator. No field/media edits or browser/source-copy/access fallback. Resume only with credible new primary evidence; no same-run retry loop."
     },
     {
       "recordId": 190,
@@ -155,23 +173,24 @@
     },
     {
       "recordIds": [
+        186,
         191,
         192,
         193
       ],
-      "task": "Original audio/visual/cultural assertions remain manual evidence holds despite lexical flags clearing. Preserve existing substantial owner prose until evidence supports a bounded correction; no stalled-player retry loop, protected comedy/draft/provider/security/owner/Portainer changes."
+      "task": "Original piano/texture/audio/visual/cultural descriptions remain explicit manual evidence holds despite bounded context corrections. v3also flags qualified/rejected health wording, so lexical flags are not a new inaccuracy/policy verdict. No stalled-player retry loop or unsupported audio comparison."
     },
     {
-      "task": "Completed release audit39090050278 is consumed. Normal future diagnostics only; Google maps processed/0errors/library20warnings and unchanged17Octdownloads. No new Inspection/submission; retain dated17Oct200review snapshot1PASS/133Discovered/66unknown, not whole-site status."
+      "task": "Completed actual39100604325artifact is consumed. No newGoogleInspection/submission; maps processed/0errors/library20warnings and unchanged17Octdownloads. Retain dated17Oct200review snapshot1PASS/133Discovered/66unknown, not whole-site/current210coverage. Preserve all provider/comedy/draft/owner/Saiyaara/Summer/Portainer/security holds."
     }
   ],
   "dataSnapshot": {
-    "observedAt": "2026-10-18T02:26:25.478Z",
+    "observedAt": "2026-10-18T05:28:03.421Z",
     "saved": 204,
     "published": 200,
-    "protectedSha256": "3238cb1c022d9ba73e6df9b3ddd5904f287989630785dcedcfb7b486e3e0026e",
-    "excludes": "Activity counters and only191.description/review_text; intended fields separately checked by exact text-pair hash.",
-    "targetTextSha256": "deb20ce3c42536c1ce1fff3d62e5e091f7642629c15d1178443d3a82ca14fb9f",
+    "protectedSha256": "23f7d3626d9800aa384a3159a441849c82f55597488de5e6b38a29e57cfa04cb",
+    "excludes": "Activity counters and only186.description/review_text/seo_description; intended three fields checked separately.",
+    "targetFieldsSha256": "328ae98a93843297f92d978cd414d64b31ca7bc3028a4be4235f56f52cd2658a",
     "verificationWrites": false
   },
   "completedDiagnostics": [
@@ -234,6 +253,43 @@
       ],
       "contentHashesChanged": 0,
       "productionWrites": false
+    },
+    {
+      "screeningVersion": 3,
+      "status": "implemented_and_regression_tested_read_only",
+      "observedAt": "2026-10-18T05:29:41.467Z",
+      "task": "Add source-review candidate flag for explicit brainwave/heart-rate/nervous-system/sleep-induction wording in listing/body/SEOdescription.",
+      "beforeCriteria": {
+        "screeningVersion": 2,
+        "records": 200,
+        "flagged": 90,
+        "genericListingIntros": 54,
+        "repeatedParagraphGroups": 1
+      },
+      "afterCriteria": {
+        "records": 200,
+        "flagged": 92,
+        "genericListingIntros": 54,
+        "repeatedParagraphGroups": 1
+      },
+      "healthCandidateRecordIds": [
+        188,
+        186,
+        185,
+        45
+      ],
+      "additionalFlaggedRecordIds": [
+        186,
+        45
+      ],
+      "contentHashesChanged": 0,
+      "productionWrites": false,
+      "tests": {
+        "focused": 8,
+        "totalLocalNode": 387,
+        "workerDryRun": "pass"
+      },
+      "limits": "Includes qualified/rejected/quoted claims. Normal relaxation labels alone do not trigger it. No medical/AI/plagiarism/policy/quality verdict or automatic rewrite;186stays flagged because the corrected text questions the claim, not because correction failed."
     }
   ],
   "records": [
@@ -504,7 +560,8 @@
       "protectedTopic": false,
       "contentSha256": "dee8287e4b2d2e2cdcc7b844937250e4850b6f361a506c3cdd4b45992adfc04c",
       "flags": [
-        "generic_listing_intro"
+        "generic_listing_intro",
+        "health_claim_needs_source_review"
       ]
     },
     {
@@ -522,10 +579,9 @@
       "slug": "flying-relaxing-sleep-music-for-meditation-stress-relief-relaxation-by-peder-b-helland",
       "category": "Music",
       "protectedTopic": false,
-      "contentSha256": "3612605c9784356b9d7011a45fe40ffcfc1f98db681750895321c2d556c786db",
+      "contentSha256": "ae9952cdebd7ff7e05acd0eb13a2b07f4089ed5ba11ad569764cd584f429d70e",
       "flags": [
-        "generic_listing_intro",
-        "claim_needs_source_review"
+        "health_claim_needs_source_review"
       ]
     },
     {
@@ -536,7 +592,8 @@
       "contentSha256": "a4257a1b5c47df531ed5db7253a70ec83727cbd682bb9dddd4523e5f26fb9f14",
       "flags": [
         "generic_listing_intro",
-        "claim_needs_source_review"
+        "claim_needs_source_review",
+        "health_claim_needs_source_review"
       ]
     },
     {
@@ -1681,7 +1738,9 @@
       "category": "Music",
       "protectedTopic": false,
       "contentSha256": "fcd910a9a1015356d5e9827a803b63545aff483b65db10c4ffa4f214f0434b64",
-      "flags": []
+      "flags": [
+        "health_claim_needs_source_review"
+      ]
     },
     {
       "id": 44,
@@ -2041,13 +2100,13 @@
     "protectedIndexedTopic": true,
     "scopeLimit": "Dated stored-Inspection review set, not a whole-site indexed count. Current library200+editorials10 is larger than the190+10 audited set; no new Inspection made."
   },
-  "screeningVersion": 2,
+  "screeningVersion": 3,
   "latestPublicAudit": {
-    "runId": 39090050278,
-    "artifactId": 12122307006,
-    "zipSha256": "60bbee5cb8d16caab80995211c4b3cffdaa5769287b5db47abce00a4ada0556b",
-    "generatedAt": "2026-10-18T02:26:07.696Z",
-    "completedAt": "2026-10-18T02:28:33Z",
+    "runId": 39100604325,
+    "artifactId": 12126377543,
+    "zipSha256": "80656c521ca61e8edd544383cf597ca21aabd36138b1f1d9c7f76ae27bdbc8b7",
+    "generatedAt": "2026-10-18T05:27:39.125Z",
+    "completedAt": "2026-10-18T05:29:29Z",
     "pages": 231,
     "technicalFailures": 0,
     "libraryReviews": 200,
