@@ -3161,6 +3161,12 @@ function renderWatchHtml(video, request, env, scriptNonce) {
       <p class="review-source-note">Vid.Best provides commentary on external media, not a claim of original video authorship. <a href="/editorial">How our reviews work</a>.</p>
       <a class="source-link" href="${escapeHtml(video.source_page_url || video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open original source ↗</a>
     </article>
+    ${thumbnail ? `<figure class="watch-review-art glass-panel" aria-label="Review image">
+      <a href="${escapeHtml(thumbnail)}" target="_blank" rel="noopener noreferrer" aria-label="View review preview image">
+        <img src="${escapeHtml(thumbnail)}" alt="${escapeHtml(video.title)} — review preview image" width="640" height="360" loading="lazy" decoding="async">
+      </a>
+      <figcaption>Preview artwork for this review. The original video remains with its publisher.</figcaption>
+    </figure>` : ""}
     <section class="comments-panel glass-panel">
       <h2>Community comments</h2>
       <form id="watch-comment-form" class="comment-form">
@@ -4071,9 +4077,12 @@ async function videoSitemapResponse(request, env, page) {
         ? `<video:publication_date>${escapeXml(publicationValue)}</video:publication_date>` : "";
       videoEntry = `<video:video><video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc><video:title>${escapeXml(row.title)}</video:title><video:description>${escapeXml(description)}</video:description>${location}${publicationDate}${duration ? `<video:duration>${duration}</video:duration>` : ""}</video:video>`;
     }
-    return `<url><loc>${escapeXml(canonical)}</loc><lastmod>${escapeXml(row.updated_at)}</lastmod>${videoEntry}</url>`;
+    const imageEntry = thumbnail
+      ? `<image:image><image:loc>${escapeXml(thumbnail)}</image:loc></image:image>`
+      : "";
+    return `<url><loc>${escapeXml(canonical)}</loc><lastmod>${escapeXml(row.updated_at)}</lastmod>${imageEntry}${videoEntry}</url>`;
   }).join("");
-  const body = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">${homepage}${entries}</urlset>`;
+  const body = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${homepage}${entries}</urlset>`;
   return new Response(body, {
     headers: securityHeaders(new Headers({ "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=900" })),
   });
