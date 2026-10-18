@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-18T02:26:36.011Z",
+  "generatedAt": "2026-10-18T05:19:05.849Z",
   "inputMode": "live_public_api",
-  "observedAt": "2026-10-18T02:26:36.011Z",
+  "observedAt": "2026-10-18T05:19:05.849Z",
   "productionWrites": false,
   "scope": "published library review bodies and listing descriptions; excludes category/listing-page overlap",
   "limitation": "Screening signals only. No AI detection, external plagiarism check, footage verification, Google status or AdSense eligibility score.",
@@ -20,6 +20,28 @@
       ]
     }
   ],
+  "preparedBatch": {
+    "recordIds": [
+      186
+    ],
+    "status": "prepared_awaiting_exact_head_ci_and_verified_release",
+    "changedFields": [
+      "description",
+      "review_text",
+      "seo_description"
+    ],
+    "reasonForSeoDescriptionException": "Remove evidenced unsupported induce-deep-sleep health promise; preserve SEO title/tags and all dates/media.",
+    "baselineObservedAt": "2026-10-18T05:18:23.594Z",
+    "protectedSha256": "23f7d3626d9800aa384a3159a441849c82f55597488de5e6b38a29e57cfa04cb",
+    "guardFields": 29,
+    "tests": {
+      "localNode": 385,
+      "focused": 6,
+      "pythonSyntax": "pass",
+      "workerDryRun": "pass",
+      "exactHeadCi": "required"
+    }
+  },
   "completedBatches": [
     {
       "recordIds": [
@@ -116,14 +138,15 @@
       "recordId": 186,
       "slug": "flying-relaxing-sleep-music-for-meditation-stress-relief-relaxation-by-peder-b-helland",
       "sourceId": "1ZYbU82GVz4",
-      "task": "Next source-verifiable Music review: bounded correction of unsupported track-specific brainwave/nervous-system/algorithmic guarantees with primary creator/catalogue context and appropriately limited evidence. Recheck current owner preimages; preserve opening/four headings/order/substantial original prose/SEO/source/poster/dates. No186edit or audio/footage observation in this run.",
+      "task": "186bounded accuracy/context correction is prepared, not deployed. Preserve original opening/four headings/order/retained piano-texture prose, SEO title/tags/source/poster/dates. Exact29field guard and intended three-field exception are captured in0045/manifest. Require exact-head CI, fresh pending/owner checks, existing Worker release, live/data verification and completed normal audit.",
       "preparationSources": [
         "https://soothingrelaxation.com/blogs/videos/flying-by-peder-b-helland",
         "https://www.pederbhelland.com/en/music/albums/flying",
         "https://soothingrelaxation.com/pages/about-soothing-relaxation",
         "https://www.nccih.nih.gov/health/music-and-health-what-you-need-to-know"
       ],
-      "limits": "Creator's exact embed corroborates source identity, not clinical effects; general music research is not proof of this track's claimed physiology. Do not adopt marketing view counts/sleep promises, rehost media or infer a listening comparison."
+      "limits": "Creator's exact embed corroborates source identity, not clinical effects; general music research is not proof of this track's claimed physiology. Do not adopt marketing view counts/sleep promises, rehost media or infer a listening comparison.",
+      "status": "prepared_awaiting_exact_head_ci_and_verified_release"
     },
     {
       "recordId": 190,
