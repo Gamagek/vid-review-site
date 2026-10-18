@@ -118,6 +118,19 @@ test("homepage mini tile holds a poster until tapped without claiming auto sound
   assert.match(loader, /Show Saiyaara video player and sound controls/);
   assert.match(loader, /cover\.addEventListener\("click"/);
   assert.match(loader, /cover\.hidden = true/);
-  assert.match(home, /const cover = card\.querySelector\("\.saiyaara-tile-cover-poster"\)/);
+  assert.match(home, /VidBestSaiyaaraTagembed\?\.updatePoster\?\./);
+  assert.match(loader, /img\.src = FALLBACK_POSTER/);
   assert.match(styles, /\.saiyaara-preview-cover:focus-visible/);
+});
+
+test("Saiyaara preview starts from first-party poster, never the expired D1 signed URL", () => {
+  assert.match(home, /surface\.dataset\.saiyaaraPoster = share \? "\/api\/tiktok\/cached-poster/);
+  assert.match(loader, /FALLBACK_POSTER = "\/api\/tiktok\/cached-poster\?id=7669587518156705056"/);
+  assert.match(loader, /img\.src = FALLBACK_POSTER/);
+  assert.match(loader, /saiyaara-preview-caption/);
+  assert.match(loader, /posterRequests\.set\(host, token\)/);
+  assert.match(home, /VidBestSaiyaaraTagembed\?\.updatePoster\?\./);
+  assert.match(styles, /saiyaara-preview-caption/);
+  assert.match(styles, /\.saiyaara-tile-cover-poster\[hidden\]/);
+  assert.doesNotMatch(loader, /IntersectionObserver|rootMargin/);
 });
