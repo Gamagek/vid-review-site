@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "inventoryAt": "2026-10-18T17:19:45.523Z",
-  "publishedLibraryCount": 210,
+  "publishedLibraryCount": 215,
   "batchLimit": 10,
   "phase": "additive_sidebar_illustrations",
   "policy": "Preserve all source/owner posters and all D1 fields. Match current published ID, slug, source and title before enabling art. Do not edit protected review topics/media or drafts. Reconcile newly published records on each run; no regeneration merely for freshness. The owner’s 18 October request authorizes separate, clearly labelled sidebar art for all published platforms/topics, including comedy, but never edits existing protected review text, SEO titles, source posters or players. Source-removal/demo/Saiyaara/Summer holds remain.",
@@ -15,1475 +15,1725 @@
       "slug": "lab-review-1-player-test",
       "category": "Technology",
       "sourceSha256": "139d0fe64db91605e887c7bb9e57b5dbc586e99e95942d9d084f8f202443aaa2",
-      "status": "hold_existing_restriction"
+      "status": "hold_existing_restriction",
+      "provider": "other"
     },
     {
       "id": 3,
       "slug": "youtube-embed-experience-demo",
       "category": "Technology",
       "sourceSha256": "c606255e0df21f3477531b3d796adc1308816bc8266163603a66c9733bc40ba3",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 4,
       "slug": "sadahatama-oba-mage-theme-song",
       "category": "Music",
       "sourceSha256": "19d48013af26fc81245c7b34548c14dd4685d9ce79fbf6ff7b19a5ff75f28462",
-      "status": "included_in_release"
+      "status": "published_verified",
+      "provider": "youtube"
     },
     {
       "id": 5,
       "slug": "itipiso-bhagava-the-power-of-supreme-compassion",
       "category": "Spirituality",
       "sourceSha256": "9fcfd2ec98b153ac2324446165aa8766cd15f117f956bcf77a1dda5abd0e2cc8",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 6,
       "slug": "a-for-apple-abc-alphabet-song",
       "category": "Education",
       "sourceSha256": "f38b2cdd8b41445c0bf8f104e9369df26b650e99924660d236aca6d0bd251924",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 7,
       "slug": "best-comedy-compilation-ultimate-try-not-to-laugh-viral-pranks",
       "category": "Funny & Comedy",
       "sourceSha256": "590851c7b551b9f8adf8d005628631874fa05640471a08e64d47f9dd1981ce66",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 8,
       "slug": "saiyaara-a-cinematic-romance",
       "category": "Music",
       "sourceSha256": "d792f165b12715d76b3ad22151da46c8f474ad517d6bb5b4a5c94c54e12962a2",
-      "status": "hold_existing_restriction"
+      "status": "hold_existing_restriction",
+      "provider": "tiktok"
     },
     {
       "id": 9,
       "slug": "the-ultimate-bollywood-anthem",
       "category": "Music",
       "sourceSha256": "28d27bb89d77684da87e978d40deefb5b5535174bc5ca79c7f235e01d9422ba9",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 10,
       "slug": "sadahatama-oba-mage-teledrama",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "ab679d42739bbbc25ee07bcf793fdfb749b6cf882339e6de14a1c89e394e8e0c",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 11,
       "slug": "the-ultimate-internet-comedy",
       "category": "Funny & Comedy",
       "sourceSha256": "2d5691c1da811831fe29920eb819a5028ef67495aaf8d187f41ee560ac1a3e90",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 12,
       "slug": "tiktok-discovery",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "2076fca17da22eb8ab99fa9806725060817413bb54e5479a299b90c0711ee950",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "tiktok"
     },
     {
       "id": 16,
       "slug": "ranking-legendary-laughing-memes",
       "category": "Funny & Comedy",
       "sourceSha256": "99cbdfa037f123c8a235809ac247ab5bd4e300d4893f202bf028487d8c98d031",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "tiktok"
     },
     {
       "id": 17,
       "slug": "mr-bean-the-ultimate-cinema-comedy",
       "category": "Funny & Comedy",
       "sourceSha256": "5086eb8b82f9b53f004a20b7488f28107777c8a3511e4cb5108671ab3545a3b2",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 18,
       "slug": "a-beautifully-creative-proposal-meme",
       "category": "Funny & Comedy",
       "sourceSha256": "c97cc746f75b62e2aa37f0732eab9fbb850c19242966ca8668541ddae7b4d480",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "tiktok"
     },
     {
       "id": 19,
       "slug": "the-funniest-memes-a-funny-proposal-friendly-pranks",
       "category": "Funny & Comedy",
       "sourceSha256": "825d6211d89daa96d68fd2e78fd5169e49a1f9af7c04343cc35fdd4348ca2ce5",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "tiktok"
     },
     {
       "id": 20,
       "slug": "the-ultimate-viral-laughs-compilation",
       "category": "Funny & Comedy",
       "sourceSha256": "ca00c1a3b43adb4498635b378d0d5cd7832d03c1170968cd2e43e2d982622273",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "tiktok"
     },
     {
       "id": 21,
       "slug": "super-funny-videos-compilation-memes",
       "category": "Funny & Comedy",
       "sourceSha256": "91783cfcc09445ac468b6d28dbf5a849a9bc6909f5ce92f4b37e325a8e67451f",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 22,
       "slug": "armchair-bean-funny-clips-mr-bean-official",
       "category": "Funny & Comedy",
       "sourceSha256": "fcdc4fbe69d3c86c0fbcf3658383ac2437370e5ccf7f989d00191bef8a6613ab",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 23,
       "slug": "christmas-day-mr-bean-official",
       "category": "Funny & Comedy",
       "sourceSha256": "20f1df7f77336b95ff01ef8912b47d0467b51ea70afb866e1e453944dec959a2",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 24,
       "slug": "the-ultimate-vocal-magic-shreya-ghoshal-s-live-teri-ore-performance",
       "category": "Music",
       "sourceSha256": "e9e4239e20e13c641f1a8fac06f5cc1ebd22242af76f8ab5af6079d36068ca4f",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 25,
       "slug": "the-ultimate-edm-anthem-alan-walker-s-faded-live-performance-alan-walker-feat-tove-stryke",
       "category": "Music",
       "sourceSha256": "64fd7c69f918daf2da18cd86bac21f33066fba89967cf9080a48644eb78fd234",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 26,
       "slug": "the-funniest-animal-memes-the-boss-chicken-the-scared-dog",
       "category": "Funny & Comedy",
       "sourceSha256": "f7efb6a7bc939510320fc08ddb45cbe7c4981d3169daaab6825c9b83f988e541",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "tiktok"
     },
     {
       "id": 27,
       "slug": "the-ultimate-michael-jackson-playlist-greatest-hits-of-the-king-of-pop",
       "category": "Music",
       "sourceSha256": "67b9571eeeeb247fdb3d0bed8c508d679ee47c1cacd13167420ed0cc969bbb4a",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 28,
       "slug": "the-ultimate-comedy-viewing-party",
       "category": "Funny & Comedy",
       "sourceSha256": "45a37553bbdf713f1f0d0ef4db6a0646eb223ee888399ca799825445d3138380",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 29,
       "slug": "the-funniest-football-match-ever-broomstick-dribbles-epic-fails",
       "category": "Funny & Comedy",
       "sourceSha256": "4d11c3471a26f038c685b887b91d2332ade9c45b02c10105911668f97f5d598d",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 30,
       "slug": "the-majestic-giant-dog-is-it-a-lion-or-a-puppy",
       "category": "Other",
       "sourceSha256": "dd32b6b27e41361b075be540c60427a08220efbd7716c4ac6ee480eb0bd68dbf",
-      "status": "hold_existing_restriction"
+      "status": "hold_existing_restriction",
+      "provider": "tiktok"
     },
     {
       "id": 31,
       "slug": "the-most-epic-avengers-scene-ever-i-m-always-angry-hulk-smash",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "65c97a89ee4f90fdc4a00fa0a023c8e66339bdf1c30a220a5632b4ce2fc31801",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 32,
       "slug": "the-extreme-skateboarding-corgi-is-this-viral-stunt-real-or-fake",
       "category": "Social Media & Trending",
       "sourceSha256": "67a49224989281732d4621900f146d230280e7cacabfbbe9456bb7583167fe1a",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "tiktok"
     },
     {
       "id": 33,
       "slug": "try-not-to-laugh-hard-mode-the-funniest-dinosaur-dub-ever",
       "category": "Funny & Comedy",
       "sourceSha256": "bda7b2134d77402b0848e1a91f57c0a9a2a8ef3a82c0494b6138fcc4a2b8ec27",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "tiktok"
     },
     {
       "id": 34,
       "slug": "the-most-epic-battle-speech-ever-aragorn-s-final-stand-lord-of-the-rings",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "6c2f550f2a7a8632104bd430841c9a6b409ca2deab81728f6841a5bfbd53b380",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 35,
       "slug": "the-most-epic-fantasy-battle-ever-hobbit-4k-action-cut",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "79d4828c6155ec065c6732eb0299bc9e3a3b9cf63d7387323de119d663745f69",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 36,
       "slug": "lady-gaga-bruno-mars-die-with-a-smile-official-music-video",
       "category": "Music",
       "sourceSha256": "4794a42203c1d970f6f257f4f16b883cb31f1c643d2e05881a4083ac4d20b6ba",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 37,
       "slug": "building-a-secret-dugout-between-two-oak-trees-bushcraft-survival-shelter",
       "category": "Adventure & Travel",
       "sourceSha256": "462bf3272909cef0bbd8352313481856bd48500e57ca5f9b26151ef7a0d07b8d",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 38,
       "slug": "how-to-make-working-model-of-a-wind-turbine-from-cardboard-school-project",
       "category": "Environment & Sustainability",
       "sourceSha256": "39b8a9c881a61ea8ebda7ca91a199877604fad786f5c74250d67b420f9055b0b",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 39,
       "slug": "15-energy-efficient-inventions-for-your-home",
       "category": "Environment & Sustainability",
       "sourceSha256": "13939cfdc70070bc44d030ef5a2ef839e164f136bfece2f8de45b0b29bfe3122",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 40,
       "slug": "how-to-make-a-water-wheel-with-generator-water-wheel-free-energy",
       "category": "Environment & Sustainability",
       "sourceSha256": "6cb92460ff73c539ecc84fedc2fc99068de5741b68641a353161a442191940d6",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 41,
       "slug": "10-home-decorating-ideas-handmade-with-seashell-seashell-craft-ideas",
       "category": "Arts & Culture",
       "sourceSha256": "3b578a9b185992b225d2287bcc79175df09b1102ff79df9ea54e2e315225dc92",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 42,
       "slug": "creating-a-seashell-gyaru-sculpture",
       "category": "Arts & Culture",
       "sourceSha256": "3aee84ff7b5075b956c57247b1febe7502158d9f8af185c08c73a434ed6f6245",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 43,
       "slug": "daily-calm-10-minute-mindfulness-meditation-be-present",
       "category": "Spirituality",
       "sourceSha256": "97f32d5c7f083507172a33e2ea16018b1ba389d0d23c1841bdeb39164d69dc97",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 44,
       "slug": "facebook-discovery",
       "category": "Spirituality",
       "sourceSha256": "6f887344a4d81d4cff8da49d49933b96f9b806cfa70c4728e670c5cc29578578",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "facebook"
     },
     {
       "id": 45,
       "slug": "facebook-discovery-5c11fe",
       "category": "Music",
       "sourceSha256": "cc3635de625df92e1e18acbd474b18f57c4fa47c43e55745050c6dd4bc03a584",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "facebook"
     },
     {
       "id": 46,
       "slug": "saiyaara-song-dj-bass-boosted-shorts-ahaan-aneet-arijit-singh-mithoon-saiyaara-ahaanpanday",
       "category": "Music",
       "sourceSha256": "8563897469b30b4fa5347cc41f1f7883fc110162ec3734317128af2d59dd1519",
-      "status": "hold_existing_restriction"
+      "status": "hold_existing_restriction",
+      "provider": "youtube"
     },
     {
       "id": 47,
       "slug": "feel-this-song",
       "category": "Music",
       "sourceSha256": "6a5bb4a9ed2beec0395dafa5e98c7fcc2ce2a53e47d9319133254b8e806bf5ff",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 48,
       "slug": "what-s-the-difference-between-meditation-and-mindfulness",
       "category": "Spirituality",
       "sourceSha256": "2ed1686fa4a89453322d113e381cacbe6774e7c2143c8d788ef45510ac3763c3",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 49,
       "slug": "try-not-to-laugh-top-100-funniest-videos-ever-memes-epic-fails-pranks-compilation-part-54",
       "category": "Funny & Comedy",
       "sourceSha256": "79cff443697eaab4142bd4d415466ca2c142fbbbb39791d085524e5f29fd20ae",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 51,
       "slug": "apple-duo-mystery-appleduo-viral-trending-shortsfeed-mustwatch-fyp-youtubeshorts-techtrend",
       "category": "Technology",
       "sourceSha256": "83c0163cd28d91f4f8e5b6a4377e325321b78a0cc1e0561265a779884574cc12",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 52,
       "slug": "china-s-street-tech-looks-like-2050",
       "category": "Technology",
       "sourceSha256": "04f8735758739977e905ddffef064ba1fa87f7ccb8be9f0310d1f5638afeb0d9",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 53,
       "slug": "1-vs-1-000-000-000-futuristic-tech",
       "category": "Technology",
       "sourceSha256": "635a7ee1f90f3e4294b81de42badd233e7ff9d7074dfef0cbf962e3503c3cac5",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 54,
       "slug": "the-ultimate-medieval-promposal-monty-python-king-arthur-style",
       "category": "Funny & Comedy",
       "sourceSha256": "f84eb91477a464c0906a8d55e01fd8c4b9767f08abc448e9fd49775e5b3a3fbf",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "tiktok"
     },
     {
       "id": 55,
       "slug": "the-northern-lights-aurora-borealis-relaxing-view",
       "category": "Music",
       "sourceSha256": "b03e8732d42433d752c47cb578a82b1837edfe9b02a3d62626aa2d4a141d9360",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 56,
       "slug": "try-not-to-laugh-challenge-impossible-milk-eat-you-will-laugh-animation-comedy-memes-cartoon",
       "category": "Funny & Comedy",
       "sourceSha256": "d514baff0d2abd864a67bfa75d9b81346bf223a946e744a860e36de4f0fb168a",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 57,
       "slug": "sri-lankan-very-famous-delicious-food-kiribath-with-katta-sambol-milk-rice-coconut",
       "category": "Food & Cooking",
       "sourceSha256": "1450eee28c7f4c793b7b000c20387fae694df7fc07c7fe3d5e522bd50c69736b",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 58,
       "slug": "the-ultimate-movie-theater-funny-fake-proposal-prank",
       "category": "Funny & Comedy",
       "sourceSha256": "3237527368d82246cd27304f3840d986f9ea7a7e0515fc7f4b9f2b17998797b1",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 59,
       "slug": "a-beautiful-places-forest-sinharaja-sinharaja-sri-lanka",
       "category": "Adventure & Travel",
       "sourceSha256": "7c72ac0a55373639116261b29b3290724282a0c73b2a00d55d8563d00ace5b2b",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 60,
       "slug": "water-challange-funny-cute-faces-instagram-dm-try-not-to-laugh",
       "category": "Funny & Comedy",
       "sourceSha256": "b1913b96afdf3fc5ff2d5772ab3fde2b465d321ca21ce805c51b3517bc92f6b2",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 61,
       "slug": "try-not-to-laugh-celebrity-reacts-to-epic-fails-pranks",
       "category": "Funny & Comedy",
       "sourceSha256": "8b3bbd0f3ebb88a307455192e453c1003b50ce41f478ebf7e7bbe306a582245d",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 62,
       "slug": "try-not-to-laugh-best-funny-videos-compilation-memes",
       "category": "Funny & Comedy",
       "sourceSha256": "1d6ddfcfdeead7019f0c78b2a6c55952e9d5b07d40b7b6406aee0c4c502ab385",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 63,
       "slug": "try-not-to-laugh-challenge-impossible-laugh-and-you-lose-part-16",
       "category": "Funny & Comedy",
       "sourceSha256": "598697a6b2e701b38b2ed0fe32b1291597d73cc4fcbe73670abc1edc4aefc869",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 64,
       "slug": "categories-of-wisdom-bhavana-learning-reflection-meditation",
       "category": "Education",
       "sourceSha256": "8f5ba1eda133ed749123cf8293a5d56648b4c8e3313c562eb6067ebfe5dcc8c9",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 65,
       "slug": "knight-rider-theme-2020-cover-remake-by-enzo-margaglio",
       "category": "Music",
       "sourceSha256": "e32aa8fe4270da6189a23bd1d96acc14181e0d4fa393547ccd5e38a6174d0ccf",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 66,
       "slug": "hidden-tree-stump-shelter-6-minute-build-fast-version",
       "category": "Adventure & Travel",
       "sourceSha256": "ea1f52e0b871c1f027171b4976079de2f58aa441ff05b8017e07cc410599d3c5",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 67,
       "slug": "j-geco-chicken-song-the-ultimate-techno-dance-anthem",
       "category": "Funny & Comedy",
       "sourceSha256": "9d87792386aa5166a50afc9cac5ba0bdeffc018b33875cbf6bdd56aa47cbc1a3",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 68,
       "slug": "those-one-places-on-earth-that-don-t-feel-real-surreal-travel-destinations",
       "category": "Adventure & Travel",
       "sourceSha256": "8beda32e4ecb39c4a6958a8ba04185549fd4325e8e4f9f5fe182dcba97601015",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 69,
       "slug": "shakti-sarah-meriaashiquitumsehi-ishveer-shaktiarora-radhikamadan-aashiqui-meriaashiqui",
       "category": "Music",
       "sourceSha256": "27248b8887efae4ca03359de26a2a09d96e425f287295cce0dcd027407094cbf",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 70,
       "slug": "wakawaka-song-new-trend-you-are-the-good-learner-shorts-trending-teen-newsong-song-shakira",
       "category": "Music",
       "sourceSha256": "127d46d00a00621462378cfd850891e8baacaf3c353b288dda5809ec8654e2bb",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 71,
       "slug": "must-watch-new-funny-video-2022-top-new-comedy-video-2022-try-to-not-laugh-episode-169-by-funny-day",
       "category": "Funny & Comedy",
       "sourceSha256": "122a35e6e2119c77b40e9e9581df22698a213459287d5331e1f8351d18ed2abf",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 73,
       "slug": "summer-inverted-7332342275151760642",
       "category": "Social Media & Trending",
       "sourceSha256": "85c77b879704b39c3ce5b44f42bc61b20585ca5ac0bf96cf4cad2def60844f88",
-      "status": "hold_existing_restriction"
+      "status": "hold_existing_restriction",
+      "provider": "tiktok"
     },
     {
       "id": 74,
       "slug": "ultimate-funny-fails-reaction-funny-sounds-try-not-to-laugh-challenge",
       "category": "Funny & Comedy",
       "sourceSha256": "9e3c2205fe7082d67bd58c0340301b77d24504164358d29c559e659064d9efc4",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 76,
       "slug": "tom-holland-zendaya-try-not-to-laugh-epic-jump-scare-fails",
       "category": "Funny & Comedy",
       "sourceSha256": "76f05c2e8d3232c36f7def87c517546fc32fccdc4f160b3d38c876d48591d7fc",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 77,
       "slug": "trend",
       "category": "Funny & Comedy",
       "sourceSha256": "bc6fdb563db82384d1a5b21a131b5d3e83caac0bfcd2b8c03a10ec764e6bd614",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 78,
       "slug": "trend-426414",
       "category": "Funny & Comedy",
       "sourceSha256": "0c379ac576931ff1658bb85b13677b170139b1efceab12372dd40b44aedfe8ea",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 79,
       "slug": "spmm5182",
       "category": "Funny & Comedy",
       "sourceSha256": "a491381dc4c0b9ce2303086c5f9950f80d6ffa02413d148b78a4bd845853ba74",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 80,
       "slug": "batman-never-asked-for-a-thank-you-edit-shorts-batman",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "92f4dedca2a7262e6f900e14190372a70eacc0339fb8e210fc594dbce3fa895f",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 81,
       "slug": "top-5-most-viewed-tiktoks-ever-billions-of-views-explained",
       "category": "Social Media & Trending",
       "sourceSha256": "c8f8b141ab690197f93fbb654fadf955b298d0687d2b9050f18150800d813e4e",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "tiktok"
     },
     {
       "id": 82,
       "slug": "super-fail-reaction-unstoppable-laughter-epic-pranks",
       "category": "Funny & Comedy",
       "sourceSha256": "06a343aee572abc4bf0c46e6dc2625af78211f5c5f25d7c31b418c241f52a29a",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 83,
       "slug": "hilarious-proposal-fail-when-romance-meets-pure-chaos-farting-girl-ruins-proposal",
       "category": "Funny & Comedy",
       "sourceSha256": "8fc624cfe3e680e076c36629db1d4ac6e63d542746d8401e21fe6005e14035b5",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 84,
       "slug": "the-chicken-is-trying-to-impress-me-ben-etkilendim-funny-animals-cartoon",
       "category": "Funny & Comedy",
       "sourceSha256": "7dc11076874192e37f3b7e8480fef41a99224e1ffd524a62420ff4f4461458ce",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 85,
       "slug": "the-psychology-of-viral-edits-why-fast-paced-videos-work",
       "category": "Funny & Comedy",
       "sourceSha256": "873640af2d9af8c9f662fb3beba1f42816fc0f5f2867052c8aae74792f9fb27c",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 86,
       "slug": "luis-fonsi-despacito-ft-daddy-yankee",
       "category": "Music",
       "sourceSha256": "844d66181a13d7e95bb88ae34b75853f2b7178597661dc8f8b1050965ed9dd89",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 87,
       "slug": "shakira-waka-waka-the-ultimate-anthem-of-resilience-unity",
       "category": "Music",
       "sourceSha256": "c636d914c2b5c5d82e7857ea3c1a83289d1b21f3570789aabc42d35d2ec103ca",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 88,
       "slug": "romantic-ai-art-the-beauty-of-digital-love-sweet-moments",
       "category": "Other",
       "sourceSha256": "d55880dcc563a8aac4cf9983a3f18345ad4c94c2354483ce2bf373772b14f8a7",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "instagram"
     },
     {
       "id": 89,
       "slug": "harry-potter-hip-hop-edit-the-ultimate-magic-rap-remix",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "fe67da49a0b38de93bfb9be6ec239af13b6ff026eae4025085d19987bfb3ee52",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 90,
       "slug": "top-5-sleep-fails-the-funniest-dreams-caught-on-camera",
       "category": "Funny & Comedy",
       "sourceSha256": "7102f6a0418880f7bc56876630de4944d3369b34ece1a86c7b5c321ed0305553",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 91,
       "slug": "celebrity-fail-reactions-pure-laughter-the-ethics-of-humor",
       "category": "Funny & Comedy",
       "sourceSha256": "cfc4100ba164a7c1f26aca20034c9016ae5930ad39721da120cf27849efd6a42",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 92,
       "slug": "edits",
       "category": "Funny & Comedy",
       "sourceSha256": "5fd7605fc9eb1ce5b79e00c8711c5b09dcec9a085e889edff6c42e068749d64f",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 93,
       "slug": "celebrity-reaction-edit-the-comedy-of-unexpected-fails",
       "category": "Funny & Comedy",
       "sourceSha256": "dae507e13de7dcf35d93f05285ad2636c1afc1feb4eb4f10b3f2b3fc8133c973",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 94,
       "slug": "celebrity-reaction-fails-pure-laughter-the-boundaries-of-pranks",
       "category": "Funny & Comedy",
       "sourceSha256": "046ac9620b18a52a1a865c0969650a200c19e3398d9e6aaa3d4be431e42bfdac",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 95,
       "slug": "celebrity-reaction-fails-the-comedy-of-unexpected-pranks",
       "category": "Funny & Comedy",
       "sourceSha256": "cd3d9a4cd939eadf058e76fd9010bbf3d4a859abe693a097901efbaa4db2b4f3",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 96,
       "slug": "celebrity-reactions-rebounding-balls-blazzier-challenges-funny-fails",
       "category": "Funny & Comedy",
       "sourceSha256": "b5b491a1297d2b2ee7d1ab8632dfdb6cf105e01b707e0f4ee2c7c96469041fc1",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 97,
       "slug": "celebrity-reactions-the-imaginary-chair-fall-funny-ladders-slapstick",
       "category": "Funny & Comedy",
       "sourceSha256": "48b1d53035666fc0c9b95dce842b5c59605e9286a69f15b078546b0b13af4b57",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 98,
       "slug": "3-why-this-kolaveri-di-official-video-dhanush-anirudh-ravichander-shruti-haasan",
       "category": "Music",
       "sourceSha256": "66c09546dfec3d3b0b55d14c6b8c37ca11ac3c9a8554394bd3f5f0fbf0f622bc",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 99,
       "slug": "maari-2-rowdy-baby-video-song-dhanush-sai-pallavi-yuvan-shankar-raja-balaji-mohan",
       "category": "Music",
       "sourceSha256": "dd850dbeed62ba61b6c76a651eae02dc57f2ea5e6132993e550b15632902302f",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 100,
       "slug": "justin-bieber-baby-ft-ludacris",
       "category": "Music",
       "sourceSha256": "14465df767b74e7aa9c19372d62cf5a42a6298f8cdcb71eb603282a045fa9128",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 101,
       "slug": "shakira-burna-boy-dai-dai-official-video",
       "category": "Music",
       "sourceSha256": "14af49fb95ab42536252f5902a286ba465103a88867fcc45bc2837b247482ee0",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 102,
       "slug": "arash-feat-helena-one-day-official-video",
       "category": "Music",
       "sourceSha256": "07a176def8f02f408b351d2ef68e3a9fb5bc884d7aee2c728787d46846f233ba",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 103,
       "slug": "psy-gangnam-style-m-v",
       "category": "Music",
       "sourceSha256": "2a4035f2c05098db17be1b72aa0a9ece5179304b50ccc9a8c897294a0aa62369",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 104,
       "slug": "place-on-earth-that-don-t-feel-real-travel-explore-expectations-adventure-shorts",
       "category": "Adventure & Travel",
       "sourceSha256": "44c8be8d16bce8f535dc0e14be94220407c3527ea051e6c9fb16b55cbb944847",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 105,
       "slug": "places-in-real-life-travel-explore-adventure-destinations",
       "category": "Adventure & Travel",
       "sourceSha256": "4d0283c4496eab670a8fcf458e48ae28613631ec0bc1c701258860b6a454aab4",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 106,
       "slug": "4-delicious-breakfast-recipes-gordon-ramsay",
       "category": "Lifestyle, Health & Fitness",
       "sourceSha256": "7f08a8ca7772341677e73afcb35f8dfae91fb56da3d6e4bf50d602a3f4e072a2",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 107,
       "slug": "three-3-best-business-can-start-with-3-dollar-in-2025-subscribe",
       "category": "Business & Economy",
       "sourceSha256": "c81c0717c6c20fac14233cb4a2e539b04a1b3f0748815cc7bb692cf95c49456b",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 108,
       "slug": "dilscoop-shot-shorts-cricket",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "e2f7e1fd3732e81dc5d2f54b2a8aba8f0b51b6181369b815168ec707e00f531c",
-      "status": "hold_existing_restriction"
+      "status": "hold_existing_restriction",
+      "provider": "youtube"
     },
     {
       "id": 109,
       "slug": "tui-tui-comedy-video-tui-tui-best-funny-video-2022-special-new-video-dont-miss-this-episode",
       "category": "Funny & Comedy",
       "sourceSha256": "c4a4ddbf22da9cee0c5a1848d4b4d57ffb04a300733fc5c5c143d0dac64f1115",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 110,
       "slug": "lasith-malinga-s-unstoppable-4-wickets-in-4-balls",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "aa7e7bc3d3fa16b0ff7a0f9de9d5c495ce78d7d68e50132add87186cf0af8928",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 111,
       "slug": "how-ali-khan-bowled-a-5-run-wide-without-the-bat-touching-the-ball",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "61f2b1d017bc056c348a12e928684f4758b9f19fc3911d8d8f055606766c724f",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 112,
       "slug": "5-5-million-views-indian-idol-funny-video",
       "category": "Funny & Comedy",
       "sourceSha256": "ca8b8800b8f7b0f05f34df2173259b4eebbf36b01ca9c850ce5f24a26ac1d218",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 113,
       "slug": "new-best-funny-videos-jacksinfo-try-not-laugh-challenge-compilation-part-15",
       "category": "Funny & Comedy",
       "sourceSha256": "72a5fc2f9567e010acfc44eff49f36c6ee6962df2cea47775e96dd9a92d8976c",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 114,
       "slug": "trend-0cb298",
       "category": "Funny & Comedy",
       "sourceSha256": "2f4c11a5ec2f574b952090f44594695a6e6bbdac1c4b084d8b2f4cb0b5105d88",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 115,
       "slug": "tujh-mein-rab-dikhta-hai-song-rab-ne-bana-di-jodi-shah-rukh-khan-anushka-sharma-roop-kumar",
       "category": "Music",
       "sourceSha256": "f0a74df9835f9ad36317d63c7ec3af4e30085ff45919eb525543f777e8827981",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 116,
       "slug": "kala-chashma-baar-baar-dekho-sidharth-m-katrina-kaif-badshah-neha-kakkar-prem-hardeep",
       "category": "Music",
       "sourceSha256": "c9e2f32e9e3333a3619a387a511ac4dd0c69501af65ea85591f42dd00f7c1027",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 117,
       "slug": "full-song-khairiyat-bonus-track-chhichhore-sushant-shraddha-pritam-amitabh-b-arijit-singh",
       "category": "Music",
       "sourceSha256": "35288f5ddeccab4de5a124c3a52399ec017988567a90a665d270d79c1c791c27",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 118,
       "slug": "saree-ke-fall-sa-full-video-r-rajkumar-pritam-shahid-sonakshi-antara-nakash",
       "category": "Music",
       "sourceSha256": "c23dc08189912a4ef33451654968f3d836b998746a0b753748e9326f1b4dd21a",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 119,
       "slug": "official-best-travelling-songs-of-bollywood-road-trip-songs-t-series",
       "category": "Music",
       "sourceSha256": "70f8a7cd7420d163473c0fa4994164fb476f513a01fee3c5ed51694479ab6be9",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 120,
       "slug": "african-action-bike-riding-2026-shorts-african-bike-funny-bikestunt",
       "category": "Funny & Comedy",
       "sourceSha256": "cc13c4419528c2eb35f9a42926840b84d85f6af83b5f03c16a51d782d38af093",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 121,
       "slug": "try-not-to-laugh-super-hard-the-funniest-moments-fails-you-laugh-you-lose-challenge-part-3",
       "category": "Funny & Comedy",
       "sourceSha256": "77760a3e762c37bbe2dcca880b6e298cd6f1c35c3e8fd3064214d56c92444161",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 122,
       "slug": "try-not-to-laugh-top-100-funniest-videos-ever-memes-epic-fails-pranks-compilation-2026-part-13",
       "category": "Funny & Comedy",
       "sourceSha256": "1da3b8a574142424cca401aa1b3cd00ad2396479b6fd0f6335d22a82481e3f6b",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 123,
       "slug": "golden-official-lyric-video-kpop-demon-hunters-sony-animation",
       "category": "Music",
       "sourceSha256": "fc0d1f8670e8ad81aee1baf46401a50cdddae86c9893b026ee48639c13a24ed2",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 124,
       "slug": "ed-sheeran-shape-of-you-official-music-video-why-ed-sheeran-s-shape-of-you-was-a-visual-masterpiece",
       "category": "Music",
       "sourceSha256": "5a6b8f14d4d8457839399aefd189254f6390b0ad39504fd73511a2e952cf41b8",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 125,
       "slug": "viral-comedy-breakdown-the-hilarious-dishwashing-dog-meme-explained",
       "category": "Funny & Comedy",
       "sourceSha256": "7cbb0d3f7a595ff0f3282d21a2585ae349cce0bb63d018a0df75f444a260dc78",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 126,
       "slug": "this-man-has-world-s-most-stunning-peacocks",
       "category": "Environment & Sustainability",
       "sourceSha256": "6ccc4b32e782c1fd7439cb93578189434784af530a08a7c30f54eb7806e649b1",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 127,
       "slug": "top-10-stunning-red-animals-wildlife-shorts-breakdown-the-visual-power-of-top-10-red-animals",
       "category": "Environment & Sustainability",
       "sourceSha256": "082e51ca65687a738371ed7a84bdbc4dfa87101ffaa5302a9dffa4c0eb905079",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 128,
       "slug": "freakiest-animals-across-the-globe-mega-episode-nat-geo-animals-freaks-of-the-jungle-sky",
       "category": "Environment & Sustainability",
       "sourceSha256": "25de2b903451e193dff83c590e579e0772f47f614b2c341e21862ad62d906579",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 129,
       "slug": "how-zach-king-gets-away-with-doing-graffiti-magic-trick-breakdown-how-zach-king-fakes-graffiti",
       "category": "Arts & Culture",
       "sourceSha256": "5ca1c5c77d661b5c226fb2268d7022117058e4891d07fc25d271a3dc2c6a2fdf",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 130,
       "slug": "katy-perry-roar-how-katy-perry-conquered-the-jungle-in-roar",
       "category": "Music",
       "sourceSha256": "d9cd86022e70482d98a10ed587d82518fb4544b4ddf6217d731de03023cbc246",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 131,
       "slug": "wiz-khalifa-see-you-again-ft-charlie-puth-official-video-furious-7-soundtrack",
       "category": "Music",
       "sourceSha256": "61df52dee5c59f34c0c8a710ad05a3c1574b539b1731dc0070d599d80833d1a4",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 132,
       "slug": "guli-mata-saad-lamjarred-shreya-ghoshal-jennifer-winget-anshul-garg",
       "category": "Music",
       "sourceSha256": "c6682471f55e4af84426d44fc91d58ce8c6855c2f52f667d8ca2eff32608997b",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 133,
       "slug": "try-not-to-laugh-best-funny-videos-compilation-memes-part-6",
       "category": "Funny & Comedy",
       "sourceSha256": "fce0df719a04ac0a537e18cb1a2f713a8752d1551a8ce103da23767ce86b9f54",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 134,
       "slug": "rose-bruno-mars-apt-official-music-video",
       "category": "Music",
       "sourceSha256": "a9e7efa592a3c913cb7c16fb5cde408c1dfba2b2cecf184044db53497d5eb0dc",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 135,
       "slug": "titli-chennai-express-full-video-song-shahrukh-khan-deepika-padukone-music-video-analysis-why-titli-",
       "category": "Music",
       "sourceSha256": "329b41a15bc81678eb3ea888c6a8211b120869593a887343ea110ab4af729e1f",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 136,
       "slug": "dumbledore-vs-voldemort-full-scene-harry-potter-and-the-order-of-the-phoenix-scene-analysis-why-dumb",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "4380ed8f301cd0e5db4118485fd6c479e0fc543860715ecf70f6dbdda7caff46",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 137,
       "slug": "the-balrog-of-morgoth-the-lord-of-the-rings-the-fellowship-of-the-ring-scene-analysis-why-the-balrog",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "c4b4c72593ddcb2d0b35edbe07b9f8cc78bb7dbc96727801fb03386344251ce0",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 138,
       "slug": "dandanakka-romeo-juliet-jayam-ravi",
       "category": "Music",
       "sourceSha256": "ebf587d9d3ba6495fcb6897a2137020fcea3ac5045d8409010577420dd6763d6",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 139,
       "slug": "this-man-expressive-soft-drink-reaction",
       "category": "Social Media & Trending",
       "sourceSha256": "ef3d09dbe0b33185073ddddc9d1d75059958072875c4a7e6fb7d113c184c2462",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "facebook"
     },
     {
       "id": 142,
       "slug": "pol-karu-playful-fashion-show",
       "category": "Social Media & Trending",
       "sourceSha256": "263661e883872e01ee0e7e430af2bd8c4dde2792203dfac87a9d625e7f9fe3b2",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "facebook"
     },
     {
       "id": 143,
       "slug": "order-now-limited-stock-potta-kusuma",
       "category": "Social Media & Trending",
       "sourceSha256": "0f9caaff1bcdaf7884cbe3b23dc845931a6ebc955948e03b073d63b0532ffa08",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "facebook"
     },
     {
       "id": 144,
       "slug": "garden-like-painting-sithara-plant",
       "category": "Social Media & Trending",
       "sourceSha256": "b39ed49098f3a79c125031dc0928a5a50fd4df6ebf5d83994d168bff98ba570f",
-      "status": "included_in_release"
+      "status": "published_verified",
+      "provider": "facebook"
     },
     {
       "id": 145,
       "slug": "nature-is-power-sinhala-earth-reflection",
       "category": "Social Media & Trending",
       "sourceSha256": "e6fa105b1f9dc6f7b8e79e39e6dd374c30a30c02ab563eb983a9851dd3fe90cc",
-      "status": "included_in_release"
+      "status": "published_verified",
+      "provider": "facebook"
     },
     {
       "id": 149,
       "slug": "live-kindly-enjoy-your-time",
       "category": "Social Media & Trending",
       "sourceSha256": "7d0e40706fcf53d4def9343c009608c68f311a192acbd6c0aca4d3d805b14c91",
-      "status": "included_in_release"
+      "status": "published_verified",
+      "provider": "facebook"
     },
     {
       "id": 150,
       "slug": "some-meetings-end-in-goodbye-sinhala-reflection",
       "category": "Social Media & Trending",
       "sourceSha256": "84f834b0d1c87afd4f541864c56d12f40d0c6c27bc99d50f1b51d8515357f795",
-      "status": "included_in_release"
+      "status": "published_verified",
+      "provider": "facebook"
     },
     {
       "id": 151,
       "slug": "trust-yourself-cinematic-confidence",
       "category": "Social Media & Trending",
       "sourceSha256": "8917541893346a88c25de69cda996b542c95a94972ccd7a7350d19cd26d4e6a4",
-      "status": "included_in_release"
+      "status": "published_verified",
+      "provider": "facebook"
     },
     {
       "id": 152,
       "slug": "past-present-progress-smart-ict",
       "category": "Social Media & Trending",
       "sourceSha256": "4cf98e98c99b532813e0f57cd6d52d746b183a0a44f69af2a132f06277f0adf2",
-      "status": "included_in_release"
+      "status": "published_verified",
+      "provider": "facebook"
     },
     {
       "id": 153,
       "slug": "cake-or-cat-cake-illusion-reaction",
       "category": "Social Media & Trending",
       "sourceSha256": "11cbe212658310e73a4c3b97a7307c547d69e5177cf6645339b3a0c5b483e3fc",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "facebook"
     },
     {
       "id": 155,
       "slug": "fashion-means-fashion-our-media",
       "category": "Social Media & Trending",
       "sourceSha256": "aad317d591e918b221113bd21156683aa6e096c9bd7831fadec347ff183c523d",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "facebook"
     },
     {
       "id": 156,
       "slug": "late-home-cat-dog-couple-shaa-bro",
       "category": "Social Media & Trending",
       "sourceSha256": "fc68b9a04adeaf35486158ae3eb3dfac77e525416c077a405eeb4ab11babeb44",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "facebook"
     },
     {
       "id": 157,
       "slug": "maths-symbols-start-dancing-dilu-teacher",
       "category": "Social Media & Trending",
       "sourceSha256": "671ff1f18ae410ac7fd3dcb2f46f06534210e5a8a0c89ecd9b5df2b7474ee97c",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "facebook"
     },
     {
       "id": 158,
       "slug": "unstoppable-cat-version-sangeethaya-lk",
       "category": "Social Media & Trending",
       "sourceSha256": "3734eb7159ea8ff14cca419f8201da987c0dc1515d097ffe360bacdae363aa3a",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "facebook"
     },
     {
       "id": 159,
       "slug": "animal-compassion-anil-oskar",
       "category": "Social Media & Trending",
       "sourceSha256": "559c8a8652c0bce0ec8fc3c29f54d4bdc20e8acffb39d3b19e4d8f7efa747ca0",
-      "status": "included_in_release"
+      "status": "published_verified",
+      "provider": "facebook"
     },
     {
       "id": 160,
       "slug": "remembering-kindness-sinhala-gratitude",
       "category": "Social Media & Trending",
       "sourceSha256": "9277db36512302674e3214100691d62c7af2aa8e2ff2ce7571c961a997f6873d",
-      "status": "included_in_release"
+      "status": "published_verified",
+      "provider": "facebook"
     },
     {
       "id": 161,
       "slug": "are-you-in-the-right-place-sinhala-reflection",
       "category": "Social Media & Trending",
       "sourceSha256": "03ba06ea0130de7f6bca42ef9d6c9101f31a867284ed0e4ac5275dac3cda8111",
-      "status": "included_in_release"
+      "status": "published_verified",
+      "provider": "facebook"
     },
     {
       "id": 162,
       "slug": "outdoor-challenge-comedy-big-reactions-around-the-table",
       "category": "Social Media & Trending",
       "sourceSha256": "0701317bae7a4699b327c0888b1bda83239b34adaffed73fbabf610d1356e213",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "facebook"
     },
     {
       "id": 164,
       "slug": "viral-animal-comedy-woman-mimics-a-bull-in-a-hilarious-standoff-paul-butterfield-rick-danko-levon-he",
       "category": "Music",
       "sourceSha256": "686882864e2d20762d218b41c05b56b5c86102f68e50b2c00ad056951713dc6c",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 165,
       "slug": "viral-wildlife-comedy-drunk-animals-eating-fermented-marula-fruit",
       "category": "Funny & Comedy",
       "sourceSha256": "cb8684fc6b9d1b1ec8444ae6c425c8377f1e2c0e6ba204f690620844a5d6d499",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 166,
       "slug": "funny-couple-riding-a-motorcycle-viral-motorcycle-comedy-hilarious-couple-fails-epic-dirt-bike-crash",
       "category": "Funny & Comedy",
       "sourceSha256": "37b9ee8f962fbdb0e31858d8665fdeebd084ea4828327437e966ec5cfeccbbdc",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 167,
       "slug": "harry-potter-ai-parody-gen-z-dumbledore-pizza-hagrid-hogwarts-chaos",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "fc65fb4b17cffea49b8d332c20d3e82503c34776eb0742d8f480c15441df149d",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 168,
       "slug": "epic-cinematic-analysis-the-lord-of-the-rings-rohan-vs-the-mumakil",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "b7f7e228da8605a9985ef1beaa3c9da7bb791163a54f9aeb1dca9830b9ccc689",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 169,
       "slug": "the-lord-of-the-rings-the-return-of-the-king-e-owyn-s-epic-showdown-with-the-witch-king-epic-cinemat",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "ffc29b7c1426075705e08902b4e5e719a9ad4f06a040a5c780ba3391c3702f22",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 170,
       "slug": "the-lord-of-the-rings-the-siege-of-minas-tirith-gandalf-s-stand-against-the-armored-trolls",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "5dfb321c6574e6926855c7671d33e949a4ed3a1c32855fb2b3c987936802a98b",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 171,
       "slug": "viral-comedy-fails-analysis-hilarious-slapstick-celebrity-reaction-edits",
       "category": "Funny & Comedy",
       "sourceSha256": "5781d7cd862fecd2468639c9180c7a2d199aeff5905ec2635c1d8dc94bee950d",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 172,
       "slug": "man-tries-to-blend-in-with-a-gorilla-it-doesn-t-go-as-planned",
       "category": "Funny & Comedy",
       "sourceSha256": "d11e227eb2bfafd775d1318c323ec447c4535bd929eddb9bb5128a20ee43712d",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 173,
       "slug": "funny-couple-sony-viral-couple-comedy-analysis-girlfriend-caught-checking-his-phone",
       "category": "Funny & Comedy",
       "sourceSha256": "88306ff7d97215f0f066c3406e61930a9febce4049677968bf3bdada80a23e70",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 174,
       "slug": "viral-firecracker-prank-analysis-epic-jump-scare-hilarious-couple-instagram-viral-comedy-reels-priya",
       "category": "Funny & Comedy",
       "sourceSha256": "908006ab3c7066ce40ef9ffefb553e6a86a9a8d2c07062dc2bb386a1116b418d",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 177,
       "slug": "viral-funny-animal-compilation-the-dramatic-corgi-play-dead-fail",
       "category": "Funny & Comedy",
       "sourceSha256": "5ef996adb8f4f9c33eea03370cde8166c17e3ea604e7587134b62c63f72cde2a",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 178,
       "slug": "the-poor-puppy-not-have-anything-short-viralshorts-emotionalstory-cutedog-streetdog-subscribe",
       "category": "Social Media & Trending",
       "sourceSha256": "522fe83a87d21087c08fe932a4fcba22c7f97baa05463840f5b70be3d1b76de8",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 179,
       "slug": "viral-couple-comedy-analysis-bts-vs-results-hilarious-jump-fail",
       "category": "Funny & Comedy",
       "sourceSha256": "7bc2ba2d7d3706df8e03e0ccfc514c16324cb35d7450c891f384d688c152e6d3",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 180,
       "slug": "bruno-mars-the-lazy-song-official-music-video",
       "category": "Music",
       "sourceSha256": "37e64f74d0b077ff011686726f69e264ee626f2c207959629bfa32ba56825a0f",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 181,
       "slug": "heartwarming-animal-rescue-puppy-saves-ducklings-shares-sweet-friendship-be-cu-n-na-y-tho-ng-minh-va",
       "category": "Social Media & Trending",
       "sourceSha256": "d3a7946ad366a955e8d3a98b1a7b68a835b1e08d1b18c377fc8b324575912c01",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 182,
       "slug": "funny-indian-tv-moments-ishani-gets-drunk-ranveer-s-hilarious-reactions-ishani-funny-moment",
       "category": "Funny & Comedy",
       "sourceSha256": "2e2ae24e5005416784fc5abee2e990e1f60fe49f48df6f83040b9480a2c246f9",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 183,
       "slug": "why-silent-comedy-shorts-are-winning-the-secret-to-global-views",
       "category": "Funny & Comedy",
       "sourceSha256": "8ff25b651eaf38339f2a9e57d946b2cb0e48de9ba12ba8f7576ec55061acb011",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 184,
       "slug": "harry-potter-ai-parody-dudley-s-monkey-tail-chaotic-dursley-fails",
       "category": "Funny & Comedy",
       "sourceSha256": "1f7bdbf9982187e3a970397ee1fb1665b7c7c119139477e7de5ca4175b0ec758",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 185,
       "slug": "sleep-well-best-relaxing-calm-focus-concentrate-music-rain-nature-sleep-well-relaxing-music-calm-rai",
       "category": "Music",
       "sourceSha256": "5aecd62f74eaf85e88f5a7bb4f9b91587d53e84d90403d51839af695046ae60e",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 186,
       "slug": "flying-relaxing-sleep-music-for-meditation-stress-relief-relaxation-by-peder-b-helland",
       "category": "Music",
       "sourceSha256": "62ede16383741bad25608306904f0e07d9aba0d202d522cda09de095a815702d",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 187,
       "slug": "top-10-strongest-disney-princesses-ranked",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "089e3a57937b6c85d71a78486da23471f50db22d4b60271e140e58138b82d1ef",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 188,
       "slug": "let-go-of-your-worries-and-find-peace-soft-piano-for-overthinking-minds",
       "category": "Music",
       "sourceSha256": "36d9da5eda3b81a261087aa3c8f270a008a44364c6230c474d8cc912352ef142",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 189,
       "slug": "majestic-predator-perfect-majestic-predator-fail-funny-cat-expectation-vs-reality-short",
       "category": "Social Media & Trending",
       "sourceSha256": "aa3088212ed8d14814a578b3c92456780a5d50f824bda1c6d9c8c885d8b61c30",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 190,
       "slug": "alok-alan-walker-headlights-feat-kiddo-lyrics-aesthetic-slowed-aesthetic-slowed-lyrics-cinematic-edi",
       "category": "Music",
       "sourceSha256": "6bfe0caf729af63bd42779ae0975c60cc9478be07e75df345c8b788edc67045b",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 191,
       "slug": "randall-wahran-official-track-festival-anthem-deep-dive",
       "category": "Music",
       "sourceSha256": "6772c70281c97ef3bc35d120129a091e60acd982ea17a346b4a8f9d5d7dbd076",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 192,
       "slug": "rachel-platten-fight-song-official-music-video-anthem-deep-dive",
       "category": "Music",
       "sourceSha256": "5642b17c197455b70585713b5c5f88e7f264d90eed4bb224a5e6946dfe549654",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 193,
       "slug": "sia-never-give-up-from-the-lion-soundtrack-lyric-video",
       "category": "Music",
       "sourceSha256": "1580c683caa810f209f109c198bce6677e9a3fcff385dd513bd132e6b52b9c0a",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 194,
       "slug": "khaby-lame-mr-bean-at-airport-security-ultimate-viral-comedy-mashup",
       "category": "Funny & Comedy",
       "sourceSha256": "3d60d38e0fbe3c37526c1308e2afc60daa78094c5fa8ef5b82adfac5c938827e",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 195,
       "slug": "harry-potter-fun-on-the-set-from-the-collectors-edition-of-lego-hp",
       "category": "Funny & Comedy",
       "sourceSha256": "777fcea64e6a50edbc843aa4a029dce281109339c696e36bf1b6646d5c407567",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 196,
       "slug": "lotr-the-fellowship-of-the-ring-music-only",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "1fa38f55ae139a8b2e2d594352bb6ca74138861dfa92a558151f92c5f41d789d",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 198,
       "slug": "monkey-gives-woman-a-flower-until-jealous-partner-attacks-viral-zoo-comedy-breakdown",
       "category": "Funny & Comedy",
       "sourceSha256": "0fbd7c5b6b0bc9cc45db45959f98ea9ab09a536d5c71860adef3b72fef58faf7",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 199,
       "slug": "ranking-funniest-robot-fails-from-grandma-s-cane-karma-to-crazy-track-crashes",
       "category": "Funny & Comedy",
       "sourceSha256": "237644fcc51beab94a49bb01c069d25301f2c3e713066f7269221844f3c65b80",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 200,
       "slug": "hilarious-viral-clips-walking-tree-angry-dishwashing-dog-car-alarm-dance",
       "category": "Funny & Comedy",
       "sourceSha256": "6afd0bbcc21b183531623e36d335c621450e693dc94ed71f7ecfbc6ed2e9de06",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 201,
       "slug": "man-returns-dropped-cash-after-seeing-a-cardboard-police-cutout-183m-view-viral-street-prank-review",
       "category": "Funny & Comedy",
       "sourceSha256": "8b196345277cfc2d2f2ff7b2cbd2f77e1e7543a5921d3252d45ce006795ae59e",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 202,
       "slug": "savage-couple-pranks-cake-fails-viral-comedy-show",
       "category": "Funny & Comedy",
       "sourceSha256": "6f8180234d907c096680d7964c448e7a92db58f589dab47f913ceb184c41f490",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 203,
       "slug": "the-ramp-roadster-tesla-roadster-drives-upside-down-flips-mid-air-the-ramp-spacex-cold-gas-thruster-",
       "category": "Environment & Sustainability",
       "sourceSha256": "e9834a4b9dbc3e00df360e37ada46de8892aa4290065b64461a677cee6295995",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 204,
       "slug": "tui-tui-comedy-video-tui-tui-best-funny-video-2022-by-busy-fun-ltd",
       "category": "Funny & Comedy",
       "sourceSha256": "4af0fd2bbcf66caefde6b6ff44b1fa2e2a0b4612f53644ac600d41844e658433",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 205,
       "slug": "very-special-trending-funny-comedy-video-2023-amazing-comedy-video-2023-ep-194-by-beenfuntv",
       "category": "Funny & Comedy",
       "sourceSha256": "6257348b4d5c4593d90042ad738019041f29ec9e873a92f8cafecdb352fb3a47",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 206,
       "slug": "interrogation-room-face-off-mr-bean-live-action-tv",
       "category": "Funny & Comedy",
       "sourceSha256": "d1f20f154eee94579a8544a2dff19e5d3d94e644aaeb7e49ddff34a404dc82dc",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 207,
       "slug": "spider-man-in-real-life-prank",
       "category": "Social Media & Trending",
       "sourceSha256": "4d7486d91f4e71c74b781fe9f8c04b613877986810c6f87ea2f069b904370b24",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 208,
       "slug": "tom-holland-zendaya-jacob-react-to-6-crazy-viral-twists-backflipping-bull-helicopter-golfer-prank-fa",
       "category": "Funny & Comedy",
       "sourceSha256": "d9b5934b7c80dacc65e9261c39b7b8ec96669d08a076bb10d9d02d11bca1fe3f",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 209,
       "slug": "headlights-alan-walker-aesthetic-sunset-travel-showcase-golden-hour-adventure-shor-lyrics-aesthetic-",
       "category": "Music",
       "sourceSha256": "d35cd0d4b8aa44578f339373034b9e0138c5ce6c812c20e74abe0b54ce6c7bcb",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 210,
       "slug": "man-pranked-by-giant-shark-cutout-in-a-pond-17m-view-viral-water-scare-comedy-show",
       "category": "Funny & Comedy",
       "sourceSha256": "0a29b3d18f3149b20bb7de25c8822a52ccc498d28009a036f7f0d85bb85b1010",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 211,
       "slug": "very-funny-animal-clever-warthog-tricks-cheetah-with-a-dust-cloud-u-turn-milton-matini-funny-animal-",
       "category": "Funny & Comedy",
       "sourceSha256": "16322e8509ff2bd3204370e93fc2a580dabdd23a8a5923a1c7a3b83da1977998",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 212,
       "slug": "apologising-after-a-fight-apologising-after-a-fight-rohit-kanupriya-viral-floor-slide-couple-comedy-",
       "category": "Funny & Comedy",
       "sourceSha256": "0060c5ea4945f3ff88be22c215359455649f6940db022f1b0317f0a9ebc9ac74",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 213,
       "slug": "she-gave-birth-to-a-dragon-mother-s-monster-2026-full-fantasy-movie-4k",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "04f12a59b5823d3a53ac9e80599c4aaaafa1cbc13ed0311d717c2b3052035e07",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 214,
       "slug": "avatar-full-movie-2025-pandora-world-superhero-fxl-fantasy-movies-2025-in-english-game-movie",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "be6480462aa121e2eaae1b7404b831b64680a45ad0f8c982ccd02954299387fc",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 215,
       "slug": "faunutland-family-fantasy-adventure-free-movie",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "b9cd49427c1aa73d57695c84ca8312c0fcd10bcbb8f00bf1c15314795c7d5dad",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 216,
       "slug": "ratatouille-english-full-movie-the-movie-of-the-game-with-remy-the-master-chef-rat",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "98dae1883af45fe38bf438f36b17d093f6e7394cf944c4752c17f4e71cb7d215",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 217,
       "slug": "five-legend-full-adventure-fantasy-movie-in-english-hollywood-movie-lauren-esposito-gabi-s",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "15cda8d855bc39ad7fc2acf62549aa12c00e592f3397c14a31fbd1892799febf",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 218,
       "slug": "pinkfong-baby-shark-dance-cultural-and-music-video-review",
       "category": "Music",
       "sourceSha256": "124f6fff6883eb057dfc322ec4182b351c12b242ac739b0986324ad8f9f414cd",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 219,
       "slug": "mark-ronson-bruno-mars-uptown-funk-music-video-review",
       "category": "Music",
       "sourceSha256": "510b49ddb095ad9737a84e2ee30f0b917ead1e5bd85bc2a05b4a9d16e5000e9f",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 220,
       "slug": "bts-dynamite-official-mv-disco-pop-video-review",
       "category": "Music",
       "sourceSha256": "3de9b0c609220eac13135eab916acf933d428d3fa7c1980741b1b8b3f5d2a1ef",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 221,
       "slug": "key-and-peele-substitute-teacher-sketch-comedy-review",
       "category": "Funny & Comedy",
       "sourceSha256": "6268bad583a5c2b909d27416da9eed0832d470e68e1202280ff2fc05676d8b2b",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 222,
       "slug": "charade-1963-full-movie-audrey-hepburn-cary-grant-classic-review",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "55a12f5cefe78d48e0802d16700c52df2a35d85ec7460fcb9700cbf1bb950ee9",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 223,
       "slug": "key-peele-text-message-confusion-digital-tone-comedy-review",
       "category": "Funny & Comedy",
       "sourceSha256": "234d7908934df3f6cd5dc4613f4d149b2764230ecefb95d82d628a78b5aac229",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 224,
       "slug": "mr-bean-the-exam-official-comedy-scene-review",
       "category": "Funny & Comedy",
       "sourceSha256": "c005622558ee8f7138e2cec2fa3f5d4d6272f17bd3f4aadbcb330cba4153fdd8",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 225,
       "slug": "key-peele-east-west-college-bowl-football-names-review",
       "category": "Funny & Comedy",
       "sourceSha256": "44560277aa03d421c20e46e6db14c40d93ed226452cca1598526ec4765cdf62f",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 226,
       "slug": "funny-ai-wild-animals-prank-lions-monkey-shares-drink-rhino-launches-lion-warthog-rescue-show",
       "category": "Funny & Comedy",
       "sourceSha256": "e88b9f17ab75cff7d0d6b83edd2e7e75d131281758e74722814f186e4371d534",
-      "status": "pending_theme_verification"
+      "status": "pending_theme_verification",
+      "provider": "youtube"
     },
     {
       "id": 227,
       "slug": "tom-holland-zendaya-react-to-14-viral-pranks-gym-squeaker-fake-proposal-thief-twists-show",
       "category": "Funny & Comedy",
       "sourceSha256": "61c1508415a27d345e2d2af037d3baec59f44fe6ffca20dbe7690946cf52da69",
+      "status": "pending_theme_verification",
+      "provider": "youtube"
+    },
+    {
+      "id": 228,
+      "slug": "ranking-funniest-animal-costume-moments-77m-view-wildlife-disguise-prank-countdown-show",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "3238455f2cfabfd206ba4832e34ca8c8e50b4031e5420cef88b12b71af156ddc",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 229,
+      "slug": "rick-astley-never-gonna-give-you-up-rickrolling-music-video-review",
+      "category": "Music",
+      "provider": "youtube",
+      "sourceSha256": "0424974c68530290458c8d58674e2637f65abc127057957d7b3acbd24c208f93",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 230,
+      "slug": "a-ha-take-on-me-rotoscoping-video-1985-music-review",
+      "category": "Music",
+      "provider": "youtube",
+      "sourceSha256": "cb50dd46a18e2deac1b512592323c35c20a366f1ee4debd0b8327e55e4cfd9f3",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 231,
+      "slug": "queen-bohemian-rhapsody-1975-official-video-review",
+      "category": "Music",
+      "provider": "youtube",
+      "sourceSha256": "85c3420b9e7b59d2d9cab9a9e62796cdafae274ad89af362b23ea1cf6d280a7a",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 232,
+      "slug": "12-epic-village-pranks-instant-karma-fails-189m-view-slapstick-comedy-show-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "89857cdbcee75bbdbf48bd6637e5f95d529121a425474bd94e676c89dc1ac786",
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Verify this release live, then select up to ten pending published records with verified themes. Facebook-first when safe; preserve all holds. Review exact current source/title/owner changes before choosing imagery.",
+  "nextTask": "Select up to ten pending published reviews after checking current main/open PRs and fresh owner source/title/slug. Facebook44 and45 have dated source-poster provenance; verify a non-misleading conceptual theme, then continue safe source-verifiable reviews across providers. Never replace protected source posters or rewrite protected topic text. Reconcile new owner records; hold source-removal/demo/source30/Saiyaara/Summer cases.",
   "batch1": {
-    "state": "awaiting_ci_release_verification",
+    "state": "published_verified",
     "recordIds": [
       4,
       144,
@@ -1583,6 +1833,62 @@
     "workerDryRun": "pass",
     "d1MigrationsAdded": 0,
     "d1Writes": 0,
-    "r2Writes": 0
-  }
+    "r2Writes": 0,
+    "release": {
+      "pullRequest": 204,
+      "head": "6474b78816f780b5b1568d2b037134224f361251",
+      "commit": "cc15729a5de82bc8b13aedfba554a6421f56cc8e",
+      "ci": 39150155027,
+      "mainCi": 39150267503,
+      "deploy": 39150267501,
+      "worker": "248f9238-57d5-4d86-be76-a91d87a865af",
+      "percentage": 100,
+      "deploymentId": "32996a49-b913-452c-aab7-6d4b6a665bf2",
+      "createdAt": "2026-10-18T17:35:43.202326Z",
+      "auditRun": 39150318252,
+      "artifact": 12145345885,
+      "archiveSha256": "fc1e80576bd0c769e9cd5e5e2eecb4be331befa3a8f2ab5480230db04fef993e",
+      "nodeTests": 417,
+      "pythonTests": 4,
+      "portainerRun": 39150267507,
+      "privilegedJobs": "all four skipped",
+      "databaseVerificationAt": "2026-10-18T17:36:59.897Z",
+      "original214Sha256": "494f438a0dd202253acc3f14cf8a12220ea54d17484407acbb5ab0186bdac9c8",
+      "targetAllMatch": true,
+      "sourcePosterFieldsChanged": 0
+    },
+    "liveVerification": "docs/review-images/batch1-live-verification-20261018.json",
+    "liveVerificationAt": "2026-10-18T17:40:15.770Z",
+    "desktopScreenshot": "docs/review-images/batch1-live-desktop-20261018.jpg",
+    "browser": {
+      "viewport": {
+        "width": 1363,
+        "height": 936
+      },
+      "artAndReviewTop": 907,
+      "artNaturalWidth": 1672,
+      "artNaturalHeight": 941,
+      "narrowViewport": "CSS breakpoint retained at900px; a separate narrow browser viewport was not available in this run."
+    },
+    "google": {
+      "mode": "read_only",
+      "inspections": 0,
+      "submissions": 0,
+      "rootIsPending": false,
+      "rootLastDownloaded": "2026-10-18T09:11:12.537Z",
+      "rootErrors": 0,
+      "libraryWarnings": 20,
+      "indexedStatus": "not refreshed in this run"
+    },
+    "limits": "Ten separate illustrations; no source poster repaired/replaced, no new viewing/audio claims. 11 original provider HTTP errors and8 protected placeholders remain. Original214rows match baseline; five independent owner publications were added during this work."
+  },
+  "reconciledAt": "2026-10-18T17:42:12.951Z",
+  "providerCounts": {
+    "other": 1,
+    "youtube": 180,
+    "tiktok": 13,
+    "facebook": 20,
+    "instagram": 1
+  },
+  "verificationCommand": "node scripts/verify-review-illustrations.mjs --ids=4,144,145,149,150,151,152,159,160,161"
 }

@@ -1,5 +1,17 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 18 October 2026: ten sidebar illustrations published and verified
+
+PR [204](https://github.com/Gamagek/vid-review-site/pull/204) merged as `cc15729a5de82bc8b13aedfba554a6421f56cc8e` after exact-head CI39150155027 passed417Node/fourPython tests and Worker dry-run. MainCI39150267503 and deploy39150267501 succeeded. Worker `248f9238-57d5-4d86-be76-a91d87a865af` is100%, deployment `32996a49-b913-452c-aab7-6d4b6a665bf2`. Portainer validation succeeded; all four privileged jobs skipped. No new migration, D1/R2 write or source-poster replacement.
+
+Live verification at17:40:15.770UTC checks all ten public WebP files:HTTP200, image/webp, exact bytes and SHA256, each page img/WebPage image/map association, unchanged source VideoObject thumbnails and original schema dates. The image map has215published review URLs/225image entries. Root has five direct urlset children; standalone image index is in robots.txt. Chrome1363×936 confirms reference4 artwork decodes1672×941 and starts beside the review at the same vertical coordinate907; explicit AI illustration caption is visible. A900px CSS breakpoint preserves stacked narrow layout; no separate narrow browser viewport was available, so do not claim a mobile-device visual test. Screenshot and exact verification evidence are in `docs/review-images/`.
+
+At17:36:59.897UTC all original214saved records still match pre-release non-counter SHA256 `494f438a0dd202253acc3f14cf8a12220ea54d17484407acbb5ab0186bdac9c8`, including every target/date. Five independent owner publications bring the library to215published/219saved; those are preserved and the queue reconciled, not claimed as this batch’s work.
+
+Completed audit39150318252/artifact12145345885, matching archive `fc1e80576bd0c769e9cd5e5e2eecb4be331befa3a8f2ab5480230db04fef993e`, reports247pages/zero technical failures,215posters at196available/11HTTPerrors/eight protected placeholders. The ten new illustrations are separate from these existing source-poster results. Google uses read-only mode with zero Inspections/submissions; root processed/notpending/zeroerrors, lastdownload09:11:12.537UTC, existing20librarywarnings. No new Google index-count/crawl improvement is established.
+
+The existing image batch task now permits up to ten vetted illustrations hourly, without duplicate PRs or changes to original review/poster/player data. Next: source/theme-verify pending Facebook44/45 and other safe published reviews, then continue the queue across all providers. Existing source-removal/demo/source30/Saiyaara/Summer holds and all protected editorial/security/data rules remain. Use `scripts/verify-review-illustrations.mjs --ids=...` for a bounded credential-free batch check; no Google API calls or video requests.
+
 ## 18 October 2026: separate sidebar illustration batch and image-discovery repair prepared
 
 Ten new built-in-imagegen conceptual illustrations (nine Facebook reviews and reference theme-song review4) preserve every source/owner poster and all review/date/SEO fields. Raster labels and page captions explicitly disclose AI-generated review illustration, not source footage. Source/title/slug association guards and byte/hash provenance are persisted. Root sitemap children are flattened to avoid unsupported nested indexes; the standalone image index is advertised in robots.txt. A containing grid keeps art beside the review rather than after its full-height related-links section.
