@@ -881,7 +881,9 @@ function renderTikTokFacade(card) {
   placeholder.textContent = "TikTok";
   imageWrap.append(placeholder);
   const ownedCover = ownedTikTokCover(card);
-  const previewImage = ownedCover || card.dataset.tiktokThumbnail || card.dataset.tiktokPoster;
+  // Use the permanent same-origin R2/SVG image before expiring TikTok CDN links.
+  const previewImage = ownedCover || card.dataset.tiktokPoster ||
+    (share.id ? "/api/tiktok/cached-poster?id=" + encodeURIComponent(share.id) : card.dataset.tiktokThumbnail);
   if (previewImage) {
     const image = document.createElement("img");
     image.src = previewImage;
