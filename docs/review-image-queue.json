@@ -23,8 +23,9 @@
       "slug": "youtube-embed-experience-demo",
       "category": "Technology",
       "sourceSha256": "c606255e0df21f3477531b3d796adc1308816bc8266163603a66c9733bc40ba3",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "hold_existing_restriction",
+      "provider": "youtube",
+      "holdReason": "Published embed experience demo: retain explicit demo hold; do not select for generated-art batches."
     },
     {
       "id": 4,
@@ -327,7 +328,7 @@
       "slug": "facebook-discovery",
       "category": "Spirituality",
       "sourceSha256": "6f887344a4d81d4cff8da49d49933b96f9b806cfa70c4728e670c5cc29578578",
-      "status": "included_in_release_batch2",
+      "status": "published_verified",
       "provider": "facebook"
     },
     {
@@ -335,7 +336,7 @@
       "slug": "facebook-discovery-5c11fe",
       "category": "Music",
       "sourceSha256": "cc3635de625df92e1e18acbd474b18f57c4fa47c43e55745050c6dd4bc03a584",
-      "status": "included_in_release_batch2",
+      "status": "published_verified",
       "provider": "facebook"
     },
     {
@@ -407,7 +408,7 @@
       "slug": "the-northern-lights-aurora-borealis-relaxing-view",
       "category": "Music",
       "sourceSha256": "b03e8732d42433d752c47cb578a82b1837edfe9b02a3d62626aa2d4a141d9360",
-      "status": "included_in_release_batch2",
+      "status": "published_verified",
       "provider": "youtube"
     },
     {
@@ -423,7 +424,7 @@
       "slug": "sri-lankan-very-famous-delicious-food-kiribath-with-katta-sambol-milk-rice-coconut",
       "category": "Food & Cooking",
       "sourceSha256": "1450eee28c7f4c793b7b000c20387fae694df7fc07c7fe3d5e522bd50c69736b",
-      "status": "included_in_release_batch2",
+      "status": "published_verified",
       "provider": "youtube"
     },
     {
@@ -439,7 +440,7 @@
       "slug": "a-beautiful-places-forest-sinharaja-sinharaja-sri-lanka",
       "category": "Adventure & Travel",
       "sourceSha256": "7c72ac0a55373639116261b29b3290724282a0c73b2a00d55d8563d00ace5b2b",
-      "status": "included_in_release_batch2",
+      "status": "published_verified",
       "provider": "youtube"
     },
     {
@@ -479,7 +480,7 @@
       "slug": "categories-of-wisdom-bhavana-learning-reflection-meditation",
       "category": "Education",
       "sourceSha256": "8f5ba1eda133ed749123cf8293a5d56648b4c8e3313c562eb6067ebfe5dcc8c9",
-      "status": "included_in_release_batch2",
+      "status": "published_verified",
       "provider": "youtube"
     },
     {
@@ -655,7 +656,7 @@
       "slug": "romantic-ai-art-the-beauty-of-digital-love-sweet-moments",
       "category": "Other",
       "sourceSha256": "d55880dcc563a8aac4cf9983a3f18345ad4c94c2354483ce2bf373772b14f8a7",
-      "status": "included_in_release_batch2",
+      "status": "published_verified",
       "provider": "instagram"
     },
     {
@@ -1367,7 +1368,7 @@
       "slug": "flying-relaxing-sleep-music-for-meditation-stress-relief-relaxation-by-peder-b-helland",
       "category": "Music",
       "sourceSha256": "62ede16383741bad25608306904f0e07d9aba0d202d522cda09de095a815702d",
-      "status": "included_in_release_batch2",
+      "status": "published_verified",
       "provider": "youtube"
     },
     {
@@ -1407,7 +1408,7 @@
       "slug": "randall-wahran-official-track-festival-anthem-deep-dive",
       "category": "Music",
       "sourceSha256": "6772c70281c97ef3bc35d120129a091e60acd982ea17a346b4a8f9d5d7dbd076",
-      "status": "included_in_release_batch2",
+      "status": "published_verified",
       "provider": "youtube"
     },
     {
@@ -1415,7 +1416,7 @@
       "slug": "rachel-platten-fight-song-official-music-video-anthem-deep-dive",
       "category": "Music",
       "sourceSha256": "5642b17c197455b70585713b5c5f88e7f264d90eed4bb224a5e6946dfe549654",
-      "status": "included_in_release_batch2",
+      "status": "published_verified",
       "provider": "youtube"
     },
     {
@@ -1883,7 +1884,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Verify batch2 PR/CI/merge/deployment and all ten live assets before selecting more pending illustrations. Reconcile current owner publications.",
+  "nextTask": "Reconcile fresh published inventory and any open image PR first. Up to ten distinct pending source/theme-verifiable illustrations, preferring safe Facebook139/142/143/153/155/156/157/158/162 only if evidence supports their theme; otherwise another supported published provider. Use clearly labelled symbolic art, preserve all owner/source media/review fields/dates and all seven holds, including demo3. Consume the next ordinarily completed audit for249/250; do not repeat same-day full Inspection or treat their bounded current HTML checks as a passing full audit. No new art merely for freshness.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -2044,7 +2045,7 @@
   },
   "verificationCommand": "node scripts/verify-review-illustrations.mjs --ids=4,144,145,149,150,151,152,159,160,161",
   "batch2": {
-    "state": "awaiting_ci_release_verification",
+    "state": "published_verified",
     "recordIds": [
       44,
       45,
@@ -2244,6 +2245,344 @@
         "updated_at": "2026-10-15T17:59:20.113Z"
       }
     ],
-    "scope": "Ten additive sidebar illustrations only; no source poster/review/player/date/SEO field or D1/R2 change."
+    "scope": "Ten additive sidebar illustrations only; no source poster/review/player/date/SEO field or D1/R2 change.",
+    "verifiedAt": "2026-10-18T18:58:24.435Z",
+    "release": {
+      "pullRequest": 206,
+      "head": "ec98ba68fd9ebe2d09ec5e76b13cc8ec54a62c00",
+      "commit": "5487c24cb856cbbe04f0c766212feb9217d946bb",
+      "ci": 39156243691,
+      "mainCi": 39156350530,
+      "deploy": 39156350496,
+      "worker": "59748d2e-d144-4791-a9c0-47a91cedd890",
+      "percentage": 100,
+      "deploymentId": "b407f335-cbfa-4486-8831-9863334560ea",
+      "createdAt": "2026-10-18T18:55:35.308568Z",
+      "nodeTests": 417,
+      "pythonTests": 4,
+      "workerDryRun": "passed",
+      "migrationLog": "No migrations to apply!",
+      "portainerRun": 39156350492,
+      "privilegedJobs": "all four skipped"
+    },
+    "preservation": {
+      "premerge": {
+        "checkedAt": "2026-10-18T18:54:24.582Z",
+        "saved": 238,
+        "published": 234,
+        "original238Sha256": "272f188f5aeac00050f794677c5f2c7c18fe39b5f4bbfab315f5dacfe746520e",
+        "targets": [
+          {
+            "id": 44,
+            "sha256": "0a6223df8e3d063ac0521f1aab13323baa9253ddb38f55644d4f7adde0ae7fef"
+          },
+          {
+            "id": 45,
+            "sha256": "4c81fe9ffb8d3d6cfc7baf72716ef2dd678c2fd2b5f8e72713ebc5766626399f"
+          },
+          {
+            "id": 55,
+            "sha256": "d45aeb98258073bc1c6c5b0179db4c4235cbdfa66f10828eec173098dac70980"
+          },
+          {
+            "id": 57,
+            "sha256": "ace6ccb440e8494fd31a44e03018028de40f17b7b5a99064e4427a53bb004c7c"
+          },
+          {
+            "id": 59,
+            "sha256": "6d631c36306e8106f8f855965529f35dc35276ca1c43e9b0e22b51bdb5203943"
+          },
+          {
+            "id": 64,
+            "sha256": "9c1fc7a2114dff1d781725128baba3006670334e6456c6e438515f143939fd37"
+          },
+          {
+            "id": 88,
+            "sha256": "fb399d36df2fe51feb10ea4986f087f5b3c6063f1a65c96eeb7b5782fbabd129"
+          },
+          {
+            "id": 186,
+            "sha256": "eeb8df5f800f991988750a446863d195e85e4d4ad9737cd45db39bbe7b2c6c9a"
+          },
+          {
+            "id": 191,
+            "sha256": "ab9c1e2ede2a2651c0f2ee77ef59a98e992e29365d48d9d6e6506b116a8669ae"
+          },
+          {
+            "id": 192,
+            "sha256": "a40c57b5a185ebac7bdf4c9a78dfd5ae0fb4bfac6654c7962f17b4082cb5c959"
+          }
+        ],
+        "migrations": [
+          "0001_initial.sql",
+          "0002_discovery_requests.sql",
+          "0003_security_rate_limits.sql",
+          "0004_maintenance_indexes.sql",
+          "0005_source_video_metadata.sql",
+          "0006_test_player_and_comment_images.sql",
+          "0007_universal_video_experience.sql",
+          "0008_verified_demo_metadata.sql",
+          "0009_app_settings.sql",
+          "0010_video_analysis.sql",
+          "0011_spirituality_buddhism.sql",
+          "0012_saiyaara_tiktok_correction.sql",
+          "0013_saiyaara_permanent_slug.sql",
+          "0013_media_cache_jobs.sql",
+          "0014_member_notifications.sql",
+          "0015_summer_inverted_tiktok.sql",
+          "0016_rights_certified_r2_cache.sql",
+          "0017_authorized_auto_cache.sql",
+          "0018_tiktok_oembed_cache.sql",
+          "0019_tiktok_oembed_backfill.sql",
+          "0020_member_personalization.sql",
+          "0021_facebook_reel_pending_drafts.sql",
+          "0022_facebook_readable_slugs.sql",
+          "0023_facebook_challenge_preview.sql",
+          "0024_digital_love_review_cover.sql",
+          "0025_lab_review_source_cover.sql",
+          "0026_gratitude_illustrated_cover.sql",
+          "0027_garden_illustrated_cover.sql",
+          "0028_nature_power_illustrated_cover.sql",
+          "0029_live_kindly_illustrated_cover.sql",
+          "0030_facebook_preview_jobs.sql",
+          "0031_past_present_progress_cover.sql",
+          "0032_animal_compassion_source_poster.sql",
+          "0033_trust_yourself_source_poster.sql",
+          "0034_some_meetings_source_poster.sql",
+          "0035_right_place_source_poster.sql",
+          "0036_anapanasati_source_poster.sql",
+          "0037_quiet_presence_source_poster.sql",
+          "0038_meri_aashiqui_illustrated_cover.sql",
+          "0039_top5_existing_source_poster.sql",
+          "0040_skateboard_symbolic_cover.sql",
+          "0041_source_based_editorial_quality.sql",
+          "0042_sia_source_context.sql",
+          "0043_fight_song_source_context.sql",
+          "0044_wahran_source_context.sql",
+          "0045_flying_source_context.sql",
+          "0046_quiet_presence_accuracy.sql"
+        ],
+        "rowsWritten": 0
+      },
+      "postdeploy": {
+        "checkedAt": "2026-10-18T18:56:25.718Z",
+        "saved": 238,
+        "published": 234,
+        "original238Sha256": "272f188f5aeac00050f794677c5f2c7c18fe39b5f4bbfab315f5dacfe746520e",
+        "targets": [
+          {
+            "id": 44,
+            "sha256": "0a6223df8e3d063ac0521f1aab13323baa9253ddb38f55644d4f7adde0ae7fef",
+            "created_at": "2026-09-27T18:01:49.145Z",
+            "updated_at": "2026-09-27T18:58:50.569Z"
+          },
+          {
+            "id": 45,
+            "sha256": "4c81fe9ffb8d3d6cfc7baf72716ef2dd678c2fd2b5f8e72713ebc5766626399f",
+            "created_at": "2026-09-27T18:02:43.958Z",
+            "updated_at": "2026-09-30T17:54:22.518Z"
+          },
+          {
+            "id": 55,
+            "sha256": "d45aeb98258073bc1c6c5b0179db4c4235cbdfa66f10828eec173098dac70980",
+            "created_at": "2026-09-29T15:46:34.963Z",
+            "updated_at": "2026-09-29T15:46:34.963Z"
+          },
+          {
+            "id": 57,
+            "sha256": "ace6ccb440e8494fd31a44e03018028de40f17b7b5a99064e4427a53bb004c7c",
+            "created_at": "2026-09-29T16:20:53.119Z",
+            "updated_at": "2026-09-29T16:20:53.119Z"
+          },
+          {
+            "id": 59,
+            "sha256": "6d631c36306e8106f8f855965529f35dc35276ca1c43e9b0e22b51bdb5203943",
+            "created_at": "2026-09-29T17:28:49.926Z",
+            "updated_at": "2026-09-29T17:29:20.042Z"
+          },
+          {
+            "id": 64,
+            "sha256": "9c1fc7a2114dff1d781725128baba3006670334e6456c6e438515f143939fd37",
+            "created_at": "2026-09-30T05:26:30.328Z",
+            "updated_at": "2026-09-30T05:29:05.195Z"
+          },
+          {
+            "id": 88,
+            "sha256": "fb399d36df2fe51feb10ea4986f087f5b3c6063f1a65c96eeb7b5782fbabd129",
+            "created_at": "2026-10-04T13:29:37.836Z",
+            "updated_at": "2026-10-04T13:29:37.836Z"
+          },
+          {
+            "id": 186,
+            "sha256": "eeb8df5f800f991988750a446863d195e85e4d4ad9737cd45db39bbe7b2c6c9a",
+            "created_at": "2026-10-14T18:28:59.793Z",
+            "updated_at": "2026-10-14T18:38:01.114Z"
+          },
+          {
+            "id": 191,
+            "sha256": "ab9c1e2ede2a2651c0f2ee77ef59a98e992e29365d48d9d6e6506b116a8669ae",
+            "created_at": "2026-10-15T17:51:23.078Z",
+            "updated_at": "2026-10-15T17:51:23.078Z"
+          },
+          {
+            "id": 192,
+            "sha256": "a40c57b5a185ebac7bdf4c9a78dfd5ae0fb4bfac6654c7962f17b4082cb5c959",
+            "created_at": "2026-10-15T17:59:20.113Z",
+            "updated_at": "2026-10-15T17:59:20.113Z"
+          }
+        ],
+        "rowsWritten": 0
+      },
+      "all238MatchAcrossDeployment": true,
+      "allTenTargetsMatchInitial": true,
+      "d1Writes": 0,
+      "r2Writes": 0,
+      "limit": "Initial-to-premerge full-library digest changed during independent production activity; all ten target rows matched throughout. Preserve concurrent changes: the fresh premerge digest, not the initial digest, is the deployment baseline. No claim that every record stayed unchanged across the entire run."
+    },
+    "verificationFile": "docs/review-images/batch2-live-verification-20261019.json",
+    "latestAudit": {
+      "latestAudit": 39156402702,
+      "artifact": 12147485197,
+      "archiveSha256": "7b46e572d8e81a0baf585867a7564f5c016b0fe15a509f279fd6428a0ecd22c3",
+      "generatedAt": "2026-10-18T18:56:04.166Z",
+      "status": "failed",
+      "pagesChecked": 267,
+      "failedPages": 2,
+      "failures": [
+        {
+          "url": "https://vid.best/watch/tom-holland-zendaya-try-not-to-laugh-pineapple-peeling-melting-cola-viral-fails-show",
+          "errors": [
+            "review_text_missing_from_html"
+          ],
+          "reviewWords": 0
+        },
+        {
+          "url": "https://vid.best/watch/porque-voce-vive-cansada-sendo-que-vc-dormi-muito-eu",
+          "errors": [
+            "review_text_missing_from_html"
+          ],
+          "reviewWords": 0
+        }
+      ],
+      "searchConsole": {
+        "status": "skipped_public_audit_failed",
+        "sitemapSubmitted": false,
+        "inspections": []
+      },
+      "sourcePosterCounts": {
+        "ok": 215,
+        "http_error": 11,
+        "placeholder": 8
+      },
+      "sourcePosterLimit": "Separate from the20 additive review illustrations; no repaired-source-poster claim.",
+      "boundedFollowup": {
+        "d1": {
+          "checkedAt": "2026-10-18T19:02:12.343Z",
+          "response": {
+            "result": [
+              {
+                "results": [
+                  {
+                    "id": 249,
+                    "slug": "tom-holland-zendaya-try-not-to-laugh-pineapple-peeling-melting-cola-viral-fails-show",
+                    "published": 1,
+                    "primary_category": "Funny & Comedy",
+                    "review_chars": 0,
+                    "description_chars": 0,
+                    "created_at": "2026-10-18T18:27:32.254Z",
+                    "updated_at": "2026-10-18T18:27:32.254Z"
+                  },
+                  {
+                    "id": 250,
+                    "slug": "porque-voce-vive-cansada-sendo-que-vc-dormi-muito-eu",
+                    "published": 1,
+                    "primary_category": "Funny & Comedy",
+                    "review_chars": 3930,
+                    "description_chars": 855,
+                    "created_at": "2026-10-18T18:27:59.614Z",
+                    "updated_at": "2026-10-18T18:58:35.315Z"
+                  }
+                ],
+                "success": true,
+                "meta": {
+                  "served_by": "v3-prod",
+                  "served_by_region": "APAC",
+                  "served_by_colo": "SIN",
+                  "served_by_primary": true,
+                  "timings": {
+                    "sql_duration_ms": 0.3872
+                  },
+                  "duration": 0.3872,
+                  "changes": 0,
+                  "last_row_id": 0,
+                  "changed_db": false,
+                  "size_after": 3493888,
+                  "rows_read": 4,
+                  "rows_written": 0,
+                  "total_attempts": 1
+                }
+              }
+            ],
+            "errors": [],
+            "messages": [],
+            "success": true,
+            "status": 200
+          }
+        },
+        "htmlChecks": [
+          {
+            "id": 249,
+            "checkedAt": "2026-10-18T19:02:36.246Z",
+            "status": 200,
+            "reviewSection": true,
+            "reviewHtmlChars": 3622
+          },
+          {
+            "id": 250,
+            "checkedAt": "2026-10-18T19:02:37.077Z",
+            "status": 200,
+            "reviewSection": true,
+            "reviewHtmlChars": 4094
+          }
+        ],
+        "interpretation": "Both missing review sections in the18:56 audit now appear after concurrent production edits. D1 at19:02:12 still had zero review/description chars for249 and populated250; public HTML at19:02:36/37 contains both. This run made no writes or text changes. Do not call the old failed audit passed; do not repeat the full audit/Google Inspections merely to erase the transient failure."
+      },
+      "lastSuccessfulSitemapEvidence": {
+        "audit": 39150318252,
+        "generatedAt": "2026-10-18T17:36:07.642Z",
+        "rootPending": false,
+        "rootErrors": 0,
+        "rootLastDownloaded": "2026-10-18T09:11:12.537Z",
+        "libraryWarnings": 20
+      },
+      "inspectionLimit": "No new inspections or sitemap submissions. This audit skipped Search Console after public failures;0inspections is not an indexed-page count. The prior18October09:09 partial200-review sample had2PASS/156Discovered/42unknown, not the current234-page library."
+    },
+    "layout": {
+      "checkedAt": "2026-10-18T19:00:47.074Z",
+      "url": "https://vid.best/watch/sri-lankan-very-famous-delicious-food-kiribath-with-katta-sambol-milk-rice-coconut",
+      "viewport": {
+        "width": 1363,
+        "height": 936
+      },
+      "review": {
+        "x": 84,
+        "y": 907,
+        "width": 746.5625
+      },
+      "art": {
+        "x": 854.5625,
+        "y": 907,
+        "width": 409.40625,
+        "height": 297.15625
+      },
+      "image": {
+        "complete": true,
+        "width": 1672,
+        "height": 941
+      },
+      "screenshot": "docs/review-images/batch2-live-desktop-20261019.jpg",
+      "caption": "AI-generated review illustration inspired by this review’s theme. This is not a frame from the source video.",
+      "limit": "Desktop visual proof only. Existing900px narrow-layout CSS unchanged; no separate narrow browser viewport available. Player visible during scrolling is not continuous playback/audio verification."
+    }
   }
 }
