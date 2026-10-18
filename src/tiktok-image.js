@@ -6,7 +6,7 @@
 // generated preview graphic (not a claimed still from inaccessible footage).
 const FIRST_PARTY = "https://vid.best";
 const TIKTOK_ID = /\/video\/(\d{15,25})(?:[/?#]|$)/;
-const OWNED_IMAGE = /^\/(?:review-covers\/[a-z0-9_/-]+\.(?:jpe?g|png|webp|avif)|media\/uploads\/tiktok-thumbnails\/\d{15,25}\.img)$/i;
+const OWNED_IMAGE = /^\/(?:review-covers\/[a-z0-9_-]+\.(?:jpe?g|png|webp|avif)|media\/uploads\/tiktok-thumbnails\/\d{15,25}\.img)$/i;
 
 export function stableTikTokImage(row, origin = FIRST_PARTY) {
   const original = String(row?.thumbnail_url || "").trim();
