@@ -625,3 +625,43 @@ test('ten source-associated illustrations are separate from video posters and pr
   const draftXml=await (await request(context,'https://vid.best/sitemaps/images-1.xml')).text();
   assert.ok(!draftXml.includes(manifest.find(row=>row.id===4).path));
 });
+
+test("image/video sitemaps and watch metadata use stable first-party TikTok posters, never expiring CDN URLs", async () => {
+  const context = createContext();
+  const expired = "https://p16-common-sign.tiktokcdn-eu.com/poster?x-expires=1660000000&x-signature=expired";
+  const source = "https://www.tiktok.com/@creator/video/7669587518156705056";
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug,title,source_url,media_type,primary_category,subcategory,description,thumbnail_url,published)
+    VALUES ('tiktok-stable-image','TikTok preview review',?,'tiktok','Music','Music Videos','Video review',?,1)`)
+    .run(source,expired);
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug,title,source_url,media_type,primary_category,subcategory,description,thumbnail_url,published)
+    VALUES ('tiktok-missing-image','Missing TikTok thumbnail',
+      'https://www.tiktok.com/@creator/video/7654628449142770958',
+      'tiktok','Music','Music Videos','Video review',NULL,1)`).run();
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug,title,source_url,media_type,primary_category,subcategory,description,thumbnail_url,published)
+    VALUES ('tiktok-draft-image','Private TikTok draft',
+      'https://www.tiktok.com/@creator/video/7654628449142770959',
+      'tiktok','Music','Music Videos','Unpublished',NULL,0)`).run();
+  const url = 'https://vid.best/api/tiktok/cached-poster?id=7669587518156705056';
+  const images = await (await request(context,'https://vid.best/sitemaps/images-1.xml')).text();
+  const video = await (await request(context,'https://vid.best/sitemaps/videos-1.xml')).text();
+  const watch = await (await request(context,'https://vid.best/watch/tiktok-stable-image',
+    { headers: { "User-Agent": "Googlebot" } })).text();
+  assert.ok(images.includes('<image:loc>'+url+'</image:loc>'));
+  assert.ok(video.includes('<video:thumbnail_loc>'+url+'</video:thumbnail_loc>'));
+  assert.ok(watch.includes('<meta property="og:image" content="'+url+'">'));
+  assert.ok(watch.includes('"thumbnailUrl":["'+url+'"]'));
+  assert.doesNotMatch(images, /x-expires|x-signature|tiktok-draft-image/);
+  assert.doesNotMatch(video, /x-expires|x-signature|tiktok-draft-image/);
+  assert.match(images,/id=7654628449142770958/);
+  assert.match(video,/id=7654628449142770958/);
+  // The original owner's metadata is NOT rewritten merely for SEO.
+  const unchanged = context.sqlite.prepare("SELECT thumbnail_url FROM videos WHERE slug='tiktok-stable-image'").get();
+  assert.equal(unchanged.thumbnail_url, expired);
+  const originalCover = 'https://vid.best/review-covers/owner-original.webp';
+  context.sqlite.prepare("UPDATE videos SET thumbnail_url=? WHERE slug='tiktok-stable-image'").run(originalCover);
+  const owned = await (await request(context,'https://vid.best/sitemaps/images-1.xml')).text();
+  assert.match(owned,/https:\/\/vid\.best\/review-covers\/owner-original\.webp/);
+});
