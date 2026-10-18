@@ -127,6 +127,8 @@ test("isolated official player is noindex/self-framed and permits only the requi
   assert.equal(result.status, 200); assert.match(result.headers.get("X-Robots-Tag"), /noindex/);
   const csp = result.headers.get("Content-Security-Policy");
   assert.match(csp, /frame-ancestors 'self'/); assert.match(csp, /connect-src[^;]*https:\/\/tiktokmedia\.megasale\.win/);
+  const scriptSources = csp.match(/(?:^|; )script-src ([^;]+)/)[1].split(" ");
+  assert.deepEqual(scriptSources, ["'self'", "https://www.tiktok.com", "https://sf16-website-login.neutral.ttwstatic.com"], "permit the observed official302script host without a wildcard");
   assert.doesNotMatch(csp, /unsafe-eval|https:\/\/\*/);
   const html = await result.text(); assert.ok(html.includes(source)); assert.match(html, /tiktok-cache-player\.js/);
   assert.doesNotMatch(html, /<iframe|embed\.js|<script(?! src=)/);
@@ -134,4 +136,11 @@ test("isolated official player is noindex/self-framed and permits only the requi
     source.replace("www.tiktok.com", "user@www.tiktok.com"), "javascript:alert(1)"]) {
     assert.equal(tikTokZeroRequestPlayer(new Request(`${origin}/api/tiktok/oembed-player?url=${encodeURIComponent(bad)}`)).status, 400);
   }
+});
+
+test("the official redirect CDN permission is confined to the isolated player", () => {
+  const general = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
+  const seo = readFileSync(new URL("../src/seo-edge.js", import.meta.url), "utf8");
+  assert.equal(general.includes("sf16-website-login.neutral.ttwstatic.com"), false);
+  assert.equal(seo.includes("sf16-website-login.neutral.ttwstatic.com"), false);
 });

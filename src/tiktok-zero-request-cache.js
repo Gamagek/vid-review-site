@@ -24,7 +24,8 @@ export function tikTokZeroRequestPlayer(request) {
 <noscript>Enable JavaScript to load TikTok's official embed, or follow the source link.</noscript></main></body></html>`, { headers: {
     "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow",
     "X-Content-Type-Options": "nosniff", "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Content-Security-Policy": "default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'none'; frame-ancestors 'self'; script-src 'self' https://www.tiktok.com; connect-src 'self' https://tiktokmedia.megasale.win https://www.tiktok.com; frame-src https://www.tiktok.com; style-src 'self' 'unsafe-inline'; img-src https: data:; media-src https://www.tiktok.com blob:",
+    // The official embed.js URL redirects here (verified18October2026).
+    "Content-Security-Policy": "default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'none'; frame-ancestors 'self'; script-src 'self' https://www.tiktok.com https://sf16-website-login.neutral.ttwstatic.com; connect-src 'self' https://tiktokmedia.megasale.win https://www.tiktok.com; frame-src https://www.tiktok.com; style-src 'self' 'unsafe-inline'; img-src https: data:; media-src https://www.tiktok.com blob:",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
   } });
 }

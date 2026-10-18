@@ -1,5 +1,13 @@
 # Requested TikTok cached oEmbed integration
 
+## PR197release and bounded script-CSP correction
+
+PR197 reviewed0cb1c59/merge`f11dedb293240790f795e6dee3796b1c2d6049c7`; exact-headCI39121602793/job117658155700 passes403Node/fourPython/editorialvalidation/Workerdry-run. Deploy39121686207/job117658399640 succeeds, no migrations; Worker`a5be7a86-08d7-4e4c-997e-7c765c894b7f`100%, deployment786f06d9 at18October11:03:52UTC. Portainer39121686206 validate117658399797 passes; incident117658477293/optional117658477423/preflight117658477479/deploy117658477820 all skip.
+
+Actual live Chrome first paint:opt-in1/newclient version,0iframes/0officialscripts. Deliberate Play creates the correct same-origin player, fetches/validates cache metadata and attempts official embed.js once, but initially shows script-load fallback. A single official HEAD at11:05:52UTC establishes302from `https://www.tiktok.com/embed.js` to `https://sf16-website-login.neutral.ttwstatic.com/obj/tiktok_web_login_static/tiktok/falcon/embed/embed_v1.0.13.js`; the isolated CSP had omitted that exact legitimate script host. The follow-up permits only that observed host in this document's script-src. General watch/home CSP, API, quota and media/security routes remain unchanged. This is a CSP correction, not an Akamai workaround or playback guarantee. Add isolated-only/exact-origin regression and require fresh exact-headCI/live verification.
+
+Follow-up local404Node tests pass. D1read18October11:08:44UTC still204saved/200published, same all-non-counter-field hash `0cfd948043b91847fe4ff442ceba1921235ae2910de38fc6a927b682e65e1736`,0verificationwrites. Consumed completed post-release39121730275/artifact12134975351, ZIP SHA256 `b6801943f3f7c325c336eb88366fca4d459b5190dcdd74a62b76e77de7aad685`:231pages/0technicalfailures,200posters181available/11errors/eight protected placeholders,0Inspections/submissions. Google maps are processed/notpending, last downloaded18October09:11:12.537UTC(root),09:11:14.226(library),09:11:13.890(editorials);0errors, library20aggregatewarnings persist. ZeroInspections does not change the separately dated2PASS/156Discovered/42unknown sample.
+
 Owner-authorized player-only change for published record18, `/watch/a-beautifully-creative-proposal-meme`, exact source `https://www.tiktok.com/@sujicomedyedit_007/video/7603012203595320584`. No review/listing/title/heading/poster/source/date/account/counter/comment/draft/R2 change or general rollout.
 
 ## Actual service contract:18October2026
