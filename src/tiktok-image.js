@@ -13,8 +13,11 @@ export function stableTikTokImage(row, origin = FIRST_PARTY) {
   if (String(row?.media_type || row?.provider || "").toLowerCase() !== "tiktok") return original;
   const id = String(row?.source_url || "").match(TIKTOK_ID)?.[1];
   if (!id) return original;
+  const ownedCoverAllowed = row?.primary_category !== "Funny & Comedy" &&
+    row?.slug !== "saiyaara-a-cinematic-romance" &&
+    row?.slug !== "summer-inverted-7332342275151760642";
   try {
-    if (original) {
+    if (original && ownedCoverAllowed) {
       const image = new URL(original, origin);
       if (image.origin === origin && !image.search && !image.hash &&
           !image.username && !image.password && OWNED_IMAGE.test(image.pathname)) {
