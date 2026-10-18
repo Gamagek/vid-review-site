@@ -118,7 +118,8 @@ test("homepage mini tile holds a poster until tapped without claiming auto sound
   assert.match(loader, /Show Saiyaara video player and sound controls/);
   assert.match(loader, /cover\.addEventListener\("click"/);
   assert.match(loader, /cover\.hidden = true/);
-  assert.match(home, /const cover = card\.querySelector\("\.saiyaara-tile-cover-poster"\)/);
+  assert.match(home, /VidBestSaiyaaraTagembed\?\.updatePoster\?\./);
+  assert.match(loader, /img\.src = FALLBACK_POSTER/);
   assert.match(styles, /\.saiyaara-preview-cover:focus-visible/);
 });
 
