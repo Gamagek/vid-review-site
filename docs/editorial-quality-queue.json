@@ -203,7 +203,7 @@
       "task": "45retainedscene/sound/Buddhist associations and186/191/192/193original audio/visual/cultural descriptions remain manual evidence holds despite bounded accuracy/context corrections. Preserve substantial owner prose and accurate public limits; no metadata→footage/clinical/lineage conclusion, stalled-player retry loop, protected comedy/draft/provider/security change."
     },
     {
-      "task": "Completed39121730275artifact consumed:231pages/0technicalfailures,0Inspections/submissions,processedmaps0errors/library20warnings,18Oct09:11UTCdownloads. Dated18Oct39114196048sample200/210reviews2PASS/156Discovered/42unknown is partial coverage; bothPASS protected comedy unchanged. Read actual later artifacts; do not repeat same-day full Inspection or bypass provider/owner/draft/security/Portainer holds."
+      "task": "Completed 39122325651 artifact consumed: 231 pages / zero technical failures, zero Inspections/submissions, processed maps / zero errors / existing 20 library warnings, 18 October 09:11 UTC downloads. Dated 39114196048 sample remains 200/210 reviews: two PASS / 156 Discovered / 42 unknown; both PASS are protected comedy, unchanged. Requested TikTok player is merged/deployed; actual provider frame shows overload-protect triggered, so playback remains unverified and retries stopped. Resume next independent published Titli135 task, not a provider retry or same-day full Inspection."
     }
   ],
   "dataSnapshot": {
@@ -2140,11 +2140,11 @@
   },
   "screeningVersion": 3,
   "latestPublicAudit": {
-    "runId": 39121730275,
-    "artifactId": 12134975351,
-    "zipSha256": "b6801943f3f7c325c336eb88366fca4d459b5190dcdd74a62b76e77de7aad685",
-    "generatedAt": "2026-10-18T11:04:14.061Z",
-    "artifactCreatedAt": "2026-10-18T11:06:36Z",
+    "runId": 39122325651,
+    "artifactId": 12134882237,
+    "zipSha256": "852bdd4bf7af1d58b824abd4e68623b12beec79cb7c8f6108ee96f4e5a63ba27",
+    "generatedAt": "2026-10-18T11:13:11.323Z",
+    "artifactCreatedAt": "2026-10-18T11:15:17Z",
     "pages": 231,
     "technicalFailures": 0,
     "libraryReviews": 200,
@@ -2160,5 +2160,79 @@
     "sitemapsProcessed": true,
     "lastDownloaded": "2026-10-18T09:11:12.537Z",
     "libraryWarnings": 20
-  }
+  },
+  "completedPlayerIntegrations": [
+    {
+      "recordId": 18,
+      "sourceId": "7603012203595320584",
+      "sourceCreator": "sujicomedyedit_007",
+      "checkedOn": "2026-10-18",
+      "scope": "Owner-authorized player-only integration; no review, listing, SEO title, heading, date, source, poster, cache or rights field edits. No general rollout or protected-topic editorial changes.",
+      "pullRequests": [
+        197,
+        198
+      ],
+      "mergeCommits": [
+        "f11dedb293240790f795e6dee3796b1c2d6049c7",
+        "9f9c732833fe06667963ba29b87a260fb6d12d00"
+      ],
+      "reviewedHead": "874b278841ce1cdf8b9c711fea1289cf5bda2aff",
+      "exactHeadCiRun": 39122208565,
+      "mainCiRun": 39122285632,
+      "tests": {
+        "node": 404,
+        "python": 4,
+        "editorialValidation": "pass",
+        "workerDryRun": "pass"
+      },
+      "deployRun": 39122285668,
+      "workerVersion": "ad44f609-896e-4e00-bee5-be57a124404d",
+      "workerPercentage": 100,
+      "deploymentId": "dc48aac5-0874-44df-9f09-fb23cbe5bdcd",
+      "deploymentCreatedAt": "2026-10-18T11:12:45.456358Z",
+      "migrationsApplied": 0,
+      "portainer": {
+        "runId": 39122285645,
+        "validation": "success",
+        "privilegedJobs": "all four skipped",
+        "automaticFlag": "unchanged"
+      },
+      "apiContract": {
+        "origin": "https://tiktokmedia.megasale.win",
+        "watchPath": "/api/watch?url=...",
+        "statsPath": "/api/stats",
+        "dailyLimitPerViewer": 20,
+        "cacheRepeat": "cache_0_request",
+        "production429Forced": false,
+        "resetTimezone": "unverified"
+      },
+      "liveCheckedAt": "2026-10-18T11:14:51.025Z",
+      "liveChecks": {
+        "apiWatchPlayerSitemap": 200,
+        "exactDeployedAssets": 4,
+        "serverVisibleOwnerParagraphs": 5,
+        "canonicalAndDates": "unchanged",
+        "preClickPlayer": false,
+        "officialScriptLoaded": true,
+        "exactOfficialIframeCreated": true,
+        "providerApiCallsByCredentialFreeVerifier": 0,
+        "verificationWrites": 0
+      },
+      "providerPlayback": {
+        "status": "unverified; external provider restriction observed",
+        "visibleMessage": "overload-protect triggered",
+        "action": "Closed player and stopped provider retries; no copying, alternate routes or access workaround. Script/frame loading is not playback proof."
+      },
+      "preservation": {
+        "checkedAt": "2026-10-18T11:13:21.574Z",
+        "saved": 204,
+        "published": 200,
+        "allNonCounterVideoFieldsSha256": "0cfd948043b91847fe4ff442ceba1921235ae2910de38fc6a927b682e65e1736",
+        "targetListingReviewSeoDescriptionSha256": "b3f5eeea29b02562dddbae401bb3f688cc40e807bcadc640aa95f04ff28377a5",
+        "rowsWrittenByVerification": 0
+      },
+      "evidenceFile": "docs/tiktok-zero-request-integration-20261018.md",
+      "nextTask": "Resume published Titli135 source-context work after fresh owner preimages; all six headings, substantial prose, SEO title, media and dates preserved. Do not retry provider playback just because this checkpoint merges."
+    }
+  ]
 }
