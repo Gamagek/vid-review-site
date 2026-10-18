@@ -134,6 +134,7 @@ function decorateVideoCards() {
         oldSurface.replaceWith(surface);
         card.classList.add("saiyaara-tagembed-tile");
         const share = parseTikTokShareUrl(card.dataset.videoSource);
+        surface.dataset.saiyaaraSource = card.dataset.videoSource || "";
         surface.dataset.saiyaaraPoster = card.dataset.videoThumbnail ||
           (share ? "/api/tiktok/cached-poster?id=" + encodeURIComponent(share.id) : "");
         window.VidBestSaiyaaraTagembed.mount(surface, "tile");

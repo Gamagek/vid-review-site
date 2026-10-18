@@ -2307,7 +2307,10 @@ test("canonical Saiyaara renders direct iframe URL but swipe remains metadata-on
   assert.ok(homeScript.includes("dataset.videoSlug"));
   assert.ok(homeScript.includes("VidBestSaiyaaraTagembed.mount"));
   assert.ok(appScript.includes("dataset.videoSlug"));
-  assert.ok(loader.includes('rootMargin: "300px 0px"'));
+  // Homepage previews are poster-only until a deliberate Play click. No
+  // viewport observer may automatically load a counted Tagembed widget.
+  assert.ok(!loader.includes('rootMargin: "300px 0px"'));
+  assert.ok(loader.includes('mountTilePlayer(host)'));
   assert.ok(loader.includes("https://widget.tagembed.com/2236794?postId=5592899&caption=1&header=1"));
   assert.ok(!loader.includes("embed.min.js"));
 });
