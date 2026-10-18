@@ -133,6 +133,7 @@ test('public API, server review, canonical, schema and sitemap preserve source, 
     };
   }
   const origin = 'https://vid.best';
+  const reviewCover = origin + '/review-illustrations/' + record.before.slug + '-v1.webp';
   const env = {PUBLIC_BASE_URL: origin, DB: {prepare: statement,
     async batch(statements) { return Promise.all(statements.map(s => s.all())); }}};
   const ctx = {waitUntil() { throw new Error('Unexpected background mutation'); }};
@@ -144,7 +145,7 @@ test('public API, server review, canonical, schema and sitemap preserve source, 
   assert.equal(response.status, 200);
   const html = await response.text();
   assert.ok(html.includes(`<link rel="canonical" href="${origin}/watch/${record.before.slug}">`));
-  assert.ok(html.includes(`<meta property="og:image" content="${record.before.thumbnail_url}">`));
+  assert.ok(html.includes(`<meta property="og:image" content="${reviewCover}">`));
   assert.ok(html.includes(escape(record.after.description)));
   for (const paragraph of record.after.review_text.split('\n\n')) assert.ok(html.includes(escape(paragraph)), paragraph);
   assert.doesNotMatch(html, /Last updated|Illustrated cover/);
@@ -152,7 +153,7 @@ test('public API, server review, canonical, schema and sitemap preserve source, 
   const page = graph.find(node => node['@type'] === 'WebPage');
   assert.equal(page.datePublished, record.before.created_at);
   assert.equal(page.dateModified, record.before.updated_at);
-  assert.equal(page.primaryImageOfPage, record.before.thumbnail_url);
+  assert.equal(page.primaryImageOfPage, reviewCover);
   const apiResponse = await request('/api/videos/' + record.before.slug);
   assert.equal(apiResponse.status, 200);
   const api = await apiResponse.json();

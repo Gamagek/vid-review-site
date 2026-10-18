@@ -582,7 +582,7 @@ test("image sitemap and semantic review cover use canonical URLs and never list 
   assert.equal(notFound.status, 404);
 });
 
-test('ten source-associated illustrations are separate from video posters and preserve owner data', async (t) => {
+test('source-associated review covers drive social images while preserving video posters and owner data', async (t) => {
   t.mock.method(globalThis, 'fetch', async () => { throw new Error('No provider traffic in regression tests'); });
   const manifest = JSON.parse(readFileSync(new URL('../src/review-illustrations.json', import.meta.url)));
   const context = createContext();
@@ -612,6 +612,10 @@ test('ten source-associated illustrations are separate from video posters and pr
     const page=graph.find(row=>row['@type']==='WebPage');
     assert.deepEqual(video.thumbnailUrl,['https://vid.best/review-covers/owner-source.jpg']);
     assert.equal(page.image.contentUrl,'https://vid.best'+art.path);
+    assert.equal(page.primaryImageOfPage,'https://vid.best'+art.path);
+    assert.ok(html.includes('<meta property="og:image" content="https://vid.best'+art.path+'">'));
+    assert.ok(html.includes('<meta name="twitter:image" content="https://vid.best'+art.path+'">'));
+    assert.match(html, /<meta property="og:image:alt" content="[^\"]*AI-generated/);
     assert.equal(page.datePublished,'2026-09-16T16:22:59.366Z');
     assert.equal(page.dateModified,'2026-10-11T10:00:00.000Z');
     assert.ok(xml.includes('<image:loc>https://vid.best'+art.path+'</image:loc>'));
@@ -625,6 +629,29 @@ test('ten source-associated illustrations are separate from video posters and pr
   context.sqlite.prepare('UPDATE videos SET published=0 WHERE id=4').run();
   const draftXml=await (await request(context,'https://vid.best/sitemaps/images-1.xml')).text();
   assert.ok(!draftXml.includes(manifest.find(row=>row.id===4).path));
+});
+
+test('public Facebook preview artwork is bounded to the audited placeholder and preserves later owner covers', async (t) => {
+  t.mock.method(globalThis, 'fetch', async () => { throw new Error('No provider traffic in regression tests'); });
+  const context=createContext();
+  const art=JSON.parse(readFileSync(new URL('../src/review-illustrations.json',import.meta.url))).find(x=>x.id===139);
+  context.sqlite.prepare(`INSERT INTO videos
+    (id,slug,title,source_url,media_type,primary_category,subcategory,description,review_text,thumbnail_url,published)
+    VALUES (?,?,?,?,'facebook','Social Media & Trending','Review','Owner listing','Owner review',?,1)`)
+    .run(art.id,art.slug,art.expectedTitle,art.sourceUrl,art.previewFallbackFrom);
+  const before=context.sqlite.prepare('SELECT * FROM videos WHERE id=139').get();
+  const payload=await (await request(context,'https://vid.best/api/videos/'+art.slug)).json();
+  assert.equal(payload.video.review_preview_url,art.path);
+  assert.equal(payload.video.review_artwork_url,art.path);
+  assert.match(payload.video.review_artwork_alt,/AI-generated.*not video footage/);
+  assert.deepEqual(context.sqlite.prepare('SELECT * FROM videos WHERE id=139').get(),before);
+  context.sqlite.prepare('UPDATE videos SET thumbnail_url=? WHERE id=139').run('/review-covers/owner-new.webp');
+  const owner=await (await request(context,'https://vid.best/api/videos/'+art.slug)).json();
+  assert.equal(owner.video.review_preview_url,null);
+  assert.equal(owner.video.thumbnail_url,'/review-covers/owner-new.webp');
+  context.sqlite.prepare('UPDATE videos SET title=? WHERE id=139').run('New owner topic');
+  const changed=await (await request(context,'https://vid.best/api/videos/'+art.slug)).json();
+  assert.equal(changed.video.review_artwork_url,null);
 });
 
 test("image/video sitemaps and watch metadata use stable first-party TikTok posters, never expiring CDN URLs", async () => {

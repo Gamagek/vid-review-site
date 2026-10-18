@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import test from 'node:test';
 import illustrations from '../src/review-illustrations.json' with { type: 'json' };
-import { reviewIllustration } from '../src/review-illustrations.js';
+import { reviewIllustration, reviewPreviewIllustration } from '../src/review-illustrations.js';
 
 test('sidebar artwork assets have unique verified WebP bytes and complete bounded provenance', () => {
   const prompts = JSON.parse(readFileSync(new URL('../docs/review-illustration-prompts.json', import.meta.url)));
@@ -38,4 +38,24 @@ test('owner title, source, slug and publication changes disable stale illustrati
   assert.equal(reviewIllustration({id:99999}),null);
   const fb=illustrations.find(row=>row.id===149);
   assert.equal(reviewIllustration({id:fb.id,slug:fb.slug,title:fb.expectedTitle,source_url:'https://www.facebook.com/watch/?v=not-the-same-video'}),null);
+});
+
+test('only audited placeholder identities get a review-art preview; owner poster changes win', () => {
+  const enabled = illustrations.filter(item => item.previewFallbackFrom);
+  assert.equal(enabled.length, 8);
+  for (const art of enabled) {
+    const row = { id:art.id, slug:art.slug, title:art.expectedTitle,
+      source_url:art.sourceUrl, published:1, thumbnail_url:art.previewFallbackFrom };
+    const before = structuredClone(row);
+    assert.equal(reviewPreviewIllustration(row)?.path, art.path);
+    for (const change of [{thumbnail_url:'/review-covers/new-owner-poster.webp'},
+      {thumbnail_url:'https://images.example.org/owner.jpg'}, {title:'Owner new title'},
+      {source_url:'https://www.facebook.com/reel/another/'}, {published:0}]) {
+      assert.equal(reviewPreviewIllustration({...row,...change}), null);
+    }
+    assert.deepEqual(row, before);
+  }
+  const working = illustrations.find(item => item.id === 162);
+  assert.equal(reviewPreviewIllustration({id:working.id,slug:working.slug,title:working.expectedTitle,
+    source_url:working.sourceUrl,published:1,thumbnail_url:'/facebook-previews/outdoor-challenge-comedy-v1.jpg'}),null);
 });
