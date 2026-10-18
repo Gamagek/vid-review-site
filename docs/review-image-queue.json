@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "inventoryAt": "2026-10-18T17:19:45.523Z",
-  "publishedLibraryCount": 215,
+  "publishedLibraryCount": 234,
   "batchLimit": 10,
   "phase": "additive_sidebar_illustrations",
   "policy": "Preserve all source/owner posters and all D1 fields. Match current published ID, slug, source and title before enabling art. Do not edit protected review topics/media or drafts. Reconcile newly published records on each run; no regeneration merely for freshness. The owner’s 18 October request authorizes separate, clearly labelled sidebar art for all published platforms/topics, including comedy, but never edits existing protected review text, SEO titles, source posters or players. Source-removal/demo/Saiyaara/Summer holds remain.",
@@ -327,7 +327,7 @@
       "slug": "facebook-discovery",
       "category": "Spirituality",
       "sourceSha256": "6f887344a4d81d4cff8da49d49933b96f9b806cfa70c4728e670c5cc29578578",
-      "status": "pending_theme_verification",
+      "status": "included_in_release_batch2",
       "provider": "facebook"
     },
     {
@@ -335,7 +335,7 @@
       "slug": "facebook-discovery-5c11fe",
       "category": "Music",
       "sourceSha256": "cc3635de625df92e1e18acbd474b18f57c4fa47c43e55745050c6dd4bc03a584",
-      "status": "pending_theme_verification",
+      "status": "included_in_release_batch2",
       "provider": "facebook"
     },
     {
@@ -407,7 +407,7 @@
       "slug": "the-northern-lights-aurora-borealis-relaxing-view",
       "category": "Music",
       "sourceSha256": "b03e8732d42433d752c47cb578a82b1837edfe9b02a3d62626aa2d4a141d9360",
-      "status": "pending_theme_verification",
+      "status": "included_in_release_batch2",
       "provider": "youtube"
     },
     {
@@ -423,7 +423,7 @@
       "slug": "sri-lankan-very-famous-delicious-food-kiribath-with-katta-sambol-milk-rice-coconut",
       "category": "Food & Cooking",
       "sourceSha256": "1450eee28c7f4c793b7b000c20387fae694df7fc07c7fe3d5e522bd50c69736b",
-      "status": "pending_theme_verification",
+      "status": "included_in_release_batch2",
       "provider": "youtube"
     },
     {
@@ -439,7 +439,7 @@
       "slug": "a-beautiful-places-forest-sinharaja-sinharaja-sri-lanka",
       "category": "Adventure & Travel",
       "sourceSha256": "7c72ac0a55373639116261b29b3290724282a0c73b2a00d55d8563d00ace5b2b",
-      "status": "pending_theme_verification",
+      "status": "included_in_release_batch2",
       "provider": "youtube"
     },
     {
@@ -479,7 +479,7 @@
       "slug": "categories-of-wisdom-bhavana-learning-reflection-meditation",
       "category": "Education",
       "sourceSha256": "8f5ba1eda133ed749123cf8293a5d56648b4c8e3313c562eb6067ebfe5dcc8c9",
-      "status": "pending_theme_verification",
+      "status": "included_in_release_batch2",
       "provider": "youtube"
     },
     {
@@ -655,7 +655,7 @@
       "slug": "romantic-ai-art-the-beauty-of-digital-love-sweet-moments",
       "category": "Other",
       "sourceSha256": "d55880dcc563a8aac4cf9983a3f18345ad4c94c2354483ce2bf373772b14f8a7",
-      "status": "pending_theme_verification",
+      "status": "included_in_release_batch2",
       "provider": "instagram"
     },
     {
@@ -1367,7 +1367,7 @@
       "slug": "flying-relaxing-sleep-music-for-meditation-stress-relief-relaxation-by-peder-b-helland",
       "category": "Music",
       "sourceSha256": "62ede16383741bad25608306904f0e07d9aba0d202d522cda09de095a815702d",
-      "status": "pending_theme_verification",
+      "status": "included_in_release_batch2",
       "provider": "youtube"
     },
     {
@@ -1407,7 +1407,7 @@
       "slug": "randall-wahran-official-track-festival-anthem-deep-dive",
       "category": "Music",
       "sourceSha256": "6772c70281c97ef3bc35d120129a091e60acd982ea17a346b4a8f9d5d7dbd076",
-      "status": "pending_theme_verification",
+      "status": "included_in_release_batch2",
       "provider": "youtube"
     },
     {
@@ -1415,7 +1415,7 @@
       "slug": "rachel-platten-fight-song-official-music-video-anthem-deep-dive",
       "category": "Music",
       "sourceSha256": "5642b17c197455b70585713b5c5f88e7f264d90eed4bb224a5e6946dfe549654",
-      "status": "pending_theme_verification",
+      "status": "included_in_release_batch2",
       "provider": "youtube"
     },
     {
@@ -1729,9 +1729,161 @@
       "provider": "youtube",
       "sourceSha256": "89857cdbcee75bbdbf48bd6637e5f95d529121a425474bd94e676c89dc1ac786",
       "status": "pending_theme_verification"
+    },
+    {
+      "id": 233,
+      "slug": "cocomelon-wheels-on-the-bus-original-2018-video-review",
+      "category": "Education",
+      "provider": "youtube",
+      "sourceSha256": "f6bd5d4da23febc75d90c6e55400db835c17df8d041a1b9888eb0e34c4ae51f8",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 234,
+      "slug": "cocomelon-bath-song-2018-hygiene-music-video-review",
+      "category": "Music",
+      "provider": "youtube",
+      "sourceSha256": "de0f675aebaedf9b5ded52fca59883caf1ffacd33322c4f2189a9e2a6cde6d2f",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 235,
+      "slug": "looloo-kids-johny-johny-yes-papa-2016-original-review",
+      "category": "Education",
+      "provider": "youtube",
+      "sourceSha256": "785ed0c30f9cdde474045ca5783d4b29eda47563c96db685198f2424bd1fb9b7",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 236,
+      "slug": "crazy-frog-axel-f-official-animated-music-video-review",
+      "category": "Music",
+      "provider": "youtube",
+      "sourceSha256": "b5b54e8dbd4045b39c8d259356900c7e8d095756577174edba73d7067d5cd936",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 237,
+      "slug": "miroshka-tv-learning-colors-colorful-eggs-on-farm-2018-review",
+      "category": "Education",
+      "provider": "youtube",
+      "sourceSha256": "d2a1bf20264caa89ad3bfd9d626457590ed51962b8bad239871ba177ce1ba91a",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 238,
+      "slug": "shree-hanuman-chalisa-hariharan-tseries-devotional-video-review",
+      "category": "Spirituality",
+      "provider": "youtube",
+      "sourceSha256": "4dc9ab10ca12111adb63bbff0399b36c85b74e077badee00237ce9254041a1cc",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 239,
+      "slug": "masha-and-bear-recipe-for-disaster-episode-17-original-review",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "d4390662e8eeea195a74dca6c3096eb1a9b6e91ab003f5b484adb4ed41a2276a",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 240,
+      "slug": "tom-holland-zendaya-try-not-to-laugh-sleep-eating-nutella-prank-watermelon-peel-viral-fails-show",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "06c62d0632ecaaad2234c4f2637c009801692218ac1e48ba596d3717e993b3a4",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 241,
+      "slug": "el-chombo-dame-tu-cosita-green-alien-viral-video-review",
+      "category": "Social Media & Trending",
+      "provider": "youtube",
+      "sourceSha256": "9bd039fe5180f10e43867182342c293144afc396adefbbd181b28807b46c8f4c",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 242,
+      "slug": "ted-ed-why-do-cats-act-so-weird-science-lesson-review",
+      "category": "Education",
+      "provider": "youtube",
+      "sourceSha256": "a81eba6ef5df3e6680ceb9ba7bbf3bfa26fd0b5e97ddf3fb022e8fbd7adc9521",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 243,
+      "slug": "onerepublic-counting-stars-2013-official-video-visual-review",
+      "category": "Music",
+      "provider": "youtube",
+      "sourceSha256": "765dceac27d2caedd29d017ab3d0fbae1ce420284c041dcccfdf630f7ddef804",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 244,
+      "slug": "funny-happy-birthday-prank-gone-wrong-tom-react-viral-comedy-short-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "a9c53fb3b300d15527dd73cb83c8851484ab59bef067f124cbe6eb5359f6945f",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 245,
+      "slug": "tom-holland-zendaya-try-not-to-laugh-kitchen-fails-barber-pranks-viral-compilation-show",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "27a58a6efd1c5d93798c352c659367369a20d65e83793ac95844b6290f586c4c",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 246,
+      "slug": "kitchen-fails-barber-pranks-viral-compilation-show",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "e6467369b48b802ed1679f7b442fe413c848022a216bfd9fd8f5333b76a1e31a",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 247,
+      "slug": "tom-holland-zendaya-try-not-to-laugh-bedroom-pranks-barber-fails-viral-compilation-show",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "8a5549dd23eebba0c5787160ae940a4893529c71fb32845f3209fc3f7ac40017",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 248,
+      "slug": "tom-holland-zendaya-try-not-to-laugh-dancing-kids-diy-fails-square-haircut-viral-show",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "aab4ac00e02662a611853d56b94f179d788e0b242dffb29d43d685643492349d",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 249,
+      "slug": "tom-holland-zendaya-try-not-to-laugh-pineapple-peeling-melting-cola-viral-fails-show",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "445ee47847076c15fdc2b32c8aea6b6df3a88860c01037257f44152df00c708e",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 250,
+      "slug": "porque-voce-vive-cansada-sendo-que-vc-dormi-muito-eu",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "7fa729ca5615ac2bc6c2876c871c134da0f129ec68bc70e49a5db8b33e49faaa",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 251,
+      "slug": "trend-e98012",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "3853a79bcfd7b623ed19966aa418faa0975b84136b08a99dcf88d698d2e41ffe",
+      "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Select up to ten pending published reviews after checking current main/open PRs and fresh owner source/title/slug. Facebook44 and45 have dated source-poster provenance; verify a non-misleading conceptual theme, then continue safe source-verifiable reviews across providers. Never replace protected source posters or rewrite protected topic text. Reconcile new owner records; hold source-removal/demo/source30/Saiyaara/Summer cases.",
+  "nextTask": "Verify batch2 PR/CI/merge/deployment and all ten live assets before selecting more pending illustrations. Reconcile current owner publications.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -1882,13 +2034,216 @@
     },
     "limits": "Ten separate illustrations; no source poster repaired/replaced, no new viewing/audio claims. 11 original provider HTTP errors and8 protected placeholders remain. Original214rows match baseline; five independent owner publications were added during this work."
   },
-  "reconciledAt": "2026-10-18T17:42:12.951Z",
+  "reconciledAt": "2026-10-18T18:51:09.544Z",
   "providerCounts": {
-    "other": 1,
-    "youtube": 180,
+    "raw": 1,
+    "youtube": 199,
     "tiktok": 13,
     "facebook": 20,
     "instagram": 1
   },
-  "verificationCommand": "node scripts/verify-review-illustrations.mjs --ids=4,144,145,149,150,151,152,159,160,161"
+  "verificationCommand": "node scripts/verify-review-illustrations.mjs --ids=4,144,145,149,150,151,152,159,160,161",
+  "batch2": {
+    "state": "awaiting_ci_release_verification",
+    "recordIds": [
+      44,
+      45,
+      55,
+      57,
+      59,
+      64,
+      88,
+      186,
+      191,
+      192
+    ],
+    "baseline": {
+      "checkedAt": "2026-10-18T18:39:33.252Z",
+      "saved": 238,
+      "published": 234,
+      "sha256": "e22dd241ceb3a50323fef12d4a27956403f86f6790d92c827f141255cedc8172",
+      "rowsWritten": 0,
+      "migrations": [
+        "0001_initial.sql",
+        "0002_discovery_requests.sql",
+        "0003_security_rate_limits.sql",
+        "0004_maintenance_indexes.sql",
+        "0005_source_video_metadata.sql",
+        "0006_test_player_and_comment_images.sql",
+        "0007_universal_video_experience.sql",
+        "0008_verified_demo_metadata.sql",
+        "0009_app_settings.sql",
+        "0010_video_analysis.sql",
+        "0011_spirituality_buddhism.sql",
+        "0012_saiyaara_tiktok_correction.sql",
+        "0013_saiyaara_permanent_slug.sql",
+        "0013_media_cache_jobs.sql",
+        "0014_member_notifications.sql",
+        "0015_summer_inverted_tiktok.sql",
+        "0016_rights_certified_r2_cache.sql",
+        "0017_authorized_auto_cache.sql",
+        "0018_tiktok_oembed_cache.sql",
+        "0019_tiktok_oembed_backfill.sql",
+        "0020_member_personalization.sql",
+        "0021_facebook_reel_pending_drafts.sql",
+        "0022_facebook_readable_slugs.sql",
+        "0023_facebook_challenge_preview.sql",
+        "0024_digital_love_review_cover.sql",
+        "0025_lab_review_source_cover.sql",
+        "0026_gratitude_illustrated_cover.sql",
+        "0027_garden_illustrated_cover.sql",
+        "0028_nature_power_illustrated_cover.sql",
+        "0029_live_kindly_illustrated_cover.sql",
+        "0030_facebook_preview_jobs.sql",
+        "0031_past_present_progress_cover.sql",
+        "0032_animal_compassion_source_poster.sql",
+        "0033_trust_yourself_source_poster.sql",
+        "0034_some_meetings_source_poster.sql",
+        "0035_right_place_source_poster.sql",
+        "0036_anapanasati_source_poster.sql",
+        "0037_quiet_presence_source_poster.sql",
+        "0038_meri_aashiqui_illustrated_cover.sql",
+        "0039_top5_existing_source_poster.sql",
+        "0040_skateboard_symbolic_cover.sql",
+        "0041_source_based_editorial_quality.sql",
+        "0042_sia_source_context.sql",
+        "0043_fight_song_source_context.sql",
+        "0044_wahran_source_context.sql",
+        "0045_flying_source_context.sql",
+        "0046_quiet_presence_accuracy.sql"
+      ],
+      "deployment": {
+        "id": "32996a49-b913-452c-aab7-6d4b6a665bf2",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "annotations": {
+          "workers/triggered_by": "deployment"
+        },
+        "versions": [
+          {
+            "version_id": "248f9238-57d5-4d86-be76-a91d87a865af",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-18T17:35:43.202326Z"
+      }
+    },
+    "sourceEvidence": {
+      "checkedOn": "2026-10-18",
+      "youtubeOfficialOembed": [
+        {
+          "id": 57,
+          "sourceId": "kdyBwCesGBA",
+          "status": 200,
+          "title": "Sri Lankan Very Famous Delicious Food Kiribath with Katta Sambol කිරිබත් Milk Rice සම්බෝල Coconut",
+          "author": "Sri Lankan Cooking"
+        },
+        {
+          "id": 59,
+          "sourceId": "H-K155NZlrk",
+          "status": 200,
+          "title": "A BEAUTIFUL PLACES FOREST SINHARAJA Sinharaja - Sri Lanka ලස්සනම තැනක් සිංහරාජ වනාන්තරය ශ්‍රී ලංකාව",
+          "author": "DISCOVER WORLD PLACES"
+        },
+        {
+          "id": 55,
+          "sourceId": "2ACoCXGL8Gg",
+          "status": 200,
+          "title": "The Northern Lights (Aurora Borealis)",
+          "author": "Mind Relaxing Music Song"
+        },
+        {
+          "id": 64,
+          "sourceId": "t4sqRgG2Rjw",
+          "status": 200,
+          "title": "ප්‍රඥාව ප්‍රභේද| සුතමය,චින්තාමය, භාවනාමය Categories of wisdom",
+          "author": "බණ සදහම් දේශන BANADHAMMA ධර්ම දහම් DHARMADHAHAM"
+        }
+      ],
+      "limits": "Official metadata only for55/57/59/64; no footage/audio inspected. Search queries were empty and search-service source opens returned DisabledError; the documented public official oEmbed API succeeded without copying media or bypassing an access control. 44/45 use dated13October source provenance;88 is explicitly title-grounded conceptual art from saved published AI-art review, not verified creator/scene observations.186/191/192 use prior primary metadata evidence, not new listening or video observations."
+    },
+    "targetRows": [
+      {
+        "id": 44,
+        "slug": "facebook-discovery",
+        "sourceSha256": "6f887344a4d81d4cff8da49d49933b96f9b806cfa70c4728e670c5cc29578578",
+        "protectedRowSha256": "0a6223df8e3d063ac0521f1aab13323baa9253ddb38f55644d4f7adde0ae7fef",
+        "created_at": "2026-09-27T18:01:49.145Z",
+        "updated_at": "2026-09-27T18:58:50.569Z"
+      },
+      {
+        "id": 45,
+        "slug": "facebook-discovery-5c11fe",
+        "sourceSha256": "cc3635de625df92e1e18acbd474b18f57c4fa47c43e55745050c6dd4bc03a584",
+        "protectedRowSha256": "4c81fe9ffb8d3d6cfc7baf72716ef2dd678c2fd2b5f8e72713ebc5766626399f",
+        "created_at": "2026-09-27T18:02:43.958Z",
+        "updated_at": "2026-09-30T17:54:22.518Z"
+      },
+      {
+        "id": 55,
+        "slug": "the-northern-lights-aurora-borealis-relaxing-view",
+        "sourceSha256": "b03e8732d42433d752c47cb578a82b1837edfe9b02a3d62626aa2d4a141d9360",
+        "protectedRowSha256": "d45aeb98258073bc1c6c5b0179db4c4235cbdfa66f10828eec173098dac70980",
+        "created_at": "2026-09-29T15:46:34.963Z",
+        "updated_at": "2026-09-29T15:46:34.963Z"
+      },
+      {
+        "id": 57,
+        "slug": "sri-lankan-very-famous-delicious-food-kiribath-with-katta-sambol-milk-rice-coconut",
+        "sourceSha256": "1450eee28c7f4c793b7b000c20387fae694df7fc07c7fe3d5e522bd50c69736b",
+        "protectedRowSha256": "ace6ccb440e8494fd31a44e03018028de40f17b7b5a99064e4427a53bb004c7c",
+        "created_at": "2026-09-29T16:20:53.119Z",
+        "updated_at": "2026-09-29T16:20:53.119Z"
+      },
+      {
+        "id": 59,
+        "slug": "a-beautiful-places-forest-sinharaja-sinharaja-sri-lanka",
+        "sourceSha256": "7c72ac0a55373639116261b29b3290724282a0c73b2a00d55d8563d00ace5b2b",
+        "protectedRowSha256": "6d631c36306e8106f8f855965529f35dc35276ca1c43e9b0e22b51bdb5203943",
+        "created_at": "2026-09-29T17:28:49.926Z",
+        "updated_at": "2026-09-29T17:29:20.042Z"
+      },
+      {
+        "id": 64,
+        "slug": "categories-of-wisdom-bhavana-learning-reflection-meditation",
+        "sourceSha256": "8f5ba1eda133ed749123cf8293a5d56648b4c8e3313c562eb6067ebfe5dcc8c9",
+        "protectedRowSha256": "9c1fc7a2114dff1d781725128baba3006670334e6456c6e438515f143939fd37",
+        "created_at": "2026-09-30T05:26:30.328Z",
+        "updated_at": "2026-09-30T05:29:05.195Z"
+      },
+      {
+        "id": 88,
+        "slug": "romantic-ai-art-the-beauty-of-digital-love-sweet-moments",
+        "sourceSha256": "d55880dcc563a8aac4cf9983a3f18345ad4c94c2354483ce2bf373772b14f8a7",
+        "protectedRowSha256": "fb399d36df2fe51feb10ea4986f087f5b3c6063f1a65c96eeb7b5782fbabd129",
+        "created_at": "2026-10-04T13:29:37.836Z",
+        "updated_at": "2026-10-04T13:29:37.836Z"
+      },
+      {
+        "id": 186,
+        "slug": "flying-relaxing-sleep-music-for-meditation-stress-relief-relaxation-by-peder-b-helland",
+        "sourceSha256": "62ede16383741bad25608306904f0e07d9aba0d202d522cda09de095a815702d",
+        "protectedRowSha256": "eeb8df5f800f991988750a446863d195e85e4d4ad9737cd45db39bbe7b2c6c9a",
+        "created_at": "2026-10-14T18:28:59.793Z",
+        "updated_at": "2026-10-14T18:38:01.114Z"
+      },
+      {
+        "id": 191,
+        "slug": "randall-wahran-official-track-festival-anthem-deep-dive",
+        "sourceSha256": "6772c70281c97ef3bc35d120129a091e60acd982ea17a346b4a8f9d5d7dbd076",
+        "protectedRowSha256": "ab9c1e2ede2a2651c0f2ee77ef59a98e992e29365d48d9d6e6506b116a8669ae",
+        "created_at": "2026-10-15T17:51:23.078Z",
+        "updated_at": "2026-10-15T17:51:23.078Z"
+      },
+      {
+        "id": 192,
+        "slug": "rachel-platten-fight-song-official-music-video-anthem-deep-dive",
+        "sourceSha256": "5642b17c197455b70585713b5c5f88e7f264d90eed4bb224a5e6946dfe549654",
+        "protectedRowSha256": "a40c57b5a185ebac7bdf4c9a78dfd5ae0fb4bfac6654c7962f17b4082cb5c959",
+        "created_at": "2026-10-15T17:59:20.113Z",
+        "updated_at": "2026-10-15T17:59:20.113Z"
+      }
+    ],
+    "scope": "Ten additive sidebar illustrations only; no source poster/review/player/date/SEO field or D1/R2 change."
+  }
 }
