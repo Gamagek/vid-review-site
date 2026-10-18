@@ -550,7 +550,13 @@ test("image sitemap and semantic review cover use canonical URLs and never list 
       'raw','Music','Music Videos','Unpublished content','https://vid.best/review-covers/draft.webp',0)`).run();
 
   const root = await (await request(context, "https://vid.best/sitemap.xml")).text();
-  assert.match(root, /<loc>https:\/\/vid\.best\/image-sitemap\.xml<\/loc>/);
+  assert.match(root, /<loc>https:\/\/vid\.best\/sitemaps\/images-1\.xml<\/loc>/);
+  assert.doesNotMatch(root, /<loc>https:\/\/vid\.best\/image-sitemap\.xml<\/loc>/, "an index must not nest another index");
+  for (const [, childUrl] of root.matchAll(/<loc>([^<]+)<\/loc>/g)) {
+    const child = await (await request(context, childUrl)).text();
+    assert.match(child, /<urlset\b/, `${childUrl} must be a sitemap, not another index`);
+    assert.doesNotMatch(child, /<sitemapindex\b/);
+  }
   const imageIndex = await (await request(context, "https://vid.best/image-sitemap.xml")).text();
   assert.match(imageIndex, /<loc>https:\/\/vid\.best\/sitemaps\/images-1\.xml<\/loc>/);
   const images = await request(context, "https://vid.best/sitemaps/images-1.xml");
@@ -573,4 +579,49 @@ test("image sitemap and semantic review cover use canonical URLs and never list 
   assert.equal(await head.text(), "");
   const notFound = await request(context, "https://vid.best/sitemaps/images-9999.xml");
   assert.equal(notFound.status, 404);
+});
+
+test('ten source-associated illustrations are separate from video posters and preserve owner data', async (t) => {
+  t.mock.method(globalThis, 'fetch', async () => { throw new Error('No provider traffic in regression tests'); });
+  const manifest = JSON.parse(readFileSync(new URL('../src/review-illustrations.json', import.meta.url)));
+  const context = createContext();
+  for (const art of manifest) {
+    context.sqlite.prepare(`INSERT INTO videos
+      (id,slug,title,source_url,media_type,primary_category,subcategory,description,review_text,thumbnail_url,published,created_at,updated_at)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(art.id,art.slug,art.expectedTitle,art.sourceUrl,
+      art.id===4?'youtube':'facebook',art.id===4?'Music':'Social Media & Trending','Review',
+      'Owner listing remains unchanged','Owner review heading\n\nSubstantial original owner text.',
+      'https://vid.best/review-covers/owner-source.jpg',1,'2026-09-16T16:22:59.366Z','2026-10-11T10:00:00.000Z');
+    context.sqlite.prepare('INSERT INTO video_source_metadata (video_id,source_published_at) VALUES (?,?)')
+      .run(art.id,'2026-01-01T00:00:00.000Z');
+  }
+  const before = context.sqlite.prepare('SELECT * FROM videos ORDER BY id').all();
+  const xml = await (await request(context,'https://vid.best/sitemaps/images-1.xml')).text();
+  const videoXml = await (await request(context,'https://vid.best/sitemaps/videos-1.xml')).text();
+  for (const art of manifest) {
+    const html = await (await request(context,'https://vid.best/watch/'+art.slug,{headers:{'User-Agent':'VidBest-SEO-Audit/1.0'}})).text();
+    assert.ok(html.includes('src="https://vid.best'+art.path+'"'));
+    assert.match(html, /AI-generated review illustration inspired/);
+    assert.match(html, /<div class="watch-review-body">\s*<article class="watch-copy glass-panel">/);
+    assert.ok(html.indexOf('<!-- review-body -->') < html.indexOf('id="vidbest-related-reviews"'));
+    assert.match(html, /Owner listing remains unchanged/);
+    assert.match(html, /Substantial original owner text/);
+    const graph=JSON.parse(html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)[1])['@graph'];
+    const video=graph.find(row=>row['@type']==='VideoObject');
+    const page=graph.find(row=>row['@type']==='WebPage');
+    assert.deepEqual(video.thumbnailUrl,['https://vid.best/review-covers/owner-source.jpg']);
+    assert.equal(page.image.contentUrl,'https://vid.best'+art.path);
+    assert.equal(page.datePublished,'2026-09-16T16:22:59.366Z');
+    assert.equal(page.dateModified,'2026-10-11T10:00:00.000Z');
+    assert.ok(xml.includes('<image:loc>https://vid.best'+art.path+'</image:loc>'));
+    assert.ok(videoXml.includes('<image:loc>https://vid.best'+art.path+'</image:loc>'));
+    assert.ok(!videoXml.includes('<video:thumbnail_loc>https://vid.best'+art.path));
+  }
+  assert.deepEqual(context.sqlite.prepare('SELECT * FROM videos ORDER BY id').all(),before);
+  context.sqlite.prepare('UPDATE videos SET thumbnail_url=NULL WHERE id=4').run();
+  const missingPosterXml=await (await request(context,'https://vid.best/sitemaps/images-1.xml')).text();
+  assert.ok(missingPosterXml.includes(manifest.find(row=>row.id===4).path));
+  context.sqlite.prepare('UPDATE videos SET published=0 WHERE id=4').run();
+  const draftXml=await (await request(context,'https://vid.best/sitemaps/images-1.xml')).text();
+  assert.ok(!draftXml.includes(manifest.find(row=>row.id===4).path));
 });

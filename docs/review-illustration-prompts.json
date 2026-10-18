@@ -1,0 +1,107 @@
+{
+  "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+  "generatedOn": "2026-10-18",
+  "limits": "Conceptual editorial art only. No source footage/audio newly inspected or reconstructed. No original poster or owner field replaced.",
+  "images": [
+    {
+      "id": 4,
+      "slug": "sadahatama-oba-mage-theme-song",
+      "prompt": "Create ONE landscape 16:9 (1536 by 864 preferred) polished original editorial review illustration for Vid.Best, designed to remain clear as a 350px sidebar mini image. This is separate conceptual artwork, NOT a video thumbnail frame, reconstruction, official poster, screenshot or source video. Tactile painted/paper-cut illustration, carefully restrained composition, attractive readable editorial typography, ample safe margins. Main theme: Two delicate intertwined flowing ribbons with small abstract music-note shapes, muted rose and warm gold against deep indigo; symbolic romance and music, no people or film scenes. Exact main text: \"THEME SONG\". Exact small but legible footer text: \"AI-GENERATED REVIEW ILLUSTRATION\" and \"VID.BEST\". These labels must be unobstructed and readable. No extra text, no play buttons or browser UI, no provider logos, no celebrity likeness, no fabricated quotes/statistics, no ranking or AdSense promises, no promotional badges. Do not imitate any source creator watermark or artwork.",
+      "asset": "public/review-illustrations/sadahatama-oba-mage-theme-song-v1.webp",
+      "bytes": 105310,
+      "sha256": "f8293c13b8c3302de1e6ce30af0267620766a3979552785e7f3c933714ad219c",
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": 144,
+      "slug": "garden-like-painting-sithara-plant",
+      "prompt": "Create ONE landscape 16:9 (1536 by 864 preferred) polished original editorial review illustration for Vid.Best, designed to remain clear as a 350px sidebar mini image. This is separate conceptual artwork, NOT a video thumbnail frame, reconstruction, official poster, screenshot or source video. Tactile painted/paper-cut illustration, carefully restrained composition, attractive readable editorial typography, ample safe margins. Main theme: An intimate botanical paper-cut garden of layered green leaves and vivid orange and yellow flowers on textured cream, a decorative imagined arrangement, no identifiable real location. Exact main text: \"A GARDEN LIKE A PAINTING\". Exact small but legible footer text: \"AI-GENERATED REVIEW ILLUSTRATION\" and \"VID.BEST\". These labels must be unobstructed and readable. No extra text, no play buttons or browser UI, no provider logos, no celebrity likeness, no fabricated quotes/statistics, no ranking or AdSense promises, no promotional badges. Do not imitate any source creator watermark or artwork.",
+      "asset": "public/review-illustrations/garden-like-painting-sithara-plant-v1.webp",
+      "bytes": 206228,
+      "sha256": "1dc55bee85932016b011882d51eb4528b356364d160e215e0cb890392325880b",
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": 145,
+      "slug": "nature-is-power-sinhala-earth-reflection",
+      "prompt": "Create ONE landscape 16:9 (1536 by 864 preferred) polished original editorial review illustration for Vid.Best, designed to remain clear as a 350px sidebar mini image. This is separate conceptual artwork, NOT a video thumbnail frame, reconstruction, official poster, screenshot or source video. Tactile painted/paper-cut illustration, carefully restrained composition, attractive readable editorial typography, ample safe margins. Main theme: A stylized green tree canopy framing blue sky and a winding river ribbon, hand-painted editorial landscape with organic layered shapes; symbolic appreciation of nature, no healing or medical claims. Exact main text: \"NATURE IS POWER\". Exact small but legible footer text: \"AI-GENERATED REVIEW ILLUSTRATION\" and \"VID.BEST\". These labels must be unobstructed and readable. No extra text, no play buttons or browser UI, no provider logos, no celebrity likeness, no fabricated quotes/statistics, no ranking or AdSense promises, no promotional badges. Do not imitate any source creator watermark or artwork.",
+      "asset": "public/review-illustrations/nature-is-power-sinhala-earth-reflection-v1.webp",
+      "bytes": 247044,
+      "sha256": "eb0fca06f91d03a330f302ef920332e8af685087d9040ced829f548116ae672a",
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": 149,
+      "slug": "live-kindly-enjoy-your-time",
+      "prompt": "Create ONE landscape 16:9 (1536 by 864 preferred) polished original editorial review illustration for Vid.Best, designed to remain clear as a 350px sidebar mini image. This is separate conceptual artwork, NOT a video thumbnail frame, reconstruction, official poster, screenshot or source video. Tactile painted/paper-cut illustration, carefully restrained composition, attractive readable editorial typography, ample safe margins. Main theme: A serene illustrated orange sunset and cool blue layered clouds with three tiny bird silhouettes, an imagined symbolic reflection on time and kindness. Exact main text: \"LIVE KINDLY\". Exact small but legible footer text: \"AI-GENERATED REVIEW ILLUSTRATION\" and \"VID.BEST\". These labels must be unobstructed and readable. No extra text, no play buttons or browser UI, no provider logos, no celebrity likeness, no fabricated quotes/statistics, no ranking or AdSense promises, no promotional badges. Do not imitate any source creator watermark or artwork.",
+      "asset": "public/review-illustrations/live-kindly-enjoy-your-time-v1.webp",
+      "bytes": 132684,
+      "sha256": "9a5f73adce805cd525912960b8d7b7ff12f018f204098d2b73c7d2d3eb31cb65",
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": 150,
+      "slug": "some-meetings-end-in-goodbye-sinhala-reflection",
+      "prompt": "Create ONE landscape 16:9 (1536 by 864 preferred) polished original editorial review illustration for Vid.Best, designed to remain clear as a 350px sidebar mini image. This is separate conceptual artwork, NOT a video thumbnail frame, reconstruction, official poster, screenshot or source video. Tactile painted/paper-cut illustration, carefully restrained composition, attractive readable editorial typography, ample safe margins. Main theme: An abstract terracotta pathway passing between two open blue arches towards warm morning light, understated editorial geometry symbolizing moving forward; no human figures, no claimed video scene. Exact main text: \"MOVING FORWARD\". Exact small but legible footer text: \"AI-GENERATED REVIEW ILLUSTRATION\" and \"VID.BEST\". These labels must be unobstructed and readable. No extra text, no play buttons or browser UI, no provider logos, no celebrity likeness, no fabricated quotes/statistics, no ranking or AdSense promises, no promotional badges. Do not imitate any source creator watermark or artwork.",
+      "asset": "public/review-illustrations/some-meetings-end-in-goodbye-sinhala-reflection-v1.webp",
+      "bytes": 102652,
+      "sha256": "9680be644f13fbc1bacc916bb5b7b159135537e3aaf8acfe47b1f305aa1c5c13",
+      "width": 1672,
+      "height": 940
+    },
+    {
+      "id": 151,
+      "slug": "trust-yourself-cinematic-confidence",
+      "prompt": "Create ONE landscape 16:9 (1536 by 864 preferred) polished original editorial review illustration for Vid.Best, designed to remain clear as a 350px sidebar mini image. This is separate conceptual artwork, NOT a video thumbnail frame, reconstruction, official poster, screenshot or source video. Tactile painted/paper-cut illustration, carefully restrained composition, attractive readable editorial typography, ample safe margins. Main theme: A small faceted amber star above a steady indigo stepping stone with wide calm teal arcs, bold geometric editorial art symbolizing confidence; no wolves, actors, movie scenes or invented footage. Exact main text: \"TRUST YOURSELF\". Exact small but legible footer text: \"AI-GENERATED REVIEW ILLUSTRATION\" and \"VID.BEST\". These labels must be unobstructed and readable. No extra text, no play buttons or browser UI, no provider logos, no celebrity likeness, no fabricated quotes/statistics, no ranking or AdSense promises, no promotional badges. Do not imitate any source creator watermark or artwork.",
+      "asset": "public/review-illustrations/trust-yourself-cinematic-confidence-v1.webp",
+      "bytes": 130056,
+      "sha256": "a2dda58b9b14042ac7cef5a31755321ec0e685fc85987b5d7798b519dd347639",
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": 152,
+      "slug": "past-present-progress-smart-ict",
+      "prompt": "Create ONE landscape 16:9 (1536 by 864 preferred) polished original editorial review illustration for Vid.Best, designed to remain clear as a 350px sidebar mini image. This is separate conceptual artwork, NOT a video thumbnail frame, reconstruction, official poster, screenshot or source video. Tactile painted/paper-cut illustration, carefully restrained composition, attractive readable editorial typography, ample safe margins. Main theme: An open cream notebook with three teal and amber ascending paper steps and playful abstract digital blocks, an imagined learning and progress metaphor; no company logos, corporate buildings or factual timelines. Exact main text: \"PAST • PRESENT • PROGRESS\". Exact small but legible footer text: \"AI-GENERATED REVIEW ILLUSTRATION\" and \"VID.BEST\". These labels must be unobstructed and readable. No extra text, no play buttons or browser UI, no provider logos, no celebrity likeness, no fabricated quotes/statistics, no ranking or AdSense promises, no promotional badges. Do not imitate any source creator watermark or artwork.",
+      "asset": "public/review-illustrations/past-present-progress-smart-ict-v1.webp",
+      "bytes": 85946,
+      "sha256": "0fd88dc9dd318d88d26f4245fbc70c6ec972f0e59b1096b34794bf99f6f19e49",
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": 159,
+      "slug": "animal-compassion-anil-oskar",
+      "prompt": "Create ONE landscape 16:9 (1536 by 864 preferred) polished original editorial review illustration for Vid.Best, designed to remain clear as a 350px sidebar mini image. This is separate conceptual artwork, NOT a video thumbnail frame, reconstruction, official poster, screenshot or source video. Tactile painted/paper-cut illustration, carefully restrained composition, attractive readable editorial typography, ample safe margins. Main theme: A gentle stylized antlered deer silhouette within a protective circle of green leaves beside abstract blue water shapes, flat painted editorial art; a symbolic compassion motif, no rescue action, no people, no invented factual outcome. Exact main text: \"ANIMAL COMPASSION\". Exact small but legible footer text: \"AI-GENERATED REVIEW ILLUSTRATION\" and \"VID.BEST\". These labels must be unobstructed and readable. No extra text, no play buttons or browser UI, no provider logos, no celebrity likeness, no fabricated quotes/statistics, no ranking or AdSense promises, no promotional badges. Do not imitate any source creator watermark or artwork.",
+      "asset": "public/review-illustrations/animal-compassion-anil-oskar-v1.webp",
+      "bytes": 131462,
+      "sha256": "bc22757e24ba9321b792e9d3aae9f09a2a0176c92fe2e3c8158b0ec80f09b599",
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": 160,
+      "slug": "remembering-kindness-sinhala-gratitude",
+      "prompt": "Create ONE landscape 16:9 (1536 by 864 preferred) polished original editorial review illustration for Vid.Best, designed to remain clear as a 350px sidebar mini image. This is separate conceptual artwork, NOT a video thumbnail frame, reconstruction, official poster, screenshot or source video. Tactile painted/paper-cut illustration, carefully restrained composition, attractive readable editorial typography, ample safe margins. Main theme: A tiny amber ant on a curved emerald leaf with generous cream negative space and softly painted forest textures, warm restrained editorial illustration representing gratitude; no human or religious depictions. Exact main text: \"REMEMBERING KINDNESS\". Exact small but legible footer text: \"AI-GENERATED REVIEW ILLUSTRATION\" and \"VID.BEST\". These labels must be unobstructed and readable. No extra text, no play buttons or browser UI, no provider logos, no celebrity likeness, no fabricated quotes/statistics, no ranking or AdSense promises, no promotional badges. Do not imitate any source creator watermark or artwork.",
+      "asset": "public/review-illustrations/remembering-kindness-sinhala-gratitude-v1.webp",
+      "bytes": 106952,
+      "sha256": "d600161d5262b080bf0ee5a60c995dc700eb97890f6310bbd97a51f18dcce707",
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": 161,
+      "slug": "are-you-in-the-right-place-sinhala-reflection",
+      "prompt": "Create ONE landscape 16:9 (1536 by 864 preferred) polished original editorial review illustration for Vid.Best, designed to remain clear as a 350px sidebar mini image. This is separate conceptual artwork, NOT a video thumbnail frame, reconstruction, official poster, screenshot or source video. Tactile painted/paper-cut illustration, carefully restrained composition, attractive readable editorial typography, ample safe margins. Main theme: An abstract camera viewfinder framing one warm gold circle aligned among teal rectangular shapes, sophisticated symbolic geometric art about perspective and finding a place; no real camera branding, race scene, speed or documentary claim. Exact main text: \"THE RIGHT PLACE\". Exact small but legible footer text: \"AI-GENERATED REVIEW ILLUSTRATION\" and \"VID.BEST\". These labels must be unobstructed and readable. No extra text, no play buttons or browser UI, no provider logos, no celebrity likeness, no fabricated quotes/statistics, no ranking or AdSense promises, no promotional badges. Do not imitate any source creator watermark or artwork.",
+      "asset": "public/review-illustrations/are-you-in-the-right-place-sinhala-reflection-v1.webp",
+      "bytes": 94294,
+      "sha256": "8ec7f9455b293043d55f5b06de301ab5a45cddc611046cf315a1f30d4b3dd549",
+      "width": 1672,
+      "height": 941
+    }
+  ]
+}

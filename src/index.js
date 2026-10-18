@@ -1,4 +1,5 @@
 import { parseInstagramUrl } from "../public/instagram-utils.js";
+import { reviewIllustration } from "./review-illustrations.js";
 import { isLikelyCrawler } from "./crawlers.js";
 import { tikTokZeroRequestPlayer } from "./tiktok-zero-request-cache.js";
 import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStatus } from "./tiktok-cache-jobs.js";
@@ -3015,6 +3016,8 @@ function renderWatchHtml(video, request, env, scriptNonce) {
       ? `${baseUrl}/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`
       : "";
   const tags = Array.isArray(video.seo_tags) ? video.seo_tags.slice(0, 20) : [];
+  const illustration = reviewIllustration(video);
+  const reviewImage = illustration ? `${baseUrl}${illustration.path}` : thumbnail;
   // A Vid.Best review's creation date is not the original third-party video's
   // publication date. Google requires the *video* date when it is known.
   const uploadDate = video.source_published_at || (video.provider === "r2" ? video.created_at : "");
@@ -3072,6 +3075,8 @@ function renderWatchHtml(video, request, env, scriptNonce) {
         publisher: { "@id": `${baseUrl}#organization` },
         ...(sourceAttribution ? { isBasedOn: sourceAttribution } : {}),
         ...(thumbnail ? { primaryImageOfPage: thumbnail } : {}),
+        ...(illustration ? { image: { "@type": "ImageObject", contentUrl: reviewImage,
+          caption: illustration.caption, width: illustration.width, height: illustration.height } } : {}),
         mainEntity: { "@id": `${canonical}#video` },
         isPartOf: { "@id": `${baseUrl}#website` },
       },
@@ -3108,7 +3113,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <meta name="twitter:description" content="${escapeHtml(description)}">
   <meta name="twitter:image" content="${escapeHtml(thumbnail)}">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/styles.css?v=20261008-saiyaara-fit4">
+  <link rel="stylesheet" href="/styles.css?v=20261018-review-art1">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   ${video.provider === "tiktok" ? '<script src="/tiktok-oembed-cache.js?v=20261018-replay" defer></script><script src="/tiktok-preview-service.js?v=20261018-replay" defer></script>' : ""}
   ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>' : ""}
@@ -3141,6 +3146,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
       </div>
       <div class="watch-player-stage">${renderMedia(video, playbackOrigin, viewer)}</div>
     </section>
+    <div class="watch-review-body">
     <article class="watch-copy glass-panel">
       <div class="tile-badges"><span class="badge">${escapeHtml(video.primary_category)}</span><span class="badge secondary">${escapeHtml(video.subcategory)}</span></div>
       <h1>${escapeHtml(watchDisplayTitle(video))}</h1>
@@ -3161,12 +3167,13 @@ function renderWatchHtml(video, request, env, scriptNonce) {
       <p class="review-source-note">Vid.Best provides commentary on external media, not a claim of original video authorship. <a href="/editorial">How our reviews work</a>.</p>
       <a class="source-link" href="${escapeHtml(video.source_page_url || video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open original source ↗</a>
     </article>
-    ${thumbnail ? `<figure class="watch-review-art glass-panel" aria-label="Review image">
-      <a href="${escapeHtml(thumbnail)}" target="_blank" rel="noopener noreferrer" aria-label="View review preview image">
-        <img src="${escapeHtml(thumbnail)}" alt="${escapeHtml(video.title)} — review preview image" width="640" height="360" loading="lazy" decoding="async">
+    ${reviewImage ? `<figure class="watch-review-art glass-panel" aria-label="Review image">
+      <a href="${escapeHtml(reviewImage)}" target="_blank" rel="noopener noreferrer" aria-label="View review preview image">
+        <img src="${escapeHtml(reviewImage)}" alt="${escapeHtml(illustration?.alt || `${video.title} — review preview image`)}" width="${illustration?.width || 640}" height="${illustration?.height || 360}" loading="lazy" decoding="async">
       </a>
-      <figcaption>Preview artwork for this review. The original video remains with its publisher.</figcaption>
+      <figcaption>${escapeHtml(illustration?.caption || "Preview artwork for this review. The original video remains with its publisher.")}</figcaption>
     </figure>` : ""}
+    </div><!-- review-body -->
     <section class="comments-panel glass-panel">
       <h2>Community comments</h2>
       <form id="watch-comment-form" class="comment-form">
@@ -4077,9 +4084,9 @@ async function videoSitemapResponse(request, env, page) {
         ? `<video:publication_date>${escapeXml(publicationValue)}</video:publication_date>` : "";
       videoEntry = `<video:video><video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc><video:title>${escapeXml(row.title)}</video:title><video:description>${escapeXml(description)}</video:description>${location}${publicationDate}${duration ? `<video:duration>${duration}</video:duration>` : ""}</video:video>`;
     }
-    const imageEntry = thumbnail
-      ? `<image:image><image:loc>${escapeXml(thumbnail)}</image:loc></image:image>`
-      : "";
+    const illustration = reviewIllustration(row);
+    const imageEntry = [...new Set([thumbnail, illustration ? `${base}${illustration.path}` : ""].filter(Boolean))]
+      .map((image) => `<image:image><image:loc>${escapeXml(image)}</image:loc></image:image>`).join("");
     return `<url><loc>${escapeXml(canonical)}</loc><lastmod>${escapeXml(row.updated_at)}</lastmod>${imageEntry}${videoEntry}</url>`;
   }).join("");
   const body = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${homepage}${entries}</urlset>`;
@@ -4108,6 +4115,7 @@ function robotsResponse(request, env) {
     "Allow: /api/facebook/thumbnail",
     "Allow: /api/instagram/thumbnail",
     `Sitemap: ${base}/sitemap.xml`,
+    `Sitemap: ${base}/image-sitemap.xml`,
   ].join("\n") + "\n";
   return new Response(body, {
     headers: securityHeaders(new Headers({ "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=3600" })),

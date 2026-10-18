@@ -1,5 +1,13 @@
 # Editorial cover provenance
 
+## 18 October 2026: separate sidebar illustration batch and image-discovery repair prepared
+
+Ten new built-in-imagegen conceptual illustrations (nine Facebook reviews and reference theme-song review4) preserve every source/owner poster and all review/date/SEO fields. Raster labels and page captions explicitly disclose AI-generated review illustration, not source footage. Source/title/slug association guards and byte/hash provenance are persisted. Root sitemap children are flattened to avoid unsupported nested indexes; the standalone image index is advertised in robots.txt. A containing grid keeps art beside the review rather than after its full-height related-links section.
+
+Read current main PR202/203 and completed audit39134241726/artifact12138698113 (matching archive87f98f10966e2b1a4838648a4875587e0569162c03d7381a3150f7e63a16b22d). Its dated231-page/0failure,181available/11error/eight-placeholder result used zero Inspections. Fresh D1 read at17:19:45.523UTC finds214saved/210published; independent owner publications are preserved. No migration, source-poster replacement or database/media write. 417Node regressions and Worker dry-run pass; exact-head CI/release/live verification are still pending. See `docs/image-sitemap-20261018.md`, `docs/review-image-queue.json` and `docs/review-illustration-prompts.json`.
+
+Next: verify release and exact ten live images, then continue the next source/theme-verified additive batch, up to ten. Preserve source-removal/Saiyaara/Summer/owner media, all editorial structure, protected-topic text, drafts, Portainer and security. No new Google indexing/approval claim.
+
 ## 18 October 2026: replay fix released without any poster or video-byte changes
 
 PR 200 / `db44e82e6c4f9e16be38f343980b23ab204fbc8e` / Worker `aa55179e-5f71-411d-9c84-9576470d6f7e` reduces browser metadata requests only. At 12:05:43.071 UTC all 204 saved video records' non-counter fields, including every source/poster/cache/rights/date/owner field, retain SHA-256 `0cfd948043b91847fe4ff442ceba1921235ae2910de38fc6a927b682e65e1736`; zero verification writes. No R2 object, video/audio, original poster, custom cover, signed URL or source-frame screenshot is copied or replaced.
