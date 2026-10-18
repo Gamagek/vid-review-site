@@ -135,8 +135,9 @@ function decorateVideoCards() {
         card.classList.add("saiyaara-tagembed-tile");
         const share = parseTikTokShareUrl(card.dataset.videoSource);
         surface.dataset.saiyaaraSource = card.dataset.videoSource || "";
-        surface.dataset.saiyaaraPoster = card.dataset.videoThumbnail ||
-          (share ? "/api/tiktok/cached-poster?id=" + encodeURIComponent(share.id) : "");
+        // Use the first-party fallback immediately. D1 card thumbnails can be
+        // signed TikTok CDN URLs that have already expired in the browser.
+        surface.dataset.saiyaaraPoster = share ? "/api/tiktok/cached-poster?id=" + encodeURIComponent(share.id) : "";
         window.VidBestSaiyaaraTagembed.mount(surface, "tile");
         return;
       }
@@ -808,12 +809,10 @@ function applyCachedTikTokPreview(card, preview) {
   // Cached metadata may arrive after Tagembed mounts. Updating the facade
   // would otherwise erase the live mini widget and leave a black tile.
   if (card.classList.contains("saiyaara-tagembed-tile")) {
-    if (preview.thumbnail_url) {
-      const poster = card.querySelector(".saiyaara-tagembed-poster");
-      const cover = card.querySelector(".saiyaara-tile-cover-poster");
-      if (poster) poster.src = preview.thumbnail_url;
-      if (cover) cover.src = preview.thumbnail_url;
-    }
+    // Prefer a *verified loaded* fresh provider thumbnail, but retain the
+    // local SVG cover when an expiring TikTok CDN URL cannot be displayed.
+    const host = card.querySelector(".preview-surface.saiyaara-tagembed-host");
+    if (preview.thumbnail_url && host) window.VidBestSaiyaaraTagembed?.updatePoster?.(host, preview.thumbnail_url);
     return;
   }
   renderTikTokFacade(card);
