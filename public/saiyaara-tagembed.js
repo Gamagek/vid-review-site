@@ -10,6 +10,58 @@
   const FALLBACK_POSTER = "/api/tiktok/cached-poster?id=7669587518156705056";
   const TRUSTED_POSTER_HOST = /(^|\.)tiktokcdn(?:-[a-z0-9-]+)?\.com$/i;
   const posterRequests = new WeakMap();
+  const AUTO_IFRAME_URL = IFRAME_URL + "&autoplay=1&muted=1";
+  const TILE_VISIBLE_RATIO = 0.68;
+  const TILE_DWELL_MS = 1100;
+  let candidateTile = null;
+  let candidateTimer = null;
+  let activeTile = null;
+  const tileObservers = new Set();
+
+  function autoplayAllowed() {
+    const network = window.navigator?.connection || window.navigator?.mozConnection ||
+      window.navigator?.webkitConnection;
+    return !document.hidden && !network?.saveData &&
+      !["slow-2g", "2g"].includes(network?.effectiveType) &&
+      !window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  }
+
+  function cancelCandidate() {
+    if (candidateTimer !== null) window.clearTimeout(candidateTimer);
+    candidateTimer = null;
+    candidateTile = null;
+  }
+
+  function stopTile(host) {
+    const iframe = host?.querySelector("iframe.saiyaara-tagembed-frame");
+    if (iframe) iframe.remove();
+    const cover = host?.querySelector(".saiyaara-preview-cover");
+    if (cover) cover.hidden = false;
+    const backup = host?.querySelector("[data-saiyaara-backup]");
+    if (backup) backup.hidden = true;
+    if (host) state(host, "preview", "");
+    if (activeTile === host) activeTile = null;
+  }
+
+  function scheduleVisiblePreview(host) {
+    if (!host?.isConnected || !autoplayAllowed() ||
+        host.dataset.tagembedAutoAttempted === "1" ||
+        host.querySelector("iframe.saiyaara-tagembed-frame")) return;
+    if (candidateTile === host) return;
+    cancelCandidate();
+    candidateTile = host;
+    candidateTimer = window.setTimeout(() => {
+      const ready = candidateTile === host && host.isConnected &&
+        autoplayAllowed() && host.dataset.saiyaaraInView === "1" &&
+        host.dataset.tagembedAutoAttempted !== "1";
+      cancelCandidate();
+      if (!ready) return;
+      // ONE automatic provider attempt per tile per page visit, after the
+      // visitor has lingered on the visible tile. It counts as a widget load.
+      host.dataset.tagembedAutoAttempted = "1";
+      mountTilePlayer(host, true);
+    }, TILE_DWELL_MS);
+  }
 
   function state(host, kind, message) {
     if (!host?.isConnected) return;
@@ -43,11 +95,19 @@
       // Do not infer playback success; keep the six-second opt-in backup timer
       // for the mini tile even when iframe HTML loads successfully.
       state(host, "frame-loaded", "");
+      if (tile) {
+        const cover = host.querySelector(".saiyaara-preview-cover");
+        if (cover && host.querySelector("iframe.saiyaara-tagembed-frame") === iframe) cover.hidden = true;
+      }
     }, { once: true });
     iframe.addEventListener("error", () => {
       loaded = true;
       window.clearTimeout(timeout);
       state(host, "failed", "Tagembed could not load the video on this connection.");
+      if (tile) {
+        const cover = host.querySelector(".saiyaara-preview-cover");
+        if (cover) cover.hidden = false;
+      }
       if (tile) {
         const backup = host.querySelector("[data-saiyaara-backup]");
         if (backup) backup.hidden = false;
@@ -90,8 +150,9 @@
       icon.setAttribute("aria-hidden", "true");
       cover.append(icon);
       cover.addEventListener("click", () => {
-        cover.hidden = true;
-        mountTilePlayer(host);
+        cancelCandidate();
+        host.dataset.tagembedAutoAttempted = "1";
+        mountTilePlayer(host, false);
         const iframe = host.querySelector(".saiyaara-tagembed-frame");
         // Browsers do not expose a third-party video's audio controls to us.
         // The visitor can now tap the embedded player's controls directly.
@@ -116,9 +177,7 @@
           return;
         }
         // Do not keep Tagembed running behind the gateway popup.
-        host.querySelector("iframe.saiyaara-tagembed-frame")?.remove();
-        const cover = host.querySelector(".saiyaara-preview-cover");
-        if (cover) cover.hidden = false;
+        stopTile(host);
         backup.hidden = true;
         void player.showPreview(source, { title: "Saiyaara", author: "TikTok creator" });
       });
@@ -178,9 +237,11 @@
       (host) => mount(host, "watch"));
   }
 
-  function mountTilePlayer(host) {
+  function mountTilePlayer(host, autoplay = false) {
     if (!host?.isConnected) return false;
     if (host.querySelector("iframe.saiyaara-tagembed-frame")) return true;
+    if (activeTile && activeTile !== host) stopTile(activeTile);
+    activeTile = host;
     const iframe = document.createElement("iframe");
     iframe.className = "saiyaara-tagembed-frame";
     iframe.title = "Saiyaara video via Tagembed";
@@ -190,8 +251,10 @@
     iframe.setAttribute("loading", "eager");
     host.append(iframe);
     connect(host, iframe);
-    iframe.setAttribute("src", IFRAME_URL);
-    state(host, "loading", "Loading TikTok video…");
+    // Vendor may ignore these parameters. A cross-origin iframe cannot be
+    // ordered to play by Vid.Best without a documented provider player API.
+    iframe.setAttribute("src", autoplay ? AUTO_IFRAME_URL : IFRAME_URL);
+    state(host, "loading", autoplay ? "Loading muted auto preview…" : "Loading TikTok video…");
     return true;
   }
 
@@ -200,8 +263,29 @@
     host.dataset.saiyaaraTagembedMounted = "1";
     host.dataset.saiyaaraMode = "tile";
     prepareHost(host, "tile");
-    // No observer: scrolling, hovering, and thumbnail rendering MUST NOT
-    // create a Tagembed iframe or consume widget loads.
+    // Mobile hover = video rectangle remains visible, not a finger gesture.
+    // Never preload a player before the card stays mostly visible.
+    if ("IntersectionObserver" in window) {
+      const observer = new window.IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.target !== host) continue;
+          const ratio = entry.isIntersecting ? entry.intersectionRatio : 0;
+          host.dataset.saiyaaraInView = ratio >= TILE_VISIBLE_RATIO ? "1" : "0";
+          if (ratio >= TILE_VISIBLE_RATIO) scheduleVisiblePreview(host);
+          else {
+            if (candidateTile === host) cancelCandidate();
+            if (ratio < 0.12 && activeTile === host) stopTile(host);
+          }
+        }
+      }, { threshold: [0, 0.12, TILE_VISIBLE_RATIO, 1] });
+      observer.observe(host);
+      tileObservers.add(observer);
+    }
+    // Desktop pointer hover can start the same dwell preview only when the
+    // tile is sufficiently visible; avoids requests for off-screen cards.
+    host.addEventListener?.("pointerenter", () => {
+      if (host.dataset.saiyaaraInView === "1") scheduleVisiblePreview(host);
+    });
     return true;
   }
 
@@ -245,5 +329,13 @@
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initWatch, { once: true });
   } else initWatch();
-  // The watch player is retained; mini tiles never background-load a widget.
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) { cancelCandidate(); if (activeTile) stopTile(activeTile); }
+  });
+  window.addEventListener("pagehide", () => {
+    cancelCandidate();
+    if (activeTile) stopTile(activeTile);
+    for (const observer of tileObservers) observer.disconnect();
+    tileObservers.clear();
+  });
 })();

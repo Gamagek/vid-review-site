@@ -1489,3 +1489,21 @@ html:has(body[data-video-slug="saiyaara-a-cinematic-romance"]) { overflow-x: cli
   color: #dbe4ff;
   font: 550 10px/1.5 system-ui,sans-serif;
 }
+
+/* Viewport-triggered Tagembed auto preview (one muted attempt after a dwell).
+   Preserve the local poster until provider iframe HTML is visible; provide a
+   readable manual fallback when the vendor declines actual autoplay. */
+.saiyaara-tagembed-tile .saiyaara-tagembed-status {
+  z-index: 10;
+  left: 5px;
+  right: auto;
+  bottom: 40px;
+  max-width: calc(100% - 10px);
+  font-size: 10px;
+}
+.saiyaara-tagembed-tile[data-tagembed-state="frame-loaded"] .saiyaara-preview-cover {
+  pointer-events: none;
+}
+.saiyaara-tagembed-tile .saiyaara-preview-cover:not([hidden]) {
+  z-index: 8;
+}
