@@ -44,6 +44,30 @@ test('public audit covers all sitemap reviews and HTML pagination without Google
   assert.doesNotMatch(summary(report), /Search Console: success/);
 });
 
+test('public SEO crawler safely traverses the new image sitemap index and child pages', async () => {
+  const imageIndex = ORIGIN + '/image-sitemap.xml';
+  const child = ORIGIN + '/sitemaps/images-1.xml';
+  const root = '<sitemapindex xmlns="' + NS + '"><sitemap><loc>' + ORIGIN + '/sitemaps/pages.xml</loc></sitemap><sitemap><loc>' + ORIGIN + '/sitemaps/videos-1.xml</loc></sitemap><sitemap><loc>' + imageIndex + '</loc></sitemap></sitemapindex>';
+  const fake = publicSite({
+    [ORIGIN + '/sitemap.xml']: () => new Response(root, { headers: { 'content-type': 'application/xml' } }),
+    [imageIndex]: () => new Response('<sitemapindex xmlns="' + NS + '"><sitemap><loc>' + child + '</loc></sitemap></sitemapindex>', { headers: { 'content-type': 'application/xml' } }),
+    [child]: () => new Response('<urlset xmlns="' + NS + '" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"><url><loc>' + ORIGIN + '/watch/review-1</loc><image:image><image:loc>' + ORIGIN + '/review-covers/valid.webp</image:loc></image:image></url></urlset>', { headers: { 'content-type': 'application/xml' } }),
+  });
+  const report = await runAudit({ fetchImpl: fake.fetchImpl, wait: noop });
+  assert.equal(publicUrl(imageIndex), imageIndex);
+  assert.equal(publicUrl(child), child);
+  for (const url of [imageIndex, child]) {
+    assert.throws(() => publicUrl(url + '?token=private'), /unsafe_public_url/);
+    assert.throws(() => publicUrl(url + '#secret'), /unsafe_public_url/);
+  }
+  assert.equal(report.publicAuditStatus, 'success');
+  assert.equal(report.discoveredReviewCount, 2, 'sitemap image entry does not create a duplicate review');
+  assert.ok(report.sitemaps.some(row => row.url === imageIndex));
+  assert.ok(report.sitemaps.some(row => row.url === child));
+  assert.equal(report.searchConsole.status, 'not_configured');
+  assert.equal(report.productionWrites, false);
+});
+
 test('public technical failures prevent Google submission and include safe diagnostics', async () => {
   const url = ORIGIN + '/watch/review-1';
   const fake = publicSite({ [url]: options => options.method === 'HEAD' ? new Response(null, { status: 404 }) : new Response(page(url, [], { noindex: true, canonical: ORIGIN + '/' }), { headers: { 'content-type': 'text/html' } }) });
