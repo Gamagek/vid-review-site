@@ -1,0 +1,7 @@
+# Thumbnail verification batch — 18 October 2026
+
+Read-only D1 verification found eight published Facebook reviews whose thumbnail_url is a Facebook video/share page rather than an image: IDs 139, 142, 143, 153, 155, 156, 157 and 158. These URLs are not image files. The current first-party thumbnail endpoint can show labeled conceptual SVG fallback artwork, but the most recent completed thumbnail audit still classifies eight such responses as placeholders. This does not establish the rights to capture, copy, or republish frames from these videos.
+
+No new image asset was created or uploaded in this batch. No production D1/R2/media/cover fields, dates, reviews, or metadata were changed. Do not count placeholders as verified source posters. Preserve all existing original and owner-created covers. Next: inspect provider-authorized public thumbnail metadata for these eight reviews without bypassing Facebook controls; where evidence and permissions are adequate, propose stable reviewed covers. Reuse the existing 15-minute Facebook preview job and avoid duplicate upstream scraping.
+
+Previous audit baseline: 200 published reviews, 181 available image responses, 11 HTTP errors, eight placeholder responses; these counts are historical, not a new audit. Existing image sitemap and video sitemap were added in PR #202 and remain the source of truth. Indexing and AdSense approval are not guaranteed by sitemap publication.
