@@ -13,3 +13,6 @@ __pycache__/
 .pytest_cache/
 seo-audit-report.json
 seo-audit-summary.txt
+
+# Bounded public illustration verification output (curated evidence lives in docs).
+review-illustration-verification.json
