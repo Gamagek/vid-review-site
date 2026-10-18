@@ -7,6 +7,9 @@
   const IFRAME_URL = "https://widget.tagembed.com/2236794?postId=5592899&caption=1&header=1";
   const LOAD_TIMEOUT = 6000;
   const WATCH_TIMEOUT = 14000;
+  const FALLBACK_POSTER = "/api/tiktok/cached-poster?id=7669587518156705056";
+  const TRUSTED_POSTER_HOST = /(^|\.)tiktokcdn(?:-[a-z0-9-]+)?\.com$/i;
+  const posterRequests = new WeakMap();
 
   function state(host, kind, message) {
     if (!host?.isConnected) return;
@@ -65,14 +68,23 @@
       cover.type = "button";
       cover.className = "saiyaara-preview-cover";
       cover.setAttribute("aria-label", "Show Saiyaara video player and sound controls");
-      if (host.dataset.saiyaaraPoster) {
-        const img = document.createElement("img");
-        img.className = "saiyaara-tile-cover-poster";
-        img.src = host.dataset.saiyaaraPoster;
-        img.alt = "";
-        img.loading = "lazy";
-        cover.append(img);
-      }
+      // Never start with the saved video thumbnail: TikTok signed CDN URLs
+      // expire. The local SVG endpoint is a guaranteed first-party fallback.
+      const img = document.createElement("img");
+      img.className = "saiyaara-tile-cover-poster";
+      img.alt = "";
+      img.decoding = "async";
+      img.loading = "lazy";
+      img.addEventListener("error", () => { img.hidden = true; });
+      img.src = FALLBACK_POSTER;
+      cover.append(img);
+      const label = document.createElement("div");
+      label.className = "saiyaara-preview-caption";
+      label.textContent = "Saiyaara · A Cinematic Romance";
+      const hint = document.createElement("small");
+      hint.textContent = "Tap to watch on Tagembed";
+      label.append(hint);
+      cover.append(label);
       const icon = document.createElement("span");
       icon.textContent = "▶";
       icon.setAttribute("aria-hidden", "true");
@@ -112,13 +124,14 @@
       });
       host.append(backup);
     }
-    if (!host.querySelector(".saiyaara-tagembed-poster") && host.dataset.saiyaaraPoster) {
+    if (!host.querySelector(".saiyaara-tagembed-poster") && (mode !== "tile" || host.dataset.saiyaaraPoster)) {
       const poster = document.createElement("img");
       poster.className = "saiyaara-tagembed-poster";
-      poster.src = host.dataset.saiyaaraPoster;
+      poster.src = mode === "tile" ? FALLBACK_POSTER : host.dataset.saiyaaraPoster;
       poster.alt = "";
       poster.decoding = "async";
       poster.loading = mode === "watch" ? "eager" : "lazy";
+      poster.addEventListener("error", () => { poster.hidden = true; });
       host.prepend(poster);
     }
     if (!host.querySelector("[data-saiyaara-tagembed-status]")) {
@@ -192,7 +205,38 @@
     return true;
   }
 
+  function updatePoster(host, thumbnail) {
+    if (!host || host.dataset.saiyaaraMode !== "tile") return false;
+    let url;
+    try {
+      url = new URL(String(thumbnail || ""));
+    } catch { return false; }
+    if (url.protocol !== "https:" || url.username || url.password || url.port ||
+        !TRUSTED_POSTER_HOST.test(url.hostname)) return false;
+    const expires = Number(url.searchParams.get("x-expires"));
+    if (url.searchParams.has("x-expires") &&
+        (!Number.isSafeInteger(expires) || expires < Date.now() / 1000 + 120)) return false;
+    // Load a *thumbnail only* before replacing the guaranteed local cover.
+    // Never request Tagembed or video bytes until Play. A failed or expired
+    // provider image must not bring back the black/broken-image preview.
+    const token = {};
+    posterRequests.set(host, token);
+    const candidate = document.createElement("img");
+    candidate.addEventListener("load", () => {
+      if (!host.isConnected || posterRequests.get(host) !== token || !candidate.naturalWidth) return;
+      for (const selector of [".saiyaara-tile-cover-poster", ".saiyaara-tagembed-poster"]) {
+        const img = host.querySelector(selector);
+        if (img) { img.hidden = false; img.src = url.href; }
+      }
+      host.dataset.saiyaaraPoster = url.href;
+    }, { once: true });
+    candidate.addEventListener("error", () => { /* Keep the local preview. */ }, { once: true });
+    candidate.src = url.href;
+    return true;
+  }
+
   window.VidBestSaiyaaraTagembed = Object.freeze({
+    updatePoster,
     slug: SLUG, iframeUrl: IFRAME_URL,
     mount: (host, mode = "watch") => mode === "tile"
       ? mountTileWhenVisible(host)
