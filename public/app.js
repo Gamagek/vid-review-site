@@ -403,6 +403,8 @@ function buildVideoCard(video) {
   card.dataset.videoTitle = video.title || "Video";
   card.dataset.videoProvider = video.provider || video.media_type || "direct";
   card.dataset.videoSource = video.source_url || "";
+  card.dataset.reviewPreview = video.review_preview_url || "";
+  card.dataset.reviewArtworkAlt = video.review_artwork_alt || "";
   card.dataset.tiktokPoster = video.preview_poster_url || "";
   card.dataset.videoEmbed = video.embed_url || "";
   card.dataset.videoThumbnail = video.thumbnail_url || "";
@@ -424,9 +426,10 @@ function buildVideoCard(video) {
 
   const image = card.querySelector(".tile-media img");
   const fallback = card.querySelector(".media-fallback");
-  if (video.thumbnail_url && card.dataset.videoProvider !== "tiktok") {
-    image.src = video.thumbnail_url;
-    image.alt = `${video.title} thumbnail`;
+  const listingImage = video.review_preview_url || video.thumbnail_url;
+  if (listingImage && card.dataset.videoProvider !== "tiktok") {
+    image.src = listingImage;
+    image.alt = video.review_preview_url ? video.review_artwork_alt : `${video.title} thumbnail`;
     fallback.hidden = true;
     image.addEventListener("error", () => {
       image.hidden = true;

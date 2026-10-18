@@ -21,3 +21,11 @@ export function reviewIllustration(row) {
       sourceIdentity(row.source_url) !== sourceIdentity(item.sourceUrl)) return null;
   return item;
 }
+
+// Only the eight audited HTML-as-image placeholders opt in. A new owner
+// thumbnail disables this fallback as well as the usual title/source guards.
+export function reviewPreviewIllustration(row) {
+  const item = reviewIllustration(row);
+  return item?.previewFallbackFrom && row.thumbnail_url === item.previewFallbackFrom
+    ? item : null;
+}

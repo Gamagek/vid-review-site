@@ -534,7 +534,8 @@ function mountFacebookFacade(card) {
   poster.width = 384;
   poster.height = 216;
   const savedPoster = card.dataset.videoThumbnail || "";
-  poster.src = savedPoster || "/api/facebook/thumbnail?id=" + encodeURIComponent(card.dataset.videoId || "");
+  poster.src = card.dataset.reviewPreview || savedPoster || "/api/facebook/thumbnail?id=" + encodeURIComponent(card.dataset.videoId || "");
+  if (card.dataset.reviewPreview) poster.alt = card.dataset.reviewArtworkAlt || "AI-generated review illustration, not a video frame";
   const fallback = card.querySelector(".media-fallback");
   poster.addEventListener("load", () => {
     if (fallback) fallback.hidden = true;

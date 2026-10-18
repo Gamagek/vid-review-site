@@ -1,5 +1,5 @@
 import { parseInstagramUrl } from "../public/instagram-utils.js";
-import { reviewIllustration } from "./review-illustrations.js";
+import { reviewIllustration, reviewPreviewIllustration } from "./review-illustrations.js";
 import { isLikelyCrawler } from "./crawlers.js";
 import { tikTokZeroRequestPlayer } from "./tiktok-zero-request-cache.js";
 import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStatus } from "./tiktok-cache-jobs.js";
@@ -1284,6 +1284,8 @@ function parseTags(value, fallback = []) {
 function serializeVideo(row) {
   if (!row) return null;
   const provider = detectMediaProvider(row);
+  const artwork = reviewIllustration(row);
+  const previewArtwork = reviewPreviewIllustration(row);
   const instagramThumbnail = provider === "instagram" && row.source_url
     ? `/api/instagram/thumbnail?url=${encodeURIComponent(row.source_url)}`
     : null;
@@ -1294,6 +1296,9 @@ function serializeVideo(row) {
     thumbnail_url: provider === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url || instagramThumbnail || null,
     // Public cards get a stable preview hint, without rewriting editor data.
     preview_poster_url: provider === "tiktok" ? stableTikTokImage(row) : null,
+    review_artwork_url: artwork?.path || null,
+    review_artwork_alt: artwork?.alt || null,
+    review_preview_url: previewArtwork?.path || null,
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
     published: Boolean(row.published),
@@ -3075,7 +3080,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
         dateModified: video.updated_at,
         publisher: { "@id": `${baseUrl}#organization` },
         ...(sourceAttribution ? { isBasedOn: sourceAttribution } : {}),
-        ...(thumbnail ? { primaryImageOfPage: thumbnail } : {}),
+        ...(reviewImage ? { primaryImageOfPage: reviewImage } : {}),
         ...(illustration ? { image: { "@type": "ImageObject", contentUrl: reviewImage,
           caption: illustration.caption, width: illustration.width, height: illustration.height } } : {}),
         mainEntity: { "@id": `${canonical}#video` },
@@ -3107,12 +3112,14 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description)}">
   <meta property="og:url" content="${escapeHtml(canonical)}">
-  <meta property="og:image" content="${escapeHtml(thumbnail)}">
+  <meta property="og:image" content="${escapeHtml(reviewImage)}">
+  ${illustration ? `<meta property="og:image:alt" content="${escapeHtml(illustration.alt)}"><meta property="og:image:width" content="${illustration.width}"><meta property="og:image:height" content="${illustration.height}">` : ""}
   <meta property="og:updated_time" content="${escapeHtml(video.updated_at)}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${escapeHtml(title)}">
   <meta name="twitter:description" content="${escapeHtml(description)}">
-  <meta name="twitter:image" content="${escapeHtml(thumbnail)}">
+  <meta name="twitter:image" content="${escapeHtml(reviewImage)}">
+  ${illustration ? `<meta name="twitter:image:alt" content="${escapeHtml(illustration.alt)}">` : ""}
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css?v=20261018-review-art1">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
