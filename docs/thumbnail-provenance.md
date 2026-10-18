@@ -1,5 +1,9 @@
 # Editorial cover provenance
 
+## 18October2026: requested source18cached oEmbed player; original posters preserved
+
+Owner-requested player-only integration verifies7603012203595320584/source creator through `/api/watch`200JSON and one `cache_0_request` repeat. All saved/custom posters, source/embed/cache/rights fields, R2 and source30/Dilscoop/Saiyaara/Summer/protected-topic holds are unchanged. No signed poster URL, source video/frame or upstream HTML is committed/rehosted. Official embed remains provider playback; cache availability is not frame/audio/rights/regional playback proof. Latest consumed39114196048/artifact12132281873:231pages/0technicalfailures,200posters181available/11errors/eight placeholders; this is not a repaired-poster claim. Full contract/limits/release record: `docs/tiktok-zero-request-integration-20261018.md`.
+
 ## 18 October 2026: Quiet Presence source JPEG reconfirmed after accuracy-only release
 
 PR195/ccc16b1/Worker58242bd9 changes only45's three text/metadata fields, not source/embed/poster/cache/rights/R2/custom media. Completed39110941220/artifact12130870548, matching archive `cec7449c78bca1d0d81afc39d8532c1ff0577f68adcf0fc806435473a7cb844c`, checks200posters181available/11HTTPerrors/eight protected placeholders,189matching headers/full-byte hashes. Original45same-origin205834byteJPEG remains `b7d414ac4fbe5fbdd476952b12a58f21f58640e010d7cff2cf9765bae3ca4901`; localrepository hash also matches. All204records' protected digest matches. No source-image replacement/generation/new media copy, full-clip/audio/rights claim or redundant inventory.

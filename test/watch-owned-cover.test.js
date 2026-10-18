@@ -72,7 +72,7 @@ test("watch first paint uses the selected illustration without changing owner te
   assert.match(html, /<h1>Owner review title<\/h1>/);
   assert.ok(html.includes("Owner review — final paragraph."));
   assert.doesNotMatch(html, /Last updated|<iframe|<video|"@type":"VideoObject"/);
-  assert.match(html, /\/watch\.js\?v=20261015-owned-cover/);
+  assert.match(html, /\/watch\.js\?v=20261018-oembed-cache/);
   assert.deepEqual(c.sqlite.prepare("SELECT * FROM videos ORDER BY id").all(), before);
   assert.deepEqual(c.sqlite.prepare("SELECT * FROM tiktok_oembed_cache").all(), metadata);
   const head = await render(c, "", { method: "HEAD" });
@@ -133,7 +133,7 @@ test("comedy, Summer and Saiyaara keep their existing presentation and player ro
   }
 });
 
-function browserHarness({ owned = cover, apiAvailable = true, failedBeforeInit = false } = {}) {
+function browserHarness({ owned = cover, apiAvailable = true, failedBeforeInit = false, zeroRequest = false } = {}) {
   const events = {}, calls = [], opened = [], created = [];
   let resolve, reject;
   const metadata = new Promise((yes, no) => { resolve = yes; reject = no; });
@@ -151,7 +151,7 @@ function browserHarness({ owned = cover, apiAvailable = true, failedBeforeInit =
   const buttons = [{}, {}];
   for (const button of buttons) button.addEventListener = (_type, fn) => { button.click = fn; };
   const card = {
-    isConnected: true, dataset: { tiktokSource: source },
+    isConnected: true, dataset: { tiktokSource: source, ...(zeroRequest ? { tiktokZeroRequest: "1" } : {}) },
     querySelector(selector) { return ({ ".tiktok-preview-card-image": image, "[data-tiktok-card-title]": title,
       "[data-tiktok-card-author]": author, "[data-tiktok-card-description]": description, ".tiktok-preview-card-kicker": kicker })[selector] || null; },
     querySelectorAll(selector) { assert.equal(selector, "[data-tiktok-show-preview]"); return buttons; },
@@ -177,6 +177,14 @@ function browserHarness({ owned = cover, apiAvailable = true, failedBeforeInit =
 }
 
 async function settle() { await Promise.resolve(); await Promise.resolve(); }
+
+test("opt-in zero-request watch cards make no old-gateway refresh before or after a deliberate Play click", () => {
+  const h = browserHarness({ zeroRequest: true });
+  assert.equal(h.serviceCalls.length, 0); assert.equal(h.opened.length, 0);
+  h.buttons[0].click({ preventDefault() {} });
+  assert.equal(h.opened.length, 1); assert.equal(h.serviceCalls.length, 0);
+  assert.equal(h.image.src, cover); assert.equal(h.kicker.textContent, illustrationLabel);
+});
 
 test("full watch script keeps the local image and label after refresh; Play remains user-initiated", async () => {
   const h = browserHarness();

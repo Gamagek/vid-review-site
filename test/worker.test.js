@@ -429,6 +429,24 @@ test("TikTok watch pages render cached metadata cards without a TikTok player", 
   assert.doesNotMatch(html, /player\/v1/);
   assert.doesNotMatch(html, /embed\.js/);
 });
+test("the requested proposal source opts into the cache player without content, date, poster or view changes", async t => {
+  const c = createTestContext(); t.after(() => c.sqlite.close());
+  const source = "https://www.tiktok.com/@sujicomedyedit_007/video/7603012203595320584";
+  c.sqlite.prepare(`INSERT INTO videos (slug,title,source_url,media_type,primary_category,subcategory,description,review_text,thumbnail_url,published,created_at,updated_at)
+    VALUES ('a-beautifully-creative-proposal-meme','Owner proposal title',?,'tiktok','Social Media & Trending','TikTok Viral Challenges','Owner listing','Owner section one\n\nOwner section two','https://vid.best/review-covers/owner.jpg',1,'2026-09-22T10:53:05.021Z','2026-09-22T20:10:20.017Z')`).run(source + "?tracking=1");
+  c.sqlite.prepare("INSERT INTO tiktok_oembed_cache (video_id,share_url,title,author_name,fetched_at) VALUES ('7603012203595320584',?,'Original cached caption','Original creator','2026-10-10T20:54:40.290Z')").run(source);
+  const before = c.sqlite.prepare("SELECT * FROM videos").all();
+  t.mock.method(globalThis, "fetch", () => { throw new Error("No upstream during first paint or cached read"); });
+  const page = await send(c, "/watch/a-beautifully-creative-proposal-meme", { headers: { "User-Agent": "VidBest-SEO-Audit/1.0" } });
+  assert.equal(page.status, 200); const html = await page.text();
+  assert.match(html, /data-tiktok-zero-request="1"/); assert.match(html, /Owner section one/); assert.match(html, /Owner section two/);
+  assert.doesNotMatch(html, /<iframe|https:\/\/www\.tiktok\.com\/embed\.js|Last updated/);
+  assert.match(html, /2026-09-22T10:53:05.021Z/); assert.match(html, /2026-09-22T20:10:20.017Z/);
+  const player = await send(c, "/api/tiktok/oembed-player?url=" + encodeURIComponent(source));
+  assert.equal(player.status, 200); assert.match(player.headers.get("Content-Security-Policy"), /frame-ancestors 'self'/);
+  assert.deepEqual(c.sqlite.prepare("SELECT * FROM videos").all(), before);
+});
+
 test("Facebook mini preview stays separate from the original-quality watch player", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
