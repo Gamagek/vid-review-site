@@ -1,5 +1,11 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 18October2026: PR197live; official embed-script redirect CSP correction
+
+PR197/f11dedb exact-head39121602793 passes403Node/4Python/dry-run; Deploy39121686207 applies0migrations and publishesWorker a5be7a86/100% at11:03:52UTC. Portainer39121686206 validationpasses/all4privilegedjobs skipped. Live Chrome confirms0pre-click player/script and exact clicked cache player. Initial script fallback is explained by officialembed.js302to sf16-website-login.neutral.ttwstatic.com (HEAD11:05:52UTC). Permit this exact observed script origin only inside the isolated player; no general CSP/owner/content/media/security change or provider bypass. Follow-upCI/live verification required; full evidence: `docs/tiktok-zero-request-integration-20261018.md`.
+
+Follow-up404Node tests pass. D111:08:44UTC204/200/allnoncounterhash `0cfd948043b91847fe4ff442ceba1921235ae2910de38fc6a927b682e65e1736`unchanged/0writes. Actual39121730275/artifact12134975351/ZIP`b6801943f3f7c325c336eb88366fca4d459b5190dcdd74a62b76e77de7aad685`:231pages/0technicalfailures,200posters181available/11errors/eight placeholders,0Inspections/submissions. Maps nowprocessed/notpending with18October09:11:12–14UTCdownloads/0errors/library20warnings; dated2PASSsample remains separate. No redundant diagnostics or provider copies.
+
 ## 18October2026: requested TikTok cache integration; real contract verified
 
 Only exact source18/proposal7603012203595320584 opts into the new click-to-play official oEmbed document. Owner supplied `/api/watch?url=...` and `/api/stats`; actual200JSON proves per-viewer/day20, first `fetched_and_cached`1/19 and second `cache_0_request`2/18 with exact sourceID/creator. Direct browser calls preserve the service's viewer counter. Once-per-open request/script, bounded validated JSON/text-only DOM,429/session Retry-After pause and source-link errors; no polling/quota bypass/copy or guessed reset.403Node/Pythoncompile/editorialvalidation/dry-run pass. No video/owner/media/date/data/migration/general-security/Portainer change. Exact-headCI/Worker/live verification is recorded on the PR/checkpoint. Full evidence/limits: `docs/tiktok-zero-request-integration-20261018.md`; next135editorial task remains separate.

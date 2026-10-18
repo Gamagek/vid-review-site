@@ -203,7 +203,7 @@
       "task": "45retainedscene/sound/Buddhist associations and186/191/192/193original audio/visual/cultural descriptions remain manual evidence holds despite bounded accuracy/context corrections. Preserve substantial owner prose and accurate public limits; no metadata→footage/clinical/lineage conclusion, stalled-player retry loop, protected comedy/draft/provider/security change."
     },
     {
-      "task": "Completed39110941220artifact is consumed. No newGoogleInspection/submission; processedmaps0errors/library20warnings and unchanged17Octdownloads. Retain dated17Oct200review snapshot1PASS/133Discovered/66unknown, not currentwhole-site/210reviewcoverage. All original media/provider/comedy/owner/draft/security/Portainer holds remain."
+      "task": "Completed39121730275artifact consumed:231pages/0technicalfailures,0Inspections/submissions,processedmaps0errors/library20warnings,18Oct09:11UTCdownloads. Dated18Oct39114196048sample200/210reviews2PASS/156Discovered/42unknown is partial coverage; bothPASS protected comedy unchanged. Read actual later artifacts; do not repeat same-day full Inspection or bypass provider/owner/draft/security/Portainer holds."
     }
   ],
   "dataSnapshot": {
@@ -2122,26 +2122,29 @@
   ],
   "preparedBatches": [],
   "googleSnapshot": {
-    "runId": 39018934414,
-    "generatedAt": "2026-10-17T08:51:41.157Z",
+    "runId": 39114196048,
+    "generatedAt": "2026-10-18T09:09:16.202Z",
     "inspectedReviewUrls": 200,
-    "reviewCoverageAtReportTime": "200/200",
-    "pass": 1,
-    "discoveredNotIndexed": 133,
-    "unknown": 66,
+    "reviewCoverageAtReportTime": "200/210",
+    "pass": 2,
+    "discoveredNotIndexed": 156,
+    "unknown": 42,
     "crawledNotIndexed": 0,
-    "lastCrawlTime": "2026-10-17T04:12:13Z",
-    "indexedReview": "https://vid.best/watch/best-comedy-compilation-ultimate-try-not-to-laugh-viral-pranks",
-    "protectedIndexedTopic": true,
-    "scopeLimit": "Dated stored-Inspection review set, not a whole-site indexed count. Current library200+editorials10 is larger than the190+10 audited set; no new Inspection made."
+    "lastCrawlTime": "2026-10-17T19:32:39Z",
+    "indexedReviews": [
+      "https://vid.best/watch/why-silent-comedy-shorts-are-winning-the-secret-to-global-views",
+      "https://vid.best/watch/best-comedy-compilation-ultimate-try-not-to-laugh-viral-pranks"
+    ],
+    "protectedIndexedTopics": true,
+    "scopeLimit": "Dated18October stored-Inspection sample:200of210reviews, not whole-site indexing. BothPASS topics are protected comedy. Later zero-Inspection diagnostics do not refresh this result."
   },
   "screeningVersion": 3,
   "latestPublicAudit": {
-    "runId": 39110941220,
-    "artifactId": 12130870548,
-    "zipSha256": "cec7449c78bca1d0d81afc39d8532c1ff0577f68adcf0fc806435473a7cb844c",
-    "generatedAt": "2026-10-18T08:18:47.201Z",
-    "completedAt": "2026-10-18T08:21:10Z",
+    "runId": 39121730275,
+    "artifactId": 12134975351,
+    "zipSha256": "b6801943f3f7c325c336eb88366fca4d459b5190dcdd74a62b76e77de7aad685",
+    "generatedAt": "2026-10-18T11:04:14.061Z",
+    "artifactCreatedAt": "2026-10-18T11:06:36Z",
     "pages": 231,
     "technicalFailures": 0,
     "libraryReviews": 200,
@@ -2155,7 +2158,7 @@
     "inspections": 0,
     "sitemapSubmissions": 0,
     "sitemapsProcessed": true,
-    "lastDownloaded": "2026-10-17T08:53:42.627Z",
+    "lastDownloaded": "2026-10-18T09:11:12.537Z",
     "libraryWarnings": 20
   }
 }
