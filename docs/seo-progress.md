@@ -1,5 +1,13 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 19 October 2026: second additive illustration batch prepared
+
+Ten new labelled conceptual illustrations are prepared for44/45(Facebook),88(Instagram) and55/57/59/64/186/191/192(YouTube). All20existing/new manifest associations are exercised by preservation/schema/sitemap tests. Original source/owner posters, titles, substantial reviews, original dates, players and database records are unchanged. Public official YouTube oEmbed verifies exact source IDs/titles/authors for55/57/59/64;44/45 use dated13October source/caption evidence,186/191/192 prior primary metadata/credits.88 is explicitly saved-title-grounded abstract AI-art imagery, not newly verified creator/scenes. No new footage/audio, health, recipe procedure, location, cultural-sample or rescue observations are asserted. Exact prompts/assets/bytes/hashes are in docs/review-illustration-prompts.json.
+
+Current main8e7fadc contains verified PR204/205; Worker248f9238 remains100%. Reused latest actual completed audit39150318252 with matching ZIPfc1e80576bd0c769e9cd5e5e2eecb4be331befa3a8f2ab5480230db04fef993e:247pages/zero technical failures,215posters196available/11errors/eight placeholders,zero GoogleInspections/submissions. No new Google indexing/crawl improvement is inferred. Fresh18October18:39:33.252UTC baseline is238saved/234published, non-counter digest e22dd241ceb3a50323fef12d4a27956403f86f6790d92c827f141255cedc8172. Every local migration through0046 is applied; no new migration, D1/R2 write or infrastructure/security change is planned. Owner publications since the preceding215-item queue are reconciled.
+
+Release gate: full required tests, exact-head CI, merge, existing Worker deployment, ten live image/hash/page/map checks and a representative desktop layout. Keep all source-removal/demo/source30/Saiyaara/Summer/owner-media and editorial restrictions. Next: finish this batch verification before selecting further pending illustrations.
+
 ## 18 October 2026: ten sidebar illustrations published and verified
 
 PR [204](https://github.com/Gamagek/vid-review-site/pull/204) merged as `cc15729a5de82bc8b13aedfba554a6421f56cc8e` after exact-head CI39150155027 passed417Node/fourPython tests and Worker dry-run. MainCI39150267503 and deploy39150267501 succeeded. Worker `248f9238-57d5-4d86-be76-a91d87a865af` is100%, deployment `32996a49-b913-452c-aab7-6d4b6a665bf2`. Portainer validation succeeded; all four privileged jobs skipped. No new migration, D1/R2 write or source-poster replacement.
