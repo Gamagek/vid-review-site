@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+<title id="title">Expressive Soft-Drink Reaction — Vid.Best original conceptual artwork</title>
+<desc id="desc">Original editorial vector illustration, not a screenshot, video frame, or publisher-provided image.</desc>
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#112946"/><stop offset="1" stop-color="#225f83"/></linearGradient><radialGradient id="glow"><stop stop-color="#9ae6ff" stop-opacity=".25"/><stop offset="1" stop-color="#9ae6ff" stop-opacity="0"/></radialGradient></defs>
+<rect width="1200" height="675" fill="url(#bg)"/>
+<circle cx="940" cy="235" r="340" fill="url(#glow)"/>
+<path d="M-70 430Q250 30 540 320T1250 180" stroke="#9ae6ff" stroke-width="8" stroke-opacity=".17" fill="none"/>
+<rect x="65" y="54" width="375" height="55" rx="26" fill="#fff" fill-opacity=".14"/>
+<text x="88" y="89" font-family="Arial,sans-serif" font-size="26" font-weight="700" fill="#fff">VID.BEST  /  VIDEO REVIEW</text>
+<g transform="translate(695 56)" fill="none" stroke="#9ae6ff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity=".93"><rect x="160" y="95" width="190" height="340" rx="48"/><path d="M166 173h178M166 359h178"/><circle cx="255" cy="264" r="62"/><path d="M228 263h54M255 235v55"/></g>
+<rect x="0" y="408" width="1200" height="267" fill="#060a17" fill-opacity=".83"/>
+<text x="70" y="488" font-family="Arial,sans-serif" font-size="46" font-weight="700" fill="#fff">Expressive Soft-Drink Reaction</text>
+<text x="72" y="540" font-family="Arial,sans-serif" font-size="28" fill="#e3ebf7">A playful moment of expression</text>
+<path d="M70 594h1060" stroke="#9ae6ff" stroke-opacity=".75" stroke-width="2"/>
+<text x="72" y="640" font-family="Arial,sans-serif" font-size="25" font-weight="700" fill="#e6efff">ORIGINAL CONCEPT ART  ·  NOT VIDEO FOOTAGE</text>
+</svg>
