@@ -129,5 +129,5 @@ test('late metadata never remounts an active TikTok player', () => {
 
 test('homepage versions the changed TikTok cover renderer', () => {
   const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
-  assert.match(html, /\/home-player\.js\?v=20261015-owned-tiktok-cover-label/);
+  assert.match(html, /\/home-player\.js\?v=20261019-saiyaara-poster/);
 });
