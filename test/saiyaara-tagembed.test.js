@@ -13,7 +13,7 @@ test("Saiyaara uses supplied iframe URL and never injects the Tagembed SDK", () 
   assert.match(loader, /allow", "autoplay; fullscreen; picture-in-picture; encrypted-media"/);
   assert.match(loader, /data-saiyaara-tagembed-host/);
   assert.match(loader, /IntersectionObserver/);
-  assert.match(loader, /mountTilePlayer\(host\)/);
+  assert.match(loader, /mountTilePlayer\(host, false\)/);
   assert.match(loader, /tagembedTracked/);
   assert.match(styles, /saiyaara-tagembed-frame/);
   assert.doesNotMatch(styles, /saiyaara-tagembed-overlay/);
@@ -137,7 +137,7 @@ test("Saiyaara preview starts from first-party poster, never the expired D1 sign
   assert.match(styles, /saiyaara-preview-caption/);
   assert.match(styles, /\.saiyaara-tile-cover-poster\[hidden\]/);
   assert.match(loader, /TILE_DWELL_MS = 1100/);
-  assert.match(loader, /TILE_VISIBLE_RATIO = 0\\.68/);
+  assert.match(loader, /TILE_VISIBLE_RATIO = 0\.68/);
 });
 
 test("viewport auto preview is muted, delayed and limits requests to a single attempt", () => {
