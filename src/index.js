@@ -6,6 +6,7 @@ import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStat
 import { tikTokCacheCandidate } from "./admin-tiktok-cache.js";
 import { isCachedTikTokThumbnail, thumbnailKey } from "./tiktok-thumbnail-cache.js";
 import { facebookPosterUrl, readFacebookPoster, facebookPlaceholderResponse } from "./facebook-posters.js";
+import { stableTikTokImage } from "./tiktok-image.js";
 import { queueFacebookPreview, runFacebookPreviewJobs, attachFacebookPreviews, facebookPreviewStatus } from "./facebook-preview-jobs.js";
 import {
   requestMemberLogin,
@@ -1291,6 +1292,8 @@ function serializeVideo(row) {
     provider,
     embed_url: provider === "facebook" ? getSafeFacebookEmbedUrl(row) : row.embed_url,
     thumbnail_url: provider === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url || instagramThumbnail || null,
+    // Public cards get a stable preview hint, without rewriting editor data.
+    preview_poster_url: provider === "tiktok" ? stableTikTokImage(row) : null,
     featured: Boolean(row.featured),
     trending: Boolean(row.trending),
     published: Boolean(row.published),
@@ -3010,11 +3013,9 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   const title = cleanText(watchDisplayTitle(video), 70);
   const description = cleanText(video.seo_description || video.description || `Discover ${video.title} on Vid.Best.`, 180);
   const tiktokId = video.provider === "tiktok" ? extractTikTokId(video.source_url) : "";
-  const thumbnail = video.thumbnail_url
-    ? absoluteUrl(video.thumbnail_url, baseUrl)
-    : tiktokId
-      ? `${baseUrl}/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`
-      : "";
+  const thumbnail = video.provider === "tiktok"
+    ? stableTikTokImage(video, baseUrl)
+    : video.thumbnail_url ? absoluteUrl(video.thumbnail_url, baseUrl) : "";
   const tags = Array.isArray(video.seo_tags) ? video.seo_tags.slice(0, 20) : [];
   const illustration = reviewIllustration(video);
   const reviewImage = illustration ? `${baseUrl}${illustration.path}` : thumbnail;
@@ -3272,7 +3273,7 @@ function renderMedia(video, playbackOrigin, viewer = false) {
     // Only the canonical Saiyaara watch page opts into the owner-supplied
     // Tagembed widget. The swipe preparation document remains metadata-only.
     if (video.slug === "saiyaara-a-cinematic-romance" && !viewer) {
-      const poster = video.tiktok_preview?.thumbnail_url || video.thumbnail_url ||
+      const poster = video.preview_poster_url ||
         `/api/tiktok/cached-poster?id=${encodeURIComponent(extractTikTokId(video.source_url))}`;
       return `<div class="saiyaara-tagembed-player" data-saiyaara-tagembed-host data-saiyaara-player="watch" data-saiyaara-poster="${escapeHtml(poster)}">
         <img class="saiyaara-tagembed-poster" src="${escapeHtml(poster)}" alt="" decoding="async" loading="eager">
@@ -3303,7 +3304,7 @@ function renderMedia(video, playbackOrigin, viewer = false) {
     );
     // Keep the selected, reviewed cover separate from provider-cached metadata.
     const ownedCover = ownedTikTokWatchCover(video, playbackOrigin);
-    const imageUrl = ownedCover || preview.thumbnail_url || `/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`;
+    const imageUrl = ownedCover || video.preview_poster_url || `/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`;
     const illustratedCover = /-illustrated-v\d+\.(?:jpe?g|png|webp|avif)$/i.test(ownedCover);
     const zeroRequestPlayer = tiktokId === "7603012203595320584" && extractTikTokUsername(video.source_url) === "sujicomedyedit_007";
     return `<article class="tiktok-preview-card" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-source="${escapeHtml(video.source_url)}" data-tiktok-player-mode="metadata-card"${zeroRequestPlayer ? ' data-tiktok-zero-request="1"' : ""}>
@@ -4057,11 +4058,10 @@ async function videoSitemapResponse(request, env, page) {
   const entries = rows.map((row) => {
     const canonical = `${base}/watch/${encodeURIComponent(row.slug)}`;
     const provider = detectMediaProvider(row);
-    const thumbnail = row.thumbnail_url
-      ? absoluteUrl(provider === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url, base)
-      : provider === "tiktok"
-        ? `${base}/api/tiktok/cached-poster?id=${encodeURIComponent(row.source_url.match(/\/video\/(\d+)/)?.[1] || "")}`
-        : "";
+    const thumbnail = provider === "tiktok"
+      ? stableTikTokImage(row, base)
+      : row.thumbnail_url
+        ? absoluteUrl(provider === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url, base) : "";
     const description = cleanText(row.seo_description || row.description || `Discover ${row.title} on Vid.Best.`, 180);
     const mediaFileUrl = verifiedVideoFileUrl(row.source_url, base);
     const tiktokVideoId = provider === "tiktok" ? row.source_url.match(/\/video\/(\d+)/)?.[1] : "";
