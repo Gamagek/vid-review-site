@@ -5,8 +5,8 @@
 (() => {
   const SLUG = "saiyaara-a-cinematic-romance";
   const IFRAME_URL = "https://widget.tagembed.com/2236794?postId=5592899&caption=1&header=1";
-  const LOAD_TIMEOUT = 14000;
-  let observer = null;
+  const LOAD_TIMEOUT = 6000;
+  const WATCH_TIMEOUT = 14000;
 
   function state(host, kind, message) {
     if (!host?.isConnected) return;
@@ -21,24 +21,34 @@
   function connect(host, iframe) {
     if (!iframe || iframe.dataset.tagembedTracked === "1") return;
     iframe.dataset.tagembedTracked = "1";
+    const tile = host.dataset.saiyaaraMode === "tile";
     let loaded = false;
     const timeout = window.setTimeout(() => {
-      if (loaded || !host.isConnected) return;
-      // Do not tear down a potentially slow player or auto-retry the provider.
-      state(host, "slow", "Tagembed has not finished loading. Its video may be unavailable.");
-    }, LOAD_TIMEOUT);
+      if (!host.isConnected || !iframe.isConnected || (!tile && loaded)) return;
+      // A cross-origin frame load is NOT a video-playing event. Keep a working
+      // player intact and reveal a user-selected backup, never auto-switch.
+      state(host, "slow", tile ? "Not playing? You can try the backup player." : "Tagembed is taking longer than usual.");
+      if (tile) {
+        const backup = host.querySelector("[data-saiyaara-backup]");
+        if (backup) backup.hidden = false;
+      }
+    }, tile ? LOAD_TIMEOUT : WATCH_TIMEOUT);
 
     iframe.addEventListener("load", () => {
       loaded = true;
-      window.clearTimeout(timeout);
-      // An iframe load can also be an upstream access-error page. Do not
-      // report playback success merely because this event fired.
+      if (!tile) window.clearTimeout(timeout);
+      // Do not infer playback success; keep the six-second opt-in backup timer
+      // for the mini tile even when iframe HTML loads successfully.
       state(host, "frame-loaded", "");
     }, { once: true });
     iframe.addEventListener("error", () => {
       loaded = true;
       window.clearTimeout(timeout);
       state(host, "failed", "Tagembed could not load the video on this connection.");
+      if (tile) {
+        const backup = host.querySelector("[data-saiyaara-backup]");
+        if (backup) backup.hidden = false;
+      }
     }, { once: true });
     // For main watch-page iframe, src is present from the server markup.
     // The iframe itself stays clickable and no poster overlay blocks it.
@@ -69,12 +79,38 @@
       cover.append(icon);
       cover.addEventListener("click", () => {
         cover.hidden = true;
+        mountTilePlayer(host);
         const iframe = host.querySelector(".saiyaara-tagembed-frame");
         // Browsers do not expose a third-party video's audio controls to us.
         // The visitor can now tap the embedded player's controls directly.
         iframe?.focus();
       });
       host.append(cover);
+    }
+    if (mode === "tile" && !host.querySelector("[data-saiyaara-backup]")) {
+      const backup = document.createElement("button");
+      backup.type = "button";
+      backup.className = "saiyaara-tagembed-backup";
+      backup.dataset.saiyaaraBackup = "1";
+      backup.textContent = "Try backup player";
+      backup.hidden = true;
+      backup.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const source = host.dataset.saiyaaraSource;
+        const player = window.VidBestTikTok;
+        if (!source || !player?.parse?.(source) || typeof player.showPreview !== "function") {
+          state(host, "failed", "Backup is unavailable. Open the video review for the source link.");
+          return;
+        }
+        // Do not keep Tagembed running behind the gateway popup.
+        host.querySelector("iframe.saiyaara-tagembed-frame")?.remove();
+        const cover = host.querySelector(".saiyaara-preview-cover");
+        if (cover) cover.hidden = false;
+        backup.hidden = true;
+        void player.showPreview(source, { title: "Saiyaara", author: "TikTok creator" });
+      });
+      host.append(backup);
     }
     if (!host.querySelector(".saiyaara-tagembed-poster") && host.dataset.saiyaaraPoster) {
       const poster = document.createElement("img");
@@ -129,21 +165,31 @@
       (host) => mount(host, "watch"));
   }
 
+  function mountTilePlayer(host) {
+    if (!host?.isConnected) return false;
+    if (host.querySelector("iframe.saiyaara-tagembed-frame")) return true;
+    const iframe = document.createElement("iframe");
+    iframe.className = "saiyaara-tagembed-frame";
+    iframe.title = "Saiyaara video via Tagembed";
+    iframe.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media");
+    iframe.setAttribute("allowfullscreen", "");
+    iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+    iframe.setAttribute("loading", "eager");
+    host.append(iframe);
+    connect(host, iframe);
+    iframe.setAttribute("src", IFRAME_URL);
+    state(host, "loading", "Loading TikTok video…");
+    return true;
+  }
+
   function mountTileWhenVisible(host) {
-    if (!host || host.dataset.saiyaaraTagembedMounted === "1") return;
+    if (!host || host.dataset.saiyaaraTagembedMounted === "1") return false;
+    host.dataset.saiyaaraTagembedMounted = "1";
+    host.dataset.saiyaaraMode = "tile";
     prepareHost(host, "tile");
-    if (!("IntersectionObserver" in window)) {
-      mount(host, "tile");
-      return;
-    }
-    const localObserver = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      localObserver.disconnect();
-      mount(host, "tile");
-    }, { rootMargin: "300px 0px", threshold: 0 });
-    // Each tile owns its observer; no other TikTok tiles are scanned.
-    localObserver.observe(host);
-    observer = localObserver;
+    // No observer: scrolling, hovering, and thumbnail rendering MUST NOT
+    // create a Tagembed iframe or consume widget loads.
+    return true;
   }
 
   window.VidBestSaiyaaraTagembed = Object.freeze({
@@ -155,5 +201,5 @@
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initWatch, { once: true });
   } else initWatch();
-  window.addEventListener("pagehide", () => observer?.disconnect());
+  // The watch player is retained; mini tiles never background-load a widget.
 })();
