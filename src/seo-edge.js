@@ -2,6 +2,7 @@ import { signedLegacyV5Page } from "./legacy-v5-signer.js";
 import edgeWorker from "./edge.js";
 import { facebookPosterUrl } from "./facebook-posters.js";
 import { reviewIllustration } from "./review-illustrations.js";
+import { stableTikTokImage } from "./tiktok-image.js";
 import { dailyWeeklyBestResponse, dailyWeeklyBestSitemap } from "./daily-weekly-best.js";
 
 const CANONICAL_ORIGIN = "https://vid.best";
@@ -179,15 +180,17 @@ function categoryCard(row) {
 }
 
 function publicThumbnail(row) {
-  if (!row.thumbnail_url) return "";
-  const value = cleanText(row.media_type === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url, 2000);
+  const imageValue = row.media_type === "tiktok" ? stableTikTokImage(row, CANONICAL_ORIGIN)
+    : row.media_type === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url;
+  if (!imageValue) return "";
+  const value = cleanText(imageValue, 2000);
   try { return new URL(value, CANONICAL_ORIGIN).href; } catch { return ""; }
 }
 
 function categoryPage(category, rows, total) {
   const canonical = categoryUrl(category);
   const description = `${CATEGORY_DESCRIPTIONS[category]} ${total.toLocaleString()} published review${total === 1 ? "" : "s"} are currently in this topic.`;
-  const firstThumb = publicThumbnail(rows.find((row) => row.thumbnail_url) || {});
+  const firstThumb = publicThumbnail(rows.find((row) => publicThumbnail(row)) || {});
   const itemList = rows.map((row, index) => ({
     "@type": "ListItem",
     position: index + 1,
