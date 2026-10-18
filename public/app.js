@@ -403,6 +403,7 @@ function buildVideoCard(video) {
   card.dataset.videoTitle = video.title || "Video";
   card.dataset.videoProvider = video.provider || video.media_type || "direct";
   card.dataset.videoSource = video.source_url || "";
+  card.dataset.tiktokPoster = video.preview_poster_url || "";
   card.dataset.videoEmbed = video.embed_url || "";
   card.dataset.videoThumbnail = video.thumbnail_url || "";
   card.dataset.facebookPreviewTitle = video.facebook_preview_title || "";
