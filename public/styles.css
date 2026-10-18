@@ -635,6 +635,33 @@ select:disabled { opacity: .52; }
 .watch-copy { padding: 30px; border-radius: var(--radius-xl); }
 .watch-copy h1 { margin: 18px 0 14px; font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1; letter-spacing: -.055em; }
 .watch-copy .lead { color: var(--muted); line-height: 1.75; }
+/* The source/editorial poster fills the vacant desktop column beside review text.
+   Keep it as an actual <img> so image crawlers see it without client-side JS. */
+.watch-review-art {
+  grid-column: 2;
+  align-self: start;
+  margin: 0;
+  padding: 16px;
+  min-width: 0;
+  border-radius: var(--radius-xl);
+}
+.watch-review-art a { display: block; }
+.watch-review-art img {
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  background: #060912;
+  border-radius: 14px;
+}
+.watch-review-art figcaption {
+  margin-top: 10px;
+  font-size: .82rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
 .watch-reactions { margin: 24px 0; }
 .watch-reactions button { min-height: 43px; }
 .interest-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: -10px 0 22px; }
@@ -778,6 +805,7 @@ code { padding: 3px 6px; border: 1px solid var(--line); border-radius: 7px; back
   .search-field { grid-column: 1 / -1; }
   .watch-shell { grid-template-columns: 1fr; }
   .watch-player-anchor, .comments-panel, .related-panel { grid-column: auto; }
+  .watch-review-art { grid-column: auto; }
   .watch-search { flex: 1; width: auto; }
   .admin-grid { grid-template-columns: 1fr; }
   .admin-side { position: static; grid-template-columns: 1fr 1fr; }
