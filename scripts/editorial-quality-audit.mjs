@@ -25,6 +25,10 @@ export function auditEditorial(rows) {
     // Candidate screening only: singular/plural view and stream claims need dated sources too.
     // A match is not a falsehood/policy verdict, including when an author quotes or questions a count.
     if (/\b(?:(?:millions?|billions?)(?:\s+of)?\s+(?:views|streams)|scientifically proven|dopamine|cortisol|neuroscience|true story)\b/i.test(row.review_text)) flags.push('claim_needs_source_review');
+    // Broad, read-only source-review candidates, including qualified/quoted discussions.
+    // A match is never a medical accuracy, treatment, authorship or policy verdict.
+    const healthText = [row.description, row.review_text, row.seo_description || ''].join('\n');
+    if (/\b(?:brainwaves?|(?:alpha|beta|theta)\s+(?:brain\s*)?waves?|nervous[\s-]+system|heart[\s-]+rate|induc(?:e[sd]?|ing)\s+(?:deep\s+)?sleep)\b/i.test(healthText)) flags.push('health_claim_needs_source_review');
     for (const part of row.review_text.split(/\n\s*\n/)) {
       const normalized = normalize(part);
       if (normalized.split(' ').length < 20) continue;
@@ -44,7 +48,7 @@ export function auditEditorial(rows) {
   const repeatedIds = new Set(repeatedParagraphs.flatMap(group => group.recordIds));
   for (const row of records) if (repeatedIds.has(row.id)) row.flags.push('shared_review_paragraph');
   return {
-    screeningVersion: 2,
+    screeningVersion: 3,
     productionWrites: false,
     scope: 'published library review bodies and listing descriptions; excludes category/listing-page overlap',
     limitation: 'Screening signals only. No AI detection, external plagiarism check, footage verification, Google status or AdSense eligibility score.',
