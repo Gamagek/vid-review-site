@@ -1,5 +1,31 @@
 # RANDALL / Wahran: bounded source-context correction
 
+## Verified publication — PR191
+
+Reviewed head `88e1081bf4270aa7ad65a0350a8fbc9d232ac672`, merge `6b353c9c64ed174aec7f7eac933f4db8416505db`. Exact-head CI39089922699/job117564298064 passes379Node/fourPython/editorial validation/Worker dry-run; main CI39090009077 succeeds. Deploy39090009132/job117564565628 applies only0044 at02:25:38UTC and releases Worker `83d402ec-678a-4502-a497-7deadc5d9ae5`100%, deployment `859fdd66-3e0a-4278-8cef-bda755169f44` at02:25:42UTC.
+
+At02:26:25UTC D1 has204saved/200published, unchanged all-record protected hash `3238cb1c022d9ba73e6df9b3ddd5904f287989630785dcedcfb7b486e3e0026e` and zero differing protected row hashes. Only191.description/review_text change; exact new text-pair SHA256 `deb20ce3c42536c1ce1fff3d62e5e091f7642629c15d1178443d3a82ca14fb9f`. Live three-request verification02:26:29UTC checks API/watch/sitemap200, all nine visible server blocks, opening/four headings/order, unchanged title/SEO/source/embed/poster, self-canonical/schema and both originaldates2026-10-15T17:51:23.078Z. Verification uses auditUA/no writes. Portainer39090009058 validation117564565284 succeeds; preflight117564658662/optional117564658984/incident117564659026/deploy117564659395 all skip.
+
+Completed actual post-release audit[39090050278](https://github.com/Gamagek/vid-review-site/actions/runs/39090050278)/job117564689813/artifact12122307006, generated02:26:07UTC/completed02:28:33UTC, ZIP SHA256 `60bbee5cb8d16caab80995211c4b3cffdaa5769287b5db47abce00a4ada0556b` matches.231publicpages/200library+10editorialreviews/zero technical failures/unlinked.200images181available/11HTTPerrors/eight protected placeholders;189matching signatures/full-byte hashes. Original191image remains exact200JPEG/12070bytes/SHA256 `6a04761c80326d6c1c9a2e95ed4f7872e9666be345f6a51fa577a497a1748426`. This is stronger current evidence than the isolated terminal HTML response and does not establish source footage or rights.
+
+Google0Inspections/0submissions, processed maps/0errors/library20aggregatewarnings; download dates remain17October08:53UTC. No new indexing/crawl claim. The earlier dated200reviewURLsnapshot1PASS/133Discovered/66unknown is not a whole-site count; indexed comedy stays protected/untouched. Public post-screening02:26:36UTC200records/91flagged/55generic intros versus02:19baseline200/92/56. The one repeated group96/97 is protected.191's lexical flags clear, but original first-three audio/visual/cultural statements and related SEO wording remain explicit manual source-evidence holds alongside192/193. No whole-review certification or approval guarantee.
+
+### Independent preparation and next task
+
+190Headlights public detail confirms sourceShortIDJyqG8o_IMN8, generic introduction and an unsourced high-retention watch-loop claim. Its saved share parameter includes unrelated text; no field altered. Public exact-source lookup18October returns empty search/online-fetch throttling. This is a lookup limitation, not proof of removal, a platform bot block or an official creator identity. No retry loop/browser fallback/media workaround; leave190unchanged until evidence is available.
+
+A different safe read-only source task identifies published186/Flying as next higher-priority evidence candidate. Public detail confirms exact1ZYbU82GVz4 and four original headings. Its current review asserts below-heartbeat tempo→beta-to-alpha/theta transitions and a nervous-system reset, without a source-specific study citation; it also guarantees algorithmic favor. These are candidates for a bounded accuracy correction, not a confirmed Google policy verdict. No186text, dates, SEO or media changed and no186audio/footage observation claimed.
+
+Primary preparation sources checked18October:
+- [Soothing Relaxation's own Flying article](https://soothingrelaxation.com/blogs/videos/flying-by-peder-b-helland),25September2019, embeds exact1ZYbU82GVz4 and separates album/single/radio/3-hour editions. Old popularity and sleep-benefit marketing text is not clinical evidence.
+- [Artist's Flying album page](https://www.pederbhelland.com/en/music/albums/flying):2019,ten-track album, composer/founder identity. Do not confuse album, single, radio and long-form video dates/versions.
+- [Creator's About page](https://soothingrelaxation.com/pages/about-soothing-relaxation): identifies composer, nature-inspired work and open listener interpretation. It does not establish a universal physiological response.
+- [NIH/NCCIH Music and Health overview](https://www.nccih.nih.gov/health/music-and-health-what-you-need-to-know): research limitations/context-dependent findings and distinction between recorded music and professional music therapy. General evidence does not validate186's specific claimed brainwave transition. No personal medical advice or quantitative clinical claim added to public review.
+
+Next186must recheck owner preimages/source and make only a small supported correction, preserving structure/substantial prose/media/dates. Any source listening/scene claim still needs actual observation.190remains a separate exact-version task. All191/192/193/source30/Dilscoop/protected-comedy/Saiyaara/Summer/owner/draft/security/Portainer holds remain. This final checkpoint uses both [read-only-preflight] [seo-only] flags—no additional Worker/migrations/privileged Portainer deployment or Google requests.
+
+The preparation/publication-gate sections below are dated history, not an unfinished191release.
+
 ## Baseline and current evidence — 18 October 2026 UTC
 
 Main `1d2fa48d07e2eb0a507500853c314ceeef320be5`; active Worker `9ebbb2df-8662-488d-8fd2-e4ff602478e2`100%, deployment `5cbe725a-927e-4124-8959-366f2e962462`. Read both task checkpoints, persisted queue and actual Deploy39078508927/job117530517417. PR190 main/CI succeed and Worker deploy skips. Latest actual completed audit[39078548051](https://github.com/Gamagek/vid-review-site/actions/runs/39078548051)/artifact12117652693, ZIP SHA256 `8d4ee00e0813b90ebb075546d950944d9dabcc6bee2fb9191838d0e9876b8979`, is reused after verifying local bytes:231pages/0technicalfailures/unlinked,200library+10editorial reviews.200posters181HTTPavailable/11HTTPerrors/eight protected placeholders. No redundant Google Inspection or full thumbnail audit.

@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-18T02:19:07.539Z",
+  "generatedAt": "2026-10-18T02:26:36.011Z",
   "inputMode": "live_public_api",
-  "observedAt": "2026-10-18T02:19:07.539Z",
+  "observedAt": "2026-10-18T02:26:36.011Z",
   "productionWrites": false,
   "scope": "published library review bodies and listing descriptions; excludes category/listing-page overlap",
   "limitation": "Screening signals only. No AI detection, external plagiarism check, footage verification, Google status or AdSense eligibility score.",
   "counts": {
     "records": 200,
-    "flagged": 92,
-    "genericListingIntros": 56,
+    "flagged": 91,
+    "genericListingIntros": 55,
     "repeatedParagraphGroups": 1
   },
   "repeatedParagraphs": [
@@ -64,6 +64,21 @@
       "textSha256": "40a7341be263c349b4d3745914d3d5d27fb55f2a1b2d87b0e08a6ae05658962b",
       "liveVerifiedAt": "2026-10-17T23:19:51.164Z",
       "remainingEvidenceHold": "Original section1/section3 audio-form descriptions and section2 notebook/stairs/car/coast/forest/bonfire scene assertions have not been independently re-verified. Keep an explicit manual evidence hold; this is a bounded context/claim correction, not whole-review certification."
+    },
+    {
+      "recordIds": [
+        191
+      ],
+      "pullRequest": 191,
+      "reviewedHead": "88e1081bf4270aa7ad65a0350a8fbc9d232ac672",
+      "mergeCommit": "6b353c9c64ed174aec7f7eac933f4db8416505db",
+      "workerVersion": "83d402ec-678a-4502-a497-7deadc5d9ae5",
+      "status": "bounded_source_context_deployed_and_live_verified",
+      "preservedHeadings": 4,
+      "protectedSha256": "3238cb1c022d9ba73e6df9b3ddd5904f287989630785dcedcfb7b486e3e0026e",
+      "textSha256": "deb20ce3c42536c1ce1fff3d62e5e091f7642629c15d1178443d3a82ca14fb9f",
+      "liveVerifiedAt": "2026-10-18T02:26:29.240Z",
+      "remainingEvidenceHold": "Original section1 vocal/cultural/style assertions, section2 sweeping-stage-light/particle/movement/temporal claims and section3 audio/drop descriptions have not been independently re-verified. Retain explicit manual source listening/viewing review, including related cultural SEO wording; this bounded source-context pass does not certify them or the whole review."
     }
   ],
   "topicHolds": {
@@ -98,12 +113,22 @@
   ],
   "nextTasks": [
     {
-      "recordId": 191,
-      "task": "Complete exact-head CI/fresh owner/pending guards, merge existing Worker deployment and verify only two intended text changes/all protected204records/liveSSR/API/dates/poster. Currently prepared only."
+      "recordId": 186,
+      "slug": "flying-relaxing-sleep-music-for-meditation-stress-relief-relaxation-by-peder-b-helland",
+      "sourceId": "1ZYbU82GVz4",
+      "task": "Next source-verifiable Music review: bounded correction of unsupported track-specific brainwave/nervous-system/algorithmic guarantees with primary creator/catalogue context and appropriately limited evidence. Recheck current owner preimages; preserve opening/four headings/order/substantial original prose/SEO/source/poster/dates. No186edit or audio/footage observation in this run.",
+      "preparationSources": [
+        "https://soothingrelaxation.com/blogs/videos/flying-by-peder-b-helland",
+        "https://www.pederbhelland.com/en/music/albums/flying",
+        "https://soothingrelaxation.com/pages/about-soothing-relaxation",
+        "https://www.nccih.nih.gov/health/music-and-health-what-you-need-to-know"
+      ],
+      "limits": "Creator's exact embed corroborates source identity, not clinical effects; general music research is not proof of this track's claimed physiology. Do not adopt marketing view counts/sleep promises, rehost media or infer a listening comparison."
     },
     {
       "recordId": 190,
-      "task": "After191live verification, inspect exact Headlights source/version identity and primary context before any bounded edit; do not assume official/artist-authorized version or fresh audio observation."
+      "sourceId": "JyqG8o_IMN8",
+      "task": "Keep separate exact-short/uploader/version task. Public detail read only; search empty/source fetch throttled18October. Existing share parameter has unrelated text. No cleanup/creator relabel/audio/retention claim edit until source evidence; a lookup limitation is not a removal/bot/policy verdict."
     },
     {
       "recordIds": [
@@ -111,18 +136,20 @@
         192,
         193
       ],
-      "task": "Preserved original audio/visual/cultural claims remain manual evidence holds. Do not reattempt stalled playback in loops, certify unseen footage, edit protected comedy or change provider/rights/security/draft/owner/Portainer state."
+      "task": "Original audio/visual/cultural assertions remain manual evidence holds despite lexical flags clearing. Preserve existing substantial owner prose until evidence supports a bounded correction; no stalled-player retry loop, protected comedy/draft/provider/security/owner/Portainer changes."
     },
     {
-      "task": "Consume normal post-release zero-Inspection audit; retain dated Google review snapshot until later authorized full report. No extra inspection/submission, provider retry or empty deployment."
+      "task": "Completed release audit39090050278 is consumed. Normal future diagnostics only; Google maps processed/0errors/library20warnings and unchanged17Octdownloads. No new Inspection/submission; retain dated17Oct200review snapshot1PASS/133Discovered/66unknown, not whole-site status."
     }
   ],
   "dataSnapshot": {
-    "observedAt": "2026-10-18T02:16:21.442Z",
+    "observedAt": "2026-10-18T02:26:25.478Z",
     "saved": 204,
     "published": 200,
     "protectedSha256": "3238cb1c022d9ba73e6df9b3ddd5904f287989630785dcedcfb7b486e3e0026e",
-    "excludes": "Activity counters and only191.description/review_text. No investigation writes."
+    "excludes": "Activity counters and only191.description/review_text; intended fields separately checked by exact text-pair hash.",
+    "targetTextSha256": "deb20ce3c42536c1ce1fff3d62e5e091f7642629c15d1178443d3a82ca14fb9f",
+    "verificationWrites": false
   },
   "completedDiagnostics": [
     {
@@ -424,11 +451,8 @@
       "slug": "randall-wahran-official-track-festival-anthem-deep-dive",
       "category": "Music",
       "protectedTopic": false,
-      "contentSha256": "0fa1cf19d99e5da34448e3d727689670f6ecdb4963e0f6a528f3d72110af252d",
-      "flags": [
-        "generic_listing_intro",
-        "claim_needs_source_review"
-      ]
+      "contentSha256": "deb20ce3c42536c1ce1fff3d62e5e091f7642629c15d1178443d3a82ca14fb9f",
+      "flags": []
     },
     {
       "id": 190,
@@ -1979,21 +2003,7 @@
       "flags": []
     }
   ],
-  "preparedBatches": [
-    {
-      "recordIds": [
-        191
-      ],
-      "status": "prepared_not_published",
-      "manifest": "content/editorial-quality/2026-10-18-wahran.json",
-      "migration": "0044_wahran_source_context.sql",
-      "baselineProtectedSha256": "3238cb1c022d9ba73e6df9b3ddd5904f287989630785dcedcfb7b486e3e0026e",
-      "baselineSaved": 204,
-      "baselinePublished": 200,
-      "guardVerifiedAt": "2026-10-18T02:21:16.210Z",
-      "matchingPreimages": 1
-    }
-  ],
+  "preparedBatches": [],
   "googleSnapshot": {
     "runId": 39018934414,
     "generatedAt": "2026-10-17T08:51:41.157Z",
@@ -2010,10 +2020,11 @@
   },
   "screeningVersion": 2,
   "latestPublicAudit": {
-    "runId": 39078548051,
-    "artifactId": 12117652693,
-    "zipSha256": "8d4ee00e0813b90ebb075546d950944d9dabcc6bee2fb9191838d0e9876b8979",
-    "generatedAt": "2026-10-17T23:19:20.205Z",
+    "runId": 39090050278,
+    "artifactId": 12122307006,
+    "zipSha256": "60bbee5cb8d16caab80995211c4b3cffdaa5769287b5db47abce00a4ada0556b",
+    "generatedAt": "2026-10-18T02:26:07.696Z",
+    "completedAt": "2026-10-18T02:28:33Z",
     "pages": 231,
     "technicalFailures": 0,
     "libraryReviews": 200,
