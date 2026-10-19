@@ -1,15 +1,23 @@
 {
   "schemaVersion": 1,
-  "inventoryAt": "2026-10-18T17:19:45.523Z",
-  "publishedLibraryCount": 247,
+  "inventoryAt": "2026-10-19T10:56:57.769Z",
+  "publishedLibraryCount": 260,
   "batchLimit": 10,
   "phase": "additive_sidebar_illustrations",
-  "policy": "Preserve all source/owner posters and all D1 fields. Match current published ID, slug, source and title before enabling art. Do not edit protected review topics/media or drafts. Reconcile newly published records on each run; no regeneration merely for freshness. The owner’s 18 October request authorizes separate, clearly labelled sidebar art for all published platforms/topics, including comedy, but never edits existing protected review text, SEO titles, source posters or players. Source-removal/demo/Saiyaara/Summer holds remain. The19October owner steering additionally authorizes identity-matched generated art in OpenGraph/Twitter/WebPage metadata and guarded fallback for genuinely broken listing previews; preserve working source posters/VideoObject evidence and all D1/R2 media fields.",
+  "policy": "Preserve all source/owner posters and all D1 fields. Match current published ID, slug, source and title before enabling art. Do not edit protected review topics/media or drafts. Reconcile newly published records on each run; no regeneration merely for freshness. The owner’s 18 October request authorizes separate sidebar artwork identified by truthful conceptual-not-source-frame captions for all published platforms/topics, including comedy, but never edits existing protected review text, SEO titles, source posters or players. Source-removal/demo/Saiyaara/Summer holds remain. The19October owner steering additionally authorizes identity-matched generated art in OpenGraph/Twitter/WebPage metadata and guarded fallback for genuinely broken listing previews; preserve working source posters/VideoObject evidence and all D1/R2 media fields.",
   "baseline": {
     "saved": 214,
     "allNonCounterVideoFieldsSha256": "494f438a0dd202253acc3f14cf8a12220ea54d17484407acbb5ab0186bdac9c8"
   },
   "entries": [
+    {
+      "id": 1,
+      "slug": "smartphone-storage-upgrade-value-iphone-samsung-short-review",
+      "category": "Technology",
+      "provider": "youtube",
+      "sourceSha256": "6165d6ccf8eaf31c19f620c008a43f426a251b108cfea8e4f1448c9568138d94",
+      "status": "pending_theme_verification"
+    },
     {
       "id": 2,
       "slug": "lab-review-1-player-test",
@@ -58,7 +66,7 @@
       "slug": "best-comedy-compilation-ultimate-try-not-to-laugh-viral-pranks",
       "category": "Funny & Comedy",
       "sourceSha256": "590851c7b551b9f8adf8d005628631874fa05640471a08e64d47f9dd1981ce66",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 8
     },
@@ -75,7 +83,7 @@
       "slug": "the-ultimate-bollywood-anthem",
       "category": "Music",
       "sourceSha256": "28d27bb89d77684da87e978d40deefb5b5535174bc5ca79c7f235e01d9422ba9",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 8
     },
@@ -84,7 +92,7 @@
       "slug": "sadahatama-oba-mage-teledrama",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "ab679d42739bbbc25ee07bcf793fdfb749b6cf882339e6de14a1c89e394e8e0c",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 8
     },
@@ -93,7 +101,7 @@
       "slug": "the-ultimate-internet-comedy",
       "category": "Funny & Comedy",
       "sourceSha256": "2d5691c1da811831fe29920eb819a5028ef67495aaf8d187f41ee560ac1a3e90",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 8
     },
@@ -120,7 +128,7 @@
       "slug": "mr-bean-the-ultimate-cinema-comedy",
       "category": "Funny & Comedy",
       "sourceSha256": "5086eb8b82f9b53f004a20b7488f28107777c8a3511e4cb5108671ab3545a3b2",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 8
     },
@@ -155,7 +163,7 @@
       "slug": "super-funny-videos-compilation-memes",
       "category": "Funny & Comedy",
       "sourceSha256": "91783cfcc09445ac468b6d28dbf5a849a9bc6909f5ce92f4b37e325a8e67451f",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 8
     },
@@ -164,7 +172,7 @@
       "slug": "armchair-bean-funny-clips-mr-bean-official",
       "category": "Funny & Comedy",
       "sourceSha256": "fcdc4fbe69d3c86c0fbcf3658383ac2437370e5ccf7f989d00191bef8a6613ab",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 8
     },
@@ -173,7 +181,7 @@
       "slug": "christmas-day-mr-bean-official",
       "category": "Funny & Comedy",
       "sourceSha256": "20f1df7f77336b95ff01ef8912b47d0467b51ea70afb866e1e453944dec959a2",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 8
     },
@@ -182,7 +190,7 @@
       "slug": "the-ultimate-vocal-magic-shreya-ghoshal-s-live-teri-ore-performance",
       "category": "Music",
       "sourceSha256": "e9e4239e20e13c641f1a8fac06f5cc1ebd22242af76f8ab5af6079d36068ca4f",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 8
     },
@@ -191,7 +199,7 @@
       "slug": "the-ultimate-edm-anthem-alan-walker-s-faded-live-performance-alan-walker-feat-tove-stryke",
       "category": "Music",
       "sourceSha256": "64fd7c69f918daf2da18cd86bac21f33066fba89967cf9080a48644eb78fd234",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 8
     },
@@ -2030,6 +2038,102 @@
       "status": "pending_theme_verification"
     },
     {
+      "id": 264,
+      "slug": "tom-react-barber-scare-gym-proposal-birthday-cake-fails-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "e266d546a88f9fbd30cc02f336353df7dfc587cc101c82974c97ae7d6863cef4",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 265,
+      "slug": "tom-react-money-prank-ghost-mask-noodles-earbud-twist-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "c7f80518785baa03cba246cf894b331144bfde99016eec1221627f6fa8dfdd1d",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 266,
+      "slug": "tom-react-roti-catch-water-bowl-haircut-fail-compilation-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "4369d3367bbe591bf84214922f4562fdb2c2c15b88389e07e7a564bd375284ab",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 267,
+      "slug": "tom-react-generator-dog-cat-flour-barber-noodles-comedy-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "9e9e9a18f85cd2d9adc1ba3decb88f8dff5a917c121d78c60ff831671d34b11b",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 268,
+      "slug": "tom-react-iphone-soap-box-door-toe-salon-mishaps-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "7e8730b4698977a68baff8dc8864c364e68fc72229e9c114708543ce8fca0e87",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 269,
+      "slug": "tom-react-mud-football-bench-flip-baby-bottle-comedy-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "e6918ded46801f6396d55799b397757b3bfd83bfa825da565a7aecd15649c020",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 270,
+      "slug": "tom-react-soda-splash-barber-sneeze-fake-snake-prank-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "dea36b6507451cf78cbd0986c9897343ceca9fe9c87c5ce4fe54b8b5439f3da3",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 271,
+      "slug": "tom-react-kitchen-bag-pop-barber-powder-singing-pranks-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "1a18cfa8dbaa02d2632ce7f0bc6c620a44c2dd501bc5fa2b88728de25a746b23",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 272,
+      "slug": "tom-react-face-mask-bed-prank-popcorn-afro-comedy-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "1d4d7ad98bc6b1c042acfa25c50e8b684143be98e2dfa33a42addec5b8654925",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 273,
+      "slug": "tom-react-cucumber-eyes-mop-prank-shaving-cream-short-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "0e8bfc1c3619cc9dab92aa5b0b4dca0bc009e811fa88a370f89f1d2428fdb597",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 274,
+      "slug": "tom-react-bicycle-puddle-raw-egg-football-fails-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "c3a5c5d2a3d186c81e8d47e06b086a48bee2eeac63d7e6307842fcca5676cbb5",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 275,
+      "slug": "tom-react-boxer-slip-barber-neck-cat-shadowboxing-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "e5a51934ab57bce34aed64edbb3941c1158e2d3a0daeba58570f813ab138bea4",
+      "status": "pending_theme_verification"
+    },
+    {
       "id": 280,
       "slug": "tom-react-broom-flip-tea-stall-selfie-flour-pranks-short-review",
       "category": "Funny & Comedy",
@@ -2038,7 +2142,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Resume prepared PR223 batch8 through exact-head CI, merge, existing Worker deployment and all ten live image/hash/HTML/social/schema/map/date checks. Count ten NEW assets only after release/live verification. Preserve prior70 clean illustrations, their redirects and provenance; no visible production labels. Other-TikTok provider methods still require verified per-video Tagembed/Iframely mappings.",
+  "nextTask": "Fresh read-only D1/main/open-PR/deployment reconciliation first. Facebook20 and ten non-held TikTok illustrations remain covered; three TikTok/other holds stay excluded. Verified per-video non-Saiyaara Tagembed/Iframely mappings remain unavailable; do not invent/reuse Saiyaara mappings or claim iframe playback. Prioritize new missing-image YouTube records267/268/269/270/271 after current theme/source verification, then the next safe pending covers, all without visible AI-generated lettering. Preserve working posters/VideoObject thumbnails and every owner field/date/draft; no repeated same-day full Inspections or sitemap submissions.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -2189,10 +2293,10 @@
     },
     "limits": "Ten separate illustrations; no source poster repaired/replaced, no new viewing/audio claims. 11 original provider HTTP errors and8 protected placeholders remain. Original214rows match baseline; five independent owner publications were added during this work."
   },
-  "reconciledAt": "2026-10-19T10:41:03.363Z",
+  "reconciledAt": "2026-10-19T10:56:57.769Z",
   "providerCounts": {
+    "youtube": 225,
     "other": 1,
-    "youtube": 212,
     "tiktok": 13,
     "facebook": 20,
     "instagram": 1
@@ -4700,7 +4804,7 @@
     "verifiedAt": "2026-10-19T10:22:17.692Z"
   },
   "batch8": {
-    "state": "prepared",
+    "state": "published_verified",
     "recordIds": [
       7,
       9,
@@ -4722,8 +4826,8 @@
       "sha256": "a87830a50ea4229d4158e24ed0060c5e14d8398eacf9cfb1ed4872a9167e9c34"
     },
     "newGenerated": 10,
-    "newPublished": 0,
-    "liveVerified": 0,
+    "newPublished": 10,
+    "liveVerified": 10,
     "sourceVerification": "docs/review-images/batch8-source-verification-20261019.json",
     "limits": "Linked-upload metadata/title/theme verified, not footage/audio. No production lettering. Prior70 revised covers remain unchanged.",
     "pr": 223,
@@ -5005,7 +5109,20 @@
       "maxId": 285
     },
     "ownerPublicationsReconciled": [
+      1,
       263,
+      264,
+      265,
+      266,
+      267,
+      268,
+      269,
+      270,
+      271,
+      272,
+      273,
+      274,
+      275,
       280
     ],
     "validation": {
@@ -5016,6 +5133,173 @@
       "ocrAssetCount": 10,
       "unintendedPlayIconRemoved": true,
       "previous70ManifestAndProvenanceEntriesUnchanged": true
+    },
+    "release": {
+      "pr": 223,
+      "head": "e5f8c8b166550c790b034c139e86762f04d324cd",
+      "tree": "6059dc76ad25513335fc10c80d92ded4b02b0bd7",
+      "merge": "595432842ab861434896c89ec456692ccaed2faa",
+      "ciRun": 39239805323,
+      "mainCiRun": 39240499154,
+      "deployRun": 39240499289,
+      "deployJob": 118019869896,
+      "portainerRun": 39240499262,
+      "worker": {
+        "id": "ce209756-efb5-4288-b230-453caf39070e",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "annotations": {
+          "workers/triggered_by": "deployment"
+        },
+        "versions": [
+          {
+            "version_id": "59976e6a-84d2-4891-aaf4-7063bf2717a3",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-19T10:52:29.286391Z"
+      }
+    },
+    "verificationFile": "docs/review-images/batch8-live-verification-20261019.json",
+    "verifiedAt": "2026-10-19T10:53:15.583Z",
+    "currentInventory": {
+      "checkedAt": "2026-10-19T10:56:57.769Z",
+      "saved": 272,
+      "published": 260,
+      "sha256": "a47548aa6950dd2e3f18bc85a0bcbc0d97c4ef69cf01574ad7f44c35acf8b605"
+    },
+    "audit": {
+      "run": 39240573381,
+      "artifact": 12180843090,
+      "zipSha256": "a1ee512e2244cbb0d905539a2f40454a93822052dabcf65b14c547003485989b",
+      "generatedAt": "2026-10-19T10:52:57.540Z",
+      "pages": 293,
+      "technicalFailures": 0,
+      "editorialWarningPages": 2,
+      "editorialWarningMessages": 3,
+      "searchConsole": {
+        "status": "success",
+        "authenticated": true,
+        "propertyVerified": true,
+        "sitemapSubmitted": false,
+        "inspections": [],
+        "sitemapMode": "read_only",
+        "sitemapProcessing": {
+          "status": "verified",
+          "isPending": false,
+          "lastDownloaded": "2026-10-19T10:22:53.041Z",
+          "lastSubmitted": "2026-10-19T10:22:50.628Z",
+          "errors": 0,
+          "warnings": 0
+        },
+        "reviewSitemaps": [
+          {
+            "url": "https://vid.best/sitemaps/videos-1.xml",
+            "submitted": false,
+            "processing": {
+              "status": "verified",
+              "isPending": false,
+              "lastDownloaded": "2026-10-19T10:22:55.035Z",
+              "lastSubmitted": "2026-10-19T10:22:51.167Z",
+              "errors": 0,
+              "warnings": 20
+            }
+          },
+          {
+            "url": "https://vid.best/sitemaps/daily-weekly-best.xml",
+            "submitted": false,
+            "processing": {
+              "status": "verified",
+              "isPending": false,
+              "lastDownloaded": "2026-10-19T10:22:53.165Z",
+              "lastSubmitted": "2026-10-19T10:22:51.501Z",
+              "errors": 0,
+              "warnings": 0
+            }
+          }
+        ],
+        "totalReviews": 270,
+        "inspectionBudget": 0
+      },
+      "sourcePosterCounts": {
+        "ok": 246,
+        "http_error": 1,
+        "placeholder": 8,
+        "missing": 5
+      },
+      "limit": "Read-only post-deploy audit: no URL Inspection calls or sitemap submissions. Source-poster availability is separate from original conceptual artwork coverage. Google download timestamps are not proof of image indexing or approval."
+    },
+    "storedInspectionEvidence": {
+      "run": 39236675555,
+      "artifact": 12180805861,
+      "inspected": 200,
+      "passCount": 2,
+      "totalReviews": 255,
+      "generatedAt": "2026-10-19T10:20:09.228Z",
+      "scope": "Actual previously completed scheduled workflow artifact, not a new inspection request by this batch. Two PASS statuses among 200 inspected URLs out of 255 review URLs at that snapshot; partial sample, not a sitewide indexed-page count or evidence of improvement. Later zero-inspection diagnostics do not erase these observations."
+    },
+    "browser": {
+      "art": {
+        "height": 297.15625,
+        "width": 409.40625,
+        "x": 854.5625,
+        "y": 439
+      },
+      "caption": "Conceptual review artwork. This is not a frame from the source video.",
+      "checkedAt": "2026-10-19T10:54:03.144Z",
+      "image": {
+        "complete": true,
+        "currentSrc": "https://vid.best/review-illustrations/sadahatama-oba-mage-teledrama-v1.webp",
+        "naturalHeight": 940,
+        "naturalWidth": 1672,
+        "renderedWidth": 375.40625
+      },
+      "limit": "Desktop sidebar decoding and matching cover/caption verified. Existing 900px responsive CSS unchanged; no independent mobile viewport or continuous source playback/audio verification.",
+      "review": {
+        "height": 2434.625,
+        "width": 746.5625,
+        "x": 84,
+        "y": 439
+      },
+      "screenshot": "docs/review-images/batch8-live-desktop-20261019.jpg",
+      "url": "https://vid.best/watch/sadahatama-oba-mage-teledrama",
+      "viewport": {
+        "height": 936,
+        "width": 1363
+      }
     }
-  }
+  },
+  "savedLibraryCount": 272,
+  "priorityMissingImages": [
+    {
+      "id": 267,
+      "slug": "tom-react-generator-dog-cat-flour-barber-noodles-comedy-review",
+      "observedAt": "2026-10-19T10:54:59.600Z",
+      "reason": "New owner publication with empty source thumbnail and no illustration; absent from image sitemap until valid artwork exists."
+    },
+    {
+      "id": 268,
+      "slug": "tom-react-iphone-soap-box-door-toe-salon-mishaps-review",
+      "observedAt": "2026-10-19T10:54:59.600Z",
+      "reason": "New owner publication with empty source thumbnail and no illustration; absent from image sitemap until valid artwork exists."
+    },
+    {
+      "id": 269,
+      "slug": "tom-react-mud-football-bench-flip-baby-bottle-comedy-review",
+      "observedAt": "2026-10-19T10:54:59.600Z",
+      "reason": "New owner publication with empty source thumbnail and no illustration; absent from image sitemap until valid artwork exists."
+    },
+    {
+      "id": 270,
+      "slug": "tom-react-soda-splash-barber-sneeze-fake-snake-prank-review",
+      "observedAt": "2026-10-19T10:54:59.600Z",
+      "reason": "New owner publication with empty source thumbnail and no illustration; absent from image sitemap until valid artwork exists."
+    },
+    {
+      "id": 271,
+      "slug": "tom-react-kitchen-bag-pop-barber-powder-singing-pranks-review",
+      "observedAt": "2026-10-19T10:54:59.600Z",
+      "reason": "New owner publication with empty source thumbnail and no illustration; absent from image sitemap until valid artwork exists."
+    }
+  ]
 }
