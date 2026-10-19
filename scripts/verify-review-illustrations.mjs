@@ -29,7 +29,9 @@ for(const a of art){
   const reader=r.body.getReader();const chunks=[];let length=0;
   while(true){const {done,value}=await reader.read();if(done)break;length+=value.length;if(length>a.bytes){await reader.cancel();throw Error('Oversized asset');}chunks.push(value);}
   const bytes=Buffer.concat(chunks);assert.equal(length,a.bytes);assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),a.sha256);
-  const html=await (await get('/watch/'+a.slug)).text();assert.ok(html.includes('src="'+ORIGIN+a.path+'"'));assert.ok(html.includes('AI-generated review illustration inspired'));
+  if(a.previousPath){const prior=await fetch(ORIGIN+a.previousPath,{headers,redirect:'manual',signal:AbortSignal.timeout(20000)});assert.equal(prior.status,301);assert.equal(prior.headers.get('location'),ORIGIN+a.path);}
+  const html=await (await get('/watch/'+a.slug)).text();assert.ok(html.includes('src="'+ORIGIN+a.path+'"'));assert.ok(html.includes(a.caption));
+  assert.ok(!/AI[\s-]*generated/i.test(a.alt+a.caption));
   const schema=JSON.parse(html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)[1]);
   const page=schema['@graph'].find(x=>x['@type']==='WebPage');const video=schema['@graph'].find(x=>x['@type']==='VideoObject');assert.equal(page.image.contentUrl,ORIGIN+a.path);assert.ok(!video?.thumbnailUrl?.includes(ORIGIN+a.path));
   assert.equal(page.primaryImageOfPage,ORIGIN+a.path);

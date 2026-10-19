@@ -129,7 +129,7 @@ test('late metadata never remounts an active TikTok player', () => {
 
 test('homepage versions the changed TikTok cover renderer', () => {
   const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
-  assert.match(html, /\/home-player\.js\?v=20261019-tiktok-art-preview/);
+  assert.match(html, /\/home-player\.js\?v=20261019-review-art-lettering/);
 });
 
 test('a separately authorized TikTok placeholder cover survives late metadata without player requests', () => {
@@ -138,7 +138,7 @@ test('a separately authorized TikTok placeholder cover survives late metadata wi
   h.card.dataset.reviewPreview=art;
   h.scope.renderTikTokFacade(h.card);
   assert.equal(h.image().src,art);
-  assert.match(h.image().alt,/AI-generated.*not a source video frame/);
+  assert.match(h.image().alt,/Conceptual review artwork.*not a source video frame/);
   h.scope.applyCachedTikTokPreview(h.card,{thumbnail_url:cached,poster_url:'/api/tiktok/cached-poster?id=6718335390845095173',cache_source:'d1'});
   assert.equal(h.image().src,art);
   assert.equal(h.card.dataset.videoThumbnail,cached);

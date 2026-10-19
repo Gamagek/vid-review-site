@@ -1,0 +1,17 @@
+# Owner-requested artwork lettering removal
+
+19 October 2026: the owner explicitly requests that no image visibly contain AI-generated wording. This supersedes the earlier visible-footer preference for all existing and future conceptual review art.
+
+Scope: edit the 70 currently published generated sidebar/social review illustrations using built-in imagegen, preserving each composition, main title and Vid.Best branding as closely as possible. Keep exact source/title/slug identity guards and source/owner posters, VideoObject thumbnails, reviews, dates, held media and drafts. Store versioned clean WebPs and retain generation/edit provenance internally. Use public captions describing conceptual review artwork and explaining that it is not a source video frame, without visible AI-generated wording. Synchronize manifest, watch/sidebar previews, Open Graph/Twitter/WebPage associations and dynamic image maps.
+
+Current branch: fix/review-art-remove-ai-lettering-20261019. Resume this work before another image-generation batch. Existing hourly task preference updated without changing its schedule or enabled state. No new automation.
+
+Initial read-only inventory at2026-10-19T07:29:48.786Z:243saved/239published, protected-field digest8af32575fba55e56e6320e4274b7f51311fb512d8ba0c6de29c38ce484b589dc (excludes views/reaction_count/comments_count). Current100%Worker9a77a25c-c339-47d1-a8a9-12cd4bd3bc42. No D1/R2 write or migration planned.
+
+Release gate: verify all edited image bytes/dimensions/hash and lettering visually, relevant full regressions and Worker dry-run, PR CI, merge/deployment, live image/HTML/social/map associations and owner-data preservation. Until verified, no publication claim. Original image generation history is preserved; the public design preference does not change how the art was produced.
+
+Prepared: all 70 existing artworks edited with built-in imagegen; every active v2 WebP decoded and passed manifest byte/hash/dimension checks (67,198–280,926 bytes), individual visual review and OCR (70 checked, no errors or detected production labels). All title/source/slug/publication and Facebook/TikTok fallback guards are preserved. Prior v1 artwork bytes are removed from the public asset tree; exact old paths return301 to their clean v2 counterparts. Original prompts, hashes and dimensions remain in provenance history and Git. Public captions retain the not-a-source-frame explanation. The homepage renderer URL is versioned to deliver the updated accessible image wording.
+
+Read-only reconciliation at2026-10-19T09:58:00.792Z:258saved/245published,70 matching artwork identities,168 pending/seven held. New owner publications256–262 are added only to queue metadata; no draft was published. All saved non-counter row digest9f2f273f57384fdb308ad3b3800fba5506bb7944bde9d7247fdf2d76ae85f727. The41 source-URL text differences are ignored public tracking parameters only; existing runtime identity checks match. 46local/47applied migrations, zero pending.
+
+Local validation:426Node/fourPython tests, preservation/history/asset checks and existing Worker dry-run passed. Earlier checks exposed stale v1/footer test expectations and three incomplete WebP encodes; these were corrected and all70 final hashes checked. No owner/source poster, VideoObject source thumbnail, review copy/structure/date, player, protected media, D1/R2 data or infrastructure configuration changed. These are70 revisions and zero new unique illustrations; publication and live confirmation remain pending PR222 CI/merge/deployment.

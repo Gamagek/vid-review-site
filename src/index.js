@@ -1,5 +1,5 @@
 import { parseInstagramUrl } from "../public/instagram-utils.js";
-import { reviewIllustration, reviewPreviewIllustration, tikTokReviewPreviewIllustration } from "./review-illustrations.js";
+import { reviewIllustration, reviewPreviewIllustration, tikTokReviewPreviewIllustration, reviewIllustrationRedirect } from "./review-illustrations.js";
 import { isLikelyCrawler } from "./crawlers.js";
 import { tikTokZeroRequestPlayer } from "./tiktok-zero-request-cache.js";
 import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStatus } from "./tiktok-cache-jobs.js";
@@ -186,6 +186,15 @@ async function route(request, env, ctx) {
 
   if (path === "/api/health" && request.method === "GET") {
     return json({ status: "ok", service: env.APP_NAME || "Vid.Best" });
+  }
+
+  const replacementArtwork = reviewIllustrationRedirect(path);
+  if (replacementArtwork && ["GET", "HEAD"].includes(request.method)) {
+    const headers = securityHeaders(new Headers({
+      Location: new URL(replacementArtwork, url.origin).href,
+      "Cache-Control": "public, max-age=86400",
+    }));
+    return new Response(null, { status: 301, headers });
   }
 
   if (path === "/api/categories" && request.method === "GET") {

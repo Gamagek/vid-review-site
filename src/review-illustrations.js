@@ -15,6 +15,14 @@ function sourceIdentity(value) {
 
 const byId = new Map(illustrations.map((item) => [item.id, Object.freeze(item)]));
 
+// Keep previously shared artwork URLs working without serving superseded lettering.
+const previousPaths = new Map(illustrations.filter(item => item.previousPath)
+  .map(item => [item.previousPath, item.path]));
+
+export function reviewIllustrationRedirect(path) {
+  return previousPaths.get(path) || null;
+}
+
 export function reviewIllustration(row) {
   const item = byId.get(Number(row?.id));
   if (!item || row.published === false || row.published === 0 ||
