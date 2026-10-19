@@ -96,7 +96,7 @@
       "slug": "tiktok-discovery",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "2076fca17da22eb8ab99fa9806725060817413bb54e5479a299b90c0711ee950",
-      "status": "prepared_batch4",
+      "status": "published_verified",
       "provider": "tiktok",
       "asset": "/review-illustrations/tiktok-discovery-v1.webp"
     },
@@ -105,7 +105,7 @@
       "slug": "ranking-legendary-laughing-memes",
       "category": "Funny & Comedy",
       "sourceSha256": "99cbdfa037f123c8a235809ac247ab5bd4e300d4893f202bf028487d8c98d031",
-      "status": "prepared_batch4",
+      "status": "published_verified",
       "provider": "tiktok",
       "asset": "/review-illustrations/ranking-legendary-laughing-memes-v1.webp"
     },
@@ -130,7 +130,7 @@
       "slug": "the-funniest-memes-a-funny-proposal-friendly-pranks",
       "category": "Funny & Comedy",
       "sourceSha256": "825d6211d89daa96d68fd2e78fd5169e49a1f9af7c04343cc35fdd4348ca2ce5",
-      "status": "prepared_batch4",
+      "status": "published_verified",
       "provider": "tiktok",
       "asset": "/review-illustrations/the-funniest-memes-a-funny-proposal-friendly-pranks-v1.webp"
     },
@@ -139,7 +139,7 @@
       "slug": "the-ultimate-viral-laughs-compilation",
       "category": "Funny & Comedy",
       "sourceSha256": "ca00c1a3b43adb4498635b378d0d5cd7832d03c1170968cd2e43e2d982622273",
-      "status": "prepared_batch4",
+      "status": "published_verified",
       "provider": "tiktok",
       "asset": "/review-illustrations/the-ultimate-viral-laughs-compilation-v1.webp"
     },
@@ -188,7 +188,7 @@
       "slug": "the-funniest-animal-memes-the-boss-chicken-the-scared-dog",
       "category": "Funny & Comedy",
       "sourceSha256": "f7efb6a7bc939510320fc08ddb45cbe7c4981d3169daaab6825c9b83f988e541",
-      "status": "prepared_batch4",
+      "status": "published_verified",
       "provider": "tiktok",
       "asset": "/review-illustrations/the-funniest-animal-memes-the-boss-chicken-the-scared-dog-v1.webp"
     },
@@ -237,7 +237,7 @@
       "slug": "the-extreme-skateboarding-corgi-is-this-viral-stunt-real-or-fake",
       "category": "Social Media & Trending",
       "sourceSha256": "67a49224989281732d4621900f146d230280e7cacabfbbe9456bb7583167fe1a",
-      "status": "prepared_batch4",
+      "status": "published_verified",
       "provider": "tiktok",
       "asset": "/review-illustrations/the-extreme-skateboarding-corgi-is-this-viral-stunt-real-or-fake-v1.webp"
     },
@@ -246,7 +246,7 @@
       "slug": "try-not-to-laugh-hard-mode-the-funniest-dinosaur-dub-ever",
       "category": "Funny & Comedy",
       "sourceSha256": "bda7b2134d77402b0848e1a91f57c0a9a2a8ef3a82c0494b6138fcc4a2b8ec27",
-      "status": "prepared_batch4",
+      "status": "published_verified",
       "provider": "tiktok",
       "asset": "/review-illustrations/try-not-to-laugh-hard-mode-the-funniest-dinosaur-dub-ever-v1.webp"
     },
@@ -407,7 +407,7 @@
       "slug": "the-ultimate-medieval-promposal-monty-python-king-arthur-style",
       "category": "Funny & Comedy",
       "sourceSha256": "f84eb91477a464c0906a8d55e01fd8c4b9767f08abc448e9fd49775e5b3a3fbf",
-      "status": "prepared_batch4",
+      "status": "published_verified",
       "provider": "tiktok",
       "asset": "/review-illustrations/the-ultimate-medieval-promposal-monty-python-king-arthur-style-v1.webp"
     },
@@ -608,7 +608,7 @@
       "slug": "top-5-most-viewed-tiktoks-ever-billions-of-views-explained",
       "category": "Social Media & Trending",
       "sourceSha256": "c8f8b141ab690197f93fbb654fadf955b298d0687d2b9050f18150800d813e4e",
-      "status": "prepared_batch4",
+      "status": "published_verified",
       "provider": "tiktok",
       "asset": "/review-illustrations/top-5-most-viewed-tiktoks-ever-billions-of-views-explained-v1.webp"
     },
@@ -673,7 +673,7 @@
       "slug": "harry-potter-hip-hop-edit-the-ultimate-magic-rap-remix",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "fe67da49a0b38de93bfb9be6ec239af13b6ff026eae4025085d19987bfb3ee52",
-      "status": "prepared_batch4",
+      "status": "published_verified",
       "provider": "youtube",
       "asset": "/review-illustrations/harry-potter-hip-hop-edit-the-ultimate-magic-rap-remix-v1.webp"
     },
@@ -1894,7 +1894,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Resume batch4 first: ten prepared assets for12/16/19/20/26/32/33/54/81/89, four guarded generic-SVG TikTok preview fallbacks. Complete exact-head CI/merge/deployment/live checks before counting new publication or choosing another batch. Existing30published; prepared40/234,187pending/sevenholds. Non-Saiyaara Tagembed/Iframely mappings remain unavailable; no guessed providers, unchanged protected source30/Saiyaara/Summer/demo/removal media/text/dates. No redundant full Google inspections or empty sitemap submissions.",
+  "nextTask": "Reconcile fresh main/open PRs/inventory. Facebook20/20 and all ten non-held TikTok reviews have art; the other three TikTok records stay held. Missing per-video Tagembed/Iframely mappings still block the requested provider chain. Continue the next distinct safe Instagram/YouTube/other artwork batch independently;187pending/sevenholds. Do not repeat this batch or edit protected text/media/dates/drafts.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -2045,7 +2045,7 @@
     },
     "limits": "Ten separate illustrations; no source poster repaired/replaced, no new viewing/audio claims. 11 original provider HTTP errors and8 protected placeholders remain. Original214rows match baseline; five independent owner publications were added during this work."
   },
-  "reconciledAt": "2026-10-18T22:52:54.939Z",
+  "reconciledAt": "2026-10-19T00:23:50.007Z",
   "providerCounts": {
     "raw": 1,
     "youtube": 199,
@@ -3418,7 +3418,7 @@
     "verificationFile": "docs/review-images/batch3-live-verification-20261019.json"
   },
   "batch4": {
-    "state": "prepared",
+    "state": "published_verified",
     "recordIds": [
       16,
       19,
@@ -3540,10 +3540,165 @@
       }
     ],
     "newGenerated": 10,
-    "newPublished": 0,
-    "newLiveVerified": 0,
-    "preservation": "Additive artwork and manifest/provenance/queue only. No original thumbnail, review, title, date, player or D1/R2 changes. Seven holds preserved.",
+    "newPublished": 10,
+    "newLiveVerified": 10,
+    "preservation": {
+      "initial": {
+        "checkedAt": "2026-10-19T00:00:07.929Z",
+        "saved": 238,
+        "published": 234,
+        "sha256": "ffdf9acdf1a8b53191eafd22effcd2a624619005adbd2d4b076b3075b5e78017"
+      },
+      "premerge": {
+        "checkedAt": "2026-10-19T00:22:17.593Z",
+        "sha256": "ffdf9acdf1a8b53191eafd22effcd2a624619005adbd2d4b076b3075b5e78017"
+      },
+      "postdeploy": {
+        "checkedAt": "2026-10-19T00:23:50.007Z",
+        "saved": 238,
+        "published": 234,
+        "sha256": "ffdf9acdf1a8b53191eafd22effcd2a624619005adbd2d4b076b3075b5e78017"
+      },
+      "all238SavedNonCounterFieldsMatch": true,
+      "allTenTargetsMatch": true,
+      "d1Writes": 0,
+      "r2Writes": 0,
+      "limit": "Only views/reaction_count/comments_count excluded from digest; normal browser view increments are allowed."
+    },
     "playbackLimit": "No new verified non-Saiyaara Tagembed/Iframely mappings. Existing players unchanged; no guessed mapping or six-second playback-failure inference.",
-    "nextTask": "Complete tests/exact-head CI/PR/deployment and ten live hash/page/social/sitemap associations before counting as published."
+    "nextTask": "Reconcile fresh main/open PRs/inventory. Facebook20/20 and all ten non-held TikTok reviews have art; the other three TikTok records stay held. Missing per-video Tagembed/Iframely mappings still block the requested provider chain. Continue the next distinct safe Instagram/YouTube/other artwork batch independently;187pending/sevenholds. Do not repeat this batch or edit protected text/media/dates/drafts.",
+    "verifiedAt": "2026-10-19T00:24:09.558Z",
+    "release": {
+      "pullRequest": 214,
+      "head": "4575050947c2e4e3e19cc8f87ef075bc85dea92c",
+      "commit": "6acd6bef999561894b2c5a483e62f30627581b42",
+      "exactHeadCi": 39180385191,
+      "mainCi": 39180477214,
+      "deployRun": 39180477270,
+      "worker": "08e6d1d0-c84f-4521-854e-1294eba20b1d",
+      "deploymentId": "114e423f-2dc6-4b53-a44e-fbd49da6b6ea",
+      "deployedAt": "2026-10-19T00:22:59.323463Z",
+      "percentage": 100,
+      "nodeTests": 425,
+      "pythonTests": 4,
+      "dryRun": "passed",
+      "migrations": "No migrations to apply",
+      "portainerRun": 39180477241,
+      "privilegedPortainerJobs": "all four skipped"
+    },
+    "coverage": {
+      "published": 234,
+      "saved": 238,
+      "identityMatchedArtworks": 40,
+      "facebookArtworks": 20,
+      "facebookPublished": 20,
+      "tiktokArtworks": 10,
+      "tiktokPublished": 13,
+      "tiktokHeldIds": [
+        8,
+        30,
+        73
+      ],
+      "pending": 187,
+      "held": 7,
+      "newGenerated": 10,
+      "newPublished": 10,
+      "newLiveVerified": 10,
+      "newTikTokPlaceholderFallbackIds": [
+        16,
+        19,
+        20,
+        26
+      ]
+    },
+    "latestCompletedAudit": {
+      "run": 39180530821,
+      "artifact": 12156331001,
+      "archiveSha256": "2c31c05ce23088166f40e234f7078241f1c6a85f9480ceb1bf9202fbd7e16df1",
+      "generatedAt": "2026-10-19T00:23:26.829Z",
+      "pagesChecked": 267,
+      "searchConsole": {
+        "status": "success",
+        "authenticated": true,
+        "propertyVerified": true,
+        "sitemapSubmitted": false,
+        "inspections": [],
+        "sitemapMode": "read_only",
+        "sitemapProcessing": {
+          "status": "verified",
+          "isPending": false,
+          "lastDownloaded": "2026-10-18T09:11:12.537Z",
+          "lastSubmitted": "2026-10-18T09:11:10.095Z",
+          "errors": 0,
+          "warnings": 0
+        },
+        "reviewSitemaps": [
+          {
+            "url": "https://vid.best/sitemaps/videos-1.xml",
+            "submitted": false,
+            "processing": {
+              "status": "verified",
+              "isPending": false,
+              "lastDownloaded": "2026-10-18T09:11:14.226Z",
+              "lastSubmitted": "2026-10-18T09:11:10.285Z",
+              "errors": 0,
+              "warnings": 20
+            }
+          },
+          {
+            "url": "https://vid.best/sitemaps/daily-weekly-best.xml",
+            "submitted": false,
+            "processing": {
+              "status": "verified",
+              "isPending": false,
+              "lastDownloaded": "2026-10-18T09:11:13.890Z",
+              "lastSubmitted": "2026-10-18T09:11:10.448Z",
+              "errors": 0,
+              "warnings": 0
+            }
+          }
+        ],
+        "totalReviews": 244,
+        "inspectionBudget": 0
+      },
+      "sourcePosters": {
+        "ok": 225,
+        "http_error": 1,
+        "placeholder": 8
+      },
+      "technicalFailures": 0,
+      "editorialWarnings": 2,
+      "limit": "Read-only zero-Inspection audit; indexed page count not refreshed. Source poster response counts remain separate from conceptual artwork and listing fallbacks; four source-route successes are generic SVG."
+    },
+    "browser": {
+      "watchUrl": "https://vid.best/watch/ranking-legendary-laughing-memes",
+      "screenshot": "docs/review-images/batch4-live-desktop-20261019.jpg",
+      "screenshotAt": "2026-10-19T00:24:39.648Z",
+      "viewport": {
+        "width": 1363,
+        "height": 936
+      },
+      "watchMainArtDecoded": {
+        "width": 1672,
+        "height": 941
+      },
+      "sidebarArtDecoded": {
+        "width": 1672,
+        "height": 941,
+        "renderedWidth": 375.40625
+      },
+      "watchFramesBeforePlay": 0,
+      "watchDisclosure": "Illustrated cover · not a video frame",
+      "miniTile": {
+        "width": 422,
+        "decodedWidth": 1672,
+        "decodedHeight": 941,
+        "frameCount": 0,
+        "artworkSurvivedCachedMetadata": true,
+        "disclosure": "Illustrated cover · not a video frame"
+      },
+      "responsiveLimit": "Existing900px stacking CSS unchanged. No independent narrow-device viewport was available; no mobile visual claim."
+    },
+    "verificationFile": "docs/review-images/batch4-live-verification-20261019.json"
   }
 }
