@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "inventoryAt": "2026-10-18T17:19:45.523Z",
-  "publishedLibraryCount": 237,
+  "publishedLibraryCount": 238,
   "batchLimit": 10,
   "phase": "additive_sidebar_illustrations",
   "policy": "Preserve all source/owner posters and all D1 fields. Match current published ID, slug, source and title before enabling art. Do not edit protected review topics/media or drafts. Reconcile newly published records on each run; no regeneration merely for freshness. The owner’s 18 October request authorizes separate, clearly labelled sidebar art for all published platforms/topics, including comedy, but never edits existing protected review text, SEO titles, source posters or players. Source-removal/demo/Saiyaara/Summer holds remain. The19October owner steering additionally authorizes identity-matched generated art in OpenGraph/Twitter/WebPage metadata and guarded fallback for genuinely broken listing previews; preserve working source posters/VideoObject evidence and all D1/R2 media fields.",
@@ -809,16 +809,18 @@
       "slug": "place-on-earth-that-don-t-feel-real-travel-explore-expectations-adventure-shorts",
       "category": "Adventure & Travel",
       "sourceSha256": "44c8be8d16bce8f535dc0e14be94220407c3527ea051e6c9fb16b55cbb944847",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 7
     },
     {
       "id": 105,
       "slug": "places-in-real-life-travel-explore-adventure-destinations",
       "category": "Adventure & Travel",
       "sourceSha256": "4d0283c4496eab670a8fcf458e48ae28613631ec0bc1c701258860b6a454aab4",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 7
     },
     {
       "id": 106,
@@ -834,8 +836,9 @@
       "slug": "three-3-best-business-can-start-with-3-dollar-in-2025-subscribe",
       "category": "Business & Economy",
       "sourceSha256": "c81c0717c6c20fac14233cb4a2e539b04a1b3f0748815cc7bb692cf95c49456b",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 7
     },
     {
       "id": 108,
@@ -1004,16 +1007,18 @@
       "slug": "freakiest-animals-across-the-globe-mega-episode-nat-geo-animals-freaks-of-the-jungle-sky",
       "category": "Environment & Sustainability",
       "sourceSha256": "25de2b903451e193dff83c590e579e0772f47f614b2c341e21862ad62d906579",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 7
     },
     {
       "id": 129,
       "slug": "how-zach-king-gets-away-with-doing-graffiti-magic-trick-breakdown-how-zach-king-fakes-graffiti",
       "category": "Arts & Culture",
       "sourceSha256": "5ca1c5c77d661b5c226fb2268d7022117058e4891d07fc25d271a3dc2c6a2fdf",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 7
     },
     {
       "id": 130,
@@ -1332,8 +1337,9 @@
       "slug": "the-poor-puppy-not-have-anything-short-viralshorts-emotionalstory-cutedog-streetdog-subscribe",
       "category": "Social Media & Trending",
       "sourceSha256": "522fe83a87d21087c08fe932a4fcba22c7f97baa05463840f5b70be3d1b76de8",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 7
     },
     {
       "id": 179,
@@ -1782,7 +1788,8 @@
       "category": "Education",
       "provider": "youtube",
       "sourceSha256": "785ed0c30f9cdde474045ca5783d4b29eda47563c96db685198f2424bd1fb9b7",
-      "status": "pending_theme_verification"
+      "status": "prepared",
+      "batch": 7
     },
     {
       "id": 236,
@@ -1798,7 +1805,8 @@
       "category": "Education",
       "provider": "youtube",
       "sourceSha256": "d2a1bf20264caa89ad3bfd9d626457590ed51962b8bad239871ba177ce1ba91a",
-      "status": "pending_theme_verification"
+      "status": "prepared",
+      "batch": 7
     },
     {
       "id": 238,
@@ -1806,7 +1814,8 @@
       "category": "Spirituality",
       "provider": "youtube",
       "sourceSha256": "4dc9ab10ca12111adb63bbff0399b36c85b74e077badee00237ce9254041a1cc",
-      "status": "pending_theme_verification"
+      "status": "prepared",
+      "batch": 7
     },
     {
       "id": 239,
@@ -1830,7 +1839,8 @@
       "category": "Social Media & Trending",
       "provider": "youtube",
       "sourceSha256": "9bd039fe5180f10e43867182342c293144afc396adefbbd181b28807b46c8f4c",
-      "status": "pending_theme_verification"
+      "status": "prepared",
+      "batch": 7
     },
     {
       "id": 242,
@@ -1936,9 +1946,17 @@
       "provider": "youtube",
       "sourceSha256": "87522c4269658d7c00d74bcfefcf769edbbdeefc004ca67baafc17fb41fcac69",
       "status": "pending_theme_verification"
+    },
+    {
+      "id": 255,
+      "slug": "motorcycle-cake-theft-barber-k-pop-fail-bed-crash",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "d05f28676906432da8239ade5bf0cc945eace96ff56c1f95eb806fc3cfbc4919",
+      "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Reconcile fresh main/open PRs/D1 before the next distinct safe remaining-artwork batch. Current60/237verified,170pending/sevenheld, including newly reconciled owner publications252/253 and late publication254. Facebook20/20 and ten non-held TikTok reviews have art. Preserve all originals, holds and protected text; never regenerate completed batch6. Other-TikTok smart playback awaits verified per-video Tagembed/Iframely mappings; do not reuse Saiyaara or invent provider signals/URLs.",
+  "nextTask": "Resume prepared batch7 through exact-head CI, PR merge, existing Worker deployment and every new image live verification before selecting more artwork. Preserve60 previous assets, all originals and holds. Other-TikTok playback needs verified per-video Tagembed/Iframely mappings.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -2089,10 +2107,10 @@
     },
     "limits": "Ten separate illustrations; no source poster repaired/replaced, no new viewing/audio claims. 11 original provider HTTP errors and8 protected placeholders remain. Original214rows match baseline; five independent owner publications were added during this work."
   },
-  "reconciledAt": "2026-10-19T05:15:57.391Z",
+  "reconciledAt": "2026-10-19T05:55:15.523Z",
   "providerCounts": {
     "raw": 1,
-    "youtube": 202,
+    "youtube": 203,
     "tiktok": 13,
     "facebook": 20,
     "instagram": 1
@@ -4223,5 +4241,136 @@
         }
       ]
     }
+  },
+  "batch7": {
+    "state": "prepared",
+    "recordIds": [
+      104,
+      105,
+      107,
+      128,
+      129,
+      178,
+      235,
+      237,
+      238,
+      241
+    ],
+    "baseline": {
+      "checkedAt": "2026-10-19T05:55:15.523Z",
+      "saved": 242,
+      "published": 238,
+      "sha256": "695e502f6ff73604376929d89fdc2d15cc974d512fb0c857ecd961f5b3b2ee45"
+    },
+    "targetRows": [
+      {
+        "id": 104,
+        "title": "😌 Place On Earth That Don't Feel Real - Travel & Illusion",
+        "slug": "place-on-earth-that-don-t-feel-real-travel-explore-expectations-adventure-shorts",
+        "sourceUrl": "https://youtube.com/shorts/mkfSZDwAaf8",
+        "published": 1,
+        "created_at": "2026-10-06T18:24:37.208Z",
+        "updated_at": "2026-10-06T20:34:18.715Z",
+        "protectedRowSha256": "00ccf772d144c1053d2d1467af43003ee8ebb9fcdc8029e62d4c4fa557a6ca8c"
+      },
+      {
+        "id": 105,
+        "title": "🌌 Places In Real Life 😆 Travel Social Media vs. Reality - The Truth About Viral Places",
+        "slug": "places-in-real-life-travel-explore-adventure-destinations",
+        "sourceUrl": "https://youtube.com/shorts/ePX1h3T_4vo",
+        "published": 1,
+        "created_at": "2026-10-06T18:27:03.927Z",
+        "updated_at": "2026-10-06T20:40:07.428Z",
+        "protectedRowSha256": "ec4190edd7e207afc90c053cc84c6893209b2bf51f677bfbc993ad99bbeae9fd"
+      },
+      {
+        "id": 107,
+        "title": "😃💼 Three 3 Best Business can start with $3 dollar in 2025 😏",
+        "slug": "three-3-best-business-can-start-with-3-dollar-in-2025-subscribe",
+        "sourceUrl": "https://youtu.be/QAGGPsFAjQU",
+        "published": 1,
+        "created_at": "2026-10-06T18:32:57.842Z",
+        "updated_at": "2026-10-06T20:51:58.582Z",
+        "protectedRowSha256": "41deef9f4b3cf3f0187d3b7753e9b238baaf5313952bd15e1808d61e3fc6df2e"
+      },
+      {
+        "id": 128,
+        "title": "🐒 Freakiest Animals Across the Globe | MEGA EPISODE | Nat Geo Animals 🦇 Freaks of the Jungle & Sky 🌳",
+        "slug": "freakiest-animals-across-the-globe-mega-episode-nat-geo-animals-freaks-of-the-jungle-sky",
+        "sourceUrl": "https://youtu.be/FNSQ-G2ksMo",
+        "published": 1,
+        "created_at": "2026-10-10T16:54:52.898Z",
+        "updated_at": "2026-10-10T16:54:52.898Z",
+        "protectedRowSha256": "13c7bf20290b7cfa7bab60f152bfb2e2260b0391b9905f8588188e91a72b7550"
+      },
+      {
+        "id": 129,
+        "title": "🎨 How Zach King Gets Away With Doing Graffiti | Magic Trick Breakdown! ✨ How Zach King Fakes Graffiti 🪜",
+        "slug": "how-zach-king-gets-away-with-doing-graffiti-magic-trick-breakdown-how-zach-king-fakes-graffiti",
+        "sourceUrl": "https://youtube.com/shorts/R1Ehb3JA-cM",
+        "published": 1,
+        "created_at": "2026-10-10T18:02:25.839Z",
+        "updated_at": "2026-10-10T18:02:25.839Z",
+        "protectedRowSha256": "f76bf7400346ae7fe3423f666a8fca68b43e9a1e96d68b7080164b995154038b"
+      },
+      {
+        "id": 178,
+        "title": "The poor puppy not have anything🥺 Heartwarming Animated Story! 🐶🐟 Cute Puppy Rescues a Goldfish",
+        "slug": "the-poor-puppy-not-have-anything-short-viralshorts-emotionalstory-cutedog-streetdog-subscribe",
+        "sourceUrl": "https://youtube.com/shorts/VREgm7qmpUU?feature=shared",
+        "published": 1,
+        "created_at": "2026-10-13T17:42:33.707Z",
+        "updated_at": "2026-10-13T18:20:09.206Z",
+        "protectedRowSha256": "c80ad937792a616c2217a2364848b0b8dfdb5beb45058c2ac525ff57651b9401"
+      },
+      {
+        "id": 235,
+        "title": "Johny Johny Yes Papa 👶 | LooLoo Kids Nursery Rhyme Review",
+        "slug": "looloo-kids-johny-johny-yes-papa-2016-original-review",
+        "sourceUrl": "https://www.youtube.com/watch?v=F4tHL8reNCs",
+        "published": 1,
+        "created_at": "2026-10-18T17:50:25.101Z",
+        "updated_at": "2026-10-18T17:50:25.101Z",
+        "protectedRowSha256": "b31bfaa15f2c0e7d6e9f6fd2c428687728eaeacb2b12d3b47dac2b8ae0bef363"
+      },
+      {
+        "id": 237,
+        "title": "Learning Colors – Colorful Eggs on a Farm 🥚 | Miroshka TV Review",
+        "slug": "miroshka-tv-learning-colors-colorful-eggs-on-farm-2018-review",
+        "sourceUrl": "https://www.youtube.com/watch?v=_nAu9D-8srA",
+        "published": 1,
+        "created_at": "2026-10-18T17:54:53.282Z",
+        "updated_at": "2026-10-18T17:54:53.282Z",
+        "protectedRowSha256": "3b45e5501f900f1f4fcef103ef162a9cbfa2a0e08063e7b37f552dac13116bcb"
+      },
+      {
+        "id": 238,
+        "title": "Shree Hanuman Chalisa 🙏 | Hariharan & T-Series Devotional Review",
+        "slug": "shree-hanuman-chalisa-hariharan-tseries-devotional-video-review",
+        "sourceUrl": "https://www.youtube.com/watch?v=AETFvQonfV8",
+        "published": 1,
+        "created_at": "2026-10-18T17:54:53.282Z",
+        "updated_at": "2026-10-18T17:54:53.282Z",
+        "protectedRowSha256": "ee8a91da74456a4ed5722cb899482ae979d21d3ac0d157c19475cda533cd91e5"
+      },
+      {
+        "id": 241,
+        "title": "Dame Tu Cosita 👽 | El Chombo's Dancing Alien Video Review",
+        "slug": "el-chombo-dame-tu-cosita-green-alien-viral-video-review",
+        "sourceUrl": "https://www.youtube.com/watch?v=FzG4uDgje3M",
+        "published": 1,
+        "created_at": "2026-10-18T17:56:44.530Z",
+        "updated_at": "2026-10-18T17:56:44.530Z",
+        "protectedRowSha256": "cd36ce5cbce525b822d8a6a1c0805af3a72cf59c7dd3d795c32824ce6db37340"
+      }
+    ],
+    "ownerPublicationsReconciled": [
+      255
+    ],
+    "sourceVerification": "docs/review-images/batch7-source-verification-20261019.json",
+    "newGenerated": 10,
+    "newPublished": 0,
+    "liveVerified": 0,
+    "limits": "Conceptual illustrations only; no footage/audio or Google indexed-count verification. Non-Saiyaara Tagembed/Iframely mappings remain unavailable."
   }
 }

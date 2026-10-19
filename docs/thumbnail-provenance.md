@@ -1,5 +1,13 @@
 # Editorial cover provenance
 
+## 19 October 2026: batch 7 prepared
+
+Ten distinct built-in imagegen conceptual covers for104/105/107/128/129/178/235/237/238/241. Fresh read-only inventory 2026-10-19T05:55:15.523Z:242saved/238published; owner publication255 reconciled in queue only. Baseline SHA256 695e502f6ff73604376929d89fdc2d15cc974d512fb0c857ecd961f5b3b2ee45. Existing60 manifest/provenance entries and all source posters, VideoObject thumbnails, owner fields/dates/media/drafts/holds are unchanged. Current linked-upload public YouTube oEmbed metadata identities returned200; no source footage/audio or original authorship inferred, including dollarbill uploader129. Exact prompts/limits/WebP bytes/dimensions/SHA256 persisted. Invented16:9 art has visible AI-GENERATED REVIEW ILLUSTRATION; no fake source scene, copied character, identifiable person, real rescue/location or outcome claim.
+
+Generated10/published0/liveverified0 until required CI/merge/deployment/live checks finish. No runtime/player/CSS/migration change. Facebook20/20 and ten non-heldTikTok art preserved; otherTikTok provider chain still requires verified mappings, not Saiyaara reuse. Last actual completed audit39203148714/artifact12164797006 verified ZIP be40ea1b3ce3a5d8aec17a5445ee62ded6584d106150434f3462fc532e92dbfd:269pages/zero technical failures/two warning pages (three messages). It predates owner254/255, not current full inventory verification. Read-only Google root notpending/zeroerrors,lastdownload2026-10-18T09:11:12.537Z;20librarywarnings;zeroInspections/submissions, no new indexed-count or indexing/AdSense promise.
+
+Next: complete this batch release and live hash/HTML/social/schema/map/date checks; then continue next safe pending artwork with fresh inventory. Preserve flat sitemap indexes and stable paths.
+
 ## 19 October 2026: batch 6 deployed and live-verified
 
 Post-release owner publication reconciliation at2026-10-19T05:15:57.391Z: record254 was independently published during verification. Current241saved/237published; artwork60/237,170pending/sevenheld. All previous240 non-counter rows still match807c938d9349fe97670ae2c13c1705a37177a49286549b1a92778ce8fa4ae434. Added only254 queue metadata; owner text/source/date/poster preserved. The269-page audit above predates254 and is not a verification of that new page. No extra deployment or Google request for this owner publication.
