@@ -1,5 +1,13 @@
 # Editorial cover provenance
 
+## 19 October 2026: batch8 prepared without visible production lettering
+
+Concurrent owner publications263/280 reconciled at2026-10-19T10:41:03.363Z:272saved/247published. Only queue metadata was added; original review/source/poster/date fields remain owner-controlled. Target10 identity, publication, description prefix and original dates match the initial snapshot. The current target non-counter SHA256 is022881559a28040f8849b1d597ba65ba12a4a80fd4ecb49d60384deb0ba356aa. Full saved-row digest changed after independent owner publications; no assertion that those newly edited owner drafts remained unchanged. Prior245-published-row digest is stored for release preservation. All ten final images visually/OCR checked, with no production lettering or play badges.
+
+Ten distinct built-in imagegen16:9 conceptual covers for7/9/10/11/17/21/22/23/24/25. Public YouTube oEmbed linked-upload titles/uploader metadata returned200 at2026-10-19T10:28:39.711Z; no source footage/audio inspected, original authorship inferred or actors/characters/official artwork copied. Romance, mashup, cinema/armchair/holiday humour, internet-compilation and live-music topics are interpreted through original objects, scenery and musical motifs. No AI-generated lettering appears in the artwork; conceptual-not-source-frame captions/alt remain accurate. Exact prompts, verification limits, WebP bytes/dimensions/SHA256 are in provenance.
+
+Generated10/newpublished0/newliveverified0 until PR223 exact-head CI, merge/deployment and live checks finish. Existing70 clean artworks/provenance/legacy redirects remain byte-for-byte unchanged. Read-only baseline 2026-10-19T10:27:04.644Z:272saved/245published, SHA256 a87830a50ea4229d4158e24ed0060c5e14d8398eacf9cfb1ed4872a9167e9c34. No D1/R2 writes, review/title/date/SEO/structure/player/source-poster/VideoObject/hold/draft changes. Next: complete this release, then continue the remaining safe queue; missing verified non-Saiyaara provider mappings remain an external limitation.
+
 ## 19 October 2026: all70 existing artwork labels removed, deployed and verified
 
 PR[222](https://github.com/Gamagek/vid-review-site/pull/222), exact-head 76709c1a92987deaf35f25398849f0062d2f35d8, CI39236125189, merged 5f84925e555eecc595b23b8a29212fee713adc8e. MainCI39236382443 and Deploy39236382275 passed. Actual100% Worker b3f603e8-c343-4a39-b2e1-f2fe3aa35b35, deployment 6fed9406-2b2e-4076-9914-6dc2b55ef8d7 at2026-10-19T10:17:56.056933Z. No pending migration; Portainer39236382462 validated with allfour privileged jobs skipped. Full426Node/fourPython tests, asset/history/identity/preview guard checks and Worker dry-run passed.
