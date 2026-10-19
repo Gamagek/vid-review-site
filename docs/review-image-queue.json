@@ -809,7 +809,7 @@
       "slug": "place-on-earth-that-don-t-feel-real-travel-explore-expectations-adventure-shorts",
       "category": "Adventure & Travel",
       "sourceSha256": "44c8be8d16bce8f535dc0e14be94220407c3527ea051e6c9fb16b55cbb944847",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 7
     },
@@ -818,7 +818,7 @@
       "slug": "places-in-real-life-travel-explore-adventure-destinations",
       "category": "Adventure & Travel",
       "sourceSha256": "4d0283c4496eab670a8fcf458e48ae28613631ec0bc1c701258860b6a454aab4",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 7
     },
@@ -836,7 +836,7 @@
       "slug": "three-3-best-business-can-start-with-3-dollar-in-2025-subscribe",
       "category": "Business & Economy",
       "sourceSha256": "c81c0717c6c20fac14233cb4a2e539b04a1b3f0748815cc7bb692cf95c49456b",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 7
     },
@@ -1007,7 +1007,7 @@
       "slug": "freakiest-animals-across-the-globe-mega-episode-nat-geo-animals-freaks-of-the-jungle-sky",
       "category": "Environment & Sustainability",
       "sourceSha256": "25de2b903451e193dff83c590e579e0772f47f614b2c341e21862ad62d906579",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 7
     },
@@ -1016,7 +1016,7 @@
       "slug": "how-zach-king-gets-away-with-doing-graffiti-magic-trick-breakdown-how-zach-king-fakes-graffiti",
       "category": "Arts & Culture",
       "sourceSha256": "5ca1c5c77d661b5c226fb2268d7022117058e4891d07fc25d271a3dc2c6a2fdf",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 7
     },
@@ -1337,7 +1337,7 @@
       "slug": "the-poor-puppy-not-have-anything-short-viralshorts-emotionalstory-cutedog-streetdog-subscribe",
       "category": "Social Media & Trending",
       "sourceSha256": "522fe83a87d21087c08fe932a4fcba22c7f97baa05463840f5b70be3d1b76de8",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 7
     },
@@ -1788,7 +1788,7 @@
       "category": "Education",
       "provider": "youtube",
       "sourceSha256": "785ed0c30f9cdde474045ca5783d4b29eda47563c96db685198f2424bd1fb9b7",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 7
     },
     {
@@ -1805,7 +1805,7 @@
       "category": "Education",
       "provider": "youtube",
       "sourceSha256": "d2a1bf20264caa89ad3bfd9d626457590ed51962b8bad239871ba177ce1ba91a",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 7
     },
     {
@@ -1814,7 +1814,7 @@
       "category": "Spirituality",
       "provider": "youtube",
       "sourceSha256": "4dc9ab10ca12111adb63bbff0399b36c85b74e077badee00237ce9254041a1cc",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 7
     },
     {
@@ -1839,7 +1839,7 @@
       "category": "Social Media & Trending",
       "provider": "youtube",
       "sourceSha256": "9bd039fe5180f10e43867182342c293144afc396adefbbd181b28807b46c8f4c",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 7
     },
     {
@@ -1956,7 +1956,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Resume prepared batch7 through exact-head CI, PR merge, existing Worker deployment and every new image live verification before selecting more artwork. Preserve60 previous assets, all originals and holds. Other-TikTok playback needs verified per-video Tagembed/Iframely mappings.",
+  "nextTask": "Fresh main/open PR/D1 reconciliation, then next distinct safe remaining-artwork batch. Current70/238verified,161pending/sevenheld. Owner publication255 reconciled without changing its source/text/date. Facebook20/20 and ten non-heldTikTok art preserved. OtherTikTok provider chain requires verified per-video Tagembed/Iframely mapping; never reuse Saiyaara or infer playback from iframe load. Preserve all original media, owner data, holds, drafts and protected text.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -2107,7 +2107,7 @@
     },
     "limits": "Ten separate illustrations; no source poster repaired/replaced, no new viewing/audio claims. 11 original provider HTTP errors and8 protected placeholders remain. Original214rows match baseline; five independent owner publications were added during this work."
   },
-  "reconciledAt": "2026-10-19T05:55:15.523Z",
+  "reconciledAt": "2026-10-19T06:07:37.748Z",
   "providerCounts": {
     "raw": 1,
     "youtube": 203,
@@ -4243,7 +4243,7 @@
     }
   },
   "batch7": {
-    "state": "prepared",
+    "state": "published_verified",
     "recordIds": [
       104,
       105,
@@ -4369,8 +4369,121 @@
     ],
     "sourceVerification": "docs/review-images/batch7-source-verification-20261019.json",
     "newGenerated": 10,
-    "newPublished": 0,
-    "liveVerified": 0,
-    "limits": "Conceptual illustrations only; no footage/audio or Google indexed-count verification. Non-Saiyaara Tagembed/Iframely mappings remain unavailable."
+    "newPublished": 10,
+    "liveVerified": 10,
+    "limits": "Conceptual illustrations only; no footage/audio or Google indexed-count verification. Non-Saiyaara Tagembed/Iframely mappings remain unavailable.",
+    "release": {
+      "pr": 220,
+      "head": "42c7b49da4b25496e5f99666d1731bf9d6aafd61",
+      "merge": "8223f53bd539ce531bcf9e092ef67dbe8a142e78",
+      "ciRun": 39207887644,
+      "mainCiRun": 39208015618,
+      "deployRun": 39208015655,
+      "portainerRun": 39208015691,
+      "worker": {
+        "id": "e75f1829-580f-47c1-af50-a6b177cb9d2a",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "annotations": {
+          "workers/triggered_by": "deployment"
+        },
+        "versions": [
+          {
+            "version_id": "9a77a25c-c339-47d1-a8a9-12cd4bd3bc42",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-19T06:07:02.262567Z"
+      }
+    },
+    "verificationFile": "docs/review-images/batch7-live-verification-20261019.json",
+    "audit": {
+      "run": 39208075085,
+      "artifact": 12166567779,
+      "zipSha256": "f9c04a7b829629052cc0a4e5c6fd6bd1d815e85ea0fbda6b73b3e4a95d9eaf1f",
+      "generatedAt": "2026-10-19T06:07:27.427Z",
+      "pages": 271,
+      "technicalFailures": 0,
+      "editorialWarningPages": 2,
+      "editorialWarningMessages": 3,
+      "searchConsole": {
+        "status": "success",
+        "authenticated": true,
+        "propertyVerified": true,
+        "sitemapSubmitted": false,
+        "inspections": [],
+        "sitemapMode": "read_only",
+        "sitemapProcessing": {
+          "status": "verified",
+          "isPending": false,
+          "lastDownloaded": "2026-10-18T09:11:12.537Z",
+          "lastSubmitted": "2026-10-18T09:11:10.095Z",
+          "errors": 0,
+          "warnings": 0
+        },
+        "reviewSitemaps": [
+          {
+            "url": "https://vid.best/sitemaps/videos-1.xml",
+            "submitted": false,
+            "processing": {
+              "status": "verified",
+              "isPending": false,
+              "lastDownloaded": "2026-10-18T09:11:14.226Z",
+              "lastSubmitted": "2026-10-18T09:11:10.285Z",
+              "errors": 0,
+              "warnings": 20
+            }
+          },
+          {
+            "url": "https://vid.best/sitemaps/daily-weekly-best.xml",
+            "submitted": false,
+            "processing": {
+              "status": "verified",
+              "isPending": false,
+              "lastDownloaded": "2026-10-18T09:11:13.890Z",
+              "lastSubmitted": "2026-10-18T09:11:10.448Z",
+              "errors": 0,
+              "warnings": 0
+            }
+          }
+        ],
+        "totalReviews": 248,
+        "inspectionBudget": 0
+      },
+      "sourcePosterCounts": {
+        "ok": 229,
+        "http_error": 1,
+        "placeholder": 8
+      },
+      "limit": "Read-only zero-Inspection diagnostics, not an indexed-page count or indexing/AdSense promise. Source posters remain separate from new review artwork."
+    },
+    "browser": {
+      "checkedAt": "2026-10-19T06:08:24.157Z",
+      "url": "https://vid.best/watch/places-in-real-life-travel-explore-adventure-destinations",
+      "viewport": {
+        "width": 1363,
+        "height": 936
+      },
+      "image": {
+        "complete": true,
+        "naturalWidth": 1672,
+        "naturalHeight": 940,
+        "renderedWidth": 375.40625
+      },
+      "art": {
+        "x": 854.5625,
+        "y": 345,
+        "width": 409.40625
+      },
+      "review": {
+        "x": 84,
+        "y": 345,
+        "width": 746.5625
+      },
+      "caption": "AI-generated review illustration inspired by this review’s theme. This is not a frame from the source video.",
+      "screenshot": "docs/review-images/batch7-live-desktop-20261019.jpg",
+      "limit": "Desktop sidebar decoding/association only; source continuous playback/audio and independent mobile viewport not verified. Existing900px responsive CSS unchanged; transient existing floating player closed via its UI for screenshot."
+    },
+    "verifiedAt": "2026-10-19T06:08:14.426Z"
   }
 }
