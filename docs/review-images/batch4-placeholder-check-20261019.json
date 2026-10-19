@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-10-19T00:14:17.917Z",
+  "posters": [
+    {
+      "id": 16,
+      "status": 200,
+      "mime": "image/svg+xml",
+      "bytes": 2028
+    },
+    {
+      "id": 19,
+      "status": 200,
+      "mime": "image/svg+xml",
+      "bytes": 2061
+    },
+    {
+      "id": 20,
+      "status": 200,
+      "mime": "image/svg+xml",
+      "bytes": 2037
+    },
+    {
+      "id": 26,
+      "status": 200,
+      "mime": "image/svg+xml",
+      "bytes": 1938
+    }
+  ],
+  "limit": "Public cached-poster responses only; no provider or Google requests."
+}

@@ -883,12 +883,12 @@ function renderTikTokFacade(card) {
   imageWrap.append(placeholder);
   const ownedCover = ownedTikTokCover(card);
   // Use the permanent same-origin R2/SVG image before expiring TikTok CDN links.
-  const previewImage = ownedCover || card.dataset.tiktokPoster ||
+  const previewImage = card.dataset.reviewPreview || ownedCover || card.dataset.tiktokPoster ||
     (share.id ? "/api/tiktok/cached-poster?id=" + encodeURIComponent(share.id) : card.dataset.tiktokThumbnail);
   if (previewImage) {
     const image = document.createElement("img");
     image.src = previewImage;
-    image.alt = "";
+    image.alt = card.dataset.reviewPreview ? "AI-generated review illustration, not a source video frame" : "";
     image.loading = ownedCover && isNearViewport(card) ? "eager" : "lazy";
     image.decoding = "async";
     image.addEventListener("load", () => imageWrap.classList.add("has-image"), { once: true });
@@ -901,7 +901,7 @@ function renderTikTokFacade(card) {
 
   const providerRow = document.createElement("span");
   providerRow.className = "tiktok-microlink-provider";
-  providerRow.textContent = ownedCover && /-illustrated-v\d+\.(?:jpe?g|png|webp|avif)$/i.test(ownedCover)
+  providerRow.textContent = card.dataset.reviewPreview || ownedCover && /-illustrated-v\d+\.(?:jpe?g|png|webp|avif)$/i.test(ownedCover)
     ? "Illustrated cover · not a video frame"
     : card.dataset.tiktokCacheReady === "1"
       ? "TikTok preview · tap for details"

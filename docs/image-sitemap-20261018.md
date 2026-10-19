@@ -1,5 +1,9 @@
 # Review artwork discovery and image sitemap (18 October 2026)
 
+## Batch 4 prepared — 19 October 2026
+
+Ten new distinct16:9conceptual covers for TikTok12/16/19/20/26/32/33/54/81 and YouTube89 use the existing guarded sidebar/social/WebPage/image-map associations. Four verified generic-SVG TikTok previews get separate digest/identity/storage-guarded artwork; existing source image routes and VideoObject evidence are untouched. All original30artworks and owner data are preserved.424Node/fourPython tests and Worker dry-run pass. New publication/live counts remain0 until exact-head CI/release/live verification. Evidence and pending release gate: `docs/review-images/batch4-report-20261019.md`; no new Google Inspection/submission or indexing claim.
+
 ## Scope and provenance
 Vid.Best has existing editorial/poster verification workflows and rights/source-media holds. This change **does not generate new image files**, fetch protected source frames, overwrite covers, update D1 rows, or claim Google index inclusion. It is an additive discovery/display layer for already-published images. Existing artwork and dates remain the source of truth.
 

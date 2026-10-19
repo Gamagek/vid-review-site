@@ -35,10 +35,10 @@ for(const a of art){
   assert.equal(page.primaryImageOfPage,ORIGIN+a.path);
   assert.ok(html.includes('<meta property="og:image" content="'+ORIGIN+a.path+'">'));
   assert.ok(html.includes('<meta name="twitter:image" content="'+ORIGIN+a.path+'">'));
-  if(a.previewFallbackFrom){const payload=await(await get('/api/videos/'+a.slug)).json();assert.equal(payload.video.review_preview_url,a.path);}
+  if(a.previewFallbackFrom||a.previewFallbackThumbnailSha256){const payload=await(await get('/api/videos/'+a.slug)).json();assert.equal(payload.video.review_preview_url,a.path);if(a.previewFallbackThumbnailSha256)assert.equal(payload.video.preview_poster_url,a.path);}
   const mapEntry=[...imageMap.matchAll(/<url>([\s\S]*?)<\/url>/g)].find(x=>x[1].includes('<loc>'+ORIGIN+'/watch/'+a.slug+'</loc>'))?.[1];
   assert.ok(mapEntry?.includes('<image:loc>'+ORIGIN+a.path+'</image:loc>'));assert.ok(videos.includes('<image:loc>'+ORIGIN+a.path+'</image:loc>'));
-  results.push({id:a.id,slug:a.slug,assetPath:a.path,status:r.status,mime:'image/webp',bytes:a.bytes,sha256:a.sha256,pageAssociation:true,socialMetadataAssociation:true,placeholderPreviewAssociation:!!a.previewFallbackFrom,imageSitemapAssociation:true,videoThumbnailUnchanged:true,datePublished:page.datePublished,dateModified:page.dateModified});
+  results.push({id:a.id,slug:a.slug,assetPath:a.path,status:r.status,mime:'image/webp',bytes:a.bytes,sha256:a.sha256,pageAssociation:true,socialMetadataAssociation:true,placeholderPreviewAssociation:!!(a.previewFallbackFrom||a.previewFallbackThumbnailSha256),imageSitemapAssociation:true,videoThumbnailUnchanged:true,datePublished:page.datePublished,dateModified:page.dateModified});
 }
 const result={checkedAt:new Date().toISOString(),rootChildren:children.length,imageMapPages:[...imageMap.matchAll(/<url>/g)].length,imageEntries:[...imageMap.matchAll(/<image:loc>/g)].length,results,inspectionCalls:0,sitemapSubmissions:0,videoProviderRequests:0,d1Writes:0,limit:'HTTP/hash/HTML associations only; not Google image indexing or source video playback.'};
 fs.writeFileSync('review-illustration-verification.json',JSON.stringify(result,null,2)+'\n');

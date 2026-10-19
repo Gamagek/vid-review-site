@@ -8,6 +8,7 @@ const origin = 'https://vid.best';
 const videoId = '7578945803910270230';
 const source = `https://www.tiktok.com/@toop5_/video/${videoId}`;
 const poster = `${origin}/media/uploads/tiktok-thumbnails/${videoId}.img`;
+const reviewArt = `${origin}/review-illustrations/top-5-most-viewed-tiktoks-ever-billions-of-views-explained-v1.webp`;
 const expired = 'https://p16-common-sign.tiktokcdn-eu.com/tos-no1a-p-0037-no/os6BEmTLgJ4RAIdwpxQsaZFYEAFtkdf0BKBWDe~tplv-tiktokx-origin.image';
 const migration = readFileSync(new URL('../migrations/0039_top5_existing_source_poster.sql', import.meta.url), 'utf8');
 const original = {
@@ -147,14 +148,14 @@ test('library, server-delivered review and sitemap share the existing source pos
   const response = await request(c, `/watch/${original.slug}`);
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.ok(html.includes(`<meta property="og:image" content="${poster}">`));
+  assert.ok(html.includes(`<meta property="og:image" content="${reviewArt}">`));
   assert.ok(html.includes(`<link rel="canonical" href="${origin}/watch/${original.slug}">`));
   assert.ok(html.match(/<img class="tiktok-preview-card-image"[^>]*>/)?.[0].includes(`src="${poster}"`));
   assert.ok(html.includes(original.review_text));
   assert.doesNotMatch(html, /Illustrated cover|Last updated|<iframe|<video/);
   const graph = JSON.parse(html.match(/<script\b[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/s)[1])['@graph'];
   const page = graph.find(item => item['@type'] === 'WebPage');
-  assert.equal(page.primaryImageOfPage, poster);
+  assert.equal(page.primaryImageOfPage, reviewArt);
   assert.equal(page.isBasedOn, source, 'public attribution omits only tracking, not the saved source identity');
   assert.equal(page.datePublished, original.created_at);
   assert.equal(page.dateModified, original.updated_at);
