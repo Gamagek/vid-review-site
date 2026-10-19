@@ -379,7 +379,7 @@ async function route(request, env, ctx) {
     return moderateComment(request, env, Number(match[1]));
   }
 
-  match = path.match(/^\\/api\\/admin\\/videos\\/(\\d+)\\/gemini-analysis$/);
+  match = path.match(/^\/api\/admin\/videos\/(\d+)\/gemini-analysis$/);
   if (match && request.method === "POST") {
     await requireAdmin(request, env);
     return analyzeYoutubeDraftWithGemini(request, env, Number(match[1]));
