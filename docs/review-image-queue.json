@@ -96,16 +96,18 @@
       "slug": "tiktok-discovery",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "2076fca17da22eb8ab99fa9806725060817413bb54e5479a299b90c0711ee950",
-      "status": "pending_theme_verification",
-      "provider": "tiktok"
+      "status": "prepared_batch4",
+      "provider": "tiktok",
+      "asset": "/review-illustrations/tiktok-discovery-v1.webp"
     },
     {
       "id": 16,
       "slug": "ranking-legendary-laughing-memes",
       "category": "Funny & Comedy",
       "sourceSha256": "99cbdfa037f123c8a235809ac247ab5bd4e300d4893f202bf028487d8c98d031",
-      "status": "pending_theme_verification",
-      "provider": "tiktok"
+      "status": "prepared_batch4",
+      "provider": "tiktok",
+      "asset": "/review-illustrations/ranking-legendary-laughing-memes-v1.webp"
     },
     {
       "id": 17,
@@ -128,16 +130,18 @@
       "slug": "the-funniest-memes-a-funny-proposal-friendly-pranks",
       "category": "Funny & Comedy",
       "sourceSha256": "825d6211d89daa96d68fd2e78fd5169e49a1f9af7c04343cc35fdd4348ca2ce5",
-      "status": "pending_theme_verification",
-      "provider": "tiktok"
+      "status": "prepared_batch4",
+      "provider": "tiktok",
+      "asset": "/review-illustrations/the-funniest-memes-a-funny-proposal-friendly-pranks-v1.webp"
     },
     {
       "id": 20,
       "slug": "the-ultimate-viral-laughs-compilation",
       "category": "Funny & Comedy",
       "sourceSha256": "ca00c1a3b43adb4498635b378d0d5cd7832d03c1170968cd2e43e2d982622273",
-      "status": "pending_theme_verification",
-      "provider": "tiktok"
+      "status": "prepared_batch4",
+      "provider": "tiktok",
+      "asset": "/review-illustrations/the-ultimate-viral-laughs-compilation-v1.webp"
     },
     {
       "id": 21,
@@ -184,8 +188,9 @@
       "slug": "the-funniest-animal-memes-the-boss-chicken-the-scared-dog",
       "category": "Funny & Comedy",
       "sourceSha256": "f7efb6a7bc939510320fc08ddb45cbe7c4981d3169daaab6825c9b83f988e541",
-      "status": "pending_theme_verification",
-      "provider": "tiktok"
+      "status": "prepared_batch4",
+      "provider": "tiktok",
+      "asset": "/review-illustrations/the-funniest-animal-memes-the-boss-chicken-the-scared-dog-v1.webp"
     },
     {
       "id": 27,
@@ -232,16 +237,18 @@
       "slug": "the-extreme-skateboarding-corgi-is-this-viral-stunt-real-or-fake",
       "category": "Social Media & Trending",
       "sourceSha256": "67a49224989281732d4621900f146d230280e7cacabfbbe9456bb7583167fe1a",
-      "status": "pending_theme_verification",
-      "provider": "tiktok"
+      "status": "prepared_batch4",
+      "provider": "tiktok",
+      "asset": "/review-illustrations/the-extreme-skateboarding-corgi-is-this-viral-stunt-real-or-fake-v1.webp"
     },
     {
       "id": 33,
       "slug": "try-not-to-laugh-hard-mode-the-funniest-dinosaur-dub-ever",
       "category": "Funny & Comedy",
       "sourceSha256": "bda7b2134d77402b0848e1a91f57c0a9a2a8ef3a82c0494b6138fcc4a2b8ec27",
-      "status": "pending_theme_verification",
-      "provider": "tiktok"
+      "status": "prepared_batch4",
+      "provider": "tiktok",
+      "asset": "/review-illustrations/try-not-to-laugh-hard-mode-the-funniest-dinosaur-dub-ever-v1.webp"
     },
     {
       "id": 34,
@@ -400,8 +407,9 @@
       "slug": "the-ultimate-medieval-promposal-monty-python-king-arthur-style",
       "category": "Funny & Comedy",
       "sourceSha256": "f84eb91477a464c0906a8d55e01fd8c4b9767f08abc448e9fd49775e5b3a3fbf",
-      "status": "pending_theme_verification",
-      "provider": "tiktok"
+      "status": "prepared_batch4",
+      "provider": "tiktok",
+      "asset": "/review-illustrations/the-ultimate-medieval-promposal-monty-python-king-arthur-style-v1.webp"
     },
     {
       "id": 55,
@@ -600,8 +608,9 @@
       "slug": "top-5-most-viewed-tiktoks-ever-billions-of-views-explained",
       "category": "Social Media & Trending",
       "sourceSha256": "c8f8b141ab690197f93fbb654fadf955b298d0687d2b9050f18150800d813e4e",
-      "status": "pending_theme_verification",
-      "provider": "tiktok"
+      "status": "prepared_batch4",
+      "provider": "tiktok",
+      "asset": "/review-illustrations/top-5-most-viewed-tiktoks-ever-billions-of-views-explained-v1.webp"
     },
     {
       "id": 82,
@@ -664,8 +673,9 @@
       "slug": "harry-potter-hip-hop-edit-the-ultimate-magic-rap-remix",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "fe67da49a0b38de93bfb9be6ec239af13b6ff026eae4025085d19987bfb3ee52",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared_batch4",
+      "provider": "youtube",
+      "asset": "/review-illustrations/harry-potter-hip-hop-edit-the-ultimate-magic-rap-remix-v1.webp"
     },
     {
       "id": 90,
@@ -1884,7 +1894,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Current identity-matched coverage30/234, Facebook20/20,197pending/sevenholds. Reconcile fresh main/open PRs/inventory first. Non-Saiyaara Tagembed→gateway→Iframely/raw phase needs verified per-video Tagembed/Iframely mappings, documented in docs/tiktok-smart-playback-plan-20261019.md; no guessed URLs or iframe-load-as-playback. Continue a distinct next source/theme-verified TikTok/other art batch independently when mappings are unavailable, preserving existing working posters and protected source30/Saiyaara/Summer/demo/removal/owner media. Use existing verification script; no repeated same-day full Google Inspection or empty sitemap submission.",
+  "nextTask": "Resume batch4 first: ten prepared assets for12/16/19/20/26/32/33/54/81/89, four guarded generic-SVG TikTok preview fallbacks. Complete exact-head CI/merge/deployment/live checks before counting new publication or choosing another batch. Existing30published; prepared40/234,187pending/sevenholds. Non-Saiyaara Tagembed/Iframely mappings remain unavailable; no guessed providers, unchanged protected source30/Saiyaara/Summer/demo/removal media/text/dates. No redundant full Google inspections or empty sitemap submissions.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -3406,5 +3416,134 @@
       "guardedPlaceholderPreviews": 8
     },
     "verificationFile": "docs/review-images/batch3-live-verification-20261019.json"
+  },
+  "batch4": {
+    "state": "prepared",
+    "recordIds": [
+      16,
+      19,
+      20,
+      26,
+      33,
+      54,
+      81,
+      12,
+      32,
+      89
+    ],
+    "baseline": {
+      "checkedAt": "2026-10-19T00:00:07.929Z",
+      "saved": 238,
+      "published": 234,
+      "sha256": "ffdf9acdf1a8b53191eafd22effcd2a624619005adbd2d4b076b3075b5e78017"
+    },
+    "targetRows": [
+      {
+        "id": 12,
+        "slug": "tiktok-discovery",
+        "title": "Meri Aashiqui Tum Se Hi: A story that tells the deepest beauty of love, The Ultimate Epic Romance & Dramatic Storytelling",
+        "sourceUrl": "https://www.tiktok.com/@rorozya/video/7622472784039415061",
+        "protectedRowSha256": "3b85a1a041b8a24fe65d46fefe841b2d7eeff69865ad060b7efe2365d0efa411",
+        "thumbnailSha256": "b11e1904b137bed7d35cc5433dfc9a78b683bcfef346b07f00aae4c96fb8e2fc",
+        "created_at": "2026-09-22T10:53:05.021Z",
+        "updated_at": "2026-09-22T20:10:20.017Z"
+      },
+      {
+        "id": 16,
+        "slug": "ranking-legendary-laughing-memes",
+        "title": "Ranking Legendary Laughing Memes",
+        "sourceUrl": "https://www.tiktok.com/@lolranking0/video/7654628449142770958",
+        "protectedRowSha256": "a6ae675be214976872aca45c59c4484affc4f6105d7695cd7fee00053b531337",
+        "thumbnailSha256": "0b242d28d6a4ee84daf2c0ebdc033a0d417ea385c1593510c5f96a63717237b7",
+        "created_at": "2026-09-22T14:59:14.216Z",
+        "updated_at": "2026-09-22T14:59:14.216Z"
+      },
+      {
+        "id": 19,
+        "slug": "the-funniest-memes-a-funny-proposal-friendly-pranks",
+        "title": "The Funniest Memes: A Funny Proposal, Friendly Pranks & Brutal Pranks",
+        "sourceUrl": "https://www.tiktok.com/@umbralarchive/video/7552567024304540959",
+        "protectedRowSha256": "d07c742932dd6f429ae81453c9d34a61cd481832bdb175cd87fca847eebf327f",
+        "thumbnailSha256": "ca83f34d64731c5242f9ef815b0453d6fadfc9d4ff591a65ca44e1f8f4c0734c",
+        "created_at": "2026-09-23T17:29:35.931Z",
+        "updated_at": "2026-09-23T17:38:16.272Z"
+      },
+      {
+        "id": 20,
+        "slug": "the-ultimate-viral-laughs-compilation",
+        "title": "The Ultimate Viral Laughs Compilation",
+        "sourceUrl": "https://www.tiktok.com/@umbralarchive/video/7549147725426593054",
+        "protectedRowSha256": "cb79598922d0e24ce1971b38c86519bdf19977145527a2cc68e34cc829d43578",
+        "thumbnailSha256": "500f92274bc5ffb49b6b11dd94b0918c39728e5b6060a15f0c4748123ade67b5",
+        "created_at": "2026-09-23T18:00:25.638Z",
+        "updated_at": "2026-09-23T18:00:25.638Z"
+      },
+      {
+        "id": 26,
+        "slug": "the-funniest-animal-memes-the-boss-chicken-the-scared-dog",
+        "title": "The Funniest Animal Memes: The Boss Chicken & The Scared Dog!",
+        "sourceUrl": "https://www.tiktok.com/@binjoy24/video/7112820250193792258",
+        "protectedRowSha256": "a2f4f1e24adc1a4294c35433ac9c2ba9273f9d94988c1ac5d5e770f0782ce74b",
+        "thumbnailSha256": "75b637d3f4f60425594f055c53aa07de2b3ac0a75763c20f814d3292e8b96d93",
+        "created_at": "2026-09-24T17:28:52.188Z",
+        "updated_at": "2026-09-24T17:28:52.188Z"
+      },
+      {
+        "id": 32,
+        "slug": "the-extreme-skateboarding-corgi-is-this-viral-stunt-real-or-fake",
+        "title": "The Extreme Skateboarding Corgi: Is This Viral Stunt Real or Fake",
+        "sourceUrl": "https://www.tiktok.com/@phpetstars/video/7376458900440190214",
+        "protectedRowSha256": "46eea6ba99452348b93615409b2379fe4491c6eff584fa2111887b8ba068ee39",
+        "thumbnailSha256": "10a9435bb7ea459c5c4b3a82c07a135d7d2553cbdd522fe57d32419be15ebc86",
+        "created_at": "2026-09-25T18:55:37.183Z",
+        "updated_at": "2026-09-25T18:55:37.183Z"
+      },
+      {
+        "id": 33,
+        "slug": "try-not-to-laugh-hard-mode-the-funniest-dinosaur-dub-ever",
+        "title": "Try Not To Laugh (Hard Mode): The Funniest Dinosaur Dub Ever!",
+        "sourceUrl": "https://www.tiktok.com/@trynotlaughq/video/7051469506358676738",
+        "protectedRowSha256": "569b8e6707fec686327838641043433952a4c2ea98bb62a9d4a08492bdef4d16",
+        "thumbnailSha256": "070554e9a0b98fd49428f1fb8b1d76c363ba4c6657e5bcc27d1217e3fa306bac",
+        "created_at": "2026-09-25T19:13:16.338Z",
+        "updated_at": "2026-09-25T19:13:16.338Z"
+      },
+      {
+        "id": 54,
+        "slug": "the-ultimate-medieval-promposal-monty-python-king-arthur-style",
+        "title": "The Ultimate Medieval Promposal: Monty Python King Arthur Style! 👑⚔️",
+        "sourceUrl": "https://www.tiktok.com/@madison_viola/video/7357359011634662698",
+        "protectedRowSha256": "105a561aaa36fb3dfe6352a40a6aa174dd9a2e40c2120c1767aed02d66a80035",
+        "thumbnailSha256": "c4e078503605eaa35cb253ce7458eb0acf6f61ad845e4b3b82fee25f49d51d02",
+        "created_at": "2026-09-28T18:22:09.312Z",
+        "updated_at": "2026-09-28T18:22:09.312Z"
+      },
+      {
+        "id": 81,
+        "slug": "top-5-most-viewed-tiktoks-ever-billions-of-views-explained",
+        "title": "Top 5 Most Viewed TikToks Ever! 🌟🤯 Billions of Views Explained",
+        "sourceUrl": "https://www.tiktok.com/@toop5_/video/7578945803910270230",
+        "protectedRowSha256": "ccb3f51cbb0200db83f42ee9843d2ae7dc2d0029ea3719045f9c051b55ce9c8e",
+        "thumbnailSha256": "9289dbd01eccd7fcce96b854c39ea2f82f2a56e5e74a1f44a155f4712444e34d",
+        "created_at": "2026-10-03T15:34:17.920Z",
+        "updated_at": "2026-10-09T21:10:52.165Z"
+      },
+      {
+        "id": 89,
+        "slug": "harry-potter-hip-hop-edit-the-ultimate-magic-rap-remix",
+        "title": "🧙✨ Harry Potter Hip-Hop Edit! ⚡ The Ultimate Magic Rap Remix",
+        "sourceUrl": "https://youtu.be/Yn_uHvb5vPQ",
+        "protectedRowSha256": "d87e780866ffe0be79cf58f4c5a504f6d9e338f7a8d1382b7067937caf4051a3",
+        "thumbnailSha256": "46ce268a1329fd19888c5600a507a6673b2f918974bd0fbb86427dc46dbcb1ac",
+        "created_at": "2026-10-04T17:38:00.472Z",
+        "updated_at": "2026-10-04T17:38:00.472Z"
+      }
+    ],
+    "newGenerated": 10,
+    "newPublished": 0,
+    "newLiveVerified": 0,
+    "preservation": "Additive artwork and manifest/provenance/queue only. No original thumbnail, review, title, date, player or D1/R2 changes. Seven holds preserved.",
+    "playbackLimit": "No new verified non-Saiyaara Tagembed/Iframely mappings. Existing players unchanged; no guessed mapping or six-second playback-failure inference.",
+    "nextTask": "Complete tests/exact-head CI/PR/deployment and ten live hash/page/social/sitemap associations before counting as published."
   }
 }

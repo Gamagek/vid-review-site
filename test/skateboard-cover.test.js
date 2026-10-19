@@ -8,6 +8,7 @@ import worker from '../src/seo-edge.js';
 const origin = 'https://vid.best';
 const source = 'https://www.tiktok.com/@phpetstars/video/7376458900440190214';
 const cover = `${origin}/review-covers/dog-skateboard-illustrated-v1.webp`;
+const reviewArt = `${origin}/review-illustrations/the-extreme-skateboarding-corgi-is-this-viral-stunt-real-or-fake-v1.webp`;
 const oldPoster = 'https://p16-common-sign.tiktokcdn-eu.com/tos-maliva-p-0068/oMnBJGAfie0mFBA3IIk6RcmDQEaEJ6Gw1UXlQ6~tplv-tiktokx-origin.image';
 const migration = readFileSync(new URL('../migrations/0040_skateboard_symbolic_cover.sql', import.meta.url), 'utf8');
 const original = {
@@ -132,7 +133,7 @@ test('server first paint and API select the labelled illustration without invent
   const response = await request(c, '/watch/' + original.slug);
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.ok(html.includes(`<meta property="og:image" content="${cover}">`));
+  assert.ok(html.includes(`<meta property="og:image" content="${reviewArt}">`));
   const image = html.match(/<img class="tiktok-preview-card-image"[^>]*>/)?.[0];
   assert.ok(image.includes(`src="${cover}"`));
   assert.ok(image.includes('object-fit:contain'));
@@ -142,7 +143,7 @@ test('server first paint and API select the labelled illustration without invent
   assert.doesNotMatch(html, /Last updated|<iframe|<video/);
   const graph = JSON.parse(html.match(/<script\b[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/s)[1])['@graph'];
   const page = graph.find(x => x['@type'] === 'WebPage');
-  assert.equal(page.primaryImageOfPage, cover);
+  assert.equal(page.primaryImageOfPage, reviewArt);
   assert.equal(page.datePublished, original.created_at);
   assert.equal(page.dateModified, original.updated_at);
   assert.equal(graph.find(x => x['@type'] === 'VideoObject'), undefined);

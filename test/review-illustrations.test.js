@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import test from 'node:test';
 import illustrations from '../src/review-illustrations.json' with { type: 'json' };
-import { reviewIllustration, reviewPreviewIllustration } from '../src/review-illustrations.js';
+import { reviewIllustration, reviewPreviewIllustration, tikTokReviewPreviewIllustration } from '../src/review-illustrations.js';
 
 test('sidebar artwork assets have unique verified WebP bytes and complete bounded provenance', () => {
   const prompts = JSON.parse(readFileSync(new URL('../docs/review-illustration-prompts.json', import.meta.url)));
@@ -58,4 +58,31 @@ test('only audited placeholder identities get a review-art preview; owner poster
   const working = illustrations.find(item => item.id === 162);
   assert.equal(reviewPreviewIllustration({id:working.id,slug:working.slug,title:working.expectedTitle,
     source_url:working.sourceUrl,published:1,thumbnail_url:'/facebook-previews/outdoor-challenge-comedy-v1.jpg'}),null);
+});
+
+test('audited TikTok placeholders use separate artwork only with matching owner-image digest and no saved source poster', async (t) => {
+  const eligible = illustrations.filter(item => item.previewFallbackThumbnailSha256);
+  assert.deepEqual(eligible.map(item => item.id), [16,19,20,26]);
+  let expected;
+  const fixture = 'https://images.example.org/expired-poster-fixture';
+  t.mock.method(crypto.subtle, 'digest', async (algorithm, bytes) => {
+    assert.equal(algorithm, 'SHA-256');
+    assert.equal(new TextDecoder().decode(bytes), fixture);
+    return Buffer.from(expected, 'hex');
+  });
+  for (const art of eligible) {
+    expected = art.previewFallbackThumbnailSha256;
+    const row = {id:art.id,slug:art.slug,title:art.expectedTitle,source_url:art.sourceUrl,published:1,thumbnail_url:fixture};
+    const before = structuredClone(row);
+    const bucket = {async head(key) { assert.equal(key, 'uploads/tiktok-thumbnails/'+art.sourceUrl.split('/').pop()+'.img'); return null; }};
+    assert.equal((await tikTokReviewPreviewIllustration(row,bucket))?.path,art.path);
+    assert.equal(await tikTokReviewPreviewIllustration(row,{async head(){return {size:123};}}),null,'existing source bytes win');
+    assert.equal(await tikTokReviewPreviewIllustration(row,{async head(){throw Error('unavailable');}}),null,'unknown storage state retains source path');
+    assert.equal(await tikTokReviewPreviewIllustration(row),null);
+    assert.equal(await tikTokReviewPreviewIllustration({...row,title:'Owner changed title'},bucket),null);
+    assert.equal(await tikTokReviewPreviewIllustration({...row,published:0},bucket),null);
+    expected = '00'.repeat(32);
+    assert.equal(await tikTokReviewPreviewIllustration(row,{async head(){throw Error('must not read storage after image changed');}}),null);
+    assert.deepEqual(row,before);
+  }
 });

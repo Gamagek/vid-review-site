@@ -1,5 +1,9 @@
 # Editorial cover provenance
 
+## 19 October 2026: fourth review-art batch prepared
+
+Ten distinct labelled1672×941WebP illustrations are prepared for TikTok12/16/19/20/26/32/33/54/81 and YouTube89. Four audited TikTok generic-SVG previews (16/19/20/26) receive separate artwork only while exact owner-thumbnail digests and source/title/slug/published guards match and no R2 source poster exists. Owner image changes, unknown storage state and saved source bytes win; source thumbnail routes and VideoObject evidence remain unchanged. No protected text/date/player/D1/R2 changes. Current prepared coverage40/234; new publication/live count remains0 until release verification. Full evidence, reused audit/Google limits and release gate: `docs/review-images/batch4-report-20261019.md`. Exact prompts/hash/size entries and queue persist all ten assets. Non-Saiyaara Tagembed/Iframely mappings remain unavailable; continue safe artwork without guessing providers.
+
 ## 19 October 2026: original social covers and eight preview fallbacks released
 
 PR [212](https://github.com/Gamagek/vid-review-site/pull/212), reviewed head `e7642246a4a9837fc3d7ed6b4661916a340e5839`, merged as `cbe8c0df99d77a99bde52ac0c8255beb39414f0d`. Exact-headCI39173956827,mainCI39174039649 and deploy39174039438 succeeded after422Node/fourPython regressions and Worker dry-run. Worker `ab95ad64-197c-411d-8d5e-b012e6d32423` is100%, deployment `067f6b7b-5c2a-4a15-b738-54e83d0c91a4` at18October22:51:50.937645UTC. Deployment log confirms no migrations to apply. Portainer validation succeeds; all four privileged jobs skip. No D1/R2/review/SEO-text/date/player/security changes.

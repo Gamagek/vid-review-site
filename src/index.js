@@ -1,5 +1,5 @@
 import { parseInstagramUrl } from "../public/instagram-utils.js";
-import { reviewIllustration, reviewPreviewIllustration } from "./review-illustrations.js";
+import { reviewIllustration, reviewPreviewIllustration, tikTokReviewPreviewIllustration } from "./review-illustrations.js";
 import { isLikelyCrawler } from "./crawlers.js";
 import { tikTokZeroRequestPlayer } from "./tiktok-zero-request-cache.js";
 import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStatus } from "./tiktok-cache-jobs.js";
@@ -1281,11 +1281,12 @@ function parseTags(value, fallback = []) {
   return [...new Set(tags.map((tag) => cleanText(tag, 40)).filter(Boolean))].slice(0, 20);
 }
 
-function serializeVideo(row) {
+async function serializeVideo(row, env) {
   if (!row) return null;
   const provider = detectMediaProvider(row);
   const artwork = reviewIllustration(row);
-  const previewArtwork = reviewPreviewIllustration(row);
+  const previewArtwork = reviewPreviewIllustration(row) ||
+    await tikTokReviewPreviewIllustration(row, env?.BUCKET);
   const instagramThumbnail = provider === "instagram" && row.source_url
     ? `/api/instagram/thumbnail?url=${encodeURIComponent(row.source_url)}`
     : null;
@@ -1295,7 +1296,7 @@ function serializeVideo(row) {
     embed_url: provider === "facebook" ? getSafeFacebookEmbedUrl(row) : row.embed_url,
     thumbnail_url: provider === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url || instagramThumbnail || null,
     // Public cards get a stable preview hint, without rewriting editor data.
-    preview_poster_url: provider === "tiktok" ? stableTikTokImage(row) : null,
+    preview_poster_url: provider === "tiktok" ? previewArtwork?.path || stableTikTokImage(row) : null,
     review_artwork_url: artwork?.path || null,
     review_artwork_alt: artwork?.alt || null,
     review_preview_url: previewArtwork?.path || null,
@@ -1779,7 +1780,7 @@ async function hydrateVideos(env, rows) {
     if (!reactionsByVideo.has(item.video_id)) reactionsByVideo.set(item.video_id, { like: 0, love: 0, useful: 0 });
     reactionsByVideo.get(item.video_id)[item.reaction] = Number(item.count);
   }
-  return rows.map((row) => serializeVideo({ ...row, reactions: reactionsByVideo.get(row.id) }));
+  return Promise.all(rows.map((row) => serializeVideo({ ...row, reactions: reactionsByVideo.get(row.id) }, env)));
 }
 
 async function getPublicVideo(env, slug) {
@@ -1931,7 +1932,7 @@ async function createVideo(request, env, ctx) {
     ctx?.waitUntil?.(processAuthorizedCacheJobs(env, { videoId: Number(row.id), limit: 1 }));
   }
   maybeQueueAdminTikTokCache(env, ctx, row);
-  return json({ success: true, video: serializeVideo(row) }, 201);
+  return json({ success: true, video: await serializeVideo(row, env) }, 201);
 }
 
 async function updateVideo(request, env, id, ctx) {
@@ -2018,7 +2019,7 @@ async function updateVideo(request, env, id, ctx) {
   if (!Number(existing.redistribution_certified) || existing.source_url !== row.source_url) {
     maybeQueueAdminTikTokCache(env, ctx, row);
   }
-  return json({ success: true, video: serializeVideo(row) });
+  return json({ success: true, video: await serializeVideo(row, env) });
 }
 
 async function deleteVideo(request, env, id) {
@@ -3125,7 +3126,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   ${video.provider === "tiktok" ? '<script src="/tiktok-oembed-cache.js?v=20261018-replay" defer></script><script src="/tiktok-preview-service.js?v=20261018-replay" defer></script>' : ""}
   ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>' : ""}
-  <script src="/watch.js?v=20261018-oembed-cache" defer></script>
+  <script src="/watch.js?v=20261019-art-preview" defer></script>
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261008-gateway1">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-cache2" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
@@ -3312,11 +3313,12 @@ function renderMedia(video, playbackOrigin, viewer = false) {
     // Keep the selected, reviewed cover separate from provider-cached metadata.
     const ownedCover = ownedTikTokWatchCover(video, playbackOrigin);
     const imageUrl = ownedCover || video.preview_poster_url || `/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`;
-    const illustratedCover = /-illustrated-v\d+\.(?:jpe?g|png|webp|avif)$/i.test(ownedCover);
+    const selectedCover = ownedCover || video.review_preview_url || "";
+    const illustratedCover = Boolean(video.review_preview_url) || /-illustrated-v\d+\.(?:jpe?g|png|webp|avif)$/i.test(ownedCover);
     const zeroRequestPlayer = tiktokId === "7603012203595320584" && extractTikTokUsername(video.source_url) === "sujicomedyedit_007";
     return `<article class="tiktok-preview-card" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-source="${escapeHtml(video.source_url)}" data-tiktok-player-mode="metadata-card"${zeroRequestPlayer ? ' data-tiktok-zero-request="1"' : ""}>
       <button type="button" class="tiktok-preview-card-media" data-tiktok-show-preview aria-label="Play TikTok video in popup">
-        <img class="tiktok-preview-card-image" src="${escapeHtml(imageUrl)}"${ownedCover ? ` data-tiktok-owned-cover="${escapeHtml(ownedCover)}" style="object-fit:contain"` : ""} data-tiktok-fallback="/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}" alt="" loading="eager" decoding="async">
+        <img class="tiktok-preview-card-image" src="${escapeHtml(imageUrl)}"${selectedCover ? ` data-tiktok-owned-cover="${escapeHtml(selectedCover)}" style="object-fit:contain"` : ""} data-tiktok-fallback="/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}" alt="" loading="eager" decoding="async">
         <span class="tiktok-preview-card-play" aria-hidden="true">▶</span>
       </button>
       <div class="tiktok-preview-card-body">
