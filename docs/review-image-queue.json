@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "inventoryAt": "2026-10-18T17:19:45.523Z",
-  "publishedLibraryCount": 236,
+  "publishedLibraryCount": 237,
   "batchLimit": 10,
   "phase": "additive_sidebar_illustrations",
   "policy": "Preserve all source/owner posters and all D1 fields. Match current published ID, slug, source and title before enabling art. Do not edit protected review topics/media or drafts. Reconcile newly published records on each run; no regeneration merely for freshness. The owner’s 18 October request authorizes separate, clearly labelled sidebar art for all published platforms/topics, including comedy, but never edits existing protected review text, SEO titles, source posters or players. Source-removal/demo/Saiyaara/Summer holds remain. The19October owner steering additionally authorizes identity-matched generated art in OpenGraph/Twitter/WebPage metadata and guarded fallback for genuinely broken listing previews; preserve working source posters/VideoObject evidence and all D1/R2 media fields.",
@@ -393,7 +393,7 @@
       "slug": "apple-duo-mystery-appleduo-viral-trending-shortsfeed-mustwatch-fyp-youtubeshorts-techtrend",
       "category": "Technology",
       "sourceSha256": "83c0163cd28d91f4f8e5b6a4377e325321b78a0cc1e0561265a779884574cc12",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 6
     },
@@ -402,7 +402,7 @@
       "slug": "china-s-street-tech-looks-like-2050",
       "category": "Technology",
       "sourceSha256": "04f8735758739977e905ddffef064ba1fa87f7ccb8be9f0310d1f5638afeb0d9",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 6
     },
@@ -411,7 +411,7 @@
       "slug": "1-vs-1-000-000-000-futuristic-tech",
       "category": "Technology",
       "sourceSha256": "635a7ee1f90f3e4294b81de42badd233e7ff9d7074dfef0cbf962e3503c3cac5",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 6
     },
@@ -517,7 +517,7 @@
       "slug": "hidden-tree-stump-shelter-6-minute-build-fast-version",
       "category": "Adventure & Travel",
       "sourceSha256": "ea1f52e0b871c1f027171b4976079de2f58aa441ff05b8017e07cc410599d3c5",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 6
     },
@@ -534,7 +534,7 @@
       "slug": "those-one-places-on-earth-that-don-t-feel-real-surreal-travel-destinations",
       "category": "Adventure & Travel",
       "sourceSha256": "8beda32e4ecb39c4a6958a8ba04185549fd4325e8e4f9f5fe182dcba97601015",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 6
     },
@@ -825,7 +825,7 @@
       "slug": "4-delicious-breakfast-recipes-gordon-ramsay",
       "category": "Lifestyle, Health & Fitness",
       "sourceSha256": "7f08a8ca7772341677e73afcb35f8dfae91fb56da3d6e4bf50d602a3f4e072a2",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 6
     },
@@ -986,7 +986,7 @@
       "slug": "this-man-has-world-s-most-stunning-peacocks",
       "category": "Environment & Sustainability",
       "sourceSha256": "6ccc4b32e782c1fd7439cb93578189434784af530a08a7c30f54eb7806e649b1",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 6
     },
@@ -995,7 +995,7 @@
       "slug": "top-10-stunning-red-animals-wildlife-shorts-breakdown-the-visual-power-of-top-10-red-animals",
       "category": "Environment & Sustainability",
       "sourceSha256": "082e51ca65687a738371ed7a84bdbc4dfa87101ffaa5302a9dffa4c0eb905079",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
       "batch": 6
     },
@@ -1765,7 +1765,7 @@
       "category": "Education",
       "provider": "youtube",
       "sourceSha256": "f6bd5d4da23febc75d90c6e55400db835c17df8d041a1b9888eb0e34c4ae51f8",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 6
     },
     {
@@ -1838,7 +1838,7 @@
       "category": "Education",
       "provider": "youtube",
       "sourceSha256": "a81eba6ef5df3e6680ceb9ba7bbf3bfa26fd0b5e97ddf3fb022e8fbd7adc9521",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 6
     },
     {
@@ -1928,9 +1928,17 @@
       "provider": "youtube",
       "sourceSha256": "11b8b4b8702c13b9dd091b8608d980263aa0ef515b8ecd005791a1486a02224c",
       "status": "pending_theme_verification"
+    },
+    {
+      "id": 254,
+      "slug": "try-not-to-laugh-500-rupee-bathroom-room-cucumber-cut-papaya-tree-fall",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "87522c4269658d7c00d74bcfefcf769edbbdeefc004ca67baafc17fb41fcac69",
+      "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Resume prepared batch6 IDs51/52/53/66/68/106/126/127/233/242 through exact-head CI, PR merge, Worker deployment and per-image live verification before selecting another batch. Preserve50 previous assets, all owner/source posters and all held records. Playback chain needs verified per-video Tagembed/Iframely mappings.",
+  "nextTask": "Reconcile fresh main/open PRs/D1 before the next distinct safe remaining-artwork batch. Current60/237verified,170pending/sevenheld, including newly reconciled owner publications252/253 and late publication254. Facebook20/20 and ten non-held TikTok reviews have art. Preserve all originals, holds and protected text; never regenerate completed batch6. Other-TikTok smart playback awaits verified per-video Tagembed/Iframely mappings; do not reuse Saiyaara or invent provider signals/URLs.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -2081,10 +2089,10 @@
     },
     "limits": "Ten separate illustrations; no source poster repaired/replaced, no new viewing/audio claims. 11 original provider HTTP errors and8 protected placeholders remain. Original214rows match baseline; five independent owner publications were added during this work."
   },
-  "reconciledAt": "2026-10-19T04:58:09.109Z",
+  "reconciledAt": "2026-10-19T05:15:57.391Z",
   "providerCounts": {
     "raw": 1,
-    "youtube": 201,
+    "youtube": 202,
     "tiktok": 13,
     "facebook": 20,
     "instagram": 1
@@ -3966,7 +3974,7 @@
     "verifiedAt": "2026-10-19T04:07:21.670Z"
   },
   "batch6": {
-    "state": "prepared",
+    "state": "published_verified",
     "recordIds": [
       51,
       52,
@@ -4093,8 +4101,127 @@
     ],
     "sourceVerification": "docs/review-images/batch6-source-verification-20261019.json",
     "newGenerated": 10,
-    "newPublished": 0,
-    "liveVerified": 0,
-    "limits": "Conceptual artwork only; no footage/audio, Google indexing or provider playback verification. Other TikTok Tagembed/Iframely mappings remain unavailable."
+    "newPublished": 10,
+    "liveVerified": 10,
+    "limits": "Conceptual artwork only; no footage/audio, Google indexing or provider playback verification. Other TikTok Tagembed/Iframely mappings remain unavailable.",
+    "release": {
+      "pr": 218,
+      "head": "e100bc22fdfee8ee2bd8f80ccc7c3b719dd11191",
+      "merge": "c977d4cc9ece45e2728e6f3184214dd55bb24c0f",
+      "ciRun": 39202983364,
+      "mainCiRun": 39203090559,
+      "deployRun": 39203090720,
+      "portainerRun": 39203090760,
+      "worker": {
+        "id": "cb23a7c8-737b-4b0e-94df-d12ee6420789",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "annotations": {
+          "workers/triggered_by": "deployment"
+        },
+        "versions": [
+          {
+            "version_id": "23602668-5f12-4450-8286-47e683b977c7",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-19T05:10:12.430353Z"
+      }
+    },
+    "verificationFile": "docs/review-images/batch6-live-verification-20261019.json",
+    "audit": {
+      "run": 39203148714,
+      "artifact": 12164797006,
+      "zipSha256": "be40ea1b3ce3a5d8aec17a5445ee62ded6584d106150434f3462fc532e92dbfd",
+      "generatedAt": "2026-10-19T05:10:40.604Z",
+      "pages": 269,
+      "technicalFailures": 0,
+      "searchConsole": {
+        "status": "success",
+        "authenticated": true,
+        "propertyVerified": true,
+        "sitemapSubmitted": false,
+        "inspections": [],
+        "sitemapMode": "read_only",
+        "sitemapProcessing": {
+          "status": "verified",
+          "isPending": false,
+          "lastDownloaded": "2026-10-18T09:11:12.537Z",
+          "lastSubmitted": "2026-10-18T09:11:10.095Z",
+          "errors": 0,
+          "warnings": 0
+        },
+        "reviewSitemaps": [
+          {
+            "url": "https://vid.best/sitemaps/videos-1.xml",
+            "submitted": false,
+            "processing": {
+              "status": "verified",
+              "isPending": false,
+              "lastDownloaded": "2026-10-18T09:11:14.226Z",
+              "lastSubmitted": "2026-10-18T09:11:10.285Z",
+              "errors": 0,
+              "warnings": 20
+            }
+          },
+          {
+            "url": "https://vid.best/sitemaps/daily-weekly-best.xml",
+            "submitted": false,
+            "processing": {
+              "status": "verified",
+              "isPending": false,
+              "lastDownloaded": "2026-10-18T09:11:13.890Z",
+              "lastSubmitted": "2026-10-18T09:11:10.448Z",
+              "errors": 0,
+              "warnings": 0
+            }
+          }
+        ],
+        "totalReviews": 246,
+        "inspectionBudget": 0
+      },
+      "sourcePosterCounts": {
+        "ok": 227,
+        "http_error": 1,
+        "placeholder": 8
+      },
+      "limit": "Read-only zero-Inspection audit; no new indexed-count or indexing/AdSense promise. Separate conceptual art does not replace or repair source VideoObject posters.",
+      "editorialWarningPages": 2,
+      "editorialWarningMessages": 3
+    },
+    "browser": {
+      "checkedAt": "2026-10-19T05:11:58.384Z",
+      "url": "https://vid.best/watch/ted-ed-why-do-cats-act-so-weird-science-lesson-review",
+      "viewport": {
+        "width": 1363,
+        "height": 936
+      },
+      "image": {
+        "width": 1672,
+        "height": 941,
+        "renderedWidth": 375.40625
+      },
+      "caption": "AI-generated review illustration inspired by this review’s theme. This is not a frame from the source video.",
+      "screenshot": "docs/review-images/batch6-live-desktop-20261019.jpg",
+      "responsiveLimit": "Existing900px stacking CSS unchanged and inspected; no independent narrow-device visual test is claimed."
+    },
+    "verifiedAt": "2026-10-19T05:11:35.804Z",
+    "lateOwnerPublication": {
+      "checkedAt": "2026-10-19T05:15:57.391Z",
+      "saved": 241,
+      "published": 237,
+      "previous240RowsSha256": "807c938d9349fe97670ae2c13c1705a37177a49286549b1a92778ce8fa4ae434",
+      "newRows": [
+        {
+          "id": 254,
+          "title": "Try Not To Laugh! 😂🥒🚽 500-Rupee Bathroom Room, Cucumber Cut & Papaya Tree Fall",
+          "slug": "try-not-to-laugh-500-rupee-bathroom-room-cucumber-cut-papaya-tree-fall",
+          "published": 1,
+          "category": "Funny & Comedy",
+          "sourceSha256": "87522c4269658d7c00d74bcfefcf769edbbdeefc004ca67baafc17fb41fcac69",
+          "provider": "youtube"
+        }
+      ]
+    }
   }
 }
