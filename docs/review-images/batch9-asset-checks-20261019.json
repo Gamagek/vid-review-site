@@ -1,0 +1,116 @@
+{
+  "checkedAt": "2026-10-19T12:12:51.125Z",
+  "method": "Individual visual inspection of all ten generated outputs plus OCR and decoded dimensions; lossless layout not inferred from OCR alone.",
+  "checks": [
+    {
+      "id": 289,
+      "width": 1672,
+      "height": 941,
+      "bytes": 108624,
+      "sha256": "d62044285c7eab34768e6fee27f2d5850869ec098af8f2c3ca3ecf7a690ca6d6",
+      "ocrText": "",
+      "visualThemeChecked": true,
+      "noProductionLettering": true,
+      "noPlayBadge": true
+    },
+    {
+      "id": 300,
+      "width": 1672,
+      "height": 941,
+      "bytes": 179428,
+      "sha256": "03a0402abaf63e409d308835d0a4a962bfcb1d5b69f760d8c5de3c006b7b327f",
+      "ocrText": "ve\nVID T\n=\n\nY,*",
+      "visualThemeChecked": true,
+      "noProductionLettering": true,
+      "noPlayBadge": true
+    },
+    {
+      "id": 302,
+      "width": 1672,
+      "height": 941,
+      "bytes": 242012,
+      "sha256": "dfbd57c3b0e45d7774c167d006c8b5fd0ceaa8ff3df77bb2838fdb48ba40e08b",
+      "ocrText": "",
+      "visualThemeChecked": true,
+      "noProductionLettering": true,
+      "noPlayBadge": true
+    },
+    {
+      "id": 308,
+      "width": 1672,
+      "height": 941,
+      "bytes": 211880,
+      "sha256": "6bbebd3693bc9836f04c08b82053ba420a3af6e49f73369a65cbbf293dba8ea2",
+      "ocrText": "",
+      "visualThemeChecked": true,
+      "noProductionLettering": true,
+      "noPlayBadge": true
+    },
+    {
+      "id": 309,
+      "width": 1672,
+      "height": 941,
+      "bytes": 206460,
+      "sha256": "26e953c795af5722feb445d424b125fd78d115cf389237159e9f92bfa95a9a7e",
+      "ocrText": "‘sn UNEXPECTED\n\nDUET?\n\nVIDSB EST\n\n—___——+-—___",
+      "visualThemeChecked": true,
+      "noProductionLettering": true,
+      "noPlayBadge": true
+    },
+    {
+      "id": 314,
+      "width": 1672,
+      "height": 940,
+      "bytes": 208038,
+      "sha256": "4c93064427540b160eda5eefd8bc7c456db4d535be3b4649a53c34f33dd1e17e",
+      "ocrText": "HERS\n\nAF sar\n\nEAT\n\nALL\n\n<x\n=\n3\n\nrar\naA..\nJ\n\nM\n\nS\nB",
+      "visualThemeChecked": true,
+      "noProductionLettering": true,
+      "noPlayBadge": true
+    },
+    {
+      "id": 315,
+      "width": 1672,
+      "height": 940,
+      "bytes": 169968,
+      "sha256": "2afaff3111a5ec3206012b64a31b80ebdce61101939aaaeab37bb54d143d056e",
+      "ocrText": "i=\n2)\nWw\n(oa)\na\nee",
+      "visualThemeChecked": true,
+      "noProductionLettering": true,
+      "noPlayBadge": true
+    },
+    {
+      "id": 320,
+      "width": 1672,
+      "height": 941,
+      "bytes": 175488,
+      "sha256": "d8d1c0710c3a15ac059dc46fb57b6e87beede749560553d778d218544a628d22",
+      "ocrText": "VID.BEST",
+      "visualThemeChecked": true,
+      "noProductionLettering": true,
+      "noPlayBadge": true
+    },
+    {
+      "id": 321,
+      "width": 1672,
+      "height": 941,
+      "bytes": 191438,
+      "sha256": "10064575129859335ddd9ccbc80cbd014d22023689f5834853569fdf92aa8cc1",
+      "ocrText": "",
+      "visualThemeChecked": true,
+      "noProductionLettering": true,
+      "noPlayBadge": true
+    },
+    {
+      "id": 324,
+      "width": 1672,
+      "height": 941,
+      "bytes": 243424,
+      "sha256": "cce36c800f2165f22d7edeb6341c7bd8cc14c0a86c8f9938620f62769b4a4d11",
+      "ocrText": "VID BEST\n\n———+---—$",
+      "visualThemeChecked": true,
+      "noProductionLettering": true,
+      "noPlayBadge": true
+    }
+  ]
+}

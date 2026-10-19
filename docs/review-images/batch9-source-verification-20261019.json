@@ -132,5 +132,17 @@
       "verified": true,
       "limit": "Ordinary public source-page metadata only: canonical video ID, handle and caption. No source footage/audio/frame, original authorship, live playback, poster availability or rights claim. No media URLs retained, no source downloads or access workaround."
     }
-  ]
+  ],
+  "publicPageGetCount": 11,
+  "preliminaryProbe": {
+    "id": 289,
+    "httpStatus": 200,
+    "sourceBytes": 425133,
+    "verifiedSourceId": "7655759307648126241",
+    "verifiedAuthorHandle": "gtb13",
+    "limit": "One initial ordinary metadata probe before the ten-item verification; no media/frame URLs saved. Exact probe timestamp was not recorded."
+  },
+  "gatewayWatchRequests": 0,
+  "sourcePlayerRequests": 0,
+  "sourceMediaDownloads": 0
 }
