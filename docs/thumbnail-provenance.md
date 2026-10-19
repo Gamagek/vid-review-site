@@ -1,5 +1,15 @@
 # Editorial cover provenance
 
+## 19 October 2026: batch9 prepared for ten new missing TikTok previews
+
+PR225 reserves289/300/302/308/309/314/315/320/321/324. Ten distinct built-in-imagegen16:9 conceptual covers interpret verified cat/animal humour, laugh-challenge, winter, musical-dog caption, farm-chicken, language-joke, drawing/mini-sketch and bread-launch topics. Ordinary public page GETs returned200 with exact video IDs, handles and captions matched at2026-10-19T12:03:02.390Z; no footage/audio inspected, source media downloaded, original authorship inferred or real event/likeness recreated. Exact prompts, verification limits, bytes/dimensions/SHA256 in provenance. No AI-production lettering or false source-frame claim.
+
+Empty TikTok thumbnail digests enable a separate preview only under existing title/slug/source/publication guards and a successful R2 head read showing no saved source poster. Owner poster edits, saved source bytes and unknown storage states win. Added a regression for empty/null fields, owner edits and storage priority. Previous80 art/provenance entries and all source posters/VideoObject thumbnails, review/SEO text/structure/dates, players, holds and drafts preserved; no D1/R2 maintenance writes or migration.
+
+Fresh read-only inventory 2026-10-19T11:59:19.103Z:313saved/302published,80previouslylive. Owner publications50/286–326 reconciled only in queue metadata. Newgenerated10/newpublished0/newliveverified0 until final-head CI/release/live checks. Initial all313 non-counter digest daad4b6e05ef74a520a3f8ac50151d6bc88d223215dbfa20f9c7d485a5d10338; target10 digest bf96690b0164c0eab89a429ea47e759a59e2590fdd750535fac2e3a6b0fe98d8. Latest completed audit39240573381/artifact12180843090 remains authoritative before this release:293pages/0technicalfailures/2warningpages at2026-10-19T10:52:57.540Z, before the42newownerpublications. It is not an audit of current302 pages. Dated200-URL Inspection sample remains partial with2PASS; no new full inspections/submission or indexed-count improvement claim. Verified non-Saiyaara Tagembed/Iframely mappings still missing.
+
+Next: complete this batch release/live proof, then continue fresh missing-image TikTok queue before remaining covers.
+
 ## 19 October 2026: batch8 deployed; ten new covers verified, cumulative80/260
 
 PR[223](https://github.com/Gamagek/vid-review-site/pull/223), exact-head e5f8c8b166550c790b034c139e86762f04d324cd, tree6059dc76ad25513335fc10c80d92ded4b02b0bd7, CI39239805323, merged595432842ab861434896c89ec456692ccaed2faa. MainCI39240499154 and Deploy[39240499289](https://github.com/Gamagek/vid-review-site/actions/runs/39240499289) passed. Actual100% Worker 59976e6a-84d2-4891-aaf4-7063bf2717a3, deploymentce209756-efb5-4288-b230-453caf39070e at2026-10-19T10:52:29.286391Z. No migrations to apply (46local/47remote, historical extra0013_media_cache_jobs.sql). Portainer39240499262 validated; all four privileged jobs skipped. Full426Node/fourPython tests and Worker dry-run passed.

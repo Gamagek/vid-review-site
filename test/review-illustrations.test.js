@@ -92,9 +92,9 @@ test('only audited placeholder identities get a review-art preview; owner poster
     source_url:working.sourceUrl,published:1,thumbnail_url:'/facebook-previews/outdoor-challenge-comedy-v1.jpg'}),null);
 });
 
-test('audited TikTok placeholders use separate artwork only with matching owner-image digest and no saved source poster', async (t) => {
+test('audited TikTok missing or placeholder images require matching owner-image digest and no saved source poster', async (t) => {
   const eligible = illustrations.filter(item => item.previewFallbackThumbnailSha256);
-  assert.deepEqual(eligible.map(item => item.id), [16,19,20,26]);
+  assert.deepEqual(eligible.map(item => item.id), [16,19,20,26,289,300,302,308,309,314,315,320,321,324]);
   let expected;
   const fixture = 'https://images.example.org/expired-poster-fixture';
   t.mock.method(crypto.subtle, 'digest', async (algorithm, bytes) => {
@@ -116,5 +116,27 @@ test('audited TikTok placeholders use separate artwork only with matching owner-
     expected = '00'.repeat(32);
     assert.equal(await tikTokReviewPreviewIllustration(row,{async head(){throw Error('must not read storage after image changed');}}),null);
     assert.deepEqual(row,before);
+  }
+});
+
+test('empty TikTok image fields can show conceptual previews while new owner and saved source posters take priority', async () => {
+  const emptyDigest = createHash('sha256').update('').digest('hex');
+  const missing = illustrations.filter(item => item.previewFallbackThumbnailSha256 === emptyDigest);
+  assert.deepEqual(missing.map(item => item.id), [289,300,302,308,309,314,315,320,321,324]);
+  for (const art of missing) {
+    for (const thumbnail_url of [null, '']) {
+      const row = {id:art.id,slug:art.slug,title:art.expectedTitle,source_url:art.sourceUrl,published:1,thumbnail_url};
+      const before = structuredClone(row);
+      const bucket = {async head(key) { assert.equal(key, 'uploads/tiktok-thumbnails/'+art.sourceUrl.split('/').pop()+'.img'); return null; }};
+      assert.equal((await tikTokReviewPreviewIllustration(row,bucket))?.path,art.path);
+      assert.equal(await tikTokReviewPreviewIllustration(row,{async head(){return {size:54321};}}),null);
+      assert.equal(await tikTokReviewPreviewIllustration(row,{async head(){throw Error('storage unavailable');}}),null);
+      assert.equal(await tikTokReviewPreviewIllustration(row),null);
+      assert.equal(await tikTokReviewPreviewIllustration({...row,thumbnail_url:'/owner/new-poster.webp'},
+        {async head(){throw Error('must not read storage after owner poster changed');}}),null);
+      assert.equal(await tikTokReviewPreviewIllustration({...row,source_url:'https://www.tiktok.com/@another/video/1234567890123456789'},bucket),null);
+      assert.equal(await tikTokReviewPreviewIllustration({...row,published:0},bucket),null);
+      assert.deepEqual(row,before);
+    }
   }
 });

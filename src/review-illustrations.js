@@ -39,8 +39,8 @@ export function reviewPreviewIllustration(row) {
     ? item : null;
 }
 
-// Only audited generic TikTok placeholders opt in. Store a digest, never the
-// signed CDN address. Any owner image edit or newly saved source poster wins.
+// Only audited missing or generic TikTok posters opt in. Store a digest, never
+// a signed CDN address. Any owner image edit or saved source poster wins.
 export async function tikTokReviewPreviewIllustration(row, bucket) {
   const item = reviewIllustration(row);
   if (!item?.previewFallbackThumbnailSha256 || !bucket?.head) return null;
