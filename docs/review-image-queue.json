@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "inventoryAt": "2026-10-18T17:19:45.523Z",
-  "publishedLibraryCount": 238,
+  "publishedLibraryCount": 245,
   "batchLimit": 10,
   "phase": "additive_sidebar_illustrations",
   "policy": "Preserve all source/owner posters and all D1 fields. Match current published ID, slug, source and title before enabling art. Do not edit protected review topics/media or drafts. Reconcile newly published records on each run; no regeneration merely for freshness. The owner’s 18 October request authorizes separate, clearly labelled sidebar art for all published platforms/topics, including comedy, but never edits existing protected review text, SEO titles, source posters or players. Source-removal/demo/Saiyaara/Summer holds remain. The19October owner steering additionally authorizes identity-matched generated art in OpenGraph/Twitter/WebPage metadata and guarded fallback for genuinely broken listing previews; preserve working source posters/VideoObject evidence and all D1/R2 media fields.",
@@ -1954,9 +1954,65 @@
       "provider": "youtube",
       "sourceSha256": "d05f28676906432da8239ade5bf0cc945eace96ff56c1f95eb806fc3cfbc4919",
       "status": "pending_theme_verification"
+    },
+    {
+      "id": 256,
+      "slug": "lawnmower-scares-forehead-sunglasses-barbershop-pranks",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "b8706fb69de0a0c9375f0402895b4d469502bf8d0df05e672753c8fc53c1fc6a",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 257,
+      "slug": "chris-colditz-try-not-to-laugh-top-ten-episode-five-short-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "4e90c8bd1c22dd8b64bd713575cac534f00e954472187e2f33629d94cb786bdb",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 258,
+      "slug": "daddy-you-sick-toddler-checkup-family-comedy-short-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "406a26891a1502d5d6d19c44878df7a815e70a4593280bd1fb714aa5401609fb",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 259,
+      "slug": "ismail0102-wait-for-it-tamil-friendship-comedy-short-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "4dbbd61f6619b102b90ac103d752a9759f884fef3a51456c3472d980f227b5c7",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 260,
+      "slug": "comedy-family-couple-comedy-shorts-relationship-humour-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "554cf3b6e855292c8440ba871ee0ab5718cd3621ca785345d8b0005cb3967b5f",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 261,
+      "slug": "ibot-cengos-entahlah-indonesian-family-comedy-short-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "7ae65b602cd7673934c4c02ef12ed379b22639df186f11cd088b81924ed09497",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 262,
+      "slug": "rachana-vishnuraj-love-nte-visiladi-malayalam-shorts-review",
+      "category": "Social Media & Trending",
+      "provider": "youtube",
+      "sourceSha256": "fd4fb56ea69493199d772c08a99c7202d67451b8f3615224569fbc424518df37",
+      "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Fresh main/open PR/D1 reconciliation, then next distinct safe remaining-artwork batch. Current70/238verified,161pending/sevenheld. Owner publication255 reconciled without changing its source/text/date. Facebook20/20 and ten non-heldTikTok art preserved. OtherTikTok provider chain requires verified per-video Tagembed/Iframely mapping; never reuse Saiyaara or infer playback from iframe load. Preserve all original media, owner data, holds, drafts and protected text.",
+  "nextTask": "Finish PR222 exact-head CI, merge/deployment and all70 revised asset/old-URL/page/social/schema/map live checks before selecting new artwork. Then continue the pending safe queue. Missing verified non-Saiyaara Tagembed/Iframely mappings still block those provider methods; do not invent them.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -2107,10 +2163,10 @@
     },
     "limits": "Ten separate illustrations; no source poster repaired/replaced, no new viewing/audio claims. 11 original provider HTTP errors and8 protected placeholders remain. Original214rows match baseline; five independent owner publications were added during this work."
   },
-  "reconciledAt": "2026-10-19T06:07:37.748Z",
+  "reconciledAt": "2026-10-19T09:58:00.792Z",
   "providerCounts": {
-    "raw": 1,
-    "youtube": 203,
+    "other": 1,
+    "youtube": 210,
     "tiktok": 13,
     "facebook": 20,
     "instagram": 1
@@ -4485,5 +4541,108 @@
       "limit": "Desktop sidebar decoding/association only; source continuous playback/audio and independent mobile viewport not verified. Existing900px responsive CSS unchanged; transient existing floating player closed via its UI for screenshot."
     },
     "verifiedAt": "2026-10-19T06:08:14.426Z"
+  },
+  "ownerDesignPreference": {
+    "recordedAt": "2026-10-19T10:02:06.054Z",
+    "visibleAIProductionLettering": false,
+    "scope": "All existing and future generated review artwork. Latest owner preference supersedes the earlier visible-label requirement.",
+    "publicCaption": "Conceptual review artwork. This is not a frame from the source video.",
+    "internalGenerationHistoryRequired": true
+  },
+  "artworkLabelRemoval": {
+    "state": "prepared",
+    "pr": 222,
+    "recordIds": [
+      4,
+      144,
+      145,
+      149,
+      150,
+      151,
+      152,
+      159,
+      160,
+      161,
+      44,
+      45,
+      55,
+      57,
+      59,
+      64,
+      88,
+      186,
+      191,
+      192,
+      18,
+      139,
+      142,
+      143,
+      153,
+      155,
+      156,
+      157,
+      158,
+      162,
+      16,
+      19,
+      20,
+      26,
+      33,
+      54,
+      81,
+      12,
+      32,
+      89,
+      5,
+      6,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      48,
+      51,
+      52,
+      53,
+      66,
+      68,
+      106,
+      126,
+      127,
+      233,
+      242,
+      104,
+      105,
+      107,
+      128,
+      129,
+      178,
+      235,
+      237,
+      238,
+      241
+    ],
+    "editedAssets": 70,
+    "newUniqueIllustrations": 0,
+    "newPublished": 0,
+    "liveVerified": 0,
+    "baseline": {
+      "checkedAt": "2026-10-19T09:58:00.792Z",
+      "saved": 258,
+      "published": 245,
+      "sha256": "9f2f273f57384fdb308ad3b3800fba5506bb7944bde9d7247fdf2d76ae85f727"
+    },
+    "ownerPublicationsReconciled": [
+      256,
+      257,
+      258,
+      259,
+      260,
+      261,
+      262
+    ],
+    "oldURLPolicy": "301 to identity-matched clean v2 asset; old labelled public bytes removed, Git history retained"
   }
 }

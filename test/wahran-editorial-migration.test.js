@@ -6,6 +6,7 @@ import {createHash} from 'node:crypto';
 import change from '../content/editorial-quality/2026-10-18-wahran.json' with {type: 'json'};
 import {auditEditorial} from '../scripts/editorial-quality-audit.mjs';
 import worker from '../src/seo-edge.js';
+import illustrations from '../src/review-illustrations.json' with {type:'json'};
 
 const migration = readFileSync(new URL('../migrations/0044_wahran_source_context.sql', import.meta.url), 'utf8');
 const record = change.records[0];
@@ -117,7 +118,7 @@ test('public API, server review, canonical, schema and sitemap preserve source, 
     };
   }
   const origin = 'https://vid.best';
-  const reviewCover = origin + '/review-illustrations/' + record.before.slug + '-v1.webp';
+  const reviewCover = origin + illustrations.find(x => x.slug === record.before.slug).path;
   const env = {PUBLIC_BASE_URL: origin, DB: {prepare: statement,
     async batch(statements) { return Promise.all(statements.map(s => s.all())); }}};
   const ctx = {waitUntil() { throw new Error('Unexpected background mutation'); }};

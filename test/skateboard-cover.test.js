@@ -4,11 +4,12 @@ import { readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import test from 'node:test';
 import worker from '../src/seo-edge.js';
+import illustrations from '../src/review-illustrations.json' with {type:'json'};
 
 const origin = 'https://vid.best';
 const source = 'https://www.tiktok.com/@phpetstars/video/7376458900440190214';
 const cover = `${origin}/review-covers/dog-skateboard-illustrated-v1.webp`;
-const reviewArt = `${origin}/review-illustrations/the-extreme-skateboarding-corgi-is-this-viral-stunt-real-or-fake-v1.webp`;
+const reviewArt = origin + illustrations.find(x => x.id === 32).path;
 const oldPoster = 'https://p16-common-sign.tiktokcdn-eu.com/tos-maliva-p-0068/oMnBJGAfie0mFBA3IIk6RcmDQEaEJ6Gw1UXlQ6~tplv-tiktokx-origin.image';
 const migration = readFileSync(new URL('../migrations/0040_skateboard_symbolic_cover.sql', import.meta.url), 'utf8');
 const original = {

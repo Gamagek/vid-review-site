@@ -602,7 +602,7 @@ test('source-associated review covers drive social images while preserving video
   for (const art of manifest) {
     const html = await (await request(context,'https://vid.best/watch/'+art.slug,{headers:{'User-Agent':'VidBest-SEO-Audit/1.0'}})).text();
     assert.ok(html.includes('src="https://vid.best'+art.path+'"'));
-    assert.match(html, /AI-generated review illustration inspired/);
+    assert.ok(html.includes(art.caption));
     assert.match(html, /<div class="watch-review-body">\s*<article class="watch-copy glass-panel">/);
     assert.ok(html.indexOf('<!-- review-body -->') < html.indexOf('id="vidbest-related-reviews"'));
     assert.match(html, /Owner listing remains unchanged/);
@@ -615,7 +615,7 @@ test('source-associated review covers drive social images while preserving video
     assert.equal(page.primaryImageOfPage,'https://vid.best'+art.path);
     assert.ok(html.includes('<meta property="og:image" content="https://vid.best'+art.path+'">'));
     assert.ok(html.includes('<meta name="twitter:image" content="https://vid.best'+art.path+'">'));
-    assert.match(html, /<meta property="og:image:alt" content="[^\"]*AI-generated/);
+    assert.match(html, /<meta property="og:image:alt" content="[^\"]*conceptual review artwork/);
     assert.equal(page.datePublished,'2026-09-16T16:22:59.366Z');
     assert.equal(page.dateModified,'2026-10-11T10:00:00.000Z');
     assert.ok(xml.includes('<image:loc>https://vid.best'+art.path+'</image:loc>'));
@@ -643,7 +643,7 @@ test('public Facebook preview artwork is bounded to the audited placeholder and 
   const payload=await (await request(context,'https://vid.best/api/videos/'+art.slug)).json();
   assert.equal(payload.video.review_preview_url,art.path);
   assert.equal(payload.video.review_artwork_url,art.path);
-  assert.match(payload.video.review_artwork_alt,/AI-generated.*not video footage/);
+  assert.match(payload.video.review_artwork_alt,/conceptual review artwork.*not video footage/);
   assert.deepEqual(context.sqlite.prepare('SELECT * FROM videos WHERE id=139').get(),before);
   context.sqlite.prepare('UPDATE videos SET thumbnail_url=? WHERE id=139').run('/review-covers/owner-new.webp');
   const owner=await (await request(context,'https://vid.best/api/videos/'+art.slug)).json();

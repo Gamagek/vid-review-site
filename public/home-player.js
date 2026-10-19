@@ -535,7 +535,7 @@ function mountFacebookFacade(card) {
   poster.height = 216;
   const savedPoster = card.dataset.videoThumbnail || "";
   poster.src = card.dataset.reviewPreview || savedPoster || "/api/facebook/thumbnail?id=" + encodeURIComponent(card.dataset.videoId || "");
-  if (card.dataset.reviewPreview) poster.alt = card.dataset.reviewArtworkAlt || "AI-generated review illustration, not a video frame";
+  if (card.dataset.reviewPreview) poster.alt = card.dataset.reviewArtworkAlt || "Conceptual review artwork, not a video frame";
   const fallback = card.querySelector(".media-fallback");
   poster.addEventListener("load", () => {
     if (fallback) fallback.hidden = true;
@@ -888,7 +888,7 @@ function renderTikTokFacade(card) {
   if (previewImage) {
     const image = document.createElement("img");
     image.src = previewImage;
-    image.alt = card.dataset.reviewPreview ? "AI-generated review illustration, not a source video frame" : "";
+    image.alt = card.dataset.reviewPreview ? "Conceptual review artwork, not a source video frame" : "";
     image.loading = ownedCover && isNearViewport(card) ? "eager" : "lazy";
     image.decoding = "async";
     image.addEventListener("load", () => imageWrap.classList.add("has-image"), { once: true });

@@ -1,5 +1,13 @@
 # Editorial cover provenance
 
+## 19 October 2026: owner-requested lettering removal prepared (PR222)
+
+The latest owner instruction supersedes all earlier visible AI-generated footer requirements, including historical examples below. All70 existing review artworks were edited with built-in imagegen to remove the footer while preserving their composition, other titles and Vid.Best branding as closely as possible. Active16:9 WebPs use fresh v2 URLs; prior v1 URLs redirect to the same clean version instead of serving labelled bytes. Original prompts/hash/dimensions remain in provenance history and Git. Public captions say “Conceptual review artwork. This is not a frame from the source video.” The existing hourly task preference was updated, without creating another task. This is70 revisions,0 new unique illustrations; publication/live verification still pending.
+
+Read-only inventory 2026-10-19T09:58:00.792Z:258saved/245published; all70 runtime title/slug/source/publication guards match. 7 owner publications reconciled only in queue metadata. All non-counter video fields SHA256 9f2f273f57384fdb308ad3b3800fba5506bb7944bde9d7247fdf2d76ae85f727. No D1/R2 writes, migration, review/date/poster/VideoObject source-thumbnail, player, held-media or draft edits. Seven held records stay held. Latest actual completed indexing audit39208075085/artifact12166567779 is historical evidence from2026-10-19T06:07:27.427Z:271pages,0 technical failures,2 warning pages/3 messages,0 Inspections/submissions. It predates newer owner records and supplies no new Google indexed count.
+
+Next: full required regressions/Worker dry-run, PR222 passing exact-head CI, merge/existing Worker release, verify70 new hashes/MIME and page/social/WebPage/map associations plus70 old redirects, then resume the next safe distinct artwork batch. Current provider mappings remain an external limitation. No indexing or AdSense promise.
+
 ## 19 October 2026: batch 7 deployed and live-verified
 
 PR[220](https://github.com/Gamagek/vid-review-site/pull/220), exact-head 42c7b49da4b25496e5f99666d1731bf9d6aafd61, CI39207887644, merged 8223f53bd539ce531bcf9e092ef67dbe8a142e78. MainCI39208015618 and Deploy39208015655 passed. Actual100% Worker 9a77a25c-c339-47d1-a8a9-12cd4bd3bc42, deployment e75f1829-580f-47c1-af50-a6b177cb9d2a at2026-10-19T06:07:02.262567Z. No migrations to apply. Portainer39208015691 validatepassed/allfourprivilegedjobsskipped. Full425Node/fourPython tests and Worker dry-run passed; no runtime/player/CSS/migration/D1/R2 change.

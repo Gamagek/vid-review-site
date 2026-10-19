@@ -3,12 +3,13 @@ import { readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import test from 'node:test';
 import worker from '../src/seo-edge.js';
+import illustrations from '../src/review-illustrations.json' with {type:'json'};
 
 const origin = 'https://vid.best';
 const videoId = '7578945803910270230';
 const source = `https://www.tiktok.com/@toop5_/video/${videoId}`;
 const poster = `${origin}/media/uploads/tiktok-thumbnails/${videoId}.img`;
-const reviewArt = `${origin}/review-illustrations/top-5-most-viewed-tiktoks-ever-billions-of-views-explained-v1.webp`;
+const reviewArt = origin + illustrations.find(x => x.id === 81).path;
 const expired = 'https://p16-common-sign.tiktokcdn-eu.com/tos-no1a-p-0037-no/os6BEmTLgJ4RAIdwpxQsaZFYEAFtkdf0BKBWDe~tplv-tiktokx-origin.image';
 const migration = readFileSync(new URL('../migrations/0039_top5_existing_source_poster.sql', import.meta.url), 'utf8');
 const original = {
