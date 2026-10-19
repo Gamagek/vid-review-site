@@ -1,3 +1,4 @@
+import { analyzeYoutubeDraftWithGemini } from "./gemini-youtube-analysis.js";
 import { parseInstagramUrl } from "../public/instagram-utils.js";
 import { reviewIllustration, reviewPreviewIllustration, tikTokReviewPreviewIllustration, reviewIllustrationRedirect } from "./review-illustrations.js";
 import { isLikelyCrawler } from "./crawlers.js";
@@ -376,6 +377,12 @@ async function route(request, env, ctx) {
   if (match && request.method === "PATCH") {
     await requireAdmin(request, env);
     return moderateComment(request, env, Number(match[1]));
+  }
+
+  match = path.match(/^\/api\/admin\/videos\/(\d+)\/gemini-analysis$/);
+  if (match && request.method === "POST") {
+    await requireAdmin(request, env);
+    return analyzeYoutubeDraftWithGemini(request, env, Number(match[1]));
   }
 
   if (path === "/api/ai/analyze-media" && request.method === "POST") {
