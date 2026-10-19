@@ -43,3 +43,23 @@ const results=new Array(codes.length);
 async function runner(){while(idx<codes.length){const i=idx++;let res=await resolve(codes[i]);res=await enrich(res);results[i]=res;console.log("TIKTOK_RESOLVED "+JSON.stringify(res));await sleep(200);}}
 await Promise.all(Array.from({length:6},runner));
 console.log("TIKTOK_SUMMARY "+JSON.stringify({requested:codes.length,valid:results.filter(x=>x?.id).length,unresolved:results.filter(x=>!x?.id).map(x=>x.code),uniqueIds:new Set(results.map(x=>x?.id).filter(Boolean)).size}));
+
+
+const probes=[{url:"https://www.tiktok.com/@brunavanessafatima/video/7683247291393707278",code:"ZSghgf6BE"},{url:"https://www.tiktok.com/@julian70908/photo/7656037838999293217",code:"ZSghb7Ugh"}];
+for (const one of probes) {
+ try {
+  const res=await fetch(one.url,{headers,signal:AbortSignal.timeout(15000)}),html=await res.text();
+  const htmlMeta={};
+  for(const prop of ["og:title","og:description","twitter:description","description"]){
+    const pattern=new RegExp("<meta[^>]+(?:property|name)=[\\\\\"']"+prop+"[\\\\\"'][^>]+content=[\\\\\"']([^\\\\\"']{0,800})","i");
+    htmlMeta[prop]=html.match(pattern)?.[1]||"";
+  }
+  const hydrated=html.match(/<script[^>]+id=["']__UNIVERSAL_DATA_FOR_REHYDRATION__["'][^>]*>([\s\S]*?)<\/script>/i);
+  let data=null;try{data=JSON.parse(hydrated?.[1]||"null")}catch{}
+  const defaultScope=data?.__DEFAULT_SCOPE__||{};
+  const detail=defaultScope["webapp.video-detail"]||{};
+  const item=detail.itemInfo?.itemStruct||detail.itemInfo||{};
+  const user=item.author||{};
+  console.log("TIKTOK_PROBE "+JSON.stringify({code:one.code,status:res.status,bytes:html.length,htmlMeta,scriptFound:!!hydrated,scopeKeys:Object.keys(defaultScope).slice(0,25),detailKeys:Object.keys(detail).slice(0,20),itemKeys:Object.keys(item).slice(0,24),videoDesc:item.desc||"",music:item.music?.title||"",stats:item.stats||null,username:user.uniqueId||"",createTime:item.createTime||"",oembedSnippet:(await (await fetch("https://www.tiktok.com/oembed?url="+encodeURIComponent(one.url),{signal:AbortSignal.timeout(9000)})).text()).slice(0,500)}));
+ }catch(e){console.log("TIKTOK_PROBE "+JSON.stringify({code:one.code,error:String(e.message)}))}
+}
