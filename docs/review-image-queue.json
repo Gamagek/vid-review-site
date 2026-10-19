@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "inventoryAt": "2026-10-19T10:56:57.769Z",
-  "publishedLibraryCount": 260,
+  "inventoryAt": "2026-10-19T11:59:19.103Z",
+  "publishedLibraryCount": 302,
   "batchLimit": 10,
   "phase": "additive_sidebar_illustrations",
   "policy": "Preserve all source/owner posters and all D1 fields. Match current published ID, slug, source and title before enabling art. Do not edit protected review topics/media or drafts. Reconcile newly published records on each run; no regeneration merely for freshness. The owner’s 18 October request authorizes separate sidebar artwork identified by truthful conceptual-not-source-frame captions for all published platforms/topics, including comedy, but never edits existing protected review text, SEO titles, source posters or players. Source-removal/demo/Saiyaara/Summer holds remain. The19October owner steering additionally authorizes identity-matched generated art in OpenGraph/Twitter/WebPage metadata and guarded fallback for genuinely broken listing previews; preserve working source posters/VideoObject evidence and all D1/R2 media fields.",
@@ -405,6 +405,14 @@
       "sourceSha256": "79cff443697eaab4142bd4d415466ca2c142fbbbb39791d085524e5f29fd20ae",
       "status": "pending_theme_verification",
       "provider": "youtube"
+    },
+    {
+      "id": 50,
+      "slug": "kulex-tom-holland-animated-memes-try-not-to-laugh-short-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "204152396333300a650f9570b93328162f23ff8aaf6b8797f49f4040c7100a0b",
+      "status": "pending_theme_verification"
     },
     {
       "id": 51,
@@ -2140,9 +2148,347 @@
       "provider": "youtube",
       "sourceSha256": "c2727281d7e31c54d0300774cb9339df3aa5b51ab1061b0092884801ca1dba87",
       "status": "pending_theme_verification"
+    },
+    {
+      "id": 286,
+      "slug": "ranking-funniest-human-fails-try-not-to-laugh-707278",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "f147adbbacdbb9d84e222de7332dd4bdbcfb3f6bcd3a9add46a6f2fe82fb6575",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 287,
+      "slug": "top-100-funniest-videos-ever-london-comedy-edit-742806",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "1a5f82f376d160cc7bd27c2b65e1350e81c27b08819b2e978a2ca12e5bb57428",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 288,
+      "slug": "nine-seconds-of-brainrot-meme-comedy-898784",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "210dcb48a5701063be9bc541483c8bc55f3023a71e23f61e7677f3ec8bdc457a",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 289,
+      "slug": "funny-cat-moments-ranking-and-laugh-challenge-126241",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "224ada6a02a2b0464cf67e379c5e5f991dd3632b8cc9dc9c11f82289fe2feaa4",
+      "status": "in_progress",
+      "batch": 9
+    },
+    {
+      "id": 290,
+      "slug": "try-not-to-laugh-short-meme-clip-challenge-356877",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "0ad4fc38a347db54896287ff5a6ac3637a2d60e99d6a4ebd230201fc2eaf2dea",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 291,
+      "slug": "epic-fails-of-2026-try-not-to-laugh-050782",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "4044ec2de55580c054659856c24d653ff81052c2d84752019d7359bb0e0f6a66",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 292,
+      "slug": "tom-holland-reaction-style-laugh-challenge-089351",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "bc49cdab9674ca56df873b033beff8b9ce32a1f0d27f978642e57f16ca82bbbb",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 293,
+      "slug": "try-not-to-laugh-part-6-ten-internet-videos-356566",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "9edfef8468505ae496a00792dae2644cdc27945d61dea1d95326bc9a2cf1d797",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 294,
+      "slug": "top-three-random-try-not-to-laugh-clips-537740",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "35eecd673d88e86169ac5d792b3a7ef461c74dd87c9835f10fb0c53ed4565e8d",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 295,
+      "slug": "welp-movie-meme-and-comic-reaction-309197",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "4d1351a98849833e4c13cbcf50102360bea957caede6bcdf1c2b36b5a52a9f88",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 296,
+      "slug": "th-th-ch-c-m-c-i-vietnamese-laugh-challenge-647879",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "64b547e53c9e7520105f1a0b46228b8d80d0436bcc7ae2339a5d5761c8a2afdd",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 297,
+      "slug": "thappar-mai-turbo-khul-gaye-animal-comedy-caption-071126",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "254af5b07280af1739cc5d22dd8ebcab027f0d364c06c6d99e3d6d0c10ca5096",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 298,
+      "slug": "tom-reacts-part-2-three-funny-internet-videos-053782",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "8dc5902cb5df39485d621f1c71970e2f782e9afb4f6c4d5923fcc7b611698d43",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 299,
+      "slug": "funny-fails-and-memes-2026-compilation-298335",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "c7633a884a40f963e5bfec50be7e1e1d0b429f347d55062ed80250298c209929",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 300,
+      "slug": "episode-724-water-in-mouth-laugh-challenge-748114",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "376603771cfce61d71b4a2f4f5eb14720b38d99b770ede4aa25bde771e129e47",
+      "status": "in_progress",
+      "batch": 9
+    },
+    {
+      "id": 301,
+      "slug": "ranking-laugh-moments-reaction-based-humour-553234",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "1060780b4ed34414e7c1673258414f95cb330574af808629b720e75755efb2e1",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 302,
+      "slug": "ranking-the-funniest-winter-moments-139665",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "a5ebb54d32a45a7a978969ed9f6d85a1934250b488eef1a0123e1b97fa716bba",
+      "status": "in_progress",
+      "batch": 9
+    },
+    {
+      "id": 303,
+      "slug": "if-you-laugh-you-have-to-follow-six-second-test-062337",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "b614a9d48a106cf4ae2eb54f2a7af3bfa8150b5a444a862db728b732d54cad53",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 304,
+      "slug": "don-t-you-dare-laugh-a-direct-audience-challenge-082198",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "046abe559563d9693e02fa9e9c9d1412d37c851b5578216a31fbef00cacd9dbd",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 305,
+      "slug": "a-funny-meme-clip-with-regional-hashtags-820116",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "6a5b428222169a37edca0e0c397d35fff8faf649c5922c59f1203af73a86afe7",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 306,
+      "slug": "top-five-laugh-moments-ranked-viral-clips-715282",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "3425613720f0403172e6bff359eb33392b04d9c54e017b6d20c2a96d446bffd2",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 307,
+      "slug": "crazy-funny-moments-comedy-challenge-800532",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "124327d52e58eadc20887958f04be97d5eeac8ff43a5de58eb0018ce676e480a",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 308,
+      "slug": "try-not-to-laugh-dogs-cats-and-animal-humour-672206",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "386e0805de1b7c481ffa72d465bfaeda09848dc9ff4042b75e4c2f59a635fdba",
+      "status": "in_progress",
+      "batch": 9
+    },
+    {
+      "id": 309,
+      "slug": "the-dog-as-a-backup-singer-sound-based-comedy-453205",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "19d0051a5f09f294dbc73a2784ee2b8e34e921b40dfa557acc54dc199a0826f0",
+      "status": "in_progress",
+      "batch": 9
+    },
+    {
+      "id": 310,
+      "slug": "tom-holland-reaction-to-funny-animation-828053",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "84b9a8039bcaafa9dd7d85d61bff6d7dc515495b3f48fb183ba49aea8ed04cb0",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 311,
+      "slug": "try-not-to-laugh-part-50-weekly-funniest-videos-354966",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "b123fcf274ae45770e9b0071c7017d6e27f9ba45cb336e175f9161db42544aad",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 312,
+      "slug": "indonesian-meme-short-everyday-online-humour-509141",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "34cc74828a09b8c4ac8dd147ec9b6e0367d77ff12ffd8ba29871c61fd166fe23",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 313,
+      "slug": "trying-not-to-laugh-but-failing-couple-clip-472391",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "c51061a86b8e2daffc7231fde83133322db8a29d3dbded86af2cc7044b4be3a4",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 314,
+      "slug": "why-are-chickens-so-funny-farm-life-moment-345921",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "ce47deec1ed8ab1f2bc4c8a63adf97fa86da7ff954abefc5c8b137a5b80c1051",
+      "status": "in_progress",
+      "batch": 9
+    },
+    {
+      "id": 315,
+      "slug": "said-every-english-word-he-knew-language-joke-703250",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "83cae2612407a4ce173e74bcabede8e1032ebfa10480fb15f3eb327f0de5207c",
+      "status": "in_progress",
+      "batch": 9
+    },
+    {
+      "id": 316,
+      "slug": "i-dreamt-they-cut-off-my-balls-andy-praise-skit-477588",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "92ec68bf0c9225e107eb8b2a4cdc217710b25906428ddace36778a0205f9d639",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 317,
+      "slug": "quick-comedy-moments-broad-laugh-challenge-672031",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "6ac8e39ffaa1c263a43f2387985a166fc33c171cc96a94f5a4bfdc2b4c92fd93",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 318,
+      "slug": "a-clever-joke-that-never-gets-old-793556",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "77b339f5661c90f904c35cad45a3b8527b1d6036065ff8bb2e39aa404344b085",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 319,
+      "slug": "laughing-at-a-joke-you-didn-t-understand-935829",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "b7e88403662c850eeb43594c11d060240813125a3532155f8e1799c6da8075ff",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 320,
+      "slug": "drawing-art-and-humour-short-creative-post-428330",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "ad0859ad6fe5e278e23a2fb9c86dd32c353affcfc8c3045fadb4532208777c82",
+      "status": "in_progress",
+      "batch": 9
+    },
+    {
+      "id": 321,
+      "slug": "minisketch-draw-part-40-ranked-visual-jokes-487630",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "6833a3a4ddc65d384cf07e8aea9b6c3800f027f248ec5906baa23fc46f075353",
+      "status": "in_progress",
+      "batch": 9
+    },
+    {
+      "id": 322,
+      "slug": "dance-monkey-dance-and-joke-short-448325",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "62e341a982270b8e7116203df1b1da548f1e69fc64bfc0f3179d3e7174a425eb",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 323,
+      "slug": "wait-for-the-ending-comedy-twist-399966",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "b9b0b3415a9552654dae21a95a3e088c2cb0345e9dcb431f8e942aa4f0d9869c",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 324,
+      "slug": "the-bread-launch-quick-african-comedy-moment-067422",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "a419fb11e7e5dc2b0be812c8681d7177435ff67a0465c396c71c118ede9eecd3",
+      "status": "in_progress",
+      "batch": 9
+    },
+    {
+      "id": 325,
+      "slug": "thai-sound-comedy-clip-short-humour-489414",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "cfd1aa0d159916af7213e524e19a914d87c2d7be199ea78c6c6614056a7a90b7",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 326,
+      "slug": "meme-madness-rapid-comedy-tiktok-927327",
+      "category": "Funny & Comedy",
+      "provider": "tiktok",
+      "sourceSha256": "7868af44cd84280ddd5837fab220ea3021d4f0809d0d08f1b3c18819d0957f9a",
+      "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Fresh read-only D1/main/open-PR/deployment reconciliation first. Facebook20 and ten non-held TikTok illustrations remain covered; three TikTok/other holds stay excluded. Verified per-video non-Saiyaara Tagembed/Iframely mappings remain unavailable; do not invent/reuse Saiyaara mappings or claim iframe playback. Prioritize new missing-image YouTube records267/268/269/270/271 after current theme/source verification, then the next safe pending covers, all without visible AI-generated lettering. Preserve working posters/VideoObject thumbnails and every owner field/date/draft; no repeated same-day full Inspections or sitemap submissions.",
+  "nextTask": "Resume in-progress batch9 before another artwork batch. Ten new missing-thumbnail TikTok records are reserved; do not count generation/publication before actual bytes and passing CI/deployment/live evidence. Preserve prior80 artwork, all owner text/dates/posters/VideoObject evidence and holds. Source-specific Tagembed/Iframely mappings remain unavailable. Five missing YouTube records267–271 remain queued behind the owner-priority missing TikTok coverage.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -2293,11 +2639,11 @@
     },
     "limits": "Ten separate illustrations; no source poster repaired/replaced, no new viewing/audio claims. 11 original provider HTTP errors and8 protected placeholders remain. Original214rows match baseline; five independent owner publications were added during this work."
   },
-  "reconciledAt": "2026-10-19T10:56:57.769Z",
+  "reconciledAt": "2026-10-19T11:59:19.103Z",
   "providerCounts": {
-    "youtube": 225,
+    "youtube": 226,
     "other": 1,
-    "tiktok": 13,
+    "tiktok": 54,
     "facebook": 20,
     "instagram": 1
   },
@@ -5269,7 +5615,7 @@
       }
     }
   },
-  "savedLibraryCount": 272,
+  "savedLibraryCount": 313,
   "priorityMissingImages": [
     {
       "id": 267,
@@ -5301,5 +5647,77 @@
       "observedAt": "2026-10-19T10:54:59.600Z",
       "reason": "New owner publication with empty source thumbnail and no illustration; absent from image sitemap until valid artwork exists."
     }
-  ]
+  ],
+  "batch9": {
+    "state": "in_progress",
+    "recordIds": [
+      289,
+      300,
+      302,
+      308,
+      309,
+      314,
+      315,
+      320,
+      321,
+      324
+    ],
+    "branch": "seo/review-illustrations-batch9-20261019",
+    "baseline": {
+      "checkedAt": "2026-10-19T11:59:19.103Z",
+      "saved": 313,
+      "published": 302,
+      "sha256": "daad4b6e05ef74a520a3f8ac50151d6bc88d223215dbfa20f9c7d485a5d10338",
+      "targetRowsSha256": "bf96690b0164c0eab89a429ea47e759a59e2590fdd750535fac2e3a6b0fe98d8"
+    },
+    "newGenerated": 0,
+    "newPublished": 0,
+    "liveVerified": 0,
+    "sourceVerification": "docs/review-images/batch9-source-verification-20261019.json",
+    "ownerPublicationsReconciled": [
+      286,
+      287,
+      288,
+      289,
+      290,
+      291,
+      292,
+      293,
+      294,
+      295,
+      296,
+      297,
+      298,
+      299,
+      300,
+      301,
+      302,
+      303,
+      304,
+      305,
+      306,
+      307,
+      308,
+      309,
+      310,
+      311,
+      312,
+      313,
+      314,
+      315,
+      316,
+      317,
+      318,
+      319,
+      320,
+      321,
+      322,
+      323,
+      324,
+      325,
+      326,
+      50
+    ],
+    "limits": "Public source IDs, account handles and captions verified from embedded metadata by one ordinary GET each. No footage/audio viewed. Ten empty TikTok thumbnails reserved for distinct conceptual art; any owner poster edit or existing R2 poster must suppress the fallback."
+  }
 }
