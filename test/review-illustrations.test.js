@@ -33,7 +33,13 @@ test('owner title, source, slug and publication changes disable stale illustrati
     for (const change of [{slug:'owner-new-slug'},{title:'Owner changed title'},{source_url:'https://example.org/another-video'},{published:0},{published:false}]) {
       assert.equal(reviewIllustration({...row,...change}), null);
     }
-    assert.equal(reviewIllustration({...row,source_url:row.source_url+'?si=public-tracking'} )?.path,item.path);
+    const trackedSource = new URL(row.source_url);
+    trackedSource.searchParams.set('si', 'public-tracking');
+    assert.equal(reviewIllustration({...row,source_url:trackedSource.href})?.path,item.path);
+    if (trackedSource.searchParams.has('v')) {
+      trackedSource.searchParams.set('v', 'different-video');
+      assert.equal(reviewIllustration({...row,source_url:trackedSource.href}),null);
+    }
   }
   assert.equal(reviewIllustration({id:99999}),null);
   const fb=illustrations.find(row=>row.id===149);
