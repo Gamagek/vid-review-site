@@ -1,0 +1,1794 @@
+{
+  "checkedAt": "2026-10-19T10:22:17.692Z",
+  "revised": 70,
+  "newUniqueIllustrations": 0,
+  "revisedPublished": 70,
+  "revisedLiveVerified": 70,
+  "oldVersionRedirectsVerified": 70,
+  "individualVisualReview": 70,
+  "ocrChecks": 70,
+  "productionLetteringDetected": 0,
+  "publishedPages": 245,
+  "rootChildren": 5,
+  "imageEntries": 315,
+  "results": [
+    {
+      "id": 4,
+      "slug": "sadahatama-oba-mage-theme-song",
+      "assetPath": "/review-illustrations/sadahatama-oba-mage-theme-song-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 93350,
+      "sha256": "15b0406387ae7f3b194225a0266e18100cd3ee1ec12030bc30536130aacedd1e",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-16T16:22:59.366Z",
+      "dateModified": "2026-09-16T16:22:59.366Z"
+    },
+    {
+      "id": 144,
+      "slug": "garden-like-painting-sithara-plant",
+      "assetPath": "/review-illustrations/garden-like-painting-sithara-plant-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 153840,
+      "sha256": "eb719c4ede853ba9a75aa7bc5897983018b018969630c407acea7cf7c4696e54",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T18:21:37.861Z"
+    },
+    {
+      "id": 145,
+      "slug": "nature-is-power-sinhala-earth-reflection",
+      "assetPath": "/review-illustrations/nature-is-power-sinhala-earth-reflection-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 218170,
+      "sha256": "08c70646ab3fd6b0d68055a4d51a1de005092123f59e52150142c891ecdd4a29",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T18:15:34.926Z"
+    },
+    {
+      "id": 149,
+      "slug": "live-kindly-enjoy-your-time",
+      "assetPath": "/review-illustrations/live-kindly-enjoy-your-time-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 123132,
+      "sha256": "3fa2a0fbc5395e6165e4fbce66ce3621e7f17a26d7013a12b052ad7cc6c1cbd0",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T18:00:38.474Z"
+    },
+    {
+      "id": 150,
+      "slug": "some-meetings-end-in-goodbye-sinhala-reflection",
+      "assetPath": "/review-illustrations/some-meetings-end-in-goodbye-sinhala-reflection-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 85706,
+      "sha256": "265cb081aa46d860e4ca841d86548244faf6af0d73adc8a0505aec0e4613c38c",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T17:43:44.501Z"
+    },
+    {
+      "id": 151,
+      "slug": "trust-yourself-cinematic-confidence",
+      "assetPath": "/review-illustrations/trust-yourself-cinematic-confidence-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 106772,
+      "sha256": "d3d8ad854f2a673b2f74d6cb04f108beaa376e5ea4a6a508cdcabc8729c24d46",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T17:33:17.120Z"
+    },
+    {
+      "id": 152,
+      "slug": "past-present-progress-smart-ict",
+      "assetPath": "/review-illustrations/past-present-progress-smart-ict-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 74844,
+      "sha256": "bc5753530ffdc455e272a95a629bcf218aceb0de48da95989df5ff410ba0323e",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T16:15:35.398Z"
+    },
+    {
+      "id": 159,
+      "slug": "animal-compassion-anil-oskar",
+      "assetPath": "/review-illustrations/animal-compassion-anil-oskar-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 108534,
+      "sha256": "8a8d23947501f7d493a1477a31109dedafb2d6ffd3bb6f2be42395b5b61a318c",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T13:59:42.010Z"
+    },
+    {
+      "id": 160,
+      "slug": "remembering-kindness-sinhala-gratitude",
+      "assetPath": "/review-illustrations/remembering-kindness-sinhala-gratitude-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 98372,
+      "sha256": "ca157f85a0621e8edd9aa1791994d4b44604dce04f135019cda35cfadf8dc3ce",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T09:32:42.822Z"
+    },
+    {
+      "id": 161,
+      "slug": "are-you-in-the-right-place-sinhala-reflection",
+      "assetPath": "/review-illustrations/are-you-in-the-right-place-sinhala-reflection-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 67198,
+      "sha256": "df6f68e4fad753a63dc767f9ae34f88a8fdc62e41847fbfea99ec8e998874069",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T09:21:09.802Z"
+    },
+    {
+      "id": 44,
+      "slug": "facebook-discovery",
+      "assetPath": "/review-illustrations/facebook-discovery-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 101176,
+      "sha256": "8d222a0ad390766bc4e8ea032a5af2453cfe6b7dc1317090c50036a6febf1e7c",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-27T18:01:49.145Z",
+      "dateModified": "2026-09-27T18:58:50.569Z"
+    },
+    {
+      "id": 45,
+      "slug": "facebook-discovery-5c11fe",
+      "assetPath": "/review-illustrations/facebook-discovery-5c11fe-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 151552,
+      "sha256": "bd949b7c54ee171f225f1af0b7073b0f7905119d48929650109ccf06e87a6198",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-27T18:02:43.958Z",
+      "dateModified": "2026-09-30T17:54:22.518Z"
+    },
+    {
+      "id": 55,
+      "slug": "the-northern-lights-aurora-borealis-relaxing-view",
+      "assetPath": "/review-illustrations/the-northern-lights-aurora-borealis-relaxing-view-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 111856,
+      "sha256": "80c277103b2cff67b004e29e2d1b88a04541a3d4fc25c1ca8285f03e0e4f8ad8",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-29T15:46:34.963Z",
+      "dateModified": "2026-09-29T15:46:34.963Z"
+    },
+    {
+      "id": 57,
+      "slug": "sri-lankan-very-famous-delicious-food-kiribath-with-katta-sambol-milk-rice-coconut",
+      "assetPath": "/review-illustrations/sri-lankan-very-famous-delicious-food-kiribath-with-katta-sambol-milk-rice-coconut-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 168664,
+      "sha256": "ffebe81ce30be30a16e98b297ced4ad2cdf51fd61f3728a27450d972005cab20",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-29T16:20:53.119Z",
+      "dateModified": "2026-09-29T16:20:53.119Z"
+    },
+    {
+      "id": 59,
+      "slug": "a-beautiful-places-forest-sinharaja-sinharaja-sri-lanka",
+      "assetPath": "/review-illustrations/a-beautiful-places-forest-sinharaja-sinharaja-sri-lanka-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 176988,
+      "sha256": "fb70ce813208d588a4c2df521faf9a890706221e0f33a5272f5fe34871de06af",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-29T17:28:49.926Z",
+      "dateModified": "2026-09-29T17:29:20.042Z"
+    },
+    {
+      "id": 64,
+      "slug": "categories-of-wisdom-bhavana-learning-reflection-meditation",
+      "assetPath": "/review-illustrations/categories-of-wisdom-bhavana-learning-reflection-meditation-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 113762,
+      "sha256": "6ed25fc57c8d084357a7ce8f2543aab627b971db94bdfc6661f6a608bebcd6c5",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-30T05:26:30.328Z",
+      "dateModified": "2026-09-30T05:29:05.195Z"
+    },
+    {
+      "id": 88,
+      "slug": "romantic-ai-art-the-beauty-of-digital-love-sweet-moments",
+      "assetPath": "/review-illustrations/romantic-ai-art-the-beauty-of-digital-love-sweet-moments-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 115050,
+      "sha256": "b5ab703e649f679386aaccbc9c130295d43b9570cfee3eb7e6cf8900e5e1b6ec",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-04T13:29:37.836Z",
+      "dateModified": "2026-10-04T13:29:37.836Z"
+    },
+    {
+      "id": 186,
+      "slug": "flying-relaxing-sleep-music-for-meditation-stress-relief-relaxation-by-peder-b-helland",
+      "assetPath": "/review-illustrations/flying-relaxing-sleep-music-for-meditation-stress-relief-relaxation-by-peder-b-helland-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 89186,
+      "sha256": "23bc3d4d9490b6b733ddc6ff43cd9d0fe82fe8e6bc0b076353de16f6011e278c",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-14T18:28:59.793Z",
+      "dateModified": "2026-10-14T18:38:01.114Z"
+    },
+    {
+      "id": 191,
+      "slug": "randall-wahran-official-track-festival-anthem-deep-dive",
+      "assetPath": "/review-illustrations/randall-wahran-official-track-festival-anthem-deep-dive-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 90862,
+      "sha256": "ec798d59b344ac11ccd22c788fe7598ff963afdab897832f4ef1e916a81318bb",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-15T17:51:23.078Z",
+      "dateModified": "2026-10-15T17:51:23.078Z"
+    },
+    {
+      "id": 192,
+      "slug": "rachel-platten-fight-song-official-music-video-anthem-deep-dive",
+      "assetPath": "/review-illustrations/rachel-platten-fight-song-official-music-video-anthem-deep-dive-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 101314,
+      "sha256": "e65afa3c00ec984660da347dd7b628b39d979d4e22cf95e809b5425f48c4eef8",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-15T17:59:20.113Z",
+      "dateModified": "2026-10-15T17:59:20.113Z"
+    },
+    {
+      "id": 18,
+      "slug": "a-beautifully-creative-proposal-meme",
+      "assetPath": "/review-illustrations/a-beautifully-creative-proposal-meme-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 143850,
+      "sha256": "556987f5bfee16aee4b552f9cf89c9f6424f7f96dda8e25eae01e032b269d320",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-23T16:55:02.405Z",
+      "dateModified": "2026-09-23T16:58:45.876Z"
+    },
+    {
+      "id": 139,
+      "slug": "this-man-expressive-soft-drink-reaction",
+      "assetPath": "/review-illustrations/this-man-expressive-soft-drink-reaction-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 227754,
+      "sha256": "222649477a6f4f853fd23838c6c82a5235c6732bd96756a345e89508cb4ad0df",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": true,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T18:34:54.225Z"
+    },
+    {
+      "id": 142,
+      "slug": "pol-karu-playful-fashion-show",
+      "assetPath": "/review-illustrations/pol-karu-playful-fashion-show-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 179508,
+      "sha256": "5f300ab82f46a7665976cb01242f808d6b961fdbc7c8ebd8c4a817abcc8b44d6",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": true,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T18:26:26.377Z"
+    },
+    {
+      "id": 143,
+      "slug": "order-now-limited-stock-potta-kusuma",
+      "assetPath": "/review-illustrations/order-now-limited-stock-potta-kusuma-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 95760,
+      "sha256": "cac8bad1f30b79ea82ebd2cfbfc162b7da9a6154cddefd8b9bceb36630123d02",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": true,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T18:24:21.126Z"
+    },
+    {
+      "id": 153,
+      "slug": "cake-or-cat-cake-illusion-reaction",
+      "assetPath": "/review-illustrations/cake-or-cat-cake-illusion-reaction-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 140814,
+      "sha256": "d38fbfe39e4cec684fc0592d805aacadbe732bcf055d54a80f5275846ae31fbc",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": true,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T16:03:58.276Z"
+    },
+    {
+      "id": 155,
+      "slug": "fashion-means-fashion-our-media",
+      "assetPath": "/review-illustrations/fashion-means-fashion-our-media-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 101184,
+      "sha256": "2db0f6e5361cadb80501f2d8a8e0c8a38b46c8bb720fa5644ae10d8ad5e22b9b",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": true,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T15:46:14.256Z"
+    },
+    {
+      "id": 156,
+      "slug": "late-home-cat-dog-couple-shaa-bro",
+      "assetPath": "/review-illustrations/late-home-cat-dog-couple-shaa-bro-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 131692,
+      "sha256": "4aa9af6edf66dadd9cacbf2f21c691ee84cf650dcb420c742cd707c963659aa6",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": true,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T14:35:02.604Z"
+    },
+    {
+      "id": 157,
+      "slug": "maths-symbols-start-dancing-dilu-teacher",
+      "assetPath": "/review-illustrations/maths-symbols-start-dancing-dilu-teacher-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 118682,
+      "sha256": "bd230efec1d539ea6e5518ee55c4584ec50019ed0b352da5197987c61df41d19",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": true,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T14:24:36.318Z"
+    },
+    {
+      "id": 158,
+      "slug": "unstoppable-cat-version-sangeethaya-lk",
+      "assetPath": "/review-illustrations/unstoppable-cat-version-sangeethaya-lk-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 157148,
+      "sha256": "c6355b5ff380850be787610c1e2dbd7f2105f705348f0780266a703ebc08888f",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": true,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T14:16:37.409Z"
+    },
+    {
+      "id": 162,
+      "slug": "outdoor-challenge-comedy-big-reactions-around-the-table",
+      "assetPath": "/review-illustrations/outdoor-challenge-comedy-big-reactions-around-the-table-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 173688,
+      "sha256": "aae82975c8b3288ffda11eb6e015723e05ee8060cc590c52ca496bcab8f84e9a",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-11T21:26:22.701Z",
+      "dateModified": "2026-10-12T06:02:21.964Z"
+    },
+    {
+      "id": 16,
+      "slug": "ranking-legendary-laughing-memes",
+      "assetPath": "/review-illustrations/ranking-legendary-laughing-memes-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 139184,
+      "sha256": "6b1bd73c5d76e45f5725c6fc19c8ee704bffeb86b1e1ea72f679ba8d16c137c6",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": true,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-22T14:59:14.216Z",
+      "dateModified": "2026-09-22T14:59:14.216Z"
+    },
+    {
+      "id": 19,
+      "slug": "the-funniest-memes-a-funny-proposal-friendly-pranks",
+      "assetPath": "/review-illustrations/the-funniest-memes-a-funny-proposal-friendly-pranks-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 116368,
+      "sha256": "2ad1260b6c32701b1c2992ee70680f6c0b25e15fe07b653d65b7783d9be845de",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": true,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-23T17:29:35.931Z",
+      "dateModified": "2026-09-23T17:38:16.272Z"
+    },
+    {
+      "id": 20,
+      "slug": "the-ultimate-viral-laughs-compilation",
+      "assetPath": "/review-illustrations/the-ultimate-viral-laughs-compilation-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 164678,
+      "sha256": "0547bbc3f65b50570417cd8750000fbdde82fa3d33b467085f2897384be47334",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": true,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-23T18:00:25.638Z",
+      "dateModified": "2026-09-23T18:00:25.638Z"
+    },
+    {
+      "id": 26,
+      "slug": "the-funniest-animal-memes-the-boss-chicken-the-scared-dog",
+      "assetPath": "/review-illustrations/the-funniest-animal-memes-the-boss-chicken-the-scared-dog-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 196168,
+      "sha256": "c250f62e34be8c46f6dee6a85c08d3d4e23c9f5a3542d2a1bcbbf2149219b6b1",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": true,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-24T17:28:52.188Z",
+      "dateModified": "2026-09-24T17:28:52.188Z"
+    },
+    {
+      "id": 33,
+      "slug": "try-not-to-laugh-hard-mode-the-funniest-dinosaur-dub-ever",
+      "assetPath": "/review-illustrations/try-not-to-laugh-hard-mode-the-funniest-dinosaur-dub-ever-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 152598,
+      "sha256": "d9b6db785b29ee6938ec696e1b7598aff1b2374f7ccaed01e6e501ededfc65d6",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-25T19:13:16.338Z",
+      "dateModified": "2026-09-25T19:13:16.338Z"
+    },
+    {
+      "id": 54,
+      "slug": "the-ultimate-medieval-promposal-monty-python-king-arthur-style",
+      "assetPath": "/review-illustrations/the-ultimate-medieval-promposal-monty-python-king-arthur-style-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 174912,
+      "sha256": "f36abb2d13db1067ef42c999d70f6d4558b5b12af19810415500f6cfd05f71a8",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-28T18:22:09.312Z",
+      "dateModified": "2026-09-28T18:22:09.312Z"
+    },
+    {
+      "id": 81,
+      "slug": "top-5-most-viewed-tiktoks-ever-billions-of-views-explained",
+      "assetPath": "/review-illustrations/top-5-most-viewed-tiktoks-ever-billions-of-views-explained-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 167960,
+      "sha256": "9d7b6594e57ca51954c22303c0c7c9463b0833acbdb3a5832fd5ebe16cd40cbb",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-03T15:34:17.920Z",
+      "dateModified": "2026-10-09T21:10:52.165Z"
+    },
+    {
+      "id": 12,
+      "slug": "tiktok-discovery",
+      "assetPath": "/review-illustrations/tiktok-discovery-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 216734,
+      "sha256": "f5a9c1dc01c699e022fab3a7ce033ae2563e404281ed29bc37dc73df0e21f729",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-22T10:53:05.021Z",
+      "dateModified": "2026-09-22T20:10:20.017Z"
+    },
+    {
+      "id": 32,
+      "slug": "the-extreme-skateboarding-corgi-is-this-viral-stunt-real-or-fake",
+      "assetPath": "/review-illustrations/the-extreme-skateboarding-corgi-is-this-viral-stunt-real-or-fake-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 128260,
+      "sha256": "719fcb0c590ded65e37258d93a71be5e7a1932c08d2b37fc40d56d78e3a26417",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-25T18:55:37.183Z",
+      "dateModified": "2026-09-25T18:55:37.183Z"
+    },
+    {
+      "id": 89,
+      "slug": "harry-potter-hip-hop-edit-the-ultimate-magic-rap-remix",
+      "assetPath": "/review-illustrations/harry-potter-hip-hop-edit-the-ultimate-magic-rap-remix-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 192802,
+      "sha256": "f6fc46de0dc56d6a473f59c561e59e524d6caf76a7db83ac38db10e4e3cf9cb9",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-04T17:38:00.472Z",
+      "dateModified": "2026-10-04T17:38:00.472Z"
+    },
+    {
+      "id": 5,
+      "slug": "itipiso-bhagava-the-power-of-supreme-compassion",
+      "assetPath": "/review-illustrations/itipiso-bhagava-the-power-of-supreme-compassion-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 110994,
+      "sha256": "8e3a2fdac2d6a55ca358ff2340e5054ef248894d1587e981355386955a4331e8",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-17T17:10:43.741Z",
+      "dateModified": "2026-09-17T17:20:46.147Z"
+    },
+    {
+      "id": 6,
+      "slug": "a-for-apple-abc-alphabet-song",
+      "assetPath": "/review-illustrations/a-for-apple-abc-alphabet-song-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 118310,
+      "sha256": "04ef1bb8cce086a58e8a86ae03d4f3ad278c54a9d0593a902c3a59d83cb2711d",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-19T17:06:56.999Z",
+      "dateModified": "2026-09-19T17:06:56.999Z"
+    },
+    {
+      "id": 37,
+      "slug": "building-a-secret-dugout-between-two-oak-trees-bushcraft-survival-shelter",
+      "assetPath": "/review-illustrations/building-a-secret-dugout-between-two-oak-trees-bushcraft-survival-shelter-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 232992,
+      "sha256": "85e6ac933cc4d4b41004fde669a8513ed77d9575ab5c92c19f0996fa3568c92b",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-25T20:50:48.546Z",
+      "dateModified": "2026-09-25T20:50:48.546Z"
+    },
+    {
+      "id": 38,
+      "slug": "how-to-make-working-model-of-a-wind-turbine-from-cardboard-school-project",
+      "assetPath": "/review-illustrations/how-to-make-working-model-of-a-wind-turbine-from-cardboard-school-project-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 118232,
+      "sha256": "111bc124cfe6200224e2f9aaa22feab45ab971733858fc53599df3b0dcda48b4",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-25T21:15:03.722Z",
+      "dateModified": "2026-09-25T21:15:03.722Z"
+    },
+    {
+      "id": 39,
+      "slug": "15-energy-efficient-inventions-for-your-home",
+      "assetPath": "/review-illustrations/15-energy-efficient-inventions-for-your-home-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 171190,
+      "sha256": "1d0a6b109369d4168b4d99fe503883433af757fa432958f6a7431413c4fbb56b",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-25T21:20:49.683Z",
+      "dateModified": "2026-09-25T21:20:49.683Z"
+    },
+    {
+      "id": 40,
+      "slug": "how-to-make-a-water-wheel-with-generator-water-wheel-free-energy",
+      "assetPath": "/review-illustrations/how-to-make-a-water-wheel-with-generator-water-wheel-free-energy-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 229836,
+      "sha256": "64a0debe739cdfe2ebace5be5040f60969abd85d71d401b2ad16718c19b87d32",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-25T21:24:53.565Z",
+      "dateModified": "2026-09-25T21:24:53.565Z"
+    },
+    {
+      "id": 41,
+      "slug": "10-home-decorating-ideas-handmade-with-seashell-seashell-craft-ideas",
+      "assetPath": "/review-illustrations/10-home-decorating-ideas-handmade-with-seashell-seashell-craft-ideas-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 191546,
+      "sha256": "30b1152ed80f2e179153e64063193c8075de4f7f4ad7e7ad99c8d8f148f79902",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-25T21:39:41.124Z",
+      "dateModified": "2026-09-25T21:39:41.124Z"
+    },
+    {
+      "id": 42,
+      "slug": "creating-a-seashell-gyaru-sculpture",
+      "assetPath": "/review-illustrations/creating-a-seashell-gyaru-sculpture-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 160476,
+      "sha256": "dbea1f4a3416a40258e887e6d127c10445ea3179d5792ad274adcef67615357a",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-25T21:45:17.649Z",
+      "dateModified": "2026-09-25T21:45:17.649Z"
+    },
+    {
+      "id": 43,
+      "slug": "daily-calm-10-minute-mindfulness-meditation-be-present",
+      "assetPath": "/review-illustrations/daily-calm-10-minute-mindfulness-meditation-be-present-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 154288,
+      "sha256": "958ad6ab90555a4cf9f764266812f65ebbc9f46ca82d4b84864ec670023f76b1",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-25T22:00:33.137Z",
+      "dateModified": "2026-09-25T22:00:33.137Z"
+    },
+    {
+      "id": 48,
+      "slug": "what-s-the-difference-between-meditation-and-mindfulness",
+      "assetPath": "/review-illustrations/what-s-the-difference-between-meditation-and-mindfulness-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 120454,
+      "sha256": "74c336248d9f6dc8f2ec656be9ec0fade04cdbe1953849171328af41871e8b42",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-27T18:27:48.266Z",
+      "dateModified": "2026-09-27T19:22:05.392Z"
+    },
+    {
+      "id": 51,
+      "slug": "apple-duo-mystery-appleduo-viral-trending-shortsfeed-mustwatch-fyp-youtubeshorts-techtrend",
+      "assetPath": "/review-illustrations/apple-duo-mystery-appleduo-viral-trending-shortsfeed-mustwatch-fyp-youtubeshorts-techtrend-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 117600,
+      "sha256": "0e0c36c59de27da159e37a44d556b48dcd2fd10e2197af3323cba6e3580c7275",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-28T17:29:28.285Z",
+      "dateModified": "2026-09-28T17:32:33.531Z"
+    },
+    {
+      "id": 52,
+      "slug": "china-s-street-tech-looks-like-2050",
+      "assetPath": "/review-illustrations/china-s-street-tech-looks-like-2050-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 233022,
+      "sha256": "a9dab0386ea71d6df5e4bdd0183d5cc0f1a5ad3adba758021d97cf2fb067019b",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-28T17:37:04.516Z",
+      "dateModified": "2026-09-28T17:37:04.516Z"
+    },
+    {
+      "id": 53,
+      "slug": "1-vs-1-000-000-000-futuristic-tech",
+      "assetPath": "/review-illustrations/1-vs-1-000-000-000-futuristic-tech-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 130962,
+      "sha256": "2607a84bdc7973b18b95d20f8a2212da04d20bf4a61a3634a8e8a4ef52368539",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-28T17:42:16.456Z",
+      "dateModified": "2026-09-28T17:42:16.456Z"
+    },
+    {
+      "id": 66,
+      "slug": "hidden-tree-stump-shelter-6-minute-build-fast-version",
+      "assetPath": "/review-illustrations/hidden-tree-stump-shelter-6-minute-build-fast-version-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 234110,
+      "sha256": "4adb4de85ff65bab2463bd575dab1f34a7819ae10cbfa020d6ae7941218f3b1c",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-30T18:10:55.685Z",
+      "dateModified": "2026-09-30T18:10:55.685Z"
+    },
+    {
+      "id": 68,
+      "slug": "those-one-places-on-earth-that-don-t-feel-real-surreal-travel-destinations",
+      "assetPath": "/review-illustrations/those-one-places-on-earth-that-don-t-feel-real-surreal-travel-destinations-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 225020,
+      "sha256": "bf97060a3b600994a2f8e46b1205d76b6eee48de370e276b6e3c9a646434a172",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-09-30T18:25:38.081Z",
+      "dateModified": "2026-09-30T18:25:38.081Z"
+    },
+    {
+      "id": 106,
+      "slug": "4-delicious-breakfast-recipes-gordon-ramsay",
+      "assetPath": "/review-illustrations/4-delicious-breakfast-recipes-gordon-ramsay-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 242598,
+      "sha256": "216eb00c32f12f627ae47dd0678212c3a4fe890ffb12a545efca1e5bc216fdda",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-06T18:28:32.315Z",
+      "dateModified": "2026-10-06T20:46:35.450Z"
+    },
+    {
+      "id": 126,
+      "slug": "this-man-has-world-s-most-stunning-peacocks",
+      "assetPath": "/review-illustrations/this-man-has-world-s-most-stunning-peacocks-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 149632,
+      "sha256": "3d59b4c1237fef6c48c3cce675c02f0e4433963c359bd57f337e39568519f50f",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-10T15:55:53.601Z",
+      "dateModified": "2026-10-10T15:55:53.601Z"
+    },
+    {
+      "id": 127,
+      "slug": "top-10-stunning-red-animals-wildlife-shorts-breakdown-the-visual-power-of-top-10-red-animals",
+      "assetPath": "/review-illustrations/top-10-stunning-red-animals-wildlife-shorts-breakdown-the-visual-power-of-top-10-red-animals-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 177028,
+      "sha256": "3ebe6c2c8efe3d79ae08a00eceec99f4b736de66e8c3a722eaa0e750a938b84e",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-10T16:24:42.083Z",
+      "dateModified": "2026-10-10T16:24:42.083Z"
+    },
+    {
+      "id": 233,
+      "slug": "cocomelon-wheels-on-the-bus-original-2018-video-review",
+      "assetPath": "/review-illustrations/cocomelon-wheels-on-the-bus-original-2018-video-review-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 206522,
+      "sha256": "55644ba9141a733ed7635b310b5333164c9f6f28175c1f59df062bc4bd900ca8",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-18T17:50:25.101Z",
+      "dateModified": "2026-10-18T17:50:25.101Z"
+    },
+    {
+      "id": 242,
+      "slug": "ted-ed-why-do-cats-act-so-weird-science-lesson-review",
+      "assetPath": "/review-illustrations/ted-ed-why-do-cats-act-so-weird-science-lesson-review-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 91314,
+      "sha256": "8a16532d8b2a592232a2e7e754de870ee613f576f27cc554e928b0e1aa197dd2",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-18T17:56:44.530Z",
+      "dateModified": "2026-10-18T17:56:44.530Z"
+    },
+    {
+      "id": 104,
+      "slug": "place-on-earth-that-don-t-feel-real-travel-explore-expectations-adventure-shorts",
+      "assetPath": "/review-illustrations/place-on-earth-that-don-t-feel-real-travel-explore-expectations-adventure-shorts-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 226394,
+      "sha256": "081c68fb8ce10c0a1fcb54cb52f0553a6aecc9e939763e01327acb9f4ed3bb93",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-06T18:24:37.208Z",
+      "dateModified": "2026-10-06T20:34:18.715Z"
+    },
+    {
+      "id": 105,
+      "slug": "places-in-real-life-travel-explore-adventure-destinations",
+      "assetPath": "/review-illustrations/places-in-real-life-travel-explore-adventure-destinations-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 144534,
+      "sha256": "a958c8b158a8827cdacc47fa3feb7329ec925eaf106f8590a8edf53ea5cf83c2",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-06T18:27:03.927Z",
+      "dateModified": "2026-10-06T20:40:07.428Z"
+    },
+    {
+      "id": 107,
+      "slug": "three-3-best-business-can-start-with-3-dollar-in-2025-subscribe",
+      "assetPath": "/review-illustrations/three-3-best-business-can-start-with-3-dollar-in-2025-subscribe-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 120066,
+      "sha256": "3c0d63c4a478e5d858cc1960533de31913cb7b02bf7f0d514ddfc5c235d80240",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-06T18:32:57.842Z",
+      "dateModified": "2026-10-06T20:51:58.582Z"
+    },
+    {
+      "id": 128,
+      "slug": "freakiest-animals-across-the-globe-mega-episode-nat-geo-animals-freaks-of-the-jungle-sky",
+      "assetPath": "/review-illustrations/freakiest-animals-across-the-globe-mega-episode-nat-geo-animals-freaks-of-the-jungle-sky-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 238158,
+      "sha256": "32260af83e99aac3cbd092cc7723751fa225a40297e34bee0a36004510f997de",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-10T16:54:52.898Z",
+      "dateModified": "2026-10-10T16:54:52.898Z"
+    },
+    {
+      "id": 129,
+      "slug": "how-zach-king-gets-away-with-doing-graffiti-magic-trick-breakdown-how-zach-king-fakes-graffiti",
+      "assetPath": "/review-illustrations/how-zach-king-gets-away-with-doing-graffiti-magic-trick-breakdown-how-zach-king-fakes-graffiti-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 280926,
+      "sha256": "8d46a0e2f8394ac0f7bc88cf121e76765a70569b570ca07bc4535dfeffc18bde",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-10T18:02:25.839Z",
+      "dateModified": "2026-10-10T18:02:25.839Z"
+    },
+    {
+      "id": 178,
+      "slug": "the-poor-puppy-not-have-anything-short-viralshorts-emotionalstory-cutedog-streetdog-subscribe",
+      "assetPath": "/review-illustrations/the-poor-puppy-not-have-anything-short-viralshorts-emotionalstory-cutedog-streetdog-subscribe-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 128306,
+      "sha256": "1faa60ccf89ee32bd5c8463e2276204ca64639d4fd7fe81b08d89126be201656",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-13T17:42:33.707Z",
+      "dateModified": "2026-10-13T18:20:09.206Z"
+    },
+    {
+      "id": 235,
+      "slug": "looloo-kids-johny-johny-yes-papa-2016-original-review",
+      "assetPath": "/review-illustrations/looloo-kids-johny-johny-yes-papa-2016-original-review-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 106018,
+      "sha256": "644d5e4deca1c1377652ebfde488f93c4462ac477ab022c318182bc9db6628ae",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-18T17:50:25.101Z",
+      "dateModified": "2026-10-18T17:50:25.101Z"
+    },
+    {
+      "id": 237,
+      "slug": "miroshka-tv-learning-colors-colorful-eggs-on-farm-2018-review",
+      "assetPath": "/review-illustrations/miroshka-tv-learning-colors-colorful-eggs-on-farm-2018-review-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 153618,
+      "sha256": "3f70f02b3e1dd05ae0924ac2cf7f506eacc5f4895fae03d7a080273ef90e8528",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-18T17:54:53.282Z",
+      "dateModified": "2026-10-18T17:54:53.282Z"
+    },
+    {
+      "id": 238,
+      "slug": "shree-hanuman-chalisa-hariharan-tseries-devotional-video-review",
+      "assetPath": "/review-illustrations/shree-hanuman-chalisa-hariharan-tseries-devotional-video-review-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 105634,
+      "sha256": "3a4e0c67e5480973eb89a885045d8f1be1f170426342caf533a114cc5caaf4c0",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-18T17:54:53.282Z",
+      "dateModified": "2026-10-18T17:54:53.282Z"
+    },
+    {
+      "id": 241,
+      "slug": "el-chombo-dame-tu-cosita-green-alien-viral-video-review",
+      "assetPath": "/review-illustrations/el-chombo-dame-tu-cosita-green-alien-viral-video-review-v2.webp",
+      "status": 200,
+      "mime": "image/webp",
+      "bytes": 177498,
+      "sha256": "b99c2d40f4f2ec5bce6308cb41acf58e33e9c9a01d5033c49dc243cd6402d9c9",
+      "pageAssociation": true,
+      "socialMetadataAssociation": true,
+      "placeholderPreviewAssociation": false,
+      "imageSitemapAssociation": true,
+      "videoThumbnailUnchanged": true,
+      "datePublished": "2026-10-18T17:56:44.530Z",
+      "dateModified": "2026-10-18T17:56:44.530Z"
+    }
+  ],
+  "inspectionCalls": 0,
+  "sitemapSubmissions": 0,
+  "d1Writes": 0,
+  "limit": "Live image bytes/HTTP/MIME/hash/redirects, server img/social/WebPage image/map associations and original date fields verified. No new Google indexed-count or source playback/audio verification.",
+  "release": {
+    "pr": 222,
+    "head": "76709c1a92987deaf35f25398849f0062d2f35d8",
+    "merge": "5f84925e555eecc595b23b8a29212fee713adc8e",
+    "ciRun": 39236125189,
+    "mainCiRun": 39236382443,
+    "deployRun": 39236382275,
+    "portainerRun": 39236382462,
+    "worker": {
+      "id": "6fed9406-2b2e-4076-9914-6dc2b55ef8d7",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "annotations": {
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "b3f603e8-c343-4a39-b2e1-f2fe3aa35b35",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-10-19T10:17:56.056933Z"
+    }
+  },
+  "preservation": {
+    "initialSavedRows": 258,
+    "initialSavedRowsMaxId": 271,
+    "initialRowsSha256": "9f2f273f57384fdb308ad3b3800fba5506bb7944bde9d7247fdf2d76ae85f727",
+    "initialRowsUnchanged": true,
+    "preMerge": {
+      "checkedAt": "2026-10-19T10:17:17.185Z",
+      "saved": 272,
+      "published": 245,
+      "maxId": 285,
+      "sha256": "a87830a50ea4229d4158e24ed0060c5e14d8398eacf9cfb1ed4872a9167e9c34",
+      "baseline258RowsSha256": "9f2f273f57384fdb308ad3b3800fba5506bb7944bde9d7247fdf2d76ae85f727",
+      "migrations": [
+        {
+          "name": "0001_initial.sql"
+        },
+        {
+          "name": "0002_discovery_requests.sql"
+        },
+        {
+          "name": "0003_security_rate_limits.sql"
+        },
+        {
+          "name": "0004_maintenance_indexes.sql"
+        },
+        {
+          "name": "0005_source_video_metadata.sql"
+        },
+        {
+          "name": "0006_test_player_and_comment_images.sql"
+        },
+        {
+          "name": "0007_universal_video_experience.sql"
+        },
+        {
+          "name": "0008_verified_demo_metadata.sql"
+        },
+        {
+          "name": "0009_app_settings.sql"
+        },
+        {
+          "name": "0010_video_analysis.sql"
+        },
+        {
+          "name": "0011_spirituality_buddhism.sql"
+        },
+        {
+          "name": "0012_saiyaara_tiktok_correction.sql"
+        },
+        {
+          "name": "0013_saiyaara_permanent_slug.sql"
+        },
+        {
+          "name": "0013_media_cache_jobs.sql"
+        },
+        {
+          "name": "0014_member_notifications.sql"
+        },
+        {
+          "name": "0015_summer_inverted_tiktok.sql"
+        },
+        {
+          "name": "0016_rights_certified_r2_cache.sql"
+        },
+        {
+          "name": "0017_authorized_auto_cache.sql"
+        },
+        {
+          "name": "0018_tiktok_oembed_cache.sql"
+        },
+        {
+          "name": "0019_tiktok_oembed_backfill.sql"
+        },
+        {
+          "name": "0020_member_personalization.sql"
+        },
+        {
+          "name": "0021_facebook_reel_pending_drafts.sql"
+        },
+        {
+          "name": "0022_facebook_readable_slugs.sql"
+        },
+        {
+          "name": "0023_facebook_challenge_preview.sql"
+        },
+        {
+          "name": "0024_digital_love_review_cover.sql"
+        },
+        {
+          "name": "0025_lab_review_source_cover.sql"
+        },
+        {
+          "name": "0026_gratitude_illustrated_cover.sql"
+        },
+        {
+          "name": "0027_garden_illustrated_cover.sql"
+        },
+        {
+          "name": "0028_nature_power_illustrated_cover.sql"
+        },
+        {
+          "name": "0029_live_kindly_illustrated_cover.sql"
+        },
+        {
+          "name": "0030_facebook_preview_jobs.sql"
+        },
+        {
+          "name": "0031_past_present_progress_cover.sql"
+        },
+        {
+          "name": "0032_animal_compassion_source_poster.sql"
+        },
+        {
+          "name": "0033_trust_yourself_source_poster.sql"
+        },
+        {
+          "name": "0034_some_meetings_source_poster.sql"
+        },
+        {
+          "name": "0035_right_place_source_poster.sql"
+        },
+        {
+          "name": "0036_anapanasati_source_poster.sql"
+        },
+        {
+          "name": "0037_quiet_presence_source_poster.sql"
+        },
+        {
+          "name": "0038_meri_aashiqui_illustrated_cover.sql"
+        },
+        {
+          "name": "0039_top5_existing_source_poster.sql"
+        },
+        {
+          "name": "0040_skateboard_symbolic_cover.sql"
+        },
+        {
+          "name": "0041_source_based_editorial_quality.sql"
+        },
+        {
+          "name": "0042_sia_source_context.sql"
+        },
+        {
+          "name": "0043_fight_song_source_context.sql"
+        },
+        {
+          "name": "0044_wahran_source_context.sql"
+        },
+        {
+          "name": "0045_flying_source_context.sql"
+        },
+        {
+          "name": "0046_quiet_presence_accuracy.sql"
+        }
+      ],
+      "deployment": {
+        "id": "e75f1829-580f-47c1-af50-a6b177cb9d2a",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "annotations": {
+          "workers/triggered_by": "deployment"
+        },
+        "versions": [
+          {
+            "version_id": "9a77a25c-c339-47d1-a8a9-12cd4bd3bc42",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-19T06:07:02.262567Z"
+      }
+    },
+    "after": {
+      "checkedAt": "2026-10-19T10:18:43.631Z",
+      "saved": 272,
+      "published": 245,
+      "maxId": 285,
+      "sha256": "a87830a50ea4229d4158e24ed0060c5e14d8398eacf9cfb1ed4872a9167e9c34",
+      "baseline258RowsSha256": "9f2f273f57384fdb308ad3b3800fba5506bb7944bde9d7247fdf2d76ae85f727",
+      "migrations": [
+        {
+          "name": "0001_initial.sql"
+        },
+        {
+          "name": "0002_discovery_requests.sql"
+        },
+        {
+          "name": "0003_security_rate_limits.sql"
+        },
+        {
+          "name": "0004_maintenance_indexes.sql"
+        },
+        {
+          "name": "0005_source_video_metadata.sql"
+        },
+        {
+          "name": "0006_test_player_and_comment_images.sql"
+        },
+        {
+          "name": "0007_universal_video_experience.sql"
+        },
+        {
+          "name": "0008_verified_demo_metadata.sql"
+        },
+        {
+          "name": "0009_app_settings.sql"
+        },
+        {
+          "name": "0010_video_analysis.sql"
+        },
+        {
+          "name": "0011_spirituality_buddhism.sql"
+        },
+        {
+          "name": "0012_saiyaara_tiktok_correction.sql"
+        },
+        {
+          "name": "0013_saiyaara_permanent_slug.sql"
+        },
+        {
+          "name": "0013_media_cache_jobs.sql"
+        },
+        {
+          "name": "0014_member_notifications.sql"
+        },
+        {
+          "name": "0015_summer_inverted_tiktok.sql"
+        },
+        {
+          "name": "0016_rights_certified_r2_cache.sql"
+        },
+        {
+          "name": "0017_authorized_auto_cache.sql"
+        },
+        {
+          "name": "0018_tiktok_oembed_cache.sql"
+        },
+        {
+          "name": "0019_tiktok_oembed_backfill.sql"
+        },
+        {
+          "name": "0020_member_personalization.sql"
+        },
+        {
+          "name": "0021_facebook_reel_pending_drafts.sql"
+        },
+        {
+          "name": "0022_facebook_readable_slugs.sql"
+        },
+        {
+          "name": "0023_facebook_challenge_preview.sql"
+        },
+        {
+          "name": "0024_digital_love_review_cover.sql"
+        },
+        {
+          "name": "0025_lab_review_source_cover.sql"
+        },
+        {
+          "name": "0026_gratitude_illustrated_cover.sql"
+        },
+        {
+          "name": "0027_garden_illustrated_cover.sql"
+        },
+        {
+          "name": "0028_nature_power_illustrated_cover.sql"
+        },
+        {
+          "name": "0029_live_kindly_illustrated_cover.sql"
+        },
+        {
+          "name": "0030_facebook_preview_jobs.sql"
+        },
+        {
+          "name": "0031_past_present_progress_cover.sql"
+        },
+        {
+          "name": "0032_animal_compassion_source_poster.sql"
+        },
+        {
+          "name": "0033_trust_yourself_source_poster.sql"
+        },
+        {
+          "name": "0034_some_meetings_source_poster.sql"
+        },
+        {
+          "name": "0035_right_place_source_poster.sql"
+        },
+        {
+          "name": "0036_anapanasati_source_poster.sql"
+        },
+        {
+          "name": "0037_quiet_presence_source_poster.sql"
+        },
+        {
+          "name": "0038_meri_aashiqui_illustrated_cover.sql"
+        },
+        {
+          "name": "0039_top5_existing_source_poster.sql"
+        },
+        {
+          "name": "0040_skateboard_symbolic_cover.sql"
+        },
+        {
+          "name": "0041_source_based_editorial_quality.sql"
+        },
+        {
+          "name": "0042_sia_source_context.sql"
+        },
+        {
+          "name": "0043_fight_song_source_context.sql"
+        },
+        {
+          "name": "0044_wahran_source_context.sql"
+        },
+        {
+          "name": "0045_flying_source_context.sql"
+        },
+        {
+          "name": "0046_quiet_presence_accuracy.sql"
+        }
+      ],
+      "deployment": {
+        "id": "6fed9406-2b2e-4076-9914-6dc2b55ef8d7",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "annotations": {
+          "workers/triggered_by": "deployment"
+        },
+        "versions": [
+          {
+            "version_id": "b3f603e8-c343-4a39-b2e1-f2fe3aa35b35",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-19T10:17:56.056933Z"
+      }
+    },
+    "finalInventory": {
+      "checkedAt": "2026-10-19T10:22:39.724Z",
+      "saved": 272,
+      "published": 245,
+      "maxId": 285,
+      "sha256": "a87830a50ea4229d4158e24ed0060c5e14d8398eacf9cfb1ed4872a9167e9c34",
+      "baseline258RowsSha256": "9f2f273f57384fdb308ad3b3800fba5506bb7944bde9d7247fdf2d76ae85f727",
+      "migrations": [
+        {
+          "name": "0001_initial.sql"
+        },
+        {
+          "name": "0002_discovery_requests.sql"
+        },
+        {
+          "name": "0003_security_rate_limits.sql"
+        },
+        {
+          "name": "0004_maintenance_indexes.sql"
+        },
+        {
+          "name": "0005_source_video_metadata.sql"
+        },
+        {
+          "name": "0006_test_player_and_comment_images.sql"
+        },
+        {
+          "name": "0007_universal_video_experience.sql"
+        },
+        {
+          "name": "0008_verified_demo_metadata.sql"
+        },
+        {
+          "name": "0009_app_settings.sql"
+        },
+        {
+          "name": "0010_video_analysis.sql"
+        },
+        {
+          "name": "0011_spirituality_buddhism.sql"
+        },
+        {
+          "name": "0012_saiyaara_tiktok_correction.sql"
+        },
+        {
+          "name": "0013_saiyaara_permanent_slug.sql"
+        },
+        {
+          "name": "0013_media_cache_jobs.sql"
+        },
+        {
+          "name": "0014_member_notifications.sql"
+        },
+        {
+          "name": "0015_summer_inverted_tiktok.sql"
+        },
+        {
+          "name": "0016_rights_certified_r2_cache.sql"
+        },
+        {
+          "name": "0017_authorized_auto_cache.sql"
+        },
+        {
+          "name": "0018_tiktok_oembed_cache.sql"
+        },
+        {
+          "name": "0019_tiktok_oembed_backfill.sql"
+        },
+        {
+          "name": "0020_member_personalization.sql"
+        },
+        {
+          "name": "0021_facebook_reel_pending_drafts.sql"
+        },
+        {
+          "name": "0022_facebook_readable_slugs.sql"
+        },
+        {
+          "name": "0023_facebook_challenge_preview.sql"
+        },
+        {
+          "name": "0024_digital_love_review_cover.sql"
+        },
+        {
+          "name": "0025_lab_review_source_cover.sql"
+        },
+        {
+          "name": "0026_gratitude_illustrated_cover.sql"
+        },
+        {
+          "name": "0027_garden_illustrated_cover.sql"
+        },
+        {
+          "name": "0028_nature_power_illustrated_cover.sql"
+        },
+        {
+          "name": "0029_live_kindly_illustrated_cover.sql"
+        },
+        {
+          "name": "0030_facebook_preview_jobs.sql"
+        },
+        {
+          "name": "0031_past_present_progress_cover.sql"
+        },
+        {
+          "name": "0032_animal_compassion_source_poster.sql"
+        },
+        {
+          "name": "0033_trust_yourself_source_poster.sql"
+        },
+        {
+          "name": "0034_some_meetings_source_poster.sql"
+        },
+        {
+          "name": "0035_right_place_source_poster.sql"
+        },
+        {
+          "name": "0036_anapanasati_source_poster.sql"
+        },
+        {
+          "name": "0037_quiet_presence_source_poster.sql"
+        },
+        {
+          "name": "0038_meri_aashiqui_illustrated_cover.sql"
+        },
+        {
+          "name": "0039_top5_existing_source_poster.sql"
+        },
+        {
+          "name": "0040_skateboard_symbolic_cover.sql"
+        },
+        {
+          "name": "0041_source_based_editorial_quality.sql"
+        },
+        {
+          "name": "0042_sia_source_context.sql"
+        },
+        {
+          "name": "0043_fight_song_source_context.sql"
+        },
+        {
+          "name": "0044_wahran_source_context.sql"
+        },
+        {
+          "name": "0045_flying_source_context.sql"
+        },
+        {
+          "name": "0046_quiet_presence_accuracy.sql"
+        }
+      ],
+      "deployment": {
+        "id": "6fed9406-2b2e-4076-9914-6dc2b55ef8d7",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "annotations": {
+          "workers/triggered_by": "deployment"
+        },
+        "versions": [
+          {
+            "version_id": "b3f603e8-c343-4a39-b2e1-f2fe3aa35b35",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-19T10:17:56.056933Z"
+      }
+    },
+    "all272NonCounterFieldsUnchanged": true,
+    "liveDates": {
+      "checkedAt": "2026-10-19T10:25:09.908Z",
+      "compared": 70,
+      "mismatches": [],
+      "writes": 0
+    },
+    "sourcePosterAndVideoObjectPolicyUnchanged": true,
+    "portainerJobs": [
+      {
+        "id": 118006342622,
+        "name": "validate",
+        "conclusion": "success"
+      },
+      {
+        "id": 118006536528,
+        "name": "preflight",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 118006536906,
+        "name": "Deploy optional v5 internal services (one-time, live-merge)",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 118006537144,
+        "name": "Read-only Portainer 524 incident status",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 118006537684,
+        "name": "deploy",
+        "conclusion": "skipped"
+      }
+    ]
+  },
+  "browser": {
+    "art": {
+      "height": 297.15625,
+      "width": 409.40625,
+      "x": 854.5625,
+      "y": 439
+    },
+    "caption": "Conceptual review artwork. This is not a frame from the source video.",
+    "checkedAt": "2026-10-19T10:21:35.519Z",
+    "image": {
+      "complete": true,
+      "naturalHeight": 940,
+      "naturalWidth": 1672,
+      "renderedWidth": 375.40625,
+      "src": "https://vid.best/review-illustrations/places-in-real-life-travel-explore-adventure-destinations-v2.webp"
+    },
+    "review": {
+      "height": 1755.09375,
+      "width": 746.5625,
+      "x": 84,
+      "y": 439
+    },
+    "url": "https://vid.best/watch/places-in-real-life-travel-explore-adventure-destinations",
+    "viewport": {
+      "height": 936,
+      "width": 1363
+    },
+    "screenshot": "docs/review-images/label-removal-live-desktop-20261019.jpg",
+    "responsiveLimit": "Existing900px stacking CSS inspected and unchanged. Desktop viewport verified; no independent mobile viewport screenshot."
+  },
+  "audit": {
+    "run": 39236465678,
+    "artifact": 12179896937,
+    "zipSha256": "a4fab2ce7f9ac48039eddfd177150697d4a5a72276352bdf9b600834f9069bed",
+    "laterRunStillInProgress": 39236675555,
+    "generatedAt": "2026-10-19T10:18:25.304Z",
+    "pages": 278,
+    "technicalFailures": 0,
+    "editorialWarningPages": 2,
+    "editorialWarningMessages": 3,
+    "searchConsole": {
+      "status": "success",
+      "authenticated": true,
+      "propertyVerified": true,
+      "sitemapSubmitted": false,
+      "inspections": [],
+      "sitemapMode": "read_only",
+      "sitemapProcessing": {
+        "status": "verified",
+        "isPending": false,
+        "lastDownloaded": "2026-10-18T09:11:12.537Z",
+        "lastSubmitted": "2026-10-18T09:11:10.095Z",
+        "errors": 0,
+        "warnings": 0
+      },
+      "reviewSitemaps": [
+        {
+          "url": "https://vid.best/sitemaps/videos-1.xml",
+          "submitted": false,
+          "processing": {
+            "status": "verified",
+            "isPending": false,
+            "lastDownloaded": "2026-10-18T09:11:14.226Z",
+            "lastSubmitted": "2026-10-18T09:11:10.285Z",
+            "errors": 0,
+            "warnings": 20
+          }
+        },
+        {
+          "url": "https://vid.best/sitemaps/daily-weekly-best.xml",
+          "submitted": false,
+          "processing": {
+            "status": "verified",
+            "isPending": false,
+            "lastDownloaded": "2026-10-18T09:11:13.890Z",
+            "lastSubmitted": "2026-10-18T09:11:10.448Z",
+            "errors": 0,
+            "warnings": 0
+          }
+        }
+      ],
+      "totalReviews": 255,
+      "inspectionBudget": 0
+    },
+    "sourcePosterCounts": {
+      "ok": 236,
+      "http_error": 1,
+      "placeholder": 8
+    },
+    "limit": "Read-only zero-Inspection diagnostics, not a new Google indexed-page count. Source posters remain separate from conceptual review artwork."
+  }
+}

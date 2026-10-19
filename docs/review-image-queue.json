@@ -58,8 +58,9 @@
       "slug": "best-comedy-compilation-ultimate-try-not-to-laugh-viral-pranks",
       "category": "Funny & Comedy",
       "sourceSha256": "590851c7b551b9f8adf8d005628631874fa05640471a08e64d47f9dd1981ce66",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "in_progress",
+      "provider": "youtube",
+      "batch": 8
     },
     {
       "id": 8,
@@ -74,24 +75,27 @@
       "slug": "the-ultimate-bollywood-anthem",
       "category": "Music",
       "sourceSha256": "28d27bb89d77684da87e978d40deefb5b5535174bc5ca79c7f235e01d9422ba9",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "in_progress",
+      "provider": "youtube",
+      "batch": 8
     },
     {
       "id": 10,
       "slug": "sadahatama-oba-mage-teledrama",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "ab679d42739bbbc25ee07bcf793fdfb749b6cf882339e6de14a1c89e394e8e0c",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "in_progress",
+      "provider": "youtube",
+      "batch": 8
     },
     {
       "id": 11,
       "slug": "the-ultimate-internet-comedy",
       "category": "Funny & Comedy",
       "sourceSha256": "2d5691c1da811831fe29920eb819a5028ef67495aaf8d187f41ee560ac1a3e90",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "in_progress",
+      "provider": "youtube",
+      "batch": 8
     },
     {
       "id": 12,
@@ -116,8 +120,9 @@
       "slug": "mr-bean-the-ultimate-cinema-comedy",
       "category": "Funny & Comedy",
       "sourceSha256": "5086eb8b82f9b53f004a20b7488f28107777c8a3511e4cb5108671ab3545a3b2",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "in_progress",
+      "provider": "youtube",
+      "batch": 8
     },
     {
       "id": 18,
@@ -150,40 +155,45 @@
       "slug": "super-funny-videos-compilation-memes",
       "category": "Funny & Comedy",
       "sourceSha256": "91783cfcc09445ac468b6d28dbf5a849a9bc6909f5ce92f4b37e325a8e67451f",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "in_progress",
+      "provider": "youtube",
+      "batch": 8
     },
     {
       "id": 22,
       "slug": "armchair-bean-funny-clips-mr-bean-official",
       "category": "Funny & Comedy",
       "sourceSha256": "fcdc4fbe69d3c86c0fbcf3658383ac2437370e5ccf7f989d00191bef8a6613ab",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "in_progress",
+      "provider": "youtube",
+      "batch": 8
     },
     {
       "id": 23,
       "slug": "christmas-day-mr-bean-official",
       "category": "Funny & Comedy",
       "sourceSha256": "20f1df7f77336b95ff01ef8912b47d0467b51ea70afb866e1e453944dec959a2",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "in_progress",
+      "provider": "youtube",
+      "batch": 8
     },
     {
       "id": 24,
       "slug": "the-ultimate-vocal-magic-shreya-ghoshal-s-live-teri-ore-performance",
       "category": "Music",
       "sourceSha256": "e9e4239e20e13c641f1a8fac06f5cc1ebd22242af76f8ab5af6079d36068ca4f",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "in_progress",
+      "provider": "youtube",
+      "batch": 8
     },
     {
       "id": 25,
       "slug": "the-ultimate-edm-anthem-alan-walker-s-faded-live-performance-alan-walker-feat-tove-stryke",
       "category": "Music",
       "sourceSha256": "64fd7c69f918daf2da18cd86bac21f33066fba89967cf9080a48644eb78fd234",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "in_progress",
+      "provider": "youtube",
+      "batch": 8
     },
     {
       "id": 26,
@@ -2012,7 +2022,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Finish PR222 exact-head CI, merge/deployment and all70 revised asset/old-URL/page/social/schema/map live checks before selecting new artwork. Then continue the pending safe queue. Missing verified non-Saiyaara Tagembed/Iframely mappings still block those provider methods; do not invent them.",
+  "nextTask": "Resume in-progress batch8 on seo/review-illustrations-batch8-20261019 before selecting any other records. Ten identities are reserved; images must actually exist, pass checks, exact-head CI, merge/deployment and live verification before publication claims. PR222 clean70 is already merged/deployed/live-verified. Do not reuse Saiyaara mappings or invent provider signals/rights.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -2163,7 +2173,7 @@
     },
     "limits": "Ten separate illustrations; no source poster repaired/replaced, no new viewing/audio claims. 11 original provider HTTP errors and8 protected placeholders remain. Original214rows match baseline; five independent owner publications were added during this work."
   },
-  "reconciledAt": "2026-10-19T09:58:00.792Z",
+  "reconciledAt": "2026-10-19T10:27:04.644Z",
   "providerCounts": {
     "other": 1,
     "youtube": 210,
@@ -4550,7 +4560,7 @@
     "internalGenerationHistoryRequired": true
   },
   "artworkLabelRemoval": {
-    "state": "prepared",
+    "state": "published_verified",
     "pr": 222,
     "recordIds": [
       4,
@@ -4627,7 +4637,7 @@
     "editedAssets": 70,
     "newUniqueIllustrations": 0,
     "newPublished": 0,
-    "liveVerified": 0,
+    "liveVerified": 70,
     "baseline": {
       "checkedAt": "2026-10-19T09:58:00.792Z",
       "saved": 258,
@@ -4643,6 +4653,62 @@
       261,
       262
     ],
-    "oldURLPolicy": "301 to identity-matched clean v2 asset; old labelled public bytes removed, Git history retained"
+    "oldURLPolicy": "301 to identity-matched clean v2 asset; old labelled public bytes removed, Git history retained",
+    "newGenerated": 0,
+    "revisedPublished": 70,
+    "release": {
+      "pr": 222,
+      "head": "76709c1a92987deaf35f25398849f0062d2f35d8",
+      "merge": "5f84925e555eecc595b23b8a29212fee713adc8e",
+      "ciRun": 39236125189,
+      "mainCiRun": 39236382443,
+      "deployRun": 39236382275,
+      "portainerRun": 39236382462,
+      "worker": {
+        "id": "6fed9406-2b2e-4076-9914-6dc2b55ef8d7",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "annotations": {
+          "workers/triggered_by": "deployment"
+        },
+        "versions": [
+          {
+            "version_id": "b3f603e8-c343-4a39-b2e1-f2fe3aa35b35",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-19T10:17:56.056933Z"
+      }
+    },
+    "verificationFile": "docs/review-images/label-removal-live-verification-20261019.json",
+    "verifiedAt": "2026-10-19T10:22:17.692Z"
+  },
+  "batch8": {
+    "state": "in_progress",
+    "recordIds": [
+      7,
+      9,
+      10,
+      11,
+      17,
+      21,
+      22,
+      23,
+      24,
+      25
+    ],
+    "branch": "seo/review-illustrations-batch8-20261019",
+    "baseline": {
+      "checkedAt": "2026-10-19T10:27:04.644Z",
+      "saved": 272,
+      "published": 245,
+      "maxId": 285,
+      "sha256": "a87830a50ea4229d4158e24ed0060c5e14d8398eacf9cfb1ed4872a9167e9c34"
+    },
+    "newGenerated": 0,
+    "newPublished": 0,
+    "liveVerified": 0,
+    "sourceVerification": "docs/review-images/batch8-source-verification-20261019.json",
+    "limits": "Linked-upload metadata/title/theme verified, not footage/audio. No production lettering. Prior70 revised covers remain unchanged."
   }
 }
