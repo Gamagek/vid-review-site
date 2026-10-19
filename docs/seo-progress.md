@@ -1,5 +1,14 @@
 # Vid.Best indexing and thumbnail work queue
 
+## 19 October 2026: batch 5 original learning, craft and nature covers prepared
+
+Ten distinct built-in-imagegen conceptual covers are prepared for published IDs5/6/37/38/39/40/41/42/43/48. Current D1 read at2026-10-19T03:57:28.723Z confirms238saved/234published and unchanged all-row non-counter SHA256 `ffdf9acdf1a8b53191eafd22effcd2a624619005adbd2d4b076b3075b5e78017`. Official public YouTube oEmbed returned HTTP200 for all ten exact source identities at03:58:58.902Z; this verifies metadata identity, not footage/audio. Each original1672×941WebP is118,686–257,856bytes with visibly checked AI-GENERATED REVIEW ILLUSTRATION disclosure. Exact prompts, SHA256, dimensions, source limits and target dates are persisted. No source frames/posters/characters were copied; water-wheel art makes no free-energy claim and mindfulness art makes no health claims.
+
+Local425Node/fourPython tests and existing Worker dry-run passed. Existing40 manifest/provenance entries remain identical. No runtime/player/CSS/migration or owner-data change. The guard automatically associates each illustration with its own server-delivered sidebar img, OG/Twitter metadata, WebPage ImageObject and dynamic flat image sitemap; original VideoObject thumbnails remain intact. Generated10/published0/liveverified0 until actual CI/merge/Worker/live checks complete. Resume this batch before any new batch.
+
+Latest completed actual audit39180530821/artifact12156331001 was read with matching ZIP SHA256 `2c31c05ce23088166f40e234f7078241f1c6a85f9480ceb1bf9202fbd7e16df1`:267pages/zero technical failures; root Google sitemap notpending/zeroerrors/zerowarnings,lastdownload2026-10-18T09:11:12.537Z;20existinglibrarywarnings. Zero URL Inspections/submissions, no new indexed-count evidence or ranking/AdSense promise. Facebook20/20 and ten non-held TikTok reviews already have artwork. Requested other-TikTok provider chain remains blocked by missing verified per-video Tagembed/Iframely mappings; preserve Saiyaara/Summer/source30/removal/raw-rights holds. Next: exact-head CI, safe merge/deployment, every new image HTTP/MIME/hash and matching page/map/date association, then persist release evidence and continue177pending/sevenheld records if unchanged.
+
+
 ## 19 October 2026: batch 4 deployed and live-verified
 
 PR[214](https://github.com/Gamagek/vid-review-site/pull/214), final reviewed head `4575050947c2e4e3e19cc8f87ef075bc85dea92c`, merged as `6acd6bef999561894b2c5a483e62f30627581b42`. Exact-headCI39180385191,mainCI39180477214 and deploy39180477270 pass425Node/fourPython tests and Worker dry-run. Worker `08e6d1d0-c84f-4521-854e-1294eba20b1d` is100%; deployment `114e423f-2dc6-4b53-a44e-fbd49da6b6ea` at19October00:22:59.323463UTC. No migrations to apply. Portainer39180477241 validates; all four privileged jobs skip.

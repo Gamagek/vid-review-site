@@ -40,16 +40,18 @@
       "slug": "itipiso-bhagava-the-power-of-supreme-compassion",
       "category": "Spirituality",
       "sourceSha256": "9fcfd2ec98b153ac2324446165aa8766cd15f117f956bcf77a1dda5abd0e2cc8",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 5
     },
     {
       "id": 6,
       "slug": "a-for-apple-abc-alphabet-song",
       "category": "Education",
       "sourceSha256": "f38b2cdd8b41445c0bf8f104e9369df26b650e99924660d236aca6d0bd251924",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 5
     },
     {
       "id": 7,
@@ -279,56 +281,63 @@
       "slug": "building-a-secret-dugout-between-two-oak-trees-bushcraft-survival-shelter",
       "category": "Adventure & Travel",
       "sourceSha256": "462bf3272909cef0bbd8352313481856bd48500e57ca5f9b26151ef7a0d07b8d",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 5
     },
     {
       "id": 38,
       "slug": "how-to-make-working-model-of-a-wind-turbine-from-cardboard-school-project",
       "category": "Environment & Sustainability",
       "sourceSha256": "39b8a9c881a61ea8ebda7ca91a199877604fad786f5c74250d67b420f9055b0b",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 5
     },
     {
       "id": 39,
       "slug": "15-energy-efficient-inventions-for-your-home",
       "category": "Environment & Sustainability",
       "sourceSha256": "13939cfdc70070bc44d030ef5a2ef839e164f136bfece2f8de45b0b29bfe3122",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 5
     },
     {
       "id": 40,
       "slug": "how-to-make-a-water-wheel-with-generator-water-wheel-free-energy",
       "category": "Environment & Sustainability",
       "sourceSha256": "6cb92460ff73c539ecc84fedc2fc99068de5741b68641a353161a442191940d6",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 5
     },
     {
       "id": 41,
       "slug": "10-home-decorating-ideas-handmade-with-seashell-seashell-craft-ideas",
       "category": "Arts & Culture",
       "sourceSha256": "3b578a9b185992b225d2287bcc79175df09b1102ff79df9ea54e2e315225dc92",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 5
     },
     {
       "id": 42,
       "slug": "creating-a-seashell-gyaru-sculpture",
       "category": "Arts & Culture",
       "sourceSha256": "3aee84ff7b5075b956c57247b1febe7502158d9f8af185c08c73a434ed6f6245",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 5
     },
     {
       "id": 43,
       "slug": "daily-calm-10-minute-mindfulness-meditation-be-present",
       "category": "Spirituality",
       "sourceSha256": "97f32d5c7f083507172a33e2ea16018b1ba389d0d23c1841bdeb39164d69dc97",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 5
     },
     {
       "id": 44,
@@ -367,8 +376,9 @@
       "slug": "what-s-the-difference-between-meditation-and-mindfulness",
       "category": "Spirituality",
       "sourceSha256": "2ed1686fa4a89453322d113e381cacbe6774e7c2143c8d788ef45510ac3763c3",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 5
     },
     {
       "id": 49,
@@ -1894,7 +1904,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Reconcile fresh main/open PRs/inventory. Facebook20/20 and all ten non-held TikTok reviews have art; the other three TikTok records stay held. Missing per-video Tagembed/Iframely mappings still block the requested provider chain. Continue the next distinct safe Instagram/YouTube/other artwork batch independently;187pending/sevenholds. Do not repeat this batch or edit protected text/media/dates/drafts.",
+  "nextTask": "Resume prepared batch5 IDs5/6/37/38/39/40/41/42/43/48 through exact-head CI, PR merge, Worker deployment and per-image live verification before selecting another batch. Preserve40 previous assets, all owner/source posters and all held records. Playback chain needs verified per-video Tagembed/Iframely mappings.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -2045,7 +2055,7 @@
     },
     "limits": "Ten separate illustrations; no source poster repaired/replaced, no new viewing/audio claims. 11 original provider HTTP errors and8 protected placeholders remain. Original214rows match baseline; five independent owner publications were added during this work."
   },
-  "reconciledAt": "2026-10-19T00:23:50.007Z",
+  "reconciledAt": "2026-10-19T03:57:28.723Z",
   "providerCounts": {
     "raw": 1,
     "youtube": 199,
@@ -3700,5 +3710,133 @@
       "responsiveLimit": "Existing900px stacking CSS unchanged. No independent narrow-device viewport was available; no mobile visual claim."
     },
     "verificationFile": "docs/review-images/batch4-live-verification-20261019.json"
+  },
+  "batch5": {
+    "state": "prepared",
+    "recordIds": [
+      5,
+      6,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      48
+    ],
+    "baseline": {
+      "checkedAt": "2026-10-19T03:57:28.723Z",
+      "saved": 238,
+      "published": 234,
+      "sha256": "ffdf9acdf1a8b53191eafd22effcd2a624619005adbd2d4b076b3075b5e78017"
+    },
+    "targetRows": [
+      {
+        "id": 5,
+        "title": "Itipiso bhagava: The Power of Supreme Compassion ඉතිපිසෝ භගවා",
+        "slug": "itipiso-bhagava-the-power-of-supreme-compassion",
+        "sourceUrl": "https://youtu.be/XTjyqOwuluA",
+        "published": 1,
+        "created_at": "2026-09-17T17:10:43.741Z",
+        "updated_at": "2026-09-17T17:20:46.147Z",
+        "protectedRowSha256": "eb7ba736b010e1ff72edfc027bef55b7aeb0302e64fffad595b186db31e76b0a"
+      },
+      {
+        "id": 6,
+        "title": "A for Apple ABC Alphabet Song",
+        "slug": "a-for-apple-abc-alphabet-song",
+        "sourceUrl": "https://youtu.be/hq3yfQnllfQ",
+        "published": 1,
+        "created_at": "2026-09-19T17:06:56.999Z",
+        "updated_at": "2026-09-19T17:06:56.999Z",
+        "protectedRowSha256": "b3e0de817e1c23b5de9a82d19a48af408a8a56691e70c434a3791c7aab7ee544"
+      },
+      {
+        "id": 37,
+        "title": "Building a Secret Dugout Between Two Oak Trees. Bushcraft, Survival Shelter",
+        "slug": "building-a-secret-dugout-between-two-oak-trees-bushcraft-survival-shelter",
+        "sourceUrl": "https://youtu.be/mu80vaqaEZg",
+        "published": 1,
+        "created_at": "2026-09-25T20:50:48.546Z",
+        "updated_at": "2026-09-25T20:50:48.546Z",
+        "protectedRowSha256": "f92d7daeba8781b8c9fa159398d42c0837961bf4a4257b7ba72d084d332f01ac"
+      },
+      {
+        "id": 38,
+        "title": "How to make working model of a wind turbine from cardboard | school project",
+        "slug": "how-to-make-working-model-of-a-wind-turbine-from-cardboard-school-project",
+        "sourceUrl": "https://youtu.be/JXYkjHKakGE",
+        "published": 1,
+        "created_at": "2026-09-25T21:15:03.722Z",
+        "updated_at": "2026-09-25T21:15:03.722Z",
+        "protectedRowSha256": "b789991e535162baaf202711fbb2bf6e1e3db6c356448cdd8007a88b11edae68"
+      },
+      {
+        "id": 39,
+        "title": "15 ENERGY EFFICIENT INVENTIONS FOR YOUR HOME",
+        "slug": "15-energy-efficient-inventions-for-your-home",
+        "sourceUrl": "https://youtu.be/-l-UYwfx3a0",
+        "published": 1,
+        "created_at": "2026-09-25T21:20:49.683Z",
+        "updated_at": "2026-09-25T21:20:49.683Z",
+        "protectedRowSha256": "190759b95d091512d7703efa343bcbafafaa192428de30d446cabca51fb78edb"
+      },
+      {
+        "id": 40,
+        "title": "How to Make a Water Wheel With Generator - Water Wheel Free Energy",
+        "slug": "how-to-make-a-water-wheel-with-generator-water-wheel-free-energy",
+        "sourceUrl": "https://youtu.be/0CkzBvg3ZBk",
+        "published": 1,
+        "created_at": "2026-09-25T21:24:53.565Z",
+        "updated_at": "2026-09-25T21:24:53.565Z",
+        "protectedRowSha256": "bbe359e03ef6d15a33b563d3978f2ed4778df3fd7651374cff5bbc90bd958e60"
+      },
+      {
+        "id": 41,
+        "title": "10 Home decorating ideas handmade with Seashell | Seashell craft ideas",
+        "slug": "10-home-decorating-ideas-handmade-with-seashell-seashell-craft-ideas",
+        "sourceUrl": "https://youtu.be/gis9v4xGeSg",
+        "published": 1,
+        "created_at": "2026-09-25T21:39:41.124Z",
+        "updated_at": "2026-09-25T21:39:41.124Z",
+        "protectedRowSha256": "30bf192e7ac66588379bf5e7ca6cbc67284225bd862410bc7d202c6543341732"
+      },
+      {
+        "id": 42,
+        "title": "creating a *SEASHELL GYARU* sculpture",
+        "slug": "creating-a-seashell-gyaru-sculpture",
+        "sourceUrl": "https://youtu.be/l8ZgFSljEnM",
+        "published": 1,
+        "created_at": "2026-09-25T21:45:17.649Z",
+        "updated_at": "2026-09-25T21:45:17.649Z",
+        "protectedRowSha256": "bcaad8d96723fe6e33e9ad2295f6bca6be3f0232cc8d30555850fa5752d042b4"
+      },
+      {
+        "id": 43,
+        "title": "Daily Calm | 10 Minute Mindfulness Meditation | Be Present",
+        "slug": "daily-calm-10-minute-mindfulness-meditation-be-present",
+        "sourceUrl": "https://youtu.be/ZToicYcHIOU",
+        "published": 1,
+        "created_at": "2026-09-25T22:00:33.137Z",
+        "updated_at": "2026-09-25T22:00:33.137Z",
+        "protectedRowSha256": "087fec5178b17f49f8bedf05f0e36bb49b0a8c06cc2dad9a35afa48b8d7a5645"
+      },
+      {
+        "id": 48,
+        "title": "What’s the Difference between Meditation and Mindfulness? 🧘‍♀️",
+        "slug": "what-s-the-difference-between-meditation-and-mindfulness",
+        "sourceUrl": "https://youtube.com/shorts/mt0cFZiAGgs",
+        "published": 1,
+        "created_at": "2026-09-27T18:27:48.266Z",
+        "updated_at": "2026-09-27T19:22:05.392Z",
+        "protectedRowSha256": "fa30e3ec2f1b3ada96af202c0c4ee622e85bb76dba171fb9d7dda5418e5f6aa8"
+      }
+    ],
+    "sourceVerification": "docs/review-images/batch5-source-verification-20261019.json",
+    "newGenerated": 10,
+    "newPublished": 0,
+    "liveVerified": 0,
+    "limits": "Conceptual artwork only; no footage/audio, Google indexing or provider playback verification. Other TikTok Tagembed/Iframely mappings remain unavailable."
   }
 }
