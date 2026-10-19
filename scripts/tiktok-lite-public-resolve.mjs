@@ -63,3 +63,31 @@ for (const one of probes) {
   console.log("TIKTOK_PROBE "+JSON.stringify({code:one.code,status:res.status,bytes:html.length,htmlMeta,scriptFound:!!hydrated,scopeKeys:Object.keys(defaultScope).slice(0,25),detailKeys:Object.keys(detail).slice(0,20),itemKeys:Object.keys(item).slice(0,24),videoDesc:item.desc||"",music:item.music?.title||"",stats:item.stats||null,username:user.uniqueId||"",createTime:item.createTime||"",oembedSnippet:(await (await fetch("https://www.tiktok.com/oembed?url="+encodeURIComponent(one.url),{signal:AbortSignal.timeout(9000)})).text()).slice(0,500)}));
  }catch(e){console.log("TIKTOK_PROBE "+JSON.stringify({code:one.code,error:String(e.message)}))}
 }
+
+
+async function getItem(r) {
+ if(!r.id)return {code:r.code,id:null,kind:"photo",finalUrl:r.finalUrl};
+ try{
+  const res=await fetch(r.finalUrl,{headers,signal:AbortSignal.timeout(14000)});
+  const html=await res.text();
+  const m=html.match(/<script[^>]+id=["']__UNIVERSAL_DATA_FOR_REHYDRATION__["'][^>]*>([\\s\\S]*?)<\\/script>/i);
+  const root=JSON.parse(m?.[1]||"null");
+  const detail=root?.__DEFAULT_SCOPE__?.["webapp.video-detail"]||{};
+  const item=detail.itemInfo?.itemStruct||{};
+  const music=item.music||{};
+  const video=item.video||{};
+  return {code:r.code,id:r.id,url:r.finalUrl,ok:!!item.id,statusCode:detail.statusCode,
+   handle:item.author?.uniqueId||r.finalUrl.match(/@([^/]+)/)?.[1]||"",
+   caption:String(item.desc||"").slice(0,1100),
+   music:String(music.title||"").slice(0,160),musicAuthor:String(music.authorName||"").slice(0,90),
+   duration:video.duration||null,
+   publishedTimestamp:item.createTime||null,
+   cover:video.cover||video.originCover||video.dynamicCover||"",
+   stats:{plays:item.stats?.playCount||null,likes:item.stats?.diggCount||null},
+   tags:(item.challenges||[]).map(x=>x.title).slice(0,12)};
+ }catch(e){return {code:r.code,id:r.id,url:r.finalUrl,error:String(e.message).slice(0,150)}}
+}
+let detailIndex=0;const details=new Array(results.length);
+async function detailRunner(){while(detailIndex<results.length){const i=detailIndex++;details[i]=await getItem(results[i]);console.log("TIKTOK_INFO "+JSON.stringify(details[i]));await sleep(150);}}
+await Promise.all(Array.from({length:6},detailRunner));
+console.log("TIKTOK_INFO_SUMMARY "+JSON.stringify({total:details.length,withItem:details.filter(x=>x.ok).length,missing:details.filter(x=>!x.ok).map(x=>x.code)}));
