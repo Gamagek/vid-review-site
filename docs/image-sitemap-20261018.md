@@ -1,5 +1,16 @@
 # Review artwork discovery and image sitemap (18 October 2026)
 
+## 19 October 2026: batch 6 technology, nature and learning art prepared
+
+Fresh read-only D1 at2026-10-19T04:58:09.109Z found240saved/236published, including owner publications252/253; added their exact IDs/slugs/categories/provider/source digests to the saved queue without changing either record. All previous238non-counter fields still match SHA256 ffdf9acdf1a8b53191eafd22effcd2a624619005adbd2d4b076b3075b5e78017; current240-row baseline is807c938d9349fe97670ae2c13c1705a37177a49286549b1a92778ce8fa4ae434. No new Facebook/TikTok record; existing20Facebook and ten non-held TikTok artwork coverage preserved. Requested other-TikTok chain still needs verified per-video Tagembed/Iframely mappings; no guessed mapping, quota signal or provider bypass.
+
+Ten separate built-in-imagegen conceptual assets prepared for51/52/53/66/68/106/126/127/233/242. Official public YouTube oEmbed HTTP200 identities read at04:58:43.781Z; saved themes guide invented art, not observed footage/audio. Distinct dual-screen/urban/invention/stump/imaginary-travel/breakfast/paper-peacock/red-wildlife/toy-bus/clay-cat compositions, each visibly AI-GENERATED REVIEW ILLUSTRATION. No source poster/character imitation, rare-breed, medical, product-performance, location or ranking claim. WebPs1672×940–941,104,000–296,220bytes; prompts/hash/size/dimensions/limits persisted. Fifty earlier manifest/provenance entries remain identical.
+
+Local425Node/fourPython tests passed and existing Worker dry-run exited0; compiled bundle contains all ten manifest paths. Fixed a test fixture that appended a second question mark to existing YouTube watch queries: URL.searchParams now preserves the source video ID while adding tracking, and explicitly changing v still fails the unchanged runtime guard. No runtime/player/CSS/migration or owner-data edit.
+
+Generated10/published0/liveverified0 until exact-head CI, safe merge, Worker deployment and per-image live HTTP/MIME/hash/page/social/schema/map/date checks complete. Resume batch6 before any new batch. Last completed actual audit39197836169/artifact12162836732 read with matching ZIP SHA25628a68d5cd04d69788f0db16081294622001417b7b733d55994743b2b884c0c06:267pages/zero technical failures at04:06:56.429UTC (before two new owner publications). Google root notpending/zeroerrors/zerowarnings,lastdownload2026-10-18T09:11:12.537Z;20librarywarnings. ZeroInspections/submissions, no refreshed indexed count or AdSense/indexing promise. After verification, expected queue60verified/169pending/sevenheld if inventory unchanged; fresh reconcile again before release.
+
+
 ## 19 October 2026: batch 5 deployed and live-verified
 
 PR216 passed exact-head CI39197708075 at8a3d475aff23749ef5548b622b53d142069c3156 and merged as3dd63864ce6a1b2cd84f69f69f43c30c803dad34. MainCI39197788427 and WorkerDeploy39197788366 passed; actual100% Worker f7ba60c2-0dd1-469e-a56c-6813c9152562, deployment0e2a81e1-0877-43c3-82b2-4a0ede49f6b5 at04:06:32.035266UTC. No migrations to apply. Portainer39197788411 validated successfully; all four privileged jobs skipped.

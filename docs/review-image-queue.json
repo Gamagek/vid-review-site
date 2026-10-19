@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "inventoryAt": "2026-10-18T17:19:45.523Z",
-  "publishedLibraryCount": 234,
+  "publishedLibraryCount": 236,
   "batchLimit": 10,
   "phase": "additive_sidebar_illustrations",
   "policy": "Preserve all source/owner posters and all D1 fields. Match current published ID, slug, source and title before enabling art. Do not edit protected review topics/media or drafts. Reconcile newly published records on each run; no regeneration merely for freshness. The owner’s 18 October request authorizes separate, clearly labelled sidebar art for all published platforms/topics, including comedy, but never edits existing protected review text, SEO titles, source posters or players. Source-removal/demo/Saiyaara/Summer holds remain. The19October owner steering additionally authorizes identity-matched generated art in OpenGraph/Twitter/WebPage metadata and guarded fallback for genuinely broken listing previews; preserve working source posters/VideoObject evidence and all D1/R2 media fields.",
@@ -393,24 +393,27 @@
       "slug": "apple-duo-mystery-appleduo-viral-trending-shortsfeed-mustwatch-fyp-youtubeshorts-techtrend",
       "category": "Technology",
       "sourceSha256": "83c0163cd28d91f4f8e5b6a4377e325321b78a0cc1e0561265a779884574cc12",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 6
     },
     {
       "id": 52,
       "slug": "china-s-street-tech-looks-like-2050",
       "category": "Technology",
       "sourceSha256": "04f8735758739977e905ddffef064ba1fa87f7ccb8be9f0310d1f5638afeb0d9",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 6
     },
     {
       "id": 53,
       "slug": "1-vs-1-000-000-000-futuristic-tech",
       "category": "Technology",
       "sourceSha256": "635a7ee1f90f3e4294b81de42badd233e7ff9d7074dfef0cbf962e3503c3cac5",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 6
     },
     {
       "id": 54,
@@ -514,8 +517,9 @@
       "slug": "hidden-tree-stump-shelter-6-minute-build-fast-version",
       "category": "Adventure & Travel",
       "sourceSha256": "ea1f52e0b871c1f027171b4976079de2f58aa441ff05b8017e07cc410599d3c5",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 6
     },
     {
       "id": 67,
@@ -530,8 +534,9 @@
       "slug": "those-one-places-on-earth-that-don-t-feel-real-surreal-travel-destinations",
       "category": "Adventure & Travel",
       "sourceSha256": "8beda32e4ecb39c4a6958a8ba04185549fd4325e8e4f9f5fe182dcba97601015",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 6
     },
     {
       "id": 69,
@@ -820,8 +825,9 @@
       "slug": "4-delicious-breakfast-recipes-gordon-ramsay",
       "category": "Lifestyle, Health & Fitness",
       "sourceSha256": "7f08a8ca7772341677e73afcb35f8dfae91fb56da3d6e4bf50d602a3f4e072a2",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 6
     },
     {
       "id": 107,
@@ -980,16 +986,18 @@
       "slug": "this-man-has-world-s-most-stunning-peacocks",
       "category": "Environment & Sustainability",
       "sourceSha256": "6ccc4b32e782c1fd7439cb93578189434784af530a08a7c30f54eb7806e649b1",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 6
     },
     {
       "id": 127,
       "slug": "top-10-stunning-red-animals-wildlife-shorts-breakdown-the-visual-power-of-top-10-red-animals",
       "category": "Environment & Sustainability",
       "sourceSha256": "082e51ca65687a738371ed7a84bdbc4dfa87101ffaa5302a9dffa4c0eb905079",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 6
     },
     {
       "id": 128,
@@ -1757,7 +1765,8 @@
       "category": "Education",
       "provider": "youtube",
       "sourceSha256": "f6bd5d4da23febc75d90c6e55400db835c17df8d041a1b9888eb0e34c4ae51f8",
-      "status": "pending_theme_verification"
+      "status": "prepared",
+      "batch": 6
     },
     {
       "id": 234,
@@ -1829,7 +1838,8 @@
       "category": "Education",
       "provider": "youtube",
       "sourceSha256": "a81eba6ef5df3e6680ceb9ba7bbf3bfa26fd0b5e97ddf3fb022e8fbd7adc9521",
-      "status": "pending_theme_verification"
+      "status": "prepared",
+      "batch": 6
     },
     {
       "id": 243,
@@ -1902,9 +1912,25 @@
       "provider": "youtube",
       "sourceSha256": "3853a79bcfd7b623ed19966aa418faa0975b84136b08a99dcf88d698d2e41ffe",
       "status": "pending_theme_verification"
+    },
+    {
+      "id": 252,
+      "slug": "meri-aashiqui-tum-se-hi",
+      "category": "Social Media & Trending",
+      "provider": "youtube",
+      "sourceSha256": "134ba8a58cc6b69b9b06ba065b3861f289be504a5421c069f702f330f59186ff",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 253,
+      "slug": "cadel-and-mia-hey-bestie-emoji-acting-challenge-15-4m-view-couple-comedy-short-review",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "11b8b4b8702c13b9dd091b8608d980263aa0ef515b8ecd005791a1486a02224c",
+      "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Reconcile fresh main/open PRs/D1 before the next distinct safe remaining-artwork batch. Current50/234verified,177pending/sevenheld. Facebook20/20 and ten non-held TikTok reviews already have art. Preserve all originals, holds and protected text; never regenerate this completed batch. Other-TikTok smart playback awaits verified per-video Tagembed/Iframely mappings; do not reuse Saiyaara or invent provider signals/URLs.",
+  "nextTask": "Resume prepared batch6 IDs51/52/53/66/68/106/126/127/233/242 through exact-head CI, PR merge, Worker deployment and per-image live verification before selecting another batch. Preserve50 previous assets, all owner/source posters and all held records. Playback chain needs verified per-video Tagembed/Iframely mappings.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -2055,10 +2081,10 @@
     },
     "limits": "Ten separate illustrations; no source poster repaired/replaced, no new viewing/audio claims. 11 original provider HTTP errors and8 protected placeholders remain. Original214rows match baseline; five independent owner publications were added during this work."
   },
-  "reconciledAt": "2026-10-19T04:07:01.348Z",
+  "reconciledAt": "2026-10-19T04:58:09.109Z",
   "providerCounts": {
     "raw": 1,
-    "youtube": 199,
+    "youtube": 201,
     "tiktok": 13,
     "facebook": 20,
     "instagram": 1
@@ -3938,5 +3964,137 @@
       "responsiveLimit": "Existing900px stacking CSS unchanged and inspected; no independent narrow-device visual test is claimed."
     },
     "verifiedAt": "2026-10-19T04:07:21.670Z"
+  },
+  "batch6": {
+    "state": "prepared",
+    "recordIds": [
+      51,
+      52,
+      53,
+      66,
+      68,
+      106,
+      126,
+      127,
+      233,
+      242
+    ],
+    "baseline": {
+      "checkedAt": "2026-10-19T04:58:09.109Z",
+      "saved": 240,
+      "published": 236,
+      "sha256": "807c938d9349fe97670ae2c13c1705a37177a49286549b1a92778ce8fa4ae434"
+    },
+    "targetRows": [
+      {
+        "id": 51,
+        "title": "🍎 Apple Duo mystery #AppleDuo #Viral #Trending #ShortsFeed #MustWatch #FYP #YouTubeShorts #TechTrend",
+        "slug": "apple-duo-mystery-appleduo-viral-trending-shortsfeed-mustwatch-fyp-youtubeshorts-techtrend",
+        "sourceUrl": "https://youtube.com/shorts/q8Afr70jd94",
+        "published": 1,
+        "created_at": "2026-09-28T17:29:28.285Z",
+        "updated_at": "2026-09-28T17:32:33.531Z",
+        "protectedRowSha256": "c8561e9535fe16624b80f6b544d0b8d6efdc6aa77a49d7e29e9231aae33d0592"
+      },
+      {
+        "id": 52,
+        "title": "China’s Street Tech Looks Like 2050 🚀",
+        "slug": "china-s-street-tech-looks-like-2050",
+        "sourceUrl": "https://youtube.com/shorts/_KIzFIgzuYQ",
+        "published": 1,
+        "created_at": "2026-09-28T17:37:04.516Z",
+        "updated_at": "2026-09-28T17:37:04.516Z",
+        "protectedRowSha256": "85242fbaaf862cbf00477a83c205e13b2a8df5ab38f1346baa431d814bce6cfb"
+      },
+      {
+        "id": 53,
+        "title": "$1 vs $1,000,000,000 Futuristic Tech!",
+        "slug": "1-vs-1-000-000-000-futuristic-tech",
+        "sourceUrl": "https://youtu.be/pAnGwRiQ4-4",
+        "published": 1,
+        "created_at": "2026-09-28T17:42:16.456Z",
+        "updated_at": "2026-09-28T17:42:16.456Z",
+        "protectedRowSha256": "4476d148cd13b40b2b34d6d58379f886748eee5216ffaaa71687c1abf8953bbb"
+      },
+      {
+        "id": 66,
+        "title": "Hidden Tree Stump Shelter — 6 Minute Build (Fast Version)",
+        "slug": "hidden-tree-stump-shelter-6-minute-build-fast-version",
+        "sourceUrl": "https://youtu.be/0gap1W6Kcyc",
+        "published": 1,
+        "created_at": "2026-09-30T18:10:55.685Z",
+        "updated_at": "2026-09-30T18:10:55.685Z",
+        "protectedRowSha256": "d3a24f4f6b47900bcfe788217f7206be1e174bbd29594c67719216051fd06671"
+      },
+      {
+        "id": 68,
+        "title": "Those one ☝️ Places on Earth That Don't Feel Real! 😌 Surreal Travel Destinations",
+        "slug": "those-one-places-on-earth-that-don-t-feel-real-surreal-travel-destinations",
+        "sourceUrl": "https://youtube.com/shorts/nUBCDS_htqQ",
+        "published": 1,
+        "created_at": "2026-09-30T18:25:38.081Z",
+        "updated_at": "2026-09-30T18:25:38.081Z",
+        "protectedRowSha256": "61b44f1006b09a9c607c6bdc247c06b8e804cd5b8008a7e943f7c0327cbaddac"
+      },
+      {
+        "id": 106,
+        "title": "🥓🍞🍳🥣 4 Delicious Breakfast Recipes | Gordon Ramsay",
+        "slug": "4-delicious-breakfast-recipes-gordon-ramsay",
+        "sourceUrl": "https://youtu.be/MuajFTgkoHw",
+        "published": 1,
+        "created_at": "2026-10-06T18:28:32.315Z",
+        "updated_at": "2026-10-06T20:46:35.450Z",
+        "protectedRowSha256": "257882646040bebd99fef60da0bc1a7c410b37188805c0c2d1e795ff6291fcf6"
+      },
+      {
+        "id": 126,
+        "title": "This Man Has World's Most Stunning Peacocks!😥❤️",
+        "slug": "this-man-has-world-s-most-stunning-peacocks",
+        "sourceUrl": "https://youtube.com/shorts/rDaPnLjldDA",
+        "published": 1,
+        "created_at": "2026-10-10T15:55:53.601Z",
+        "updated_at": "2026-10-10T15:55:53.601Z",
+        "protectedRowSha256": "6f7b8e6071d76d5c32f52b4e013767876b97f933d2ed95ce03e49793d3ece11a"
+      },
+      {
+        "id": 127,
+        "title": "🦩 Top 10 Stunning Red Animals 🌏Wildlife Shorts Breakdown! ✨ The Visual Power of 'Top 10 Red Animals",
+        "slug": "top-10-stunning-red-animals-wildlife-shorts-breakdown-the-visual-power-of-top-10-red-animals",
+        "sourceUrl": "https://youtube.com/shorts/JLNAOa5J9JI",
+        "published": 1,
+        "created_at": "2026-10-10T16:24:42.083Z",
+        "updated_at": "2026-10-10T16:24:42.083Z",
+        "protectedRowSha256": "13642618b863d20209a2c41d87b6c0c049481022ec14723ae188704662b6d706"
+      },
+      {
+        "id": 233,
+        "title": "CoComelon – Wheels on the Bus 🚌 | A Record-Breaking Sing-Along Reviewed",
+        "slug": "cocomelon-wheels-on-the-bus-original-2018-video-review",
+        "sourceUrl": "https://www.youtube.com/watch?v=e_04ZrNroTo",
+        "published": 1,
+        "created_at": "2026-10-18T17:50:25.101Z",
+        "updated_at": "2026-10-18T17:50:25.101Z",
+        "protectedRowSha256": "b5be7528720110515ae5f450d6921355e63e7aae9e1bdf597e6cd002c9c82e8b"
+      },
+      {
+        "id": 242,
+        "title": "Why Do Cats Act So Weird? 🐈 | TED-Ed Science Video Review",
+        "slug": "ted-ed-why-do-cats-act-so-weird-science-lesson-review",
+        "sourceUrl": "https://www.youtube.com/watch?v=sI8NsYIyQ2A",
+        "published": 1,
+        "created_at": "2026-10-18T17:56:44.530Z",
+        "updated_at": "2026-10-18T17:56:44.530Z",
+        "protectedRowSha256": "ba13e9b96a95bb9e764200a7dc7eab036a5e2e4b27b4f4d4d4189ef93c2e79e4"
+      }
+    ],
+    "ownerPublicationsReconciled": [
+      252,
+      253
+    ],
+    "sourceVerification": "docs/review-images/batch6-source-verification-20261019.json",
+    "newGenerated": 10,
+    "newPublished": 0,
+    "liveVerified": 0,
+    "limits": "Conceptual artwork only; no footage/audio, Google indexing or provider playback verification. Other TikTok Tagembed/Iframely mappings remain unavailable."
   }
 }
