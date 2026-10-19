@@ -70,8 +70,10 @@ async function getItem(r) {
  try{
   const res=await fetch(r.finalUrl,{headers,signal:AbortSignal.timeout(14000)});
   const html=await res.text();
-  const m=html.match(/<script[^>]+id=["']__UNIVERSAL_DATA_FOR_REHYDRATION__["'][^>]*>([\\s\\S]*?)<\\/script>/i);
-  const root=JSON.parse(m?.[1]||"null");
+  const startTag=html.indexOf('id="__UNIVERSAL_DATA_FOR_REHYDRATION__"');
+  const startBody=html.indexOf('>',startTag)+1;
+  const endBody=html.indexOf('</script>',startBody);
+  const root=JSON.parse(startTag>=0&&startBody>0&&endBody>startBody?html.slice(startBody,endBody):'null');
   const detail=root?.__DEFAULT_SCOPE__?.["webapp.video-detail"]||{};
   const item=detail.itemInfo?.itemStruct||{};
   const music=item.music||{};
