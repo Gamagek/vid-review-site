@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "inventoryAt": "2026-10-19T12:09:52.278Z",
+  "inventoryAt": "2026-10-19T16:02:14.965Z",
   "publishedLibraryCount": 302,
   "batchLimit": 10,
   "phase": "additive_sidebar_illustrations",
@@ -2179,7 +2179,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "224ada6a02a2b0464cf67e379c5e5f991dd3632b8cc9dc9c11f82289fe2feaa4",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 9
     },
     {
@@ -2268,7 +2268,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "376603771cfce61d71b4a2f4f5eb14720b38d99b770ede4aa25bde771e129e47",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 9
     },
     {
@@ -2285,7 +2285,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "a5ebb54d32a45a7a978969ed9f6d85a1934250b488eef1a0123e1b97fa716bba",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 9
     },
     {
@@ -2334,7 +2334,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "386e0805de1b7c481ffa72d465bfaeda09848dc9ff4042b75e4c2f59a635fdba",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 9
     },
     {
@@ -2343,7 +2343,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "19d0051a5f09f294dbc73a2784ee2b8e34e921b40dfa557acc54dc199a0826f0",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 9
     },
     {
@@ -2384,7 +2384,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "ce47deec1ed8ab1f2bc4c8a63adf97fa86da7ff954abefc5c8b137a5b80c1051",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 9
     },
     {
@@ -2393,7 +2393,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "83cae2612407a4ce173e74bcabede8e1032ebfa10480fb15f3eb327f0de5207c",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 9
     },
     {
@@ -2434,7 +2434,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "ad0859ad6fe5e278e23a2fb9c86dd32c353affcfc8c3045fadb4532208777c82",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 9
     },
     {
@@ -2443,7 +2443,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "6833a3a4ddc65d384cf07e8aea9b6c3800f027f248ec5906baa23fc46f075353",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 9
     },
     {
@@ -2468,7 +2468,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "a419fb11e7e5dc2b0be812c8681d7177435ff67a0465c396c71c118ede9eecd3",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 9
     },
     {
@@ -2488,7 +2488,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Finish PR225 batch9: full checks, exact final-head CI, merge, existing Worker deployment and all ten live image/hash/HTML/preview/social/schema/map/date checks. Count ten new assets as published/live only after verification. Preserve prior80 artwork and all source/owner posters/data. New missing TikTok posters remain first priority; original five missing YouTube records267–271 remain queued. Do not invent per-video Tagembed/Iframely mappings.",
+  "nextTask": "Freshly reconcile main, open PRs, live Worker and read-only D1 first. Preserve the later owner Dashboard Worker dea4814c-4705-40c3-afbb-1d22ed6ed9da; do not overwrite its changes with a stale main deployment. Continue the next safe 10 distinct source/theme-verified covers among the 31 missing-thumbnail TikTok records in priorityMissingImages, with no production lettering. Keep all source/owner posters, held media and protected review text unchanged. Then address missing-image YouTube267–271 and remaining reviews (205 pending total now). Non-Saiyaara Tagembed/Iframely methods remain blocked by absent verified per-video owner-authorized mappings; never invent/reuse Saiyaara mappings or fabricate playback signals. This checkpoint is documentation/evidence only [read-only-preflight][seo-only]: no Worker deployment, maintenance writes, new Inspection or sitemap submission.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -2639,7 +2639,7 @@
     },
     "limits": "Ten separate illustrations; no source poster repaired/replaced, no new viewing/audio claims. 11 original provider HTTP errors and8 protected placeholders remain. Original214rows match baseline; five independent owner publications were added during this work."
   },
-  "reconciledAt": "2026-10-19T12:09:52.278Z",
+  "reconciledAt": "2026-10-19T16:02:14.965Z",
   "providerCounts": {
     "youtube": 226,
     "other": 1,
@@ -5618,6 +5618,192 @@
   "savedLibraryCount": 313,
   "priorityMissingImages": [
     {
+      "id": 286,
+      "slug": "ranking-funniest-human-fails-try-not-to-laugh-707278",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 287,
+      "slug": "top-100-funniest-videos-ever-london-comedy-edit-742806",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 288,
+      "slug": "nine-seconds-of-brainrot-meme-comedy-898784",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 290,
+      "slug": "try-not-to-laugh-short-meme-clip-challenge-356877",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 291,
+      "slug": "epic-fails-of-2026-try-not-to-laugh-050782",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 292,
+      "slug": "tom-holland-reaction-style-laugh-challenge-089351",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 293,
+      "slug": "try-not-to-laugh-part-6-ten-internet-videos-356566",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 294,
+      "slug": "top-three-random-try-not-to-laugh-clips-537740",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 295,
+      "slug": "welp-movie-meme-and-comic-reaction-309197",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 296,
+      "slug": "th-th-ch-c-m-c-i-vietnamese-laugh-challenge-647879",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 297,
+      "slug": "thappar-mai-turbo-khul-gaye-animal-comedy-caption-071126",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 298,
+      "slug": "tom-reacts-part-2-three-funny-internet-videos-053782",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 299,
+      "slug": "funny-fails-and-memes-2026-compilation-298335",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 301,
+      "slug": "ranking-laugh-moments-reaction-based-humour-553234",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 303,
+      "slug": "if-you-laugh-you-have-to-follow-six-second-test-062337",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 304,
+      "slug": "don-t-you-dare-laugh-a-direct-audience-challenge-082198",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 305,
+      "slug": "a-funny-meme-clip-with-regional-hashtags-820116",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 306,
+      "slug": "top-five-laugh-moments-ranked-viral-clips-715282",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 307,
+      "slug": "crazy-funny-moments-comedy-challenge-800532",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 310,
+      "slug": "tom-holland-reaction-to-funny-animation-828053",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 311,
+      "slug": "try-not-to-laugh-part-50-weekly-funniest-videos-354966",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 312,
+      "slug": "indonesian-meme-short-everyday-online-humour-509141",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 313,
+      "slug": "trying-not-to-laugh-but-failing-couple-clip-472391",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 316,
+      "slug": "i-dreamt-they-cut-off-my-balls-andy-praise-skit-477588",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 317,
+      "slug": "quick-comedy-moments-broad-laugh-challenge-672031",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 318,
+      "slug": "a-clever-joke-that-never-gets-old-793556",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 319,
+      "slug": "laughing-at-a-joke-you-didn-t-understand-935829",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 322,
+      "slug": "dance-monkey-dance-and-joke-short-448325",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 323,
+      "slug": "wait-for-the-ending-comedy-twist-399966",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 325,
+      "slug": "thai-sound-comedy-clip-short-humour-489414",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
+      "id": 326,
+      "slug": "meme-madness-rapid-comedy-tiktok-927327",
+      "observedAt": "2026-10-19T16:10:20.312Z",
+      "reason": "Current read-only D1 has an empty thumbnail field and no conceptual artwork. Verify exact current source/theme and saved-source-poster priority before generating a distinct cover; missing metadata alone does not prove source video playback."
+    },
+    {
       "id": 267,
       "slug": "tom-react-generator-dog-cat-flour-barber-noodles-comedy-review",
       "observedAt": "2026-10-19T10:54:59.600Z",
@@ -5649,7 +5835,7 @@
     }
   ],
   "batch9": {
-    "state": "prepared",
+    "state": "published_verified",
     "recordIds": [
       289,
       300,
@@ -5671,8 +5857,8 @@
       "targetRowsSha256": "bf96690b0164c0eab89a429ea47e759a59e2590fdd750535fac2e3a6b0fe98d8"
     },
     "newGenerated": 10,
-    "newPublished": 0,
-    "liveVerified": 0,
+    "newPublished": 10,
+    "liveVerified": 10,
     "sourceVerification": "docs/review-images/batch9-source-verification-20261019.json",
     "ownerPublicationsReconciled": [
       286,
@@ -6045,6 +6231,198 @@
       "workerDryRun": true,
       "visualAssetCount": 10,
       "ocrAssetCount": 10
+    },
+    "release": {
+      "pr": 225,
+      "head": "f833df7ac2e2787ccd1d88aef06f73c669ffbeed",
+      "tree": "c0041cd373e220176986b569115f04aa40281741",
+      "merge": "8a14694989e627f293f5d9dd8a604ad65dbe0c1f",
+      "ciRun": 39250686556,
+      "mainCiRun": 39250867453,
+      "deployRun": 39250867522,
+      "deployJob": 118054036310,
+      "portainerRun": 39250867465,
+      "worker": {
+        "id": "e74b7d1e-0273-4d3a-b114-44cfc59a6055",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "versions": [
+          {
+            "version_id": "9b428d81-1d55-4843-8aec-54d439c91146",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-19T12:17:46.79475Z",
+        "annotations": {
+          "workers/triggered_by": "deployment"
+        }
+      },
+      "deploymentLogEvidence": [
+        "2026-10-19T12:17:36.7359949Z # tests 427",
+        "2026-10-19T12:17:36.7360130Z # pass 427",
+        "2026-10-19T12:17:36.7360215Z # fail 0",
+        "2026-10-19T12:17:42.6483333Z ✅ No migrations to apply!",
+        "2026-10-19T12:17:49.8203463Z Deployed vid-review-site triggers (0.89 sec)",
+        "2026-10-19T12:17:49.8210116Z Current Version ID: 9b428d81-1d55-4843-8aec-54d439c91146"
+      ],
+      "portainerJobs": [
+        {
+          "name": "validate",
+          "conclusion": "success"
+        },
+        {
+          "name": "preflight",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Read-only Portainer 524 incident status",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Deploy optional v5 internal services (one-time, live-merge)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "deploy",
+          "conclusion": "skipped"
+        }
+      ]
+    },
+    "laterOwnerDeployment": {
+      "checkedAt": "2026-10-19T16:02:15.561Z",
+      "deployment": {
+        "id": "522f81ff-03cb-4b72-a1eb-64b56c49310d",
+        "source": "dash",
+        "strategy": "percentage",
+        "annotations": {
+          "workers/message": "Deployed version dea4814c",
+          "workers/triggered_by": "deployment"
+        },
+        "versions": [
+          {
+            "version_id": "dea4814c-4705-40c3-afbb-1d22ed6ed9da",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-19T15:37:05.83307Z"
+      },
+      "limit": "A later Dashboard deployment was observed after the successful PR225 release. It is preserved; this verification-only checkpoint must not redeploy or roll it back. Current public image checks were performed under this later release, not the earlier PR225 Worker."
+    },
+    "verificationFile": "docs/review-images/batch9-live-verification-20261019.json",
+    "verifiedAt": "2026-10-19T16:05:05.842Z",
+    "currentInventory": {
+      "checkedAt": "2026-10-19T16:02:14.965Z",
+      "saved": 313,
+      "published": 302,
+      "sha256": "daad4b6e05ef74a520a3f8ac50151d6bc88d223215dbfa20f9c7d485a5d10338"
+    },
+    "audit": {
+      "run": 39250958512,
+      "artifact": 12185951687,
+      "zipSha256": "84a64e198f9f93b4b864e143ee81939e5ca83588482e3be6061505fc6fd3066e",
+      "generatedAt": "2026-10-19T12:18:20.086Z",
+      "pages": 336,
+      "libraryReviews": 302,
+      "editorialReviews": 10,
+      "technicalFailures": 0,
+      "editorialWarningPages": 2,
+      "editorialWarningMessages": 3,
+      "warningPages": [
+        {
+          "url": "https://vid.best/watch/lab-review-1-player-test",
+          "warnings": [
+            "short_review_needs_editorial_check",
+            "demo_page_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-embed-experience-demo",
+          "warnings": [
+            "demo_page_needs_editorial_check"
+          ]
+        }
+      ],
+      "searchConsole": {
+        "status": "success",
+        "authenticated": true,
+        "propertyVerified": true,
+        "sitemapSubmitted": false,
+        "inspections": [],
+        "sitemapMode": "read_only",
+        "sitemapProcessing": {
+          "status": "verified",
+          "isPending": false,
+          "lastDownloaded": "2026-10-19T10:22:53.041Z",
+          "lastSubmitted": "2026-10-19T10:22:50.628Z",
+          "errors": 0,
+          "warnings": 0
+        },
+        "reviewSitemaps": [
+          {
+            "url": "https://vid.best/sitemaps/videos-1.xml",
+            "submitted": false,
+            "processing": {
+              "status": "verified",
+              "isPending": false,
+              "lastDownloaded": "2026-10-19T10:22:55.035Z",
+              "lastSubmitted": "2026-10-19T10:22:51.167Z",
+              "errors": 0,
+              "warnings": 20
+            }
+          },
+          {
+            "url": "https://vid.best/sitemaps/daily-weekly-best.xml",
+            "submitted": false,
+            "processing": {
+              "status": "verified",
+              "isPending": false,
+              "lastDownloaded": "2026-10-19T10:22:53.165Z",
+              "lastSubmitted": "2026-10-19T10:22:51.501Z",
+              "errors": 0,
+              "warnings": 0
+            }
+          }
+        ],
+        "totalReviews": 312,
+        "inspectionBudget": 0
+      },
+      "sourcePosterCounts": {
+        "ok": 288,
+        "http_error": 1,
+        "placeholder": 8,
+        "missing": 5
+      },
+      "limit": "Actual completed post-PR225 release audit. No URL Inspection calls or sitemap submissions. Google download timestamps predate this batch; they do not establish image indexing or approval. Source-poster HTTP availability is separate from conceptual artwork, source identity, decoded imagery, rights or playback."
+    },
+    "browser": {
+      "art": {
+        "height": 297.15625,
+        "width": 409.40625,
+        "x": 854.5625,
+        "y": 466.078125
+      },
+      "caption": "Conceptual review artwork. This is not a frame from the source video.",
+      "checkedAt": "2026-10-19T16:08:58.102Z",
+      "image": {
+        "complete": true,
+        "currentSrc": "https://vid.best/review-illustrations/funny-cat-moments-ranking-and-laugh-challenge-126241-v1.webp",
+        "naturalHeight": 941,
+        "naturalWidth": 1672,
+        "renderedWidth": 375.40625
+      },
+      "review": {
+        "height": 1262.96875,
+        "width": 746.5625,
+        "x": 84,
+        "y": 466.078125
+      },
+      "url": "https://vid.best/watch/funny-cat-moments-ranking-and-laugh-challenge-126241",
+      "viewport": {
+        "height": 936,
+        "width": 1363
+      },
+      "screenshot": "docs/review-images/batch9-live-desktop-20261019.jpg",
+      "limit": "Desktop sidebar decoding, relevant artwork and truthful caption verified. Existing 900px responsive CSS unchanged; no independent mobile viewport or continuous source playback/audio verification. No Play action was taken."
     }
   }
 }
