@@ -3126,7 +3126,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   ${video.provider === "tiktok" ? '<script src="/tiktok-oembed-cache.js?v=20261018-replay" defer></script><script src="/tiktok-preview-service.js?v=20261018-replay" defer></script>' : ""}
   ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>' : ""}
-  <script src="/watch.js?v=20261018-oembed-cache" defer></script>
+  <script src="/watch.js?v=20261019-art-preview" defer></script>
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261008-gateway1">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-cache2" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
@@ -3313,11 +3313,12 @@ function renderMedia(video, playbackOrigin, viewer = false) {
     // Keep the selected, reviewed cover separate from provider-cached metadata.
     const ownedCover = ownedTikTokWatchCover(video, playbackOrigin);
     const imageUrl = ownedCover || video.preview_poster_url || `/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}`;
+    const selectedCover = ownedCover || video.review_preview_url || "";
     const illustratedCover = Boolean(video.review_preview_url) || /-illustrated-v\d+\.(?:jpe?g|png|webp|avif)$/i.test(ownedCover);
     const zeroRequestPlayer = tiktokId === "7603012203595320584" && extractTikTokUsername(video.source_url) === "sujicomedyedit_007";
     return `<article class="tiktok-preview-card" data-tiktok-id="${escapeHtml(tiktokId)}" data-tiktok-source="${escapeHtml(video.source_url)}" data-tiktok-player-mode="metadata-card"${zeroRequestPlayer ? ' data-tiktok-zero-request="1"' : ""}>
       <button type="button" class="tiktok-preview-card-media" data-tiktok-show-preview aria-label="Play TikTok video in popup">
-        <img class="tiktok-preview-card-image" src="${escapeHtml(imageUrl)}"${ownedCover ? ` data-tiktok-owned-cover="${escapeHtml(ownedCover)}" style="object-fit:contain"` : ""} data-tiktok-fallback="/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}" alt="" loading="eager" decoding="async">
+        <img class="tiktok-preview-card-image" src="${escapeHtml(imageUrl)}"${selectedCover ? ` data-tiktok-owned-cover="${escapeHtml(selectedCover)}" style="object-fit:contain"` : ""} data-tiktok-fallback="/api/tiktok/cached-poster?id=${encodeURIComponent(tiktokId)}" alt="" loading="eager" decoding="async">
         <span class="tiktok-preview-card-play" aria-hidden="true">▶</span>
       </button>
       <div class="tiktok-preview-card-body">

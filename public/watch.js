@@ -74,7 +74,7 @@ function initializeTikTokPreviewCard() {
       const cover = new URL(value, location.origin);
       return cover.origin === location.origin && !cover.username && !cover.password &&
         !cover.search && !cover.hash &&
-        /^\/review-covers\/[a-z0-9_-]+\.(?:jpe?g|png|webp|avif)$/i.test(cover.pathname)
+        /^\/review-(?:covers|illustrations)\/[a-z0-9_-]+\.(?:jpe?g|png|webp|avif)$/i.test(cover.pathname)
         ? cover.href : "";
     } catch { return ""; }
   })();

@@ -72,7 +72,7 @@ test("watch first paint uses the selected illustration without changing owner te
   assert.match(html, /<h1>Owner review title<\/h1>/);
   assert.ok(html.includes("Owner review — final paragraph."));
   assert.doesNotMatch(html, /Last updated|<iframe|<video|"@type":"VideoObject"/);
-  assert.match(html, /\/watch\.js\?v=20261018-oembed-cache/);
+  assert.match(html, /\/watch\.js\?v=20261019-art-preview/);
   assert.deepEqual(c.sqlite.prepare("SELECT * FROM videos ORDER BY id").all(), before);
   assert.deepEqual(c.sqlite.prepare("SELECT * FROM tiktok_oembed_cache").all(), metadata);
   const head = await render(c, "", { method: "HEAD" });
@@ -177,6 +177,15 @@ function browserHarness({ owned = cover, apiAvailable = true, failedBeforeInit =
 }
 
 async function settle() { await Promise.resolve(); await Promise.resolve(); }
+
+test('a server-selected conceptual preview cover survives watch metadata refresh without opening a player', async () => {
+  const art=origin+'/review-illustrations/ranking-legendary-laughing-memes-v1.webp';
+  const h=browserHarness({owned:art});
+  h.resolve({thumbnail_url:providerPoster}); await settle();
+  assert.equal(h.image.src,art);
+  assert.equal(h.opened.length,0);
+  assert.equal(h.created.some(type=>['video','iframe','script'].includes(type)),false);
+});
 
 test("opt-in zero-request watch cards make no old-gateway refresh before or after a deliberate Play click", () => {
   const h = browserHarness({ zeroRequest: true });
