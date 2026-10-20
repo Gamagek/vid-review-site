@@ -13,7 +13,10 @@ if(!process.env.GEMINI_API_KEY)throw Error('Missing GEMINI_API_KEY secret');
 const source='https://www.youtube.com/watch?v='+id;
 const prompt='Analyze the actual video, including observable scenes, on-screen text and clearly audible speech. Return JSON only: {accessible:boolean,observed_scenes:[{timestamp:string,description:string}],audio_summary:string,uncertainties:[string],editorial_outline:[{heading:string,notes:string}],suggested_title:string,suggested_description:string,seo_title:string,seo_description:string,seo_tags:[string]}. If video unavailable, accessible=false and do not invent details. Be precise; no fabricated quotes, scene descriptions or claims of human viewing. Distinguish effects and editing from real-world events. Editorial outline should have 3–6 substantive sections only if evidence supports them.';
 const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(values.model)+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':process.env.GEMINI_API_KEY},body:JSON.stringify({contents:[{parts:[{file_data:{file_uri:source}},{text:prompt}]}],generationConfig:{temperature:0.2,responseMimeType:'application/json',maxOutputTokens:4500}}),signal:AbortSignal.timeout(120000)});
-if(!response.ok)throw Error('Gemini API HTTP '+response.status+' (no draft written)');
+if(!response.ok){
+  const body=(await response.text()).slice(0,1800).replace(/AIza[\\w-]+/g,'[REDACTED_API_KEY]');
+  throw Error('Gemini API HTTP '+response.status+': '+body+' (no draft written)');
+}
 const payload=await response.json();
 const candidate=payload.candidates?.[0];
 if(candidate?.finishReason&&candidate.finishReason!=='STOP')throw Error('Incomplete Gemini output: '+candidate.finishReason);
