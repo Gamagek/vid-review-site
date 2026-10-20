@@ -196,8 +196,9 @@
   ],
   "nextTasks": [
     {
-      "task": "Review the existing watch-page document-title selection before any implementation: renderWatchHtml currently uses the first70characters of video.title, ignoring saved seo_title. Titli135 live HTML/API and unchanged src/index.js establish the difference; evaluate use of owner-authored SEO titles in metadata while preserving H1/video titles, protected owner wording, source identity and dates. This is a separate renderer investigation, not permission for bulk title rewrites or a claim that Google currently uses either title.",
-      "evidenceFile": "docs/titli-live-verification-20261020.json"
+      "task": "Do not repeat the completed saved-title correction. Investigate the stored library sitemap error1 through already authorized read-only error details if available; no empty production commit, blind resubmission, WAF/provider bypass or redundant full Inspections. Public XML/basic required-element checks pass but do not explain the Google error. If exact external error detail remains unavailable, record that limit and continue a small evidence-ready unprotected editorial task; verified provider mappings remain absent and image creation stays paused.",
+      "evidenceFile": "docs/watch-metadata-title-verification-20261020.json",
+      "observedAt": "2026-10-20T12:11:31.185Z"
     },
     {
       "recordIds": [
@@ -348,6 +349,25 @@
       "verified": "T-Series exact Titli page credits ChinmayiSripaada/GopiSunder,Vishal-Shekhar,AmitabhBhattacharya and TamillyricistsCharulathaMani/MadhumithaMani. Separate making page credits FarahKhan; AppleMusic identifies3July2013audio catalogue. No footage/audio comparison or edit.",
       "limits": "Do not transfer OneTwoThreeFour credits, album/site/uploaddates or claim fresh scene/audio/filming-location observation. Distinct music-video/making/lyric/remix entries are not interchangeable.",
       "productionWrites": false
+    },
+    {
+      "status": "metadata_only_renderer_deployed_and_live_verified",
+      "observedAt": "2026-10-20T12:11:31.185Z",
+      "pullRequest": 240,
+      "reviewedHead": "f805ec1adbee0ab35f71d8967a073ba9486f3aa1",
+      "mergeCommit": "0804feff295fd3042086b5f9ff3c60bce17b75b8",
+      "workerVersion": "90c860b7-4351-4f55-9f01-c8fd710a9257",
+      "task": "Honor saved editorial seo_title in document/OG/Twitter/WebPage metadata only, with unchanged display-title fallback and70-character bound.",
+      "productionDataWrites": false,
+      "sqlMigrations": 0,
+      "imagesCreated": 0,
+      "imagesEdited": 0,
+      "fullNodeTests": 437,
+      "pythonTests": 4,
+      "focusedTests": 5,
+      "liveSamples": 7,
+      "preserved": "All388rows/29non-counter fields from the newer premerge baseline, original H1/review/VideoObject/player/poster/canonical/dates and existing100artwork guards; image pause and held-media/protected-copy safeguards.",
+      "evidenceFile": "docs/watch-metadata-title-verification-20261020.json"
     }
   ],
   "records": [
@@ -2170,24 +2190,22 @@
   },
   "screeningVersion": 3,
   "latestPublicAudit": {
-    "runId": 39397811613,
-    "artifactId": 12252129316,
-    "zipSha256": "ad2298637791faf497e96405b0c5120e8fc6040fcdc0aa1e4cef32d811021056",
-    "generatedAt": "2026-10-20T09:03:25.542Z",
+    "runId": 39420225531,
+    "artifactId": 12262994432,
+    "zipSha256": "a17e8cbacfd6639a85fc6364821e7cc13516c36b046a5c5bafaee3f0d4fcc7be",
+    "generatedAt": "2026-10-20T12:10:42.930Z",
     "pages": 422,
-    "technicalFailures": 0,
     "libraryReviews": 388,
     "editorialReviews": 10,
-    "editorialWarningPages": 39,
-    "editorialWarningMessages": 40,
+    "technicalFailures": 0,
+    "editorialWarningPages": 34,
+    "editorialWarningMessages": 35,
     "thumbnailCounts": {
       "ok": 336,
       "http_error": 1,
       "placeholder": 8,
       "missing": 43
     },
-    "inspections": 0,
-    "sitemapSubmissions": 0,
     "searchConsole": {
       "status": "success",
       "authenticated": true,
@@ -2198,8 +2216,8 @@
       "sitemapProcessing": {
         "status": "verified",
         "isPending": false,
-        "lastDownloaded": "2026-10-19T10:22:53.041Z",
-        "lastSubmitted": "2026-10-19T10:22:50.628Z",
+        "lastDownloaded": "2026-10-20T09:45:17.780Z",
+        "lastSubmitted": "2026-10-20T09:45:13.976Z",
         "errors": 0,
         "warnings": 0
       },
@@ -2210,9 +2228,9 @@
           "processing": {
             "status": "verified",
             "isPending": false,
-            "lastDownloaded": "2026-10-19T10:22:55.035Z",
-            "lastSubmitted": "2026-10-19T10:22:51.167Z",
-            "errors": 0,
+            "lastDownloaded": "2026-10-20T09:45:16.373Z",
+            "lastSubmitted": "2026-10-20T09:45:14.292Z",
+            "errors": 1,
             "warnings": 20
           }
         },
@@ -2222,8 +2240,8 @@
           "processing": {
             "status": "verified",
             "isPending": false,
-            "lastDownloaded": "2026-10-19T10:22:53.165Z",
-            "lastSubmitted": "2026-10-19T10:22:51.501Z",
+            "lastDownloaded": "2026-10-20T09:45:17.804Z",
+            "lastSubmitted": "2026-10-20T09:45:14.528Z",
             "errors": 0,
             "warnings": 0
           }
@@ -2232,7 +2250,9 @@
       "totalReviews": 398,
       "inspectionBudget": 0
     },
-    "limit": "Actual completed post-PR236 read-only audit. Internal warnings are not Google/AdSense verdicts; no new indexed count or source playback claim. Google download timestamps and warning counts must be read as dated observations."
+    "inspections": 0,
+    "sitemapSubmissions": 0,
+    "limit": "Actual completed post-release zero-inspection audit. Internal warnings and source-image counts are not Google indexing/AdSense verdicts; existing100conceptual images are separate."
   },
   "completedPlayerIntegrations": [
     {
@@ -2428,5 +2448,17 @@
       }
     },
     "limit": "At09:03:48.776Z the release matched the exact expected three-field change and all other387rows. A later09:10:36.339Z read shows independent non-counter data changes outside135; Titli135still exactly matches its intended result and original dates. The completed migration targets only135. Preserve current out-of-scope changes; do not roll back or attribute them to this release. Actor/changed-field attribution is not established by these read-only hashes."
+  },
+  "latestRuntimeMetadataTitleChange": {
+    "observedAt": "2026-10-20T12:11:31.185Z",
+    "saved": 388,
+    "published": 388,
+    "metadataTitlesUsingSavedField": 388,
+    "metadataDifferencesAtLatestInventory": 263,
+    "allNonCounterSha256": "b854c4033bf425e28ff86478e9ec54ebb69846d54802f9223b5493add2d1347a",
+    "baselineAt": "2026-10-20T12:08:25.583Z",
+    "afterReadAt": "2026-10-20T12:11:03.867Z",
+    "earlierIndependentDataChangesPreserved": true,
+    "evidenceFile": "docs/watch-metadata-title-verification-20261020.json"
   }
 }
