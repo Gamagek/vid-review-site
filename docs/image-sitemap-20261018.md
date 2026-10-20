@@ -1,5 +1,13 @@
 # Review artwork discovery and image sitemap (18 October 2026)
 
+## 20 October 2026: batch10 live discovery verified; 100 conceptual covers
+
+PR234 merged `77c1630b4d2df3127704474b73363f6b4c56878c`; exact-headCI39386368376/mainCI39387241003/Deploy39387240940 passed. Actual100% Worker `40b866f7-3a95-4328-9aea-d61e8be5a4ca` published2026-10-20T07:33:38.05342Z. At07:36:20.850Z all ten new public image200/MIME/bytes/SHA256 checks pass, along with exact matching watchimg, OG/Twitter, WebPage ImageObject, guarded preview, image/video-map associations and original publication/modification dates. Prior90art/source posters/VideoObject thumbnails remain unchanged. Newgenerated10/newpublished10/newliveverified10; cumulative100/388published,279pending/nineheld.
+
+Root `/sitemap.xml` still lists five directurlsets, not the standalone index; `/image-sitemap.xml` remains discoverable inrobots and lists `/sitemaps/images-1.xml`. Image map now345pages/445imageentries;43published image-less YouTube reviews remain queued. No nested index, fake date freshness or empty production submission. Desktop sidebar decoding/caption verified; unchanged900px responsive CSS is not an independent mobile-browser test. All388D1 non-counter fields and ten live dates match baseline; no DB/R2/migration/player/review/SEO/hold changes.
+
+Actual completed audit39387320477/artifact12247239491 at07:34:24.252Z:422pages/0technicalfailures;0Inspections/0submissions. Google download timestamps still19Oct10:22:53.041Z(root),10:22:55.035Z(library),10:22:53.165Z(editorial);20library warnings remain. These pre-release timestamps do not prove Google crawled/indexed these covers. See `docs/review-images/batch10-live-verification-20261020.json` for dated evidence/hash/screenshot. Next safe21missingTikTok previews, then43YouTube omissions; no indexing/AdSense promise or invented provider mapping. This evidence-only checkpoint must skip production deployment.
+
 ## 20 October 2026: ten new TikTok conceptual covers prepared for dynamic discovery
 
 PR234 adds ten original16:9WebPs to existing identity-checked manifest for286/287/288/290/291/293/294/296/313/322, not to source VideoObject thumbnails or owner media fields. After successful release the unchanged server-rendered cover/OG/Twitter/WebPage/dynamic image/video-map paths will all reference each exact stable URL; do not count them as published/live yet. Newgenerated10/newpublished0/newliveverified0. Prior90images, flat root5urlsets and standaloneimageindex/robots discovery preserved. No fake freshness dates, source poster replacement, sitemap resubmission or URL Inspection.
