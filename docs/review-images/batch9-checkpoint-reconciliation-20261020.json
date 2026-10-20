@@ -1,0 +1,1450 @@
+{
+  "checkedAt": "2026-10-20T06:55:41.181Z",
+  "main": "345d6bd8f530c3aaa16086d0140725de2e929221",
+  "mainTree": "ab4724968947b3ac4992c6677320e55aadecef3f",
+  "ownerChangesPreserved": [
+    "2d076cc",
+    "e12aebd",
+    "b953284",
+    "95148db",
+    "395fa63",
+    "345d6bd"
+  ],
+  "previousCheckpointHead": "dfa8e7fc9b05beabc2328a2390d0450b6c507a61",
+  "previousCheckpointCI": 39283991785,
+  "worker": {
+    "checkedAt": "2026-10-20T06:53:21.165Z",
+    "active": {
+      "id": "afd2bd49-66e5-4f66-bd4e-68b47fb2357f",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "versions": [
+        {
+          "version_id": "83c4c8b1-f1eb-43aa-b541-168a561f26f8",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-10-20T02:40:16.259843Z",
+      "annotations": {
+        "workers/triggered_by": "deployment"
+      }
+    },
+    "recent": [
+      {
+        "id": "afd2bd49-66e5-4f66-bd4e-68b47fb2357f",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "versions": [
+          {
+            "version_id": "83c4c8b1-f1eb-43aa-b541-168a561f26f8",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-20T02:40:16.259843Z",
+        "annotations": {
+          "workers/triggered_by": "deployment"
+        }
+      },
+      {
+        "id": "3fe7b583-b40b-4973-a609-29740c15d4f7",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "versions": [
+          {
+            "version_id": "1060078a-6c41-4e8a-acf1-270e47bb7d28",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-20T02:37:31.341686Z",
+        "annotations": {
+          "workers/triggered_by": "deployment"
+        }
+      },
+      {
+        "id": "b94126a0-d60b-437d-b393-70666e32a741",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "versions": [
+          {
+            "version_id": "9f225124-7d32-4a9c-9ddf-5e88ef99da0b",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-20T02:34:49.11415Z",
+        "annotations": {
+          "workers/triggered_by": "deployment"
+        }
+      }
+    ]
+  },
+  "inventory": {
+    "checkedAt": "2026-10-20T06:55:41.181Z",
+    "saved": 388,
+    "published": 388,
+    "sha256": "308e8d4b33e4ba32d9ddddcaaf32ecb9be79d4de04835d4a4c5ad45354414e49",
+    "original313RowsSha256": "e2f2803cc24c35a8818d72f00fbaa1cb00295b8e7273e140371ebeb750c9b9ca",
+    "providerCounts": {
+      "youtube": 312,
+      "other": 1,
+      "tiktok": 54,
+      "facebook": 20,
+      "instagram": 1
+    },
+    "artIdentityMismatches": [],
+    "newRows": [
+      {
+        "id": 72,
+        "slug": "ultimate-funny-fails-try-not-to-laugh",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "7386147da0de0f8ef7e93c88d2835705e4ed8e5412fccd1220fea3279627cc8c"
+      },
+      {
+        "id": 75,
+        "slug": "hilarious-ai-face-filter-prank-best-escalator-reactions",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "c1a3a39a9dd153f25e34b92e891334ff63a3ffb58c288812b5a898e9b01aaa7e"
+      },
+      {
+        "id": 276,
+        "slug": "research-draft-tom-react-trend-eywdspxi-do",
+        "category": "Social Media & Trending",
+        "provider": "youtube",
+        "sourceSha256": "039793820b76e0ac5707391094761315a8a59f1320f10e856a33493e20a33a47"
+      },
+      {
+        "id": 277,
+        "slug": "research-draft-tom-react-trend-z8oyvz7vhd4",
+        "category": "Social Media & Trending",
+        "provider": "youtube",
+        "sourceSha256": "c920458842373b5fe3316d53bff598c359fe6ccc0f27a5aad74c246bba70a76c"
+      },
+      {
+        "id": 278,
+        "slug": "research-draft-tom-react-trend-au1mew4bxcs",
+        "category": "Social Media & Trending",
+        "provider": "youtube",
+        "sourceSha256": "19ca4c822dd37b2a7149d68d82f37296a2098793f489f4d55779954f35f9918f"
+      },
+      {
+        "id": 279,
+        "slug": "research-draft-tom-react-trend-8rgwysznpgw",
+        "category": "Social Media & Trending",
+        "provider": "youtube",
+        "sourceSha256": "5a7ea061f4e6c98d0b4cc59268f04275fb0ed2f4a8ddcf11d1946e0e523bac19"
+      },
+      {
+        "id": 281,
+        "slug": "research-draft-tom-react-trend-h3bz0mjpdng",
+        "category": "Social Media & Trending",
+        "provider": "youtube",
+        "sourceSha256": "65b93b11843c1d5fc9cb739c0bac9f6df34f9771479f74308235d558b808226b"
+      },
+      {
+        "id": 282,
+        "slug": "research-draft-tom-react-trend-dr-dlxxigfe",
+        "category": "Social Media & Trending",
+        "provider": "youtube",
+        "sourceSha256": "b8e2c166048aa3fa38d084da0fa579b0e27fb817d547666e71f08d2d3b2c53c8"
+      },
+      {
+        "id": 283,
+        "slug": "research-draft-tom-react-trend-zoh19vcgzne",
+        "category": "Social Media & Trending",
+        "provider": "youtube",
+        "sourceSha256": "f0a7282c37849c447a6a268743ec013436f830f5cc1fd037f2e76843925494fa"
+      },
+      {
+        "id": 284,
+        "slug": "research-draft-tom-react-trend-sz1gszkmkpo",
+        "category": "Social Media & Trending",
+        "provider": "youtube",
+        "sourceSha256": "05bdd0f8a174bf9f4a35c4af0547b042287f66bfc264495923a3ef3ac3379f1b"
+      },
+      {
+        "id": 285,
+        "slug": "research-draft-tom-react-trend-a59cbttf4vq",
+        "category": "Social Media & Trending",
+        "provider": "youtube",
+        "sourceSha256": "3f62689a37137075f964b554c2cb385906004057d5788080119c8f8738a11ba7"
+      },
+      {
+        "id": 327,
+        "slug": "saiyaara-saiyaara-song-saiyaara-yrf-reels-officialteaser-sorts-ahaanpanday-viral",
+        "category": "Music",
+        "provider": "youtube",
+        "sourceSha256": "e3d7c3f9b3e55fdcde89a8d266c8ea49a7e60b678cf8d08a2860ce149cf8e5f7"
+      },
+      {
+        "id": 328,
+        "slug": "saiyaara-reprise-female-full-song-ahaan-aneet-tanishk-faheem-arslan-shreya-irshad",
+        "category": "Music",
+        "provider": "youtube",
+        "sourceSha256": "c9c18835e26056f56322ab3be3681fc5413ac697590fc94847d71864736808c1"
+      },
+      {
+        "id": 329,
+        "slug": "river-forest-calm-music-relaxation-study-nature-sound-mind",
+        "category": "Music",
+        "provider": "youtube",
+        "sourceSha256": "8f7386265b85f82b3924a5be2013b1a03f57d8c42b8415521000bc16d8bb587e"
+      },
+      {
+        "id": 330,
+        "slug": "youtube-short-irqegfrjdxw",
+        "category": "Social Media & Trending",
+        "provider": "youtube",
+        "sourceSha256": "472a4605f5fb848d02c054c1ab21e4c1d67fb46508ad11b43bb3ea3ef25c48f0"
+      },
+      {
+        "id": 331,
+        "slug": "youtube-short-v6xay4hwxfw",
+        "category": "Social Media & Trending",
+        "provider": "youtube",
+        "sourceSha256": "d14d7e68ba6207ba6d1bd625a0dff9404c773510d83422965b7229e61da97802"
+      },
+      {
+        "id": 332,
+        "slug": "youtube-short-lmlaknm5eom",
+        "category": "Social Media & Trending",
+        "provider": "youtube",
+        "sourceSha256": "a3028b2b84aa10daefb383f18c0b04f0be682a243a14ce63d11a2acaa607d750"
+      },
+      {
+        "id": 333,
+        "slug": "youtube-short-nzucv20jwwi",
+        "category": "Social Media & Trending",
+        "provider": "youtube",
+        "sourceSha256": "d4fbe0b971186006c6873b5e30b6e1fdcdb118370f65619ad223f8f46368fd62"
+      },
+      {
+        "id": 334,
+        "slug": "youtube-short-wd9anpar5ts",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "450fdf476df3fbab6487d9a9194537c54082f035ae003b0f8a2d69c0d34b0efa"
+      },
+      {
+        "id": 335,
+        "slug": "youtube-short-oonvgraywqu",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "9590217cdfd7c209fd1c56c878f27462023ce7de308ef951e86edf41861b15f2"
+      },
+      {
+        "id": 336,
+        "slug": "youtube-short-nq75jr-umro",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "4a5b59e64be2103e18146f47ace0965dd209477c9de29e69ec56bbedaca5aa47"
+      },
+      {
+        "id": 337,
+        "slug": "youtube-short-kxsdgu80gtw",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "cfa7c96fe14f35b62722a72653765e133e59a505757f6e479a5ccc7d4700ca47"
+      },
+      {
+        "id": 338,
+        "slug": "youtube-short-w-wsj70bf3y",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "604d5637963a38a8b0d07ae51e56129568d28d0bb5841db7bb6cb437b2ae86e0"
+      },
+      {
+        "id": 339,
+        "slug": "youtube-short-bxdlclqno9c",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "8df3fec615da49e63f84982b977ba9f1b27aa1295d1a83c8408c87185e766e29"
+      },
+      {
+        "id": 340,
+        "slug": "youtube-short-kzjdtnzyhec",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "44407d67c59ec3ac56e6a2dd0521d7fa723bd7d555c282773f1ca55d67d6099b"
+      },
+      {
+        "id": 341,
+        "slug": "youtube-short-sxeubb-g7fc",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "3682aa5efaeffaaabadc5a1b659d75b3fc0f43ff380df0b388a29c10d0b3509d"
+      },
+      {
+        "id": 342,
+        "slug": "youtube-short-fdd6l84a0sa",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "04525099b65bddbc8962da8b6d4144e94c7b0484518a2f28a1440e429eb88081"
+      },
+      {
+        "id": 343,
+        "slug": "youtube-short-dvl2jvehljw",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "21f4d1d8794cbd6bc2be4dca00ca589dcbf120389f1af4c1e6745c4034ddade6"
+      },
+      {
+        "id": 344,
+        "slug": "youtube-short-a2oqy5gqzmo",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "a9835031da447029f7b98815163a51eb75df5fb3a126da075dbcf4c31f0dd96d"
+      },
+      {
+        "id": 345,
+        "slug": "youtube-short-loehltqoeh0",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "1b7b40ea9526f7cb3268b4a56e2b3b2baeefb2d1f124bdf69137bcdda130eb41"
+      },
+      {
+        "id": 346,
+        "slug": "youtube-short-eu-ikegmiti",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "8c663be8035dcc0230207e423ec876a206b34cf7424d731d54904a19aedf45c4"
+      },
+      {
+        "id": 347,
+        "slug": "youtube-short-g54abythds8",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "eed7ee574aedd1a5400d47e80badda4e27a924e04a28b3a7310776546710e0a0"
+      },
+      {
+        "id": 348,
+        "slug": "youtube-short--q9aae71fru",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "45ce4a609eeed78e57bf6ca88131df4f6374c324da2bc04a8069f11c154b4369"
+      },
+      {
+        "id": 349,
+        "slug": "youtube-short-wtvozn3ycre",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "35eee35926fb1c1bf2b52d5a6bd62850349d69767a2c0f413b21679193da9581"
+      },
+      {
+        "id": 350,
+        "slug": "youtube-short-3gw5iil0hra",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "f745675194c9dfb6f4dca5532bd83537470a3fac5d361bb38db1a1fd8b934f5c"
+      },
+      {
+        "id": 351,
+        "slug": "youtube-short-4dy9mtqjwwq",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "32831d4442e49399ca5884d7506dbcb6521d552e64af7d4378bbb7ec912e28c0"
+      },
+      {
+        "id": 352,
+        "slug": "youtube-short-vcgftqtifiw",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "a7bef894f38b7250e651b460c0ee0bd2e57e429871ec4d4e2254e71f7be0e3c3"
+      },
+      {
+        "id": 353,
+        "slug": "youtube-short-ryd-wxf3lva",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "368917ad7271562f7ff633aad6cc052ee10a1fd93a3a0969893649550d3bcade"
+      },
+      {
+        "id": 354,
+        "slug": "youtube-short-y9ksured-7g",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "5d8c4b50c483f5e151af913ca6efb9fe2df4f77d7789367284cd95b9b5b39f17"
+      },
+      {
+        "id": 355,
+        "slug": "youtube-short-ydrnhrautlo",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "e1b95da92bab289274c1e4c03ce81e7bdb8a4931044bfa5378320ec9538fd335"
+      },
+      {
+        "id": 356,
+        "slug": "youtube-short-myjjeulifsk",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "e312d72baaeb3d72a393b541965440b1d11f94285cfa038625043e814066ee9c"
+      },
+      {
+        "id": 357,
+        "slug": "youtube-short-2tbpxj4ctle",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "b8e1231c43d4df3fd4f314698850166165f98f14b5024cd3bef11fadd32be6ce"
+      },
+      {
+        "id": 358,
+        "slug": "youtube-short-ed5-0vgje54",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "290b04b91610d8c454ea4c129941443321e1918b27d33e7b0ddc4be58ebe0bb2"
+      },
+      {
+        "id": 359,
+        "slug": "youtube-short-lk-pdh-jakk",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "dacba36b443a803d68647a467be9ac14eb505ad2b2c168c04165ccaf634717ac"
+      },
+      {
+        "id": 360,
+        "slug": "youtube-short--iqndxkm-ta",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "a8972728771433535ec18cd8f40844b994c40707e62914661b12faffff87e57e"
+      },
+      {
+        "id": 361,
+        "slug": "youtube-short-zqdnakrccnq",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "a9f97609a6c717aedf3ce23f29ecbe28d63686666105b971bde43ffb89c97156"
+      },
+      {
+        "id": 362,
+        "slug": "youtube-short-6f-3axjy4i4",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "46474db821c5716c8f51372027ba1db201195cd28c5e5400df9859aea05e5fa6"
+      },
+      {
+        "id": 363,
+        "slug": "pranks-dust-blasts-mask-reveals",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "2d3b5e292209b2e16cfb494c855ac1260ba3d779a9db37a69f1bfebc5c593081"
+      },
+      {
+        "id": 364,
+        "slug": "youtube-short-fcuuonmnaz4",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "d34953e04e0b8b7633e492453ec482c971c91786cc3af66ad58db58c1dd9ac48"
+      },
+      {
+        "id": 365,
+        "slug": "youtube-short-0nafqcsbjz0",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "7c0732f8f56722dcd78b57c0680f7343693724345a88b772045ea16a28c8d01c"
+      },
+      {
+        "id": 366,
+        "slug": "youtube-short-6zuwetwrmqg",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "818196652a5077212efcbd1d523043561fb57fbc1a1a136a4c394eac63ddd096"
+      },
+      {
+        "id": 367,
+        "slug": "youtube-short-tsxgmtx5wdc",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "189d7ee0a410d81f33b62f46351a07864dd52d8fc69a4c41107a6ed1782bc94a"
+      },
+      {
+        "id": 368,
+        "slug": "youtube-short--9f4qbjakhe",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "30be767701ad9f4aa2a0a9778933859911b00d8ec363faa64488a1f01cbc6e4b"
+      },
+      {
+        "id": 369,
+        "slug": "youtube-short-bnykvcmixi0",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "b7de68e098c3f4037a743fe8292fa583e2f9c0fed44679ea300c00ddeca219ae"
+      },
+      {
+        "id": 370,
+        "slug": "youtube-short-kesssuyz5ys",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "6a270d95f0a95c76e31022d51b054c1168186e258191069e339ac0ccb81ebad7"
+      },
+      {
+        "id": 371,
+        "slug": "youtube-short-2vuoqomi6uo",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "f7bd48c4b96762d6e056a9975c3e43018c48f24578c6d60aba7dd29425c62a0d"
+      },
+      {
+        "id": 372,
+        "slug": "youtube-short-goamj2r7fhi",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "0bc6da3432fc425fe82d0b750a07d219fa7361e2a62f0d58fcb71738a480eafe"
+      },
+      {
+        "id": 373,
+        "slug": "youtube-short-pclxcrxkszi",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "8e49fc2508d2d79cf576378ebeb1d7dcf22f4164a8816836eb7fba94df8109d8"
+      },
+      {
+        "id": 374,
+        "slug": "youtube-short-7p7ztnneec4",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "dd1c901f919bd8df5174ff51c246b56a168b1d43261346273c74f2df4ceb1317"
+      },
+      {
+        "id": 375,
+        "slug": "youtube-short-gshb7h3nxdq",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "56ac3fff67682c8a52c9dd6cdb939c4f18bc5ce7630352182d66e823a1f4780f"
+      },
+      {
+        "id": 376,
+        "slug": "youtube-short-5f0nr5aaz-u",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "a25759cb5f3ac083bd1b20c36e88fd6127d326ad3efefeec9efe831092fbe7b9"
+      },
+      {
+        "id": 377,
+        "slug": "youtube-short-tbdbgpqky3e",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "e4e368e9837acd2ebfdd8a8a99718d9e8031fc41fbe9fbb0d4f510da2d010f33"
+      },
+      {
+        "id": 378,
+        "slug": "youtube-short-qyyohmpu18c",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "310620dae7336182fadfaea067d7befc4ea754214cfc1c0999eadf57f8f3386c"
+      },
+      {
+        "id": 379,
+        "slug": "youtube-short-wi7a28ngsv4",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "d5a98adeff16daf247fb19e1bae7bd7e6813e99eeb6910fa9bc535a2add34456"
+      },
+      {
+        "id": 380,
+        "slug": "youtube-short-7fn26kyxqvo",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "df4c569677d9b407b39e42466c280a961195724e29322f86062282d49f71082d"
+      },
+      {
+        "id": 381,
+        "slug": "youtube-short-nsjquj0opvc",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "9f00b7adb5acf1bfce4498d38ec756574692389664c611d90fad21e6b69586b1"
+      },
+      {
+        "id": 382,
+        "slug": "youtube-short-k0cojchz6qe",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "f4b2bc5f190767916d812022d7e4247e0aa3ad4c083f93daa006e2fa3f3c7b9c"
+      },
+      {
+        "id": 383,
+        "slug": "youtube-short-yrnokp--5mw",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "bcad0e6becf21fed8177e3f7f312d0e2b382123669ce51f02f030fe96b510999"
+      },
+      {
+        "id": 384,
+        "slug": "youtube-short-wld0h6jvjx4",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "369cc55db252e4e07cc8f8a3c8623edf6a3fc949a8ef32f57c8afbfceb3afac4"
+      },
+      {
+        "id": 385,
+        "slug": "youtube-short-esaj4jjheqs",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "34c4b06283d29b7df86216f7aed98275704b89a3ffe0e06cd7901c18d0dc2b74"
+      },
+      {
+        "id": 386,
+        "slug": "youtube-short-h204j257esi",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "a2a27e4c6dd1b2fff60e93d53cffe60db8a98f460d2c07fcb1504babf04f2c37"
+      },
+      {
+        "id": 387,
+        "slug": "youtube-short-dfedvzevxbc",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "e4549c69b7ee6605b2c71bffb6f3be8ceaea2a9e6b6cb99f6c20f388b7969ad8"
+      },
+      {
+        "id": 388,
+        "slug": "youtube-short-nemlhjl-yj8",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "56655e718488c0a1df3d1a70aadf40fb00a7906f9bccad172346325444565da8"
+      },
+      {
+        "id": 389,
+        "slug": "youtube-short-uvqz3mnxhme",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "99de94dadf9cdb4cfd59eeba6af163b0ac5e11c2e1f203e78150f7eae5a42591"
+      },
+      {
+        "id": 390,
+        "slug": "youtube-short-4b4iqf2saye",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "82627e70249b07564d30fcf5e7c873964eb4bf26f2087c5bfa27d2006aa0a672"
+      },
+      {
+        "id": 391,
+        "slug": "youtube-short-q5t5mpaogm0",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "535adecfe6bd69e08906495326b10fce1fd70446b091e0dee3fdfb4f7da1745a"
+      },
+      {
+        "id": 392,
+        "slug": "youtube-short-i6fejmn7rju",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "f99eff3359105f19f8c6200fb710ea5d6e597d9260b7bf88e4a727e6ac9fdc0e"
+      },
+      {
+        "id": 393,
+        "slug": "youtube-short-wiovwe28bbq",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "ea37f3ed16e8ce88f3fd04c10ea049158f1ea6c5290bdb9ebd7060dd35233e6a"
+      },
+      {
+        "id": 394,
+        "slug": "youtube-short-6iem4fnzlhg",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "675538fbe8fbfd2b070d8b4195c87f77e9f1bf63dfed33ac3560df7164ae2894"
+      },
+      {
+        "id": 395,
+        "slug": "youtube-short-dx9n4qhxbc0",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "93054560ce46a8c67dffcf8823f943c1daaae992d0f4c9af81c59cd1f4546d6d"
+      },
+      {
+        "id": 396,
+        "slug": "youtube-short-yjnz20zt49m",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "59bf6f5758326f84b8be9176ca128c7b29104fd37451f7f33a5f233acf4f9101"
+      },
+      {
+        "id": 397,
+        "slug": "youtube-short-y5vqg0a0de4",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "c4d06e839b4b1eb766ada8ed122aede4820d388d6d173099f3b67f0bfbf5b6ac"
+      },
+      {
+        "id": 398,
+        "slug": "youtube-short-iyviqkw9u5g",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "30447f77d36414cae118261800232c9d720775ef4bc97f25880960c8ba177daf"
+      },
+      {
+        "id": 399,
+        "slug": "youtube-short-rgeh6qzfhks",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "0a6c6e1b9080049ffde815ce78f3e2a3b32712ccd1130ed8779b2b55e5b64e9f"
+      },
+      {
+        "id": 400,
+        "slug": "youtube-short-fe8ctyczjja",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "a2cf58b20c1c3acf95590f95c11a4979c63c9866c8bfd176092957f142327f9b"
+      },
+      {
+        "id": 401,
+        "slug": "youtube-short-l79eveapmwk",
+        "category": "Funny & Comedy",
+        "provider": "youtube",
+        "sourceSha256": "27ebc4cbb1ed091d3625d8f39165b894aa15a07934721a833b1d5b2fd586b304"
+      }
+    ],
+    "unpublishedQueueIds": [],
+    "candidates": [
+      {
+        "id": 286,
+        "slug": "ranking-funniest-human-fails-try-not-to-laugh-707278",
+        "title": "Ranking Funniest Human Fails — Try Not to Laugh",
+        "sourceUrl": "https://www.tiktok.com/@brunavanessafatima/video/7683247291393707278",
+        "published": 1,
+        "category": "Funny & Comedy",
+        "description": "A Vid.Best editorial look at @brunavanessafatima's ranking funniest human fails — try not to laugh TikTok, its captioned premise, format, and critical context.",
+        "reviewExcerpt": "🎬 The premise and creator framing\n\nThe public TikTok caption published by @brunavanessafatima frames this 22-second post as ranking funniest human fails — try not to laugh. A ranking promises to compare human mishaps rather than follow a single story. The value of that format is the tension between a quick setup and the order in which the moments are placed.\n\n⏱️ How the short-form format works\n\nA humour ranking works best when the viewer can tell why the next moment belongs ",
+        "created_at": "2026-10-19T11:49:28.051Z",
+        "updated_at": "2026-10-19T11:49:28.051Z",
+        "thumbnailEmpty": true
+      },
+      {
+        "id": 287,
+        "slug": "top-100-funniest-videos-ever-london-comedy-edit-742806",
+        "title": "Top 100 Funniest Videos Ever — London Comedy Edit",
+        "sourceUrl": "https://www.tiktok.com/@fmw560/video/7636459888750742806",
+        "published": 1,
+        "category": "Funny & Comedy",
+        "description": "A Vid.Best editorial look at @fmw560's top 100 funniest videos ever — london comedy edit TikTok, its captioned premise, format, and critical context.",
+        "reviewExcerpt": "🎬 The premise and creator framing\n\nThe public TikTok caption published by @fmw560 frames this 46-second post as top 100 funniest videos ever — london comedy edit. A 'top 100' headline is an ambitious promise for a short clip, so the interesting question is whether this is an excerpt from a broader series or a hyperbolic description of one montage.\n\n⏱️ How the short-form format works\n\nThe London Comedy and TikTok UK tags place the upload in a recognisable creator community, t",
+        "created_at": "2026-10-19T11:49:28.051Z",
+        "updated_at": "2026-10-19T11:49:28.051Z",
+        "thumbnailEmpty": true
+      },
+      {
+        "id": 288,
+        "slug": "nine-seconds-of-brainrot-meme-comedy-898784",
+        "title": "Nine Seconds of Brainrot Meme Comedy",
+        "sourceUrl": "https://www.tiktok.com/@nn.ediitz/video/7598252716497898784",
+        "published": 1,
+        "category": "Funny & Comedy",
+        "description": "A Vid.Best editorial look at @nn.ediitz's nine seconds of brainrot meme comedy TikTok, its captioned premise, format, and critical context.",
+        "reviewExcerpt": "🎬 The premise and creator framing\n\nThe public TikTok caption published by @nn.ediitz frames this 9-second post as nine seconds of brainrot meme comedy. The post's tiny runtime and 'brainrot' hashtags signal deliberately compressed internet humour. That vocabulary describes a style of fast associative editing, not a specific plot.\n\n⏱️ How the short-form format works\n\nA nine-second meme has almost no space for character introductions. It generally has to rely on an instantly r",
+        "created_at": "2026-10-19T11:49:28.051Z",
+        "updated_at": "2026-10-19T11:49:28.051Z",
+        "thumbnailEmpty": true
+      },
+      {
+        "id": 290,
+        "slug": "try-not-to-laugh-short-meme-clip-challenge-356877",
+        "title": "Try Not to Laugh — Short Meme-Clip Challenge",
+        "sourceUrl": "https://www.tiktok.com/@dakidbk/video/7620254113292356877",
+        "published": 1,
+        "category": "Funny & Comedy",
+        "description": "A Vid.Best editorial look at @dakidbk's try not to laugh — short meme-clip challenge TikTok, its captioned premise, format, and critical context.",
+        "reviewExcerpt": "🎬 The premise and creator framing\n\nThe public TikTok caption published by @dakidbk frames this 22-second post as try not to laugh — short meme-clip challenge. This creator uses a minimal caption combining try-not-to-laugh with memes and short-form discovery tags. Rather than a named skit, the invitation is an open-ended comic challenge.\n\n⏱️ How the short-form format works\n\nBroad meme compilations often rely on shared cultural references. The shortest gag can work without exp",
+        "created_at": "2026-10-19T11:49:28.051Z",
+        "updated_at": "2026-10-19T11:49:28.051Z",
+        "thumbnailEmpty": true
+      },
+      {
+        "id": 291,
+        "slug": "epic-fails-of-2026-try-not-to-laugh-050782",
+        "title": "Epic Fails of 2026 — Try Not to Laugh",
+        "sourceUrl": "https://www.tiktok.com/@laughloungh/video/7615725868547050782",
+        "published": 1,
+        "category": "Funny & Comedy",
+        "description": "A Vid.Best editorial look at @laughloungh's epic fails of 2026 — try not to laugh TikTok, its captioned premise, format, and critical context.",
+        "reviewExcerpt": "🎬 The premise and creator framing\n\nThe public TikTok caption published by @laughloungh frames this 22-second post as epic fails of 2026 — try not to laugh. The listing positions the video as a collection of 2026 'epic fails'. That temporal label gives the post a contemporary feel, though it does not independently verify when each incident happened.\n\n⏱️ How the short-form format works\n\nFail compilations depend on visible chains of cause and effect. A missed step or failed pla",
+        "created_at": "2026-10-19T11:49:28.051Z",
+        "updated_at": "2026-10-19T11:49:28.051Z",
+        "thumbnailEmpty": true
+      },
+      {
+        "id": 293,
+        "slug": "try-not-to-laugh-part-6-ten-internet-videos-356566",
+        "title": "Try Not to Laugh Part 6 — Ten Internet Videos",
+        "sourceUrl": "https://www.tiktok.com/@tomreactsofficiall/video/7620518085929356566",
+        "published": 1,
+        "category": "Funny & Comedy",
+        "description": "A Vid.Best editorial look at @tomreactsofficiall's try not to laugh part 6 — ten internet videos TikTok, its captioned premise, format, and critical context.",
+        "reviewExcerpt": "🎬 The premise and creator framing\n\nThe public TikTok caption published by @tomreactsofficiall frames this 79-second post as try not to laugh part 6 — ten internet videos. Part six and 'ten funniest videos' clearly identify a serialised countdown challenge. A continuing series has to balance familiar expectations with enough fresh material to justify another instalment.\n\n⏱️ How the short-form format works\n\nThe comparatively long runtime for this batch makes room for multiple ",
+        "created_at": "2026-10-19T11:49:28.051Z",
+        "updated_at": "2026-10-19T11:49:28.051Z",
+        "thumbnailEmpty": true
+      },
+      {
+        "id": 294,
+        "slug": "top-three-random-try-not-to-laugh-clips-537740",
+        "title": "Top Three Random Try-Not-to-Laugh Clips",
+        "sourceUrl": "https://www.tiktok.com/@shortfuel2/video/7591013499602537740",
+        "published": 1,
+        "category": "Funny & Comedy",
+        "description": "A Vid.Best editorial look at @shortfuel2's top three random try-not-to-laugh clips TikTok, its captioned premise, format, and critical context.",
+        "reviewExcerpt": "🎬 The premise and creator framing\n\nThe public TikTok caption published by @shortfuel2 frames this 20-second post as top three random try-not-to-laugh clips. The 'top three' structure offers a deliberately manageable ranking, and the word 'random' makes unpredictability part of the invitation rather than a flaw.\n\n⏱️ How the short-form format works\n\nWith only three contenders, a viewer can remember each setup and compare their impact. That can be more satisfying than a montage",
+        "created_at": "2026-10-19T11:49:28.051Z",
+        "updated_at": "2026-10-19T11:49:28.051Z",
+        "thumbnailEmpty": true
+      },
+      {
+        "id": 296,
+        "slug": "th-th-ch-c-m-c-i-vietnamese-laugh-challenge-647879",
+        "title": "Thử Thách Cấm Cười — Vietnamese Laugh Challenge",
+        "sourceUrl": "https://www.tiktok.com/@taivelao/video/7602607842209647879",
+        "published": 1,
+        "category": "Funny & Comedy",
+        "description": "A Vid.Best editorial look at @taivelao's thử thách cấm cười — vietnamese laugh challenge TikTok, its captioned premise, format, and critical context.",
+        "reviewExcerpt": "🎬 The premise and creator framing\n\nThe public TikTok caption published by @taivelao frames this 28-second post as thử thách cấm cười — vietnamese laugh challenge. The Vietnamese phrase 'thử thách cấm cười' presents a no-laugh challenge. It places the post within an audience that recognises the joke-testing format in its own language.\n\n⏱️ How the short-form format works\n\nComedy framed through a local-language caption need not depend on translation if timing and reactions are ",
+        "created_at": "2026-10-19T11:49:28.051Z",
+        "updated_at": "2026-10-19T11:49:28.051Z",
+        "thumbnailEmpty": true
+      },
+      {
+        "id": 313,
+        "slug": "trying-not-to-laugh-but-failing-couple-clip-472391",
+        "title": "Trying Not to Laugh but Failing — Couple Clip",
+        "sourceUrl": "https://www.tiktok.com/@dyraze0/video/7636632146215472391",
+        "published": 1,
+        "category": "Funny & Comedy",
+        "description": "A contextual review of @dyraze0's trying not to laugh but failing — couple clip TikTok Short. The editorial notes examine its verified captioned premise and the storytelling questions raised by the format.",
+        "reviewExcerpt": "🎬 The premise and creator framing\n\nThe public TikTok caption published by @dyraze0 presents this 25-second post as trying not to laugh but failing — couple clip. The post explicitly combines a failed laugh challenge with couple-related and Douyin hashtags, suggesting relationship-centred humour within a Chinese short-video style.\n\n⏱️ How the short-form format works\n\nCouple comedy can use tiny differences of expectation to create a payoff, while a try-not-to-laugh framing add",
+        "created_at": "2026-10-19T11:52:25.610Z",
+        "updated_at": "2026-10-19T11:52:25.610Z",
+        "thumbnailEmpty": true
+      },
+      {
+        "id": 322,
+        "slug": "dance-monkey-dance-and-joke-short-448325",
+        "title": "Dance Monkey — Dance and Joke Short",
+        "sourceUrl": "https://www.tiktok.com/@warface2991/video/7216300787679448325",
+        "published": 1,
+        "category": "Funny & Comedy",
+        "description": "A contextual review of @warface2991's dance monkey — dance and joke short TikTok Short. The editorial notes examine its verified captioned premise and the storytelling questions raised by the format.",
+        "reviewExcerpt": "🎬 The premise and creator framing\n\nThe public TikTok caption published by @warface2991 presents this 67-second post as dance monkey — dance and joke short. The creator tags the post with dance, funny and joke, and TikTok metadata lists 'Dance Monkey' as its musical track. That is a stronger musical identity than an upload labelled only original sound.\n\n⏱️ How the short-form format works\n\nDance humour often plays with the relationship between musical rhythm and deliberately u",
+        "created_at": "2026-10-19T11:52:25.610Z",
+        "updated_at": "2026-10-19T11:52:25.610Z",
+        "thumbnailEmpty": true
+      }
+    ],
+    "targetRowsSha256": "c64fe298c56652c14e81836a60ce1698c32df26419a0d1076ec0116d6e69b11d"
+  },
+  "queueStates": {
+    "pending_theme_verification": 289,
+    "hold_existing_restriction": 9,
+    "published_verified": 90
+  },
+  "thumbnailDiagnostic": {
+    "checkedAt": "2026-10-20T06:59:20.818Z",
+    "remainingMissingTikTok": [
+      286,
+      287,
+      288,
+      290,
+      291,
+      292,
+      293,
+      294,
+      295,
+      296,
+      297,
+      298,
+      299,
+      301,
+      303,
+      304,
+      305,
+      306,
+      307,
+      310,
+      311,
+      312,
+      313,
+      316,
+      317,
+      318,
+      319,
+      322,
+      323,
+      325,
+      326
+    ],
+    "missingThumbnailYouTubeIds": [
+      267,
+      268,
+      269,
+      270,
+      271,
+      364,
+      365,
+      366,
+      367,
+      368,
+      369,
+      370,
+      371,
+      372,
+      373,
+      374,
+      375,
+      376,
+      377,
+      378,
+      379,
+      380,
+      381,
+      382,
+      383,
+      384,
+      385,
+      386,
+      387,
+      388,
+      389,
+      390,
+      391,
+      392,
+      393,
+      394,
+      395,
+      396,
+      397,
+      398,
+      399,
+      400,
+      401
+    ]
+  },
+  "sourceImageMissingYouTubeIds": [
+    267,
+    268,
+    269,
+    270,
+    271,
+    364,
+    365,
+    366,
+    367,
+    368,
+    369,
+    370,
+    371,
+    372,
+    373,
+    374,
+    375,
+    376,
+    377,
+    378,
+    379,
+    380,
+    381,
+    382,
+    383,
+    384,
+    385,
+    386,
+    387,
+    388,
+    389,
+    390,
+    391,
+    392,
+    393,
+    394,
+    395,
+    396,
+    397,
+    398,
+    399,
+    400,
+    401
+  ],
+  "freshBatch9LiveRecheck": {
+    "checkedAt": "2026-10-20T06:58:08.350Z",
+    "rootChildren": 5,
+    "imageMapPages": 345,
+    "imageEntries": 435,
+    "results": [
+      {
+        "id": 289,
+        "slug": "funny-cat-moments-ranking-and-laugh-challenge-126241",
+        "assetPath": "/review-illustrations/funny-cat-moments-ranking-and-laugh-challenge-126241-v1.webp",
+        "status": 200,
+        "mime": "image/webp",
+        "bytes": 108624,
+        "sha256": "d62044285c7eab34768e6fee27f2d5850869ec098af8f2c3ca3ecf7a690ca6d6",
+        "pageAssociation": true,
+        "socialMetadataAssociation": true,
+        "placeholderPreviewAssociation": true,
+        "imageSitemapAssociation": true,
+        "videoThumbnailUnchanged": true,
+        "datePublished": "2026-10-19T11:49:28.051Z",
+        "dateModified": "2026-10-19T11:49:28.051Z"
+      },
+      {
+        "id": 300,
+        "slug": "episode-724-water-in-mouth-laugh-challenge-748114",
+        "assetPath": "/review-illustrations/episode-724-water-in-mouth-laugh-challenge-748114-v1.webp",
+        "status": 200,
+        "mime": "image/webp",
+        "bytes": 179428,
+        "sha256": "03a0402abaf63e409d308835d0a4a962bfcb1d5b69f760d8c5de3c006b7b327f",
+        "pageAssociation": true,
+        "socialMetadataAssociation": true,
+        "placeholderPreviewAssociation": true,
+        "imageSitemapAssociation": true,
+        "videoThumbnailUnchanged": true,
+        "datePublished": "2026-10-19T11:49:28.051Z",
+        "dateModified": "2026-10-19T11:49:28.051Z"
+      },
+      {
+        "id": 302,
+        "slug": "ranking-the-funniest-winter-moments-139665",
+        "assetPath": "/review-illustrations/ranking-the-funniest-winter-moments-139665-v1.webp",
+        "status": 200,
+        "mime": "image/webp",
+        "bytes": 242012,
+        "sha256": "dfbd57c3b0e45d7774c167d006c8b5fd0ceaa8ff3df77bb2838fdb48ba40e08b",
+        "pageAssociation": true,
+        "socialMetadataAssociation": true,
+        "placeholderPreviewAssociation": true,
+        "imageSitemapAssociation": true,
+        "videoThumbnailUnchanged": true,
+        "datePublished": "2026-10-19T11:49:28.051Z",
+        "dateModified": "2026-10-19T11:49:28.051Z"
+      },
+      {
+        "id": 308,
+        "slug": "try-not-to-laugh-dogs-cats-and-animal-humour-672206",
+        "assetPath": "/review-illustrations/try-not-to-laugh-dogs-cats-and-animal-humour-672206-v1.webp",
+        "status": 200,
+        "mime": "image/webp",
+        "bytes": 211880,
+        "sha256": "6bbebd3693bc9836f04c08b82053ba420a3af6e49f73369a65cbbf293dba8ea2",
+        "pageAssociation": true,
+        "socialMetadataAssociation": true,
+        "placeholderPreviewAssociation": true,
+        "imageSitemapAssociation": true,
+        "videoThumbnailUnchanged": true,
+        "datePublished": "2026-10-19T11:52:25.610Z",
+        "dateModified": "2026-10-19T11:52:25.610Z"
+      },
+      {
+        "id": 309,
+        "slug": "the-dog-as-a-backup-singer-sound-based-comedy-453205",
+        "assetPath": "/review-illustrations/the-dog-as-a-backup-singer-sound-based-comedy-453205-v1.webp",
+        "status": 200,
+        "mime": "image/webp",
+        "bytes": 206460,
+        "sha256": "26e953c795af5722feb445d424b125fd78d115cf389237159e9f92bfa95a9a7e",
+        "pageAssociation": true,
+        "socialMetadataAssociation": true,
+        "placeholderPreviewAssociation": true,
+        "imageSitemapAssociation": true,
+        "videoThumbnailUnchanged": true,
+        "datePublished": "2026-10-19T11:52:25.610Z",
+        "dateModified": "2026-10-19T11:52:25.610Z"
+      },
+      {
+        "id": 314,
+        "slug": "why-are-chickens-so-funny-farm-life-moment-345921",
+        "assetPath": "/review-illustrations/why-are-chickens-so-funny-farm-life-moment-345921-v1.webp",
+        "status": 200,
+        "mime": "image/webp",
+        "bytes": 208038,
+        "sha256": "4c93064427540b160eda5eefd8bc7c456db4d535be3b4649a53c34f33dd1e17e",
+        "pageAssociation": true,
+        "socialMetadataAssociation": true,
+        "placeholderPreviewAssociation": true,
+        "imageSitemapAssociation": true,
+        "videoThumbnailUnchanged": true,
+        "datePublished": "2026-10-19T11:52:25.610Z",
+        "dateModified": "2026-10-19T11:52:25.610Z"
+      },
+      {
+        "id": 315,
+        "slug": "said-every-english-word-he-knew-language-joke-703250",
+        "assetPath": "/review-illustrations/said-every-english-word-he-knew-language-joke-703250-v1.webp",
+        "status": 200,
+        "mime": "image/webp",
+        "bytes": 169968,
+        "sha256": "2afaff3111a5ec3206012b64a31b80ebdce61101939aaaeab37bb54d143d056e",
+        "pageAssociation": true,
+        "socialMetadataAssociation": true,
+        "placeholderPreviewAssociation": true,
+        "imageSitemapAssociation": true,
+        "videoThumbnailUnchanged": true,
+        "datePublished": "2026-10-19T11:52:25.610Z",
+        "dateModified": "2026-10-19T11:52:25.610Z"
+      },
+      {
+        "id": 320,
+        "slug": "drawing-art-and-humour-short-creative-post-428330",
+        "assetPath": "/review-illustrations/drawing-art-and-humour-short-creative-post-428330-v1.webp",
+        "status": 200,
+        "mime": "image/webp",
+        "bytes": 175488,
+        "sha256": "d8d1c0710c3a15ac059dc46fb57b6e87beede749560553d778d218544a628d22",
+        "pageAssociation": true,
+        "socialMetadataAssociation": true,
+        "placeholderPreviewAssociation": true,
+        "imageSitemapAssociation": true,
+        "videoThumbnailUnchanged": true,
+        "datePublished": "2026-10-19T11:52:25.610Z",
+        "dateModified": "2026-10-19T11:52:25.610Z"
+      },
+      {
+        "id": 321,
+        "slug": "minisketch-draw-part-40-ranked-visual-jokes-487630",
+        "assetPath": "/review-illustrations/minisketch-draw-part-40-ranked-visual-jokes-487630-v1.webp",
+        "status": 200,
+        "mime": "image/webp",
+        "bytes": 191438,
+        "sha256": "10064575129859335ddd9ccbc80cbd014d22023689f5834853569fdf92aa8cc1",
+        "pageAssociation": true,
+        "socialMetadataAssociation": true,
+        "placeholderPreviewAssociation": true,
+        "imageSitemapAssociation": true,
+        "videoThumbnailUnchanged": true,
+        "datePublished": "2026-10-19T11:52:25.610Z",
+        "dateModified": "2026-10-19T11:52:25.610Z"
+      },
+      {
+        "id": 324,
+        "slug": "the-bread-launch-quick-african-comedy-moment-067422",
+        "assetPath": "/review-illustrations/the-bread-launch-quick-african-comedy-moment-067422-v1.webp",
+        "status": 200,
+        "mime": "image/webp",
+        "bytes": 243424,
+        "sha256": "cce36c800f2165f22d7edeb6341c7bd8cc14c0a86c8f9938620f62769b4a4d11",
+        "pageAssociation": true,
+        "socialMetadataAssociation": true,
+        "placeholderPreviewAssociation": true,
+        "imageSitemapAssociation": true,
+        "videoThumbnailUnchanged": true,
+        "datePublished": "2026-10-19T11:52:25.610Z",
+        "dateModified": "2026-10-19T11:52:25.610Z"
+      }
+    ],
+    "inspectionCalls": 0,
+    "sitemapSubmissions": 0,
+    "videoProviderRequests": 0,
+    "d1Writes": 0,
+    "limit": "HTTP/hash/HTML associations only; not Google image indexing or source video playback."
+  },
+  "audit": {
+    "run": 39360176692,
+    "artifact": 12236219785,
+    "zipSha256": "ce74f55b4544faa2406130724eb7a922d176d2f5b5f37992bdb2c15cb9f989b2",
+    "generatedAt": "2026-10-20T02:42:03.381Z",
+    "pages": 422,
+    "library": 388,
+    "editorial": 10,
+    "technicalFailures": 0,
+    "warningPages": 40,
+    "warningMessages": 41,
+    "warnings": [
+      {
+        "url": "https://vid.best/watch/lab-review-1-player-test",
+        "warnings": [
+          "short_review_needs_editorial_check",
+          "demo_page_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-embed-experience-demo",
+        "warnings": [
+          "demo_page_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-6f-3axjy4i4",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-fcuuonmnaz4",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-0nafqcsbjz0",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-6zuwetwrmqg",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-tsxgmtx5wdc",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short--9f4qbjakhe",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-bnykvcmixi0",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-kesssuyz5ys",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-2vuoqomi6uo",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-goamj2r7fhi",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-pclxcrxkszi",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-7p7ztnneec4",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-gshb7h3nxdq",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-5f0nr5aaz-u",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-tbdbgpqky3e",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-qyyohmpu18c",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-wi7a28ngsv4",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-7fn26kyxqvo",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-nsjquj0opvc",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-k0cojchz6qe",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-yrnokp--5mw",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-wld0h6jvjx4",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-esaj4jjheqs",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-h204j257esi",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-dfedvzevxbc",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-nemlhjl-yj8",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-uvqz3mnxhme",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-4b4iqf2saye",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-q5t5mpaogm0",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-i6fejmn7rju",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-wiovwe28bbq",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-6iem4fnzlhg",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-dx9n4qhxbc0",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-yjnz20zt49m",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-y5vqg0a0de4",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-iyviqkw9u5g",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-rgeh6qzfhks",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      },
+      {
+        "url": "https://vid.best/watch/youtube-short-fe8ctyczjja",
+        "warnings": [
+          "short_review_needs_editorial_check"
+        ]
+      }
+    ],
+    "sourcePosterCounts": {
+      "ok": 336,
+      "http_error": 1,
+      "placeholder": 8,
+      "missing": 43
+    },
+    "searchConsole": {
+      "status": "success",
+      "authenticated": true,
+      "propertyVerified": true,
+      "sitemapSubmitted": false,
+      "inspections": [],
+      "sitemapMode": "read_only",
+      "sitemapProcessing": {
+        "status": "verified",
+        "isPending": false,
+        "lastDownloaded": "2026-10-19T10:22:53.041Z",
+        "lastSubmitted": "2026-10-19T10:22:50.628Z",
+        "errors": 0,
+        "warnings": 0
+      },
+      "reviewSitemaps": [
+        {
+          "url": "https://vid.best/sitemaps/videos-1.xml",
+          "submitted": false,
+          "processing": {
+            "status": "verified",
+            "isPending": false,
+            "lastDownloaded": "2026-10-19T10:22:55.035Z",
+            "lastSubmitted": "2026-10-19T10:22:51.167Z",
+            "errors": 0,
+            "warnings": 20
+          }
+        },
+        {
+          "url": "https://vid.best/sitemaps/daily-weekly-best.xml",
+          "submitted": false,
+          "processing": {
+            "status": "verified",
+            "isPending": false,
+            "lastDownloaded": "2026-10-19T10:22:53.165Z",
+            "lastSubmitted": "2026-10-19T10:22:51.501Z",
+            "errors": 0,
+            "warnings": 0
+          }
+        }
+      ],
+      "totalReviews": 398,
+      "inspectionBudget": 0
+    },
+    "limit": "Internal editorial heuristics, not an AdSense/Google quality verdict. Current source-poster HTTP evidence is not footage, rights or playback proof. Zero new URL Inspections/submissions; no current Google indexed-count claim."
+  },
+  "newGenerated": 0,
+  "newPublished": 0,
+  "newLiveVerified": 0,
+  "recheckedExistingImages": 10,
+  "cumulativeIllustrations": 90,
+  "currentPublished": 388,
+  "limits": "Finish the existing batch9 checkpoint PR227 before creating a new art batch. No source/review/date/poster/player/D1/R2 mutation. Historical batch9 proof remains a dated observation of 313saved/302published on19October, not current counts. New owner publications and changes occurred independently; do not claim the historical all313 hash is unchanged today. Source/title/slug/published guards currently match all90 artworks. Current388-row SHA256 is the new preservation baseline. No extra Worker deployment for this documentation-only checkpoint."
+}
