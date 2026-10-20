@@ -1,0 +1,166 @@
+{
+  "date": "2026-10-20",
+  "scope": "Only published Music180.description/review_text/seo_description. Replace the repeated generic listing and remove unsupported ranking/production-cost conclusions from one section4 paragraph in favour of bounded replay-appeal interpretation and source-specific version-choice guidance. Preserve opening, four headings/order, sections1–3, SEO title/tags, all identities/media/posters/dates/counters and every other record.",
+  "branch": "seo/lazy-song-source-context-20261020",
+  "baseCommit": "384a7c1d8c8d567d3575c8970f6d32008ae0f263",
+  "baseline": {
+    "checkedAt": "2026-10-20T13:06:36.951Z",
+    "saved": 388,
+    "published": 388,
+    "fields": [
+      "cache_attempts",
+      "cache_error",
+      "cache_next_attempt_at",
+      "cache_source_url",
+      "cache_status",
+      "cached_at",
+      "created_at",
+      "description",
+      "embed_url",
+      "featured",
+      "id",
+      "media_type",
+      "primary_category",
+      "published",
+      "r2_key",
+      "redistribution_certified",
+      "redistribution_certified_at",
+      "review_text",
+      "seo_description",
+      "seo_tags",
+      "seo_title",
+      "slug",
+      "source_page_url",
+      "source_url",
+      "subcategory",
+      "thumbnail_url",
+      "title",
+      "trending",
+      "updated_at"
+    ],
+    "allNonCounterSha256": "b854c4033bf425e28ff86478e9ec54ebb69846d54802f9223b5493add2d1347a",
+    "unaffected387Sha256": "0e4b27406b8a3f47701045e5a75b834bc516c189ae107f6e55e8d76a7b8a114b",
+    "targetSha256": "1ebc1d263d691b55c70b4eec53f1cdf749cea50af64dc38b4281ce900b4d5330",
+    "expectedTargetAfterSha256": "41f11384a5324942969c155ac94bc52a7eb2e50d12598092eb0fd11f55906bb7",
+    "expectedAllAfterSha256": "5fcfef2d0964f91eb38184077c032878170fa8b479cfae2038149c458a238033",
+    "preimageMismatches": [],
+    "sourceMetadata": [],
+    "migrations": [
+      "0001_initial.sql",
+      "0002_discovery_requests.sql",
+      "0003_security_rate_limits.sql",
+      "0004_maintenance_indexes.sql",
+      "0005_source_video_metadata.sql",
+      "0006_test_player_and_comment_images.sql",
+      "0007_universal_video_experience.sql",
+      "0008_verified_demo_metadata.sql",
+      "0009_app_settings.sql",
+      "0010_video_analysis.sql",
+      "0011_spirituality_buddhism.sql",
+      "0012_saiyaara_tiktok_correction.sql",
+      "0013_saiyaara_permanent_slug.sql",
+      "0013_media_cache_jobs.sql",
+      "0014_member_notifications.sql",
+      "0015_summer_inverted_tiktok.sql",
+      "0016_rights_certified_r2_cache.sql",
+      "0017_authorized_auto_cache.sql",
+      "0018_tiktok_oembed_cache.sql",
+      "0019_tiktok_oembed_backfill.sql",
+      "0020_member_personalization.sql",
+      "0021_facebook_reel_pending_drafts.sql",
+      "0022_facebook_readable_slugs.sql",
+      "0023_facebook_challenge_preview.sql",
+      "0024_digital_love_review_cover.sql",
+      "0025_lab_review_source_cover.sql",
+      "0026_gratitude_illustrated_cover.sql",
+      "0027_garden_illustrated_cover.sql",
+      "0028_nature_power_illustrated_cover.sql",
+      "0029_live_kindly_illustrated_cover.sql",
+      "0030_facebook_preview_jobs.sql",
+      "0031_past_present_progress_cover.sql",
+      "0032_animal_compassion_source_poster.sql",
+      "0033_trust_yourself_source_poster.sql",
+      "0034_some_meetings_source_poster.sql",
+      "0035_right_place_source_poster.sql",
+      "0036_anapanasati_source_poster.sql",
+      "0037_quiet_presence_source_poster.sql",
+      "0038_meri_aashiqui_illustrated_cover.sql",
+      "0039_top5_existing_source_poster.sql",
+      "0040_skateboard_symbolic_cover.sql",
+      "0041_source_based_editorial_quality.sql",
+      "0042_sia_source_context.sql",
+      "0043_fight_song_source_context.sql",
+      "0044_wahran_source_context.sql",
+      "0045_flying_source_context.sql",
+      "0046_quiet_presence_accuracy.sql",
+      "0047_titli_source_context.sql"
+    ],
+    "worker": [
+      {
+        "id": "2fffb841-d0cc-4e0e-97b6-545a1e0065e8",
+        "created_on": "2026-10-20T12:09:58.567488Z",
+        "versions": [
+          {
+            "version_id": "90c860b7-4351-4f55-9f01-c8fd710a9257",
+            "percentage": 100
+          }
+        ]
+      }
+    ],
+    "queryWrites": [
+      0,
+      0,
+      0
+    ]
+  },
+  "expected": {
+    "saved": 388,
+    "published": 388,
+    "allNonCounterSha256": "5fcfef2d0964f91eb38184077c032878170fa8b479cfae2038149c458a238033",
+    "unaffected387Sha256": "0e4b27406b8a3f47701045e5a75b834bc516c189ae107f6e55e8d76a7b8a114b",
+    "targetSha256": "41f11384a5324942969c155ac94bc52a7eb2e50d12598092eb0fd11f55906bb7",
+    "changedFields": [
+      "description",
+      "review_text",
+      "seo_description"
+    ],
+    "preservedHeadings": 4,
+    "originalCreatedAt": "2026-10-13T18:29:20.812Z",
+    "originalUpdatedAt": "2026-10-13T18:40:13.113Z"
+  },
+  "hashMethod": "Rows ORDER BY id;29 non-counter keys sorted lexicographically in each row, then SHA-256 of UTF-8 JSON.stringify. Excludes views/reaction_count/comments_count only.",
+  "migrations": {
+    "localBefore": 47,
+    "remoteBefore": 48,
+    "pendingOnly": "0048_lazy_song_source_context.sql",
+    "historicalRemoteOnly": "0013_media_cache_jobs.sql"
+  },
+  "sourceMetadataLimit": "Fresh source metadata query returns no row for180. Preserve existing omission of VideoObject/video sitemap metadata; do not manufacture source publication/duration. Source poster and canonical review/image associations remain untouched.",
+  "tests": {
+    "focused": 5,
+    "node": 442,
+    "python": 4,
+    "workerDryRun": "passed",
+    "mutationGuard": "All29 owner-preimage fields tested separately; idempotent second application0changes; live activity counters excluded and preserved."
+  },
+  "imagePause": {
+    "active": true,
+    "ownerInstructionDate": "2026-10-20",
+    "generated": 0,
+    "edited": 0,
+    "published": 0,
+    "limit": "Preserve existing100artworks and388queue entries. No image generation/editing, preview substitution, source-poster or image association change."
+  },
+  "googleSitemapLimit": {
+    "observedOn": "2026-10-20",
+    "artifactRun": 39420225531,
+    "apiDocumentation": [
+      "https://developers.google.com/webmaster-tools/v1/sitemaps/get",
+      "https://developers.google.com/webmaster-tools/v1/sitemaps"
+    ],
+    "status": "exact_error_detail_unavailable_through_configured_api",
+    "detail": "The Sitemaps resource exposes numeric error/warning counts, timestamps and content-type totals, not error-category/line/detail messages. Do not use deprecated contents.indexed or infer0indexed from0Inspections.",
+    "manualPrerequisite": "Owner-provided Search Console Sitemaps error detail (message and affected URL/line, if shown) for https://vid.best/sitemaps/videos-1.xml, or an already authorized method exposing that detail. No new browser/login/credential scope, resubmission, Indexing API or full Inspection attempted."
+  },
+  "status": "prepared_not_deployed"
+}

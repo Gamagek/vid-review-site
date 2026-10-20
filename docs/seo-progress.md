@@ -1,3 +1,13 @@
+## 20 October 2026: image pause retained; Lazy Song180 source-context correction prepared
+
+No image generation/editing, artwork batch or source-poster/image-association change. Fresh read-only D1 at2026-10-20T13:06:36.951Z remains388saved/388published; all29non-counter fields across388rows SHA256b854c4033bf425e28ff86478e9ec54ebb69846d54802f9223b5493add2d1347a. Current Worker90c860b7 remains100%active. Main384a7c1 and open owner PR239/229 were reconciled without changes.
+
+Official Bruno Mars video/album pages identify the exactfLexgOxsZu0 upload and a separate2011news entry identifies an official alternate edition. Prepare only180.description/review_text/seo_description: replace generic listing/ranking/budget conclusions with original bounded replay-appeal interpretation and version-choice guidance. Keep opening, four headings/order and sections1–3, SEOtitle/tags, source/player/poster, original dates, rights/cache fields and every other record. Retained footage/audio/choreography/Poreotics/cost claims remain unverified and the public limitation says so. No fresh viewing/listen or invented source facts.
+
+Single idempotent migration0048 guards all29owner preimages. Fivefocused/442Node/fourPython tests and Worker dry-run pass; only0048is pending against47local/48remote baseline (historical remote-only0013_media_cache_jobs.sql). Fresh source metadata has no180row: preserve absence of VideoObject/source-date metadata rather than fabricate it. Prepared/expected hashes are in docs/lazy-song-preservation-baseline-20261020.json; no production completion claimed before CI/merge/deploy/live checks.
+
+Google exact-error investigation is blocked at API capability, not retried: official Sitemaps.get/resource schema exposes numeric errors/warnings/timestamps, no category/line detail. Latest actual completed39420225531artifact still records1error/20warnings for the library map, not its cause. Need owner-supplied Search Console error message/affected URL/line, or already-authorized detailed evidence; no new login/credential scope, Google submission, Inspection or restricted Indexing API. Deprecated contents.indexed is not an indexed-page count. Continue safe independent non-image work.
+
 # Vid.Best indexing and thumbnail work queue
 
 ## 20 October 2026: saved SEO titles deployed; seven live preservation samples pass
