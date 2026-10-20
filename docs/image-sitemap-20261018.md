@@ -1,5 +1,11 @@
 # Review artwork discovery and image sitemap (18 October 2026)
 
+## 20 October 2026: ten new TikTok conceptual covers prepared for dynamic discovery
+
+PR234 adds ten original16:9WebPs to existing identity-checked manifest for286/287/288/290/291/293/294/296/313/322, not to source VideoObject thumbnails or owner media fields. After successful release the unchanged server-rendered cover/OG/Twitter/WebPage/dynamic image/video-map paths will all reference each exact stable URL; do not count them as published/live yet. Newgenerated10/newpublished0/newliveverified0. Prior90images, flat root5urlsets and standaloneimageindex/robots discovery preserved. No fake freshness dates, source poster replacement, sitemap resubmission or URL Inspection.
+
+All ten WebPs1672×941/119798–200940bytes pass uniqueness/visual/OCR/hash checks without production lettering. Full427Node/fourPython/sixfocused/Worker-dry-run pass; all388D1 non-counter rows and target10dates/identities unchanged. No pending migrations. Latest completed audit39360176692 predates this batch and is not image-indexing proof. Next exact-headCI/merge/existing Worker release and all ten live associations; then21missingTikTok previews and43YouTube image omissions. Provenance/limits are recorded; Google scheduling and missing verified provider mappings remain external.
+
 ## 20 October 2026: current inventory reconciliation and fresh existing-image checks
 
 Current owner main345d6bd/current100%Worker83c4c8b1 are preserved in existing PR227. Read-only D1:388published/388saved;90existing artwork guards match,289pending/nineheld (including new Saiyaara327/328). Fresh batch9 recheck2026-10-20T06:58:08.350Z verifies all ten existing image hashes/HTTP/MIME/watch/social/WebPage/maps/guardedpreviews under that current Worker. Root still5flaturlsets; image map345pages/435imageentries,43published YouTube pages currently lack valid image metadata/artwork. No new unique art or publication in this documentation-only checkpoint[read-only-preflight][seo-only].

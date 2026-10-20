@@ -2243,7 +2243,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "f147adbbacdbb9d84e222de7332dd4bdbcfb3f6bcd3a9add46a6f2fe82fb6575",
-      "status": "source_verified_reserved",
+      "status": "prepared",
       "batch": 10
     },
     {
@@ -2252,7 +2252,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "1a5f82f376d160cc7bd27c2b65e1350e81c27b08819b2e978a2ca12e5bb57428",
-      "status": "source_verified_reserved",
+      "status": "prepared",
       "batch": 10
     },
     {
@@ -2261,7 +2261,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "210dcb48a5701063be9bc541483c8bc55f3023a71e23f61e7677f3ec8bdc457a",
-      "status": "source_verified_reserved",
+      "status": "prepared",
       "batch": 10
     },
     {
@@ -2279,7 +2279,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "0ad4fc38a347db54896287ff5a6ac3637a2d60e99d6a4ebd230201fc2eaf2dea",
-      "status": "source_verified_reserved",
+      "status": "prepared",
       "batch": 10
     },
     {
@@ -2288,7 +2288,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "4044ec2de55580c054659856c24d653ff81052c2d84752019d7359bb0e0f6a66",
-      "status": "source_verified_reserved",
+      "status": "prepared",
       "batch": 10
     },
     {
@@ -2305,7 +2305,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "9edfef8468505ae496a00792dae2644cdc27945d61dea1d95326bc9a2cf1d797",
-      "status": "source_verified_reserved",
+      "status": "prepared",
       "batch": 10
     },
     {
@@ -2314,7 +2314,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "35eecd673d88e86169ac5d792b3a7ef461c74dd87c9835f10fb0c53ed4565e8d",
-      "status": "source_verified_reserved",
+      "status": "prepared",
       "batch": 10
     },
     {
@@ -2331,7 +2331,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "64b547e53c9e7520105f1a0b46228b8d80d0436bcc7ae2339a5d5761c8a2afdd",
-      "status": "source_verified_reserved",
+      "status": "prepared",
       "batch": 10
     },
     {
@@ -2472,7 +2472,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "c51061a86b8e2daffc7231fde83133322db8a29d3dbded86af2cc7044b4be3a4",
-      "status": "source_verified_reserved",
+      "status": "prepared",
       "batch": 10
     },
     {
@@ -2549,7 +2549,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "62e341a982270b8e7116203df1b1da548f1e69fc64bfc0f3179d3e7174a425eb",
-      "status": "source_verified_reserved",
+      "status": "prepared",
       "batch": 10
     },
     {
@@ -3188,7 +3188,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Resume existing batch10 branch/PR before selecting more records. Ten sources286/287/288/290/291/293/294/296/313/322 verified and reserved; generate one distinct16:9 conceptual artwork each using exact planned briefs, no production lettering. No bytes generated or publication claimed yet. Then complete WebP/hash/visual/preservation checks, final-head CI, merge/existing Worker release and every live image/page/social/map/preview check. Preserve current owner main and all D1/R2/source posters/reviews/dates/players/holds. Continue remaining missing TikTok previews before43YouTube image omissions; unavailable Tagembed/Iframely mappings are never invented.",
+  "nextTask": "Finish PR234 batch10: all required tests/Worker dry-run, exact final-head CI, current-main/D1/migration reconciliation, merge/existing Worker release and every new live image hash/MIME/HTML/social/WebPage/map/original-date/guardedpreview check. Ten generated assets are not counted as published/live until verified. Preserve all prior90 art, owner code/data/source posters/reviews/dates/players/holds. Then21remaining missingTikTok preview covers before43YouTube image omissions. Do not invent per-video Tagembed/Iframely mappings, quota signals or raw-cache rights.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -7378,7 +7378,7 @@
     "all90IdentityGuardsMatch": true
   },
   "batch10": {
-    "state": "source_verified_reserved",
+    "state": "prepared",
     "recordIds": [
       286,
       287,
@@ -7401,11 +7401,136 @@
       "sha256": "308e8d4b33e4ba32d9ddddcaaf32ecb9be79d4de04835d4a4c5ad45354414e49",
       "targetRowsSha256": "c64fe298c56652c14e81836a60ce1698c32df26419a0d1076ec0116d6e69b11d"
     },
-    "newGenerated": 0,
+    "newGenerated": 10,
     "newPublished": 0,
     "liveVerified": 0,
     "sourceVerification": "docs/review-images/batch10-source-verification-20261020.json",
     "briefs": "docs/review-images/batch10-artwork-briefs-20261020.json",
-    "limits": "Metadata/caption verified, not source footage/audio. No artwork bytes yet; one distinct built-in imagegen call required per asset. Preserve all source/owner posters, empty-thumbnail identity/storage guards and all original D1 fields/dates/player/holds."
+    "limits": "Metadata/caption verified, not source footage/audio. No artwork bytes yet; one distinct built-in imagegen call required per asset. Preserve all source/owner posters, empty-thumbnail identity/storage guards and all original D1 fields/dates/player/holds.",
+    "preparedAt": "2026-10-20T07:18:28.145Z",
+    "pr": 234,
+    "validation": {
+      "prior90ManifestAndProvenanceUnchanged": true,
+      "distinctNewHashes": 10,
+      "visualAssets": 10,
+      "ocrAssets": 10,
+      "conditionalEmptyThumbnailFallbacks": 10,
+      "nodeTests": 427,
+      "pythonTests": 4,
+      "focusedTests": 6,
+      "workerDryRun": true,
+      "full388NonCounterFieldsMatch": true,
+      "allTenOriginalDateAndIdentityFieldsMatch": true
+    },
+    "preReleaseBaseline": {
+      "checkedAt": "2026-10-20T07:19:55.041Z",
+      "saved": 388,
+      "published": 388,
+      "sha256": "308e8d4b33e4ba32d9ddddcaaf32ecb9be79d4de04835d4a4c5ad45354414e49",
+      "targetRowsSha256": "c64fe298c56652c14e81836a60ce1698c32df26419a0d1076ec0116d6e69b11d",
+      "artIdentityMismatches": [],
+      "candidates": [
+        {
+          "id": 286,
+          "slug": "ranking-funniest-human-fails-try-not-to-laugh-707278",
+          "title": "Ranking Funniest Human Fails — Try Not to Laugh",
+          "sourceUrl": "https://www.tiktok.com/@brunavanessafatima/video/7683247291393707278",
+          "published": 1,
+          "created_at": "2026-10-19T11:49:28.051Z",
+          "updated_at": "2026-10-19T11:49:28.051Z",
+          "thumbnailEmpty": true
+        },
+        {
+          "id": 287,
+          "slug": "top-100-funniest-videos-ever-london-comedy-edit-742806",
+          "title": "Top 100 Funniest Videos Ever — London Comedy Edit",
+          "sourceUrl": "https://www.tiktok.com/@fmw560/video/7636459888750742806",
+          "published": 1,
+          "created_at": "2026-10-19T11:49:28.051Z",
+          "updated_at": "2026-10-19T11:49:28.051Z",
+          "thumbnailEmpty": true
+        },
+        {
+          "id": 288,
+          "slug": "nine-seconds-of-brainrot-meme-comedy-898784",
+          "title": "Nine Seconds of Brainrot Meme Comedy",
+          "sourceUrl": "https://www.tiktok.com/@nn.ediitz/video/7598252716497898784",
+          "published": 1,
+          "created_at": "2026-10-19T11:49:28.051Z",
+          "updated_at": "2026-10-19T11:49:28.051Z",
+          "thumbnailEmpty": true
+        },
+        {
+          "id": 290,
+          "slug": "try-not-to-laugh-short-meme-clip-challenge-356877",
+          "title": "Try Not to Laugh — Short Meme-Clip Challenge",
+          "sourceUrl": "https://www.tiktok.com/@dakidbk/video/7620254113292356877",
+          "published": 1,
+          "created_at": "2026-10-19T11:49:28.051Z",
+          "updated_at": "2026-10-19T11:49:28.051Z",
+          "thumbnailEmpty": true
+        },
+        {
+          "id": 291,
+          "slug": "epic-fails-of-2026-try-not-to-laugh-050782",
+          "title": "Epic Fails of 2026 — Try Not to Laugh",
+          "sourceUrl": "https://www.tiktok.com/@laughloungh/video/7615725868547050782",
+          "published": 1,
+          "created_at": "2026-10-19T11:49:28.051Z",
+          "updated_at": "2026-10-19T11:49:28.051Z",
+          "thumbnailEmpty": true
+        },
+        {
+          "id": 293,
+          "slug": "try-not-to-laugh-part-6-ten-internet-videos-356566",
+          "title": "Try Not to Laugh Part 6 — Ten Internet Videos",
+          "sourceUrl": "https://www.tiktok.com/@tomreactsofficiall/video/7620518085929356566",
+          "published": 1,
+          "created_at": "2026-10-19T11:49:28.051Z",
+          "updated_at": "2026-10-19T11:49:28.051Z",
+          "thumbnailEmpty": true
+        },
+        {
+          "id": 294,
+          "slug": "top-three-random-try-not-to-laugh-clips-537740",
+          "title": "Top Three Random Try-Not-to-Laugh Clips",
+          "sourceUrl": "https://www.tiktok.com/@shortfuel2/video/7591013499602537740",
+          "published": 1,
+          "created_at": "2026-10-19T11:49:28.051Z",
+          "updated_at": "2026-10-19T11:49:28.051Z",
+          "thumbnailEmpty": true
+        },
+        {
+          "id": 296,
+          "slug": "th-th-ch-c-m-c-i-vietnamese-laugh-challenge-647879",
+          "title": "Thử Thách Cấm Cười — Vietnamese Laugh Challenge",
+          "sourceUrl": "https://www.tiktok.com/@taivelao/video/7602607842209647879",
+          "published": 1,
+          "created_at": "2026-10-19T11:49:28.051Z",
+          "updated_at": "2026-10-19T11:49:28.051Z",
+          "thumbnailEmpty": true
+        },
+        {
+          "id": 313,
+          "slug": "trying-not-to-laugh-but-failing-couple-clip-472391",
+          "title": "Trying Not to Laugh but Failing — Couple Clip",
+          "sourceUrl": "https://www.tiktok.com/@dyraze0/video/7636632146215472391",
+          "published": 1,
+          "created_at": "2026-10-19T11:52:25.610Z",
+          "updated_at": "2026-10-19T11:52:25.610Z",
+          "thumbnailEmpty": true
+        },
+        {
+          "id": 322,
+          "slug": "dance-monkey-dance-and-joke-short-448325",
+          "title": "Dance Monkey — Dance and Joke Short",
+          "sourceUrl": "https://www.tiktok.com/@warface2991/video/7216300787679448325",
+          "published": 1,
+          "created_at": "2026-10-19T11:52:25.610Z",
+          "updated_at": "2026-10-19T11:52:25.610Z",
+          "thumbnailEmpty": true
+        }
+      ]
+    }
   }
 }

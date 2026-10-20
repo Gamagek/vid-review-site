@@ -9,6 +9,7 @@ import worker from '../src/index.js';
 test('sidebar artwork assets have unique verified WebP bytes and complete bounded provenance', () => {
   const prompts = JSON.parse(readFileSync(new URL('../docs/review-illustration-prompts.json', import.meta.url)));
   const paths = new Set();
+  const hashes = new Set();
   for (const item of illustrations) {
     assert.match(item.path, /^\/review-illustrations\/[a-z0-9-]+-v\d+\.webp$/);
     assert.ok(!paths.has(item.path)); paths.add(item.path);
@@ -17,6 +18,8 @@ test('sidebar artwork assets have unique verified WebP bytes and complete bounde
     assert.equal(bytes.toString('ascii', 8, 12), 'WEBP');
     assert.equal(bytes.length, item.bytes);
     assert.equal(createHash('sha256').update(bytes).digest('hex'), item.sha256);
+    assert.ok(!hashes.has(item.sha256), 'each active artwork has distinct image bytes');
+    hashes.add(item.sha256);
     assert.ok(bytes.length < 300_000, 'sidebar assets stay bounded');
     assert.ok(item.width >= 1200 && item.height >= 675);
     assert.match(item.alt, /[Cc]onceptual.*not video footage/);
@@ -94,7 +97,7 @@ test('only audited placeholder identities get a review-art preview; owner poster
 
 test('audited TikTok missing or placeholder images require matching owner-image digest and no saved source poster', async (t) => {
   const eligible = illustrations.filter(item => item.previewFallbackThumbnailSha256);
-  assert.deepEqual(eligible.map(item => item.id), [16,19,20,26,289,300,302,308,309,314,315,320,321,324]);
+  assert.deepEqual(eligible.map(item => item.id), [16,19,20,26,289,300,302,308,309,314,315,320,321,324,286,287,288,290,291,293,294,296,313,322]);
   let expected;
   const fixture = 'https://images.example.org/expired-poster-fixture';
   t.mock.method(crypto.subtle, 'digest', async (algorithm, bytes) => {
@@ -122,7 +125,7 @@ test('audited TikTok missing or placeholder images require matching owner-image 
 test('empty TikTok image fields can show conceptual previews while new owner and saved source posters take priority', async () => {
   const emptyDigest = createHash('sha256').update('').digest('hex');
   const missing = illustrations.filter(item => item.previewFallbackThumbnailSha256 === emptyDigest);
-  assert.deepEqual(missing.map(item => item.id), [289,300,302,308,309,314,315,320,321,324]);
+  assert.deepEqual(missing.map(item => item.id), [289,300,302,308,309,314,315,320,321,324,286,287,288,290,291,293,294,296,313,322]);
   for (const art of missing) {
     for (const thumbnail_url of [null, '']) {
       const row = {id:art.id,slug:art.slug,title:art.expectedTitle,source_url:art.sourceUrl,published:1,thumbnail_url};
