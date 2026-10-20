@@ -1,5 +1,11 @@
 # Editorial cover provenance
 
+## 20 October 2026: batch10 original conceptual assets prepared (PR234)
+
+Ten distinct built-in-imagegen calls for286/287/288/290/291/293/294/296/313/322;1672×941 WebPs119798–200940bytes. All visually/OCR checked with no visible AI-production lettering or source-frame/play-badge implication. Exact planned-and-used prompts, raw-output and WebP SHA256, bytes/dimensions/source-caption limits retained in docs/review-illustration-prompts.json and batch10-artwork-briefs/source-verification/asset-checks-20261020.json. Current public source metadata returned200/exact IDs/accounts/captions once each; no footage/audio inspected, media URLs retained or source bytes downloaded.
+
+Newgenerated10/newpublished0/newliveverified0 pending final-headCI/release/live proof. Prior90art/provenance/bytes unchanged, all388saved non-counter fields and target10identity/date fields preserved at2026-10-20T07:19:55.041Z. Only existing identity/empty-thumbnail-digest/R2-source-poster-priority gates enable a separate preview; owner fields/source VideoObject thumbnails are not rewritten. Full427Node/fourPython/sixfocused/dry-run pass. No migration/DB/R2/player/review/text/date/hold/security mutation. Next complete PR234 safely; mappings remain an external limitation and images are not a Google/AdSense promise.
+
 ## 20 October 2026: ninety existing covers reconcile with388published reviews
 
 Existing PR227 is reconciled with owner main345d6bd/current100%Worker83c4c8b1, preserving independent owner Gemini/editorial changes. Current D1388saved/388published, all90artwork source/title/slug/publication guards match. Added86owner-published records only to queue metadata; Saiyaara327/328 held. Fresh ten-image batch9 HTTP/WebP/bytes/hash/watch/social/schema/preview/map recheck passes2026-10-20T06:58:08.350Z.0new unique images/0new publications in this checkpoint,10existing images rechecked. No source/owner poster, VideoObject thumbnail, review/text/date/player or D1/R2 change.
