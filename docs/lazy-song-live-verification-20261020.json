@@ -466,9 +466,12 @@
     "newPublished": 0,
     "newLiveVerified": 0,
     "existingConceptualArtworks": 100,
-    "currentPublishedPages": 388,
+    "currentPublishedPages": 389,
     "allExistingArtImagesManifestProvenanceQueueAndAssociationsPreserved": true,
-    "resumeRequiresExplicitOwnerRequest": true
+    "resumeRequiresExplicitOwnerRequest": true,
+    "currentCountObservedAt": "2026-10-20T13:23:52.484Z",
+    "savedQueueEntries": 388,
+    "queueReconciliationLimit": "Saved388entries remain untouched during the image pause; later newly published402is preserved and must not be counted as an artwork or as audited by the earlier422-page diagnostic."
   },
   "googleSitemapLimit": {
     "observedOn": "2026-10-20",
@@ -596,7 +599,7 @@
     "zipSha256": "c0735a51cfa26b14120330d34f0a4ddf4b9a350edeb9b39d5841e38624c0ee42",
     "generatedAt": "2026-10-20T13:14:24.489Z"
   },
-  "nextTask": "Do not repeat the completed180/135corrections orPR240. Exact Google library-sitemap1error/20warning detail remains an external prerequisite: owner-provided SearchConsole message and affected URL/line, or already-authorized detailed evidence; configured Sitemaps API lacks it. Continue a fresh source-verifiable unprotected non-image editorial task after current main/PR/Worker/D1 reconciliation. Preserve all owner headings/prose/identities/dates/holds. Image creation remains paused and provider mappings must not be invented; no repeated full Inspections or blind resubmission.",
+  "nextTask": "Do not repeat180/135orPR240. Preserve independent new published402and fresh389saved/389published inventory; all earlier388non-counter rows still match the verified release. Reconcile future non-image candidate selection against this newer inventory, leaving protected Funny & Comedy copy and existing artwork/pause/queue progress intact. Exact Google library-sitemap error message/URL/line remains external/manual; no blind resubmission/full Inspection, invented provider mapping or artwork resumption.",
   "verificationWrites": 0,
   "r2Writes": 0,
   "limit": "One bounded source-context correction, not full viewing/audio/creator/production-cost verification or a Google/AdSense verdict. API/source-page evidence does not establish actual playback. No current whole-site indexed-page count.",
@@ -664,5 +667,30 @@
     "inspections": 0,
     "sitemapSubmissions": 0,
     "limit": "Actual completed post-release zero-inspection audit. Internal warnings and source-image counts are not Google indexing/AdSense verdicts; existing100conceptual images are separate."
+  },
+  "laterIndependentDataObservation": {
+    "checkedAt": "2026-10-20T13:23:52.484Z",
+    "saved": 389,
+    "published": 389,
+    "baselineIds": 388,
+    "matchedBaselineIds": 388,
+    "existingBaseline388NonCounterSha256": "5fcfef2d0964f91eb38184077c032878170fa8b479cfae2038149c458a238033",
+    "currentAllNonCounterSha256": "a94f041bf30485a7d1da1cf7a4bc40a59219e6c130d859c300430463bf826029",
+    "targetSha256": "41f11384a5324942969c155ac94bc52a7eb2e50d12598092eb0fd11f55906bb7",
+    "unrelatedNewRows": [
+      {
+        "id": 402,
+        "slug": "youtube-short-e2ep9ejzj8q",
+        "title": "Giraffe Surprise, Lemon Squeeze Fails and Cake Plate Prank",
+        "source_url": "https://www.youtube.com/shorts/e2ep9EjzJ8Q",
+        "published": 1,
+        "created_at": "2026-10-20T13:22:02.108Z",
+        "updated_at": "2026-10-20T13:22:02.108Z"
+      }
+    ],
+    "queryWrites": [
+      0
+    ],
+    "limit": "Later independent data addition, not inserted by the180-only migration. Preserve new rows; dated release388-row exact preservation remains separately verified. Image queue stays paused/preserved; new row not silently counted as illustrated or covered by the prior422-page audit."
   }
 }
