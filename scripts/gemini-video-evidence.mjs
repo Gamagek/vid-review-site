@@ -2,7 +2,7 @@
 // Analyze an explicitly supplied public YouTube video using Gemini; never publish.
 import { parseArgs } from 'node:util';
 import { mkdirSync, writeFileSync } from 'node:fs';
-const {values}=parseArgs({options:{url:{type:'string'},'video-id':{type:'string'},model:{type:'string',default:'gemini-2.5-flash'},out:{type:'string',default:'gemini-evidence.json'}}});
+const {values}=parseArgs({options:{url:{type:'string'},'video-id':{type:'string'},model:{type:'string',default:'gemini-3.8-flash'},out:{type:'string',default:'gemini-evidence.json'}}});
 const raw=values.url||'',u=new URL(raw);
 const host=u.hostname.toLowerCase();
 if(!['youtube.com','www.youtube.com','m.youtube.com','youtu.be'].includes(host))throw Error('Public YouTube URL required');
