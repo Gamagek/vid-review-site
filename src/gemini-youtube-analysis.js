@@ -8,7 +8,7 @@ export async function analyzeYoutubeDraftWithGemini(request, env, videoId) {
     "SELECT id, title, source_url, media_type, published FROM videos WHERE id = ?"
   ).bind(videoId).first();
   if (!row) return reply({ error: "Video not found" }, 404);
-  if (row.published) return reply({ error: "Only unpublished drafts may be analyzed" }, 409);
+  // Published videos may be analyzed for editorial improvement; this endpoint never writes to D1.
   if (row.media_type !== "youtube") return reply({ error: "YouTube drafts only" }, 400);
   const url = parseYoutubeUrl(row.source_url);
   if (!url) return reply({ error: "Invalid YouTube source URL" }, 400);
@@ -30,7 +30,7 @@ export async function analyzeYoutubeDraftWithGemini(request, env, videoId) {
   let response;
   try {
     response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
       {
         method: "POST",
         headers: {
@@ -40,7 +40,7 @@ export async function analyzeYoutubeDraftWithGemini(request, env, videoId) {
         body: JSON.stringify({
           contents: [{
             role: "user",
-            parts: [{ text: prompt }, { file_data: { file_uri: url, mime_type: "video/mp4" } }]
+            parts: [{ text: prompt }, { file_data: { file_uri: url } }]
           }],
           generationConfig: { temperature: 0.25, responseMimeType: "application/json", maxOutputTokens: 3000 }
         }),
@@ -60,7 +60,7 @@ export async function analyzeYoutubeDraftWithGemini(request, env, videoId) {
   catch { return reply({ error: "Gemini did not return valid structured analysis" }, 502); }
   if (!analysis || typeof analysis !== "object") return reply({ error: "Empty Gemini analysis" }, 502);
   return reply({
-    success: true, video_id: row.id, source_url: url, model: "gemini-2.5-flash",
+    success: true, video_id: row.id, source_url: url, model: "gemini-3.8-flash",
     verified: false, requires_editorial_review: true, analysis
   });
 }
