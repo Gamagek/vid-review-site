@@ -1,5 +1,11 @@
 # Editorial cover provenance
 
+## 20 October 2026: batch10 ten unique covers published and individually live verified
+
+PR234 merged `77c1630b4d2df3127704474b73363f6b4c56878c` after exact-headCI39386368376; Deploy39387240940 released100% Worker `40b866f7-3a95-4328-9aea-d61e8be5a4ca`. Ten new1672×941 WebPs119798–200940bytes for286/287/288/290/291/293/294/296/313/322 all pass live200/MIME/exactbytes/SHA256, watch/OG/Twitter/WebPage/maps and guarded missing-preview associations at2026-10-20T07:36:20.850Z. NEW GENERATED10 / NEW PUBLISHED10 / NEW LIVE VERIFIED10; cumulative100/388published. Exact built-in generation prompts, source-caption evidence/limits, raw-output hashes and active WebP hashes remain in provenance. No visible production lettering, fake frame/creator-poster/likeness claim or fake play badge. These invented symbolic scenes are not inspected footage/audio.
+
+All388saved non-counter fields and selected10original identities/dates still match their baseline at08:06:13.692Z; prior90manifest entries preserved. Original source/owner posters and VideoObject thumbnails are unchanged; empty-thumbnail/storage-priority guards alone enable the separate fallback. No DB/R2 maintenance writes or migrations, review/SEO/player/security/hold/draft edits. Desktop screenshot and decoded image/caption verified; independent mobile/source playback not claimed. Full evidence: `docs/review-images/batch10-live-verification-20261020.json`. Actual audit39387320477 has0technicalfailures,0Inspections/0submissions and no new Google-indexing evidence. Next21missingTikTok previews before43YouTube omissions; missing verified provider mappings remain external.
+
 ## 20 October 2026: batch10 original conceptual assets prepared (PR234)
 
 Ten distinct built-in-imagegen calls for286/287/288/290/291/293/294/296/313/322;1672×941 WebPs119798–200940bytes. All visually/OCR checked with no visible AI-production lettering or source-frame/play-badge implication. Exact planned-and-used prompts, raw-output and WebP SHA256, bytes/dimensions/source-caption limits retained in docs/review-illustration-prompts.json and batch10-artwork-briefs/source-verification/asset-checks-20261020.json. Current public source metadata returned200/exact IDs/accounts/captions once each; no footage/audio inspected, media URLs retained or source bytes downloaded.

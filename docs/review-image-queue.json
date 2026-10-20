@@ -2243,7 +2243,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "f147adbbacdbb9d84e222de7332dd4bdbcfb3f6bcd3a9add46a6f2fe82fb6575",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 10
     },
     {
@@ -2252,7 +2252,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "1a5f82f376d160cc7bd27c2b65e1350e81c27b08819b2e978a2ca12e5bb57428",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 10
     },
     {
@@ -2261,7 +2261,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "210dcb48a5701063be9bc541483c8bc55f3023a71e23f61e7677f3ec8bdc457a",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 10
     },
     {
@@ -2279,7 +2279,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "0ad4fc38a347db54896287ff5a6ac3637a2d60e99d6a4ebd230201fc2eaf2dea",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 10
     },
     {
@@ -2288,7 +2288,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "4044ec2de55580c054659856c24d653ff81052c2d84752019d7359bb0e0f6a66",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 10
     },
     {
@@ -2305,7 +2305,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "9edfef8468505ae496a00792dae2644cdc27945d61dea1d95326bc9a2cf1d797",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 10
     },
     {
@@ -2314,7 +2314,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "35eecd673d88e86169ac5d792b3a7ef461c74dd87c9835f10fb0c53ed4565e8d",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 10
     },
     {
@@ -2331,7 +2331,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "64b547e53c9e7520105f1a0b46228b8d80d0436bcc7ae2339a5d5761c8a2afdd",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 10
     },
     {
@@ -2472,7 +2472,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "c51061a86b8e2daffc7231fde83133322db8a29d3dbded86af2cc7044b4be3a4",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 10
     },
     {
@@ -2549,7 +2549,7 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "62e341a982270b8e7116203df1b1da548f1e69fc64bfc0f3179d3e7174a425eb",
-      "status": "prepared",
+      "status": "published_verified",
       "batch": 10
     },
     {
@@ -3188,7 +3188,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Finish PR234 batch10: all required tests/Worker dry-run, exact final-head CI, current-main/D1/migration reconciliation, merge/existing Worker release and every new live image hash/MIME/HTML/social/WebPage/map/original-date/guardedpreview check. Ten generated assets are not counted as published/live until verified. Preserve all prior90 art, owner code/data/source posters/reviews/dates/players/holds. Then21remaining missingTikTok preview covers before43YouTube image omissions. Do not invent per-video Tagembed/Iframely mappings, quota signals or raw-cache rights.",
+  "nextTask": "Fresh read-only inventory/main/open-PR/Worker reconciliation first. Batch10 PR234 is merged and ten new covers are live verified (100/388published;279pending/nineheld). Do not regenerate or republish them. Prioritize next ten safe source/theme-verifiable entries among21remaining empty TikTok previews (292/295/297/298/299/301/303/304/305/306/307/310/311/312/316/317/318/319/323/325/326), avoiding real-person likenesses and unverifiable themes; then43YouTube image omissions before remaining distinct covers. Preserve all source/owner posters, D1/R2/reviews/SEO/dates/players/holds/owner main. Other-TikTok verified per-video Tagembed/Iframely mappings remain missing; do not invent credentials, signals, mapping URLs or reuse Saiyaara. Google audit39387320477 is zero-inspection/read-only and does not establish a new indexed count.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -6318,62 +6318,14 @@
   "savedLibraryCount": 388,
   "priorityMissingImages": [
     {
-      "id": 286,
-      "slug": "ranking-funniest-human-fails-try-not-to-laugh-707278",
-      "observedAt": "2026-10-20T06:59:20.818Z",
-      "reason": "Read-only D1 thumbnail is empty and no conceptual artwork exists; verify exact source/theme and saved-source-poster priority before generating."
-    },
-    {
-      "id": 287,
-      "slug": "top-100-funniest-videos-ever-london-comedy-edit-742806",
-      "observedAt": "2026-10-20T06:59:20.818Z",
-      "reason": "Read-only D1 thumbnail is empty and no conceptual artwork exists; verify exact source/theme and saved-source-poster priority before generating."
-    },
-    {
-      "id": 288,
-      "slug": "nine-seconds-of-brainrot-meme-comedy-898784",
-      "observedAt": "2026-10-20T06:59:20.818Z",
-      "reason": "Read-only D1 thumbnail is empty and no conceptual artwork exists; verify exact source/theme and saved-source-poster priority before generating."
-    },
-    {
-      "id": 290,
-      "slug": "try-not-to-laugh-short-meme-clip-challenge-356877",
-      "observedAt": "2026-10-20T06:59:20.818Z",
-      "reason": "Read-only D1 thumbnail is empty and no conceptual artwork exists; verify exact source/theme and saved-source-poster priority before generating."
-    },
-    {
-      "id": 291,
-      "slug": "epic-fails-of-2026-try-not-to-laugh-050782",
-      "observedAt": "2026-10-20T06:59:20.818Z",
-      "reason": "Read-only D1 thumbnail is empty and no conceptual artwork exists; verify exact source/theme and saved-source-poster priority before generating."
-    },
-    {
       "id": 292,
       "slug": "tom-holland-reaction-style-laugh-challenge-089351",
       "observedAt": "2026-10-20T06:59:20.818Z",
       "reason": "Read-only D1 thumbnail is empty and no conceptual artwork exists; verify exact source/theme and saved-source-poster priority before generating."
     },
     {
-      "id": 293,
-      "slug": "try-not-to-laugh-part-6-ten-internet-videos-356566",
-      "observedAt": "2026-10-20T06:59:20.818Z",
-      "reason": "Read-only D1 thumbnail is empty and no conceptual artwork exists; verify exact source/theme and saved-source-poster priority before generating."
-    },
-    {
-      "id": 294,
-      "slug": "top-three-random-try-not-to-laugh-clips-537740",
-      "observedAt": "2026-10-20T06:59:20.818Z",
-      "reason": "Read-only D1 thumbnail is empty and no conceptual artwork exists; verify exact source/theme and saved-source-poster priority before generating."
-    },
-    {
       "id": 295,
       "slug": "welp-movie-meme-and-comic-reaction-309197",
-      "observedAt": "2026-10-20T06:59:20.818Z",
-      "reason": "Read-only D1 thumbnail is empty and no conceptual artwork exists; verify exact source/theme and saved-source-poster priority before generating."
-    },
-    {
-      "id": 296,
-      "slug": "th-th-ch-c-m-c-i-vietnamese-laugh-challenge-647879",
       "observedAt": "2026-10-20T06:59:20.818Z",
       "reason": "Read-only D1 thumbnail is empty and no conceptual artwork exists; verify exact source/theme and saved-source-poster priority before generating."
     },
@@ -6450,12 +6402,6 @@
       "reason": "Read-only D1 thumbnail is empty and no conceptual artwork exists; verify exact source/theme and saved-source-poster priority before generating."
     },
     {
-      "id": 313,
-      "slug": "trying-not-to-laugh-but-failing-couple-clip-472391",
-      "observedAt": "2026-10-20T06:59:20.818Z",
-      "reason": "Read-only D1 thumbnail is empty and no conceptual artwork exists; verify exact source/theme and saved-source-poster priority before generating."
-    },
-    {
       "id": 316,
       "slug": "i-dreamt-they-cut-off-my-balls-andy-praise-skit-477588",
       "observedAt": "2026-10-20T06:59:20.818Z",
@@ -6476,12 +6422,6 @@
     {
       "id": 319,
       "slug": "laughing-at-a-joke-you-didn-t-understand-935829",
-      "observedAt": "2026-10-20T06:59:20.818Z",
-      "reason": "Read-only D1 thumbnail is empty and no conceptual artwork exists; verify exact source/theme and saved-source-poster priority before generating."
-    },
-    {
-      "id": 322,
-      "slug": "dance-monkey-dance-and-joke-short-448325",
       "observedAt": "2026-10-20T06:59:20.818Z",
       "reason": "Read-only D1 thumbnail is empty and no conceptual artwork exists; verify exact source/theme and saved-source-poster priority before generating."
     },
@@ -7378,7 +7318,7 @@
     "all90IdentityGuardsMatch": true
   },
   "batch10": {
-    "state": "prepared",
+    "state": "published_verified",
     "recordIds": [
       286,
       287,
@@ -7402,11 +7342,11 @@
       "targetRowsSha256": "c64fe298c56652c14e81836a60ce1698c32df26419a0d1076ec0116d6e69b11d"
     },
     "newGenerated": 10,
-    "newPublished": 0,
-    "liveVerified": 0,
+    "newPublished": 10,
+    "liveVerified": 10,
     "sourceVerification": "docs/review-images/batch10-source-verification-20261020.json",
     "briefs": "docs/review-images/batch10-artwork-briefs-20261020.json",
-    "limits": "Metadata/caption verified, not source footage/audio. No artwork bytes yet; one distinct built-in imagegen call required per asset. Preserve all source/owner posters, empty-thumbnail identity/storage guards and all original D1 fields/dates/player/holds.",
+    "limits": "Ten distinct built-in-imagegen conceptual artworks exist, passed visual/OCR/WebP/hash/preservation checks, were merged/deployed and individually live verified. Exact public source ID/account/caption metadata verified; no footage/audio viewed. Existing identity/empty-thumbnail/storage guards preserve working source/owner posters. No Google image indexing, continuous provider playback or AdSense claim.",
     "preparedAt": "2026-10-20T07:18:28.145Z",
     "pr": 234,
     "validation": {
@@ -7531,6 +7471,417 @@
           "thumbnailEmpty": true
         }
       ]
+    },
+    "release": {
+      "pr": 234,
+      "url": "https://github.com/Gamagek/vid-review-site/pull/234",
+      "head": "fc937aef3c451be1de4ffa16e70cf926b3a7ff19",
+      "tree": "1d918add9c8e39e68f2503304efe947ffde0cd14",
+      "merge": "77c1630b4d2df3127704474b73363f6b4c56878c",
+      "mergedAt": "2026-10-20T07:32:59Z",
+      "ciRun": 39386368376,
+      "mainCiRun": 39387241003,
+      "deployRun": 39387240940,
+      "deployJob": 118509901748,
+      "portainerRun": 39387241162,
+      "worker": {
+        "id": "594173d3-510c-443b-8fe4-cd18296ce65f",
+        "source": "wrangler",
+        "strategy": "percentage",
+        "annotations": {
+          "workers/triggered_by": "deployment"
+        },
+        "versions": [
+          {
+            "version_id": "40b866f7-3a95-4328-9aea-d61e8be5a4ca",
+            "percentage": 100
+          }
+        ],
+        "created_on": "2026-10-20T07:33:38.05342Z"
+      },
+      "workerObservedAt": "2026-10-20T08:06:37.586Z",
+      "deploymentLogEvidence": [
+        "2026-10-20T07:33:27.0910883Z # tests 427",
+        "2026-10-20T07:33:27.0911060Z # pass 427",
+        "2026-10-20T07:33:27.0911140Z # fail 0",
+        "2026-10-20T07:33:31.7254827Z D1 videos table already uses the current schema; no legacy bootstrap needed.",
+        "2026-10-20T07:33:33.7534403Z ✅ No migrations to apply!",
+        "2026-10-20T07:33:40.0411973Z Deployed vid-review-site triggers (0.79 sec)",
+        "2026-10-20T07:33:40.0416770Z Current Version ID: 40b866f7-3a95-4328-9aea-d61e8be5a4ca"
+      ],
+      "portainerJobs": [
+        {
+          "id": 118509902520,
+          "name": "validate",
+          "conclusion": "success"
+        },
+        {
+          "id": 118510069996,
+          "name": "Read-only Portainer 524 incident status",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 118510070122,
+          "name": "deploy",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 118510070168,
+          "name": "preflight",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 118510070275,
+          "name": "Deploy optional v5 internal services (one-time, live-merge)",
+          "conclusion": "skipped"
+        }
+      ]
+    },
+    "verifiedAt": "2026-10-20T07:36:20.850Z",
+    "verificationFile": "docs/review-images/batch10-live-verification-20261020.json",
+    "currentInventory": {
+      "checkedAt": "2026-10-20T08:06:13.692Z",
+      "saved": 388,
+      "published": 388,
+      "sha256": "308e8d4b33e4ba32d9ddddcaaf32ecb9be79d4de04835d4a4c5ad45354414e49",
+      "targetRowsSha256": "c64fe298c56652c14e81836a60ce1698c32df26419a0d1076ec0116d6e69b11d"
+    },
+    "audit": {
+      "run": 39387320477,
+      "artifact": 12247239491,
+      "zipSha256": "08793f908bcbff902620f7afafaccfbfb39cd558c0dccb9d7d0a756433f37dbb",
+      "generatedAt": "2026-10-20T07:34:24.252Z",
+      "pages": 422,
+      "libraryReviews": 388,
+      "editorialReviews": 10,
+      "technicalFailures": 0,
+      "editorialWarningPages": 40,
+      "editorialWarningMessages": 41,
+      "warningPages": [
+        {
+          "url": "https://vid.best/watch/lab-review-1-player-test",
+          "warnings": [
+            "short_review_needs_editorial_check",
+            "demo_page_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-embed-experience-demo",
+          "warnings": [
+            "demo_page_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-6f-3axjy4i4",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-fcuuonmnaz4",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-0nafqcsbjz0",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-6zuwetwrmqg",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-tsxgmtx5wdc",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short--9f4qbjakhe",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-bnykvcmixi0",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-kesssuyz5ys",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-2vuoqomi6uo",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-goamj2r7fhi",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-pclxcrxkszi",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-7p7ztnneec4",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-gshb7h3nxdq",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-5f0nr5aaz-u",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-tbdbgpqky3e",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-qyyohmpu18c",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-wi7a28ngsv4",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-7fn26kyxqvo",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-nsjquj0opvc",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-k0cojchz6qe",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-yrnokp--5mw",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-wld0h6jvjx4",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-esaj4jjheqs",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-h204j257esi",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-dfedvzevxbc",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-nemlhjl-yj8",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-uvqz3mnxhme",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-4b4iqf2saye",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-q5t5mpaogm0",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-i6fejmn7rju",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-wiovwe28bbq",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-6iem4fnzlhg",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-dx9n4qhxbc0",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-yjnz20zt49m",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-y5vqg0a0de4",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-iyviqkw9u5g",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-rgeh6qzfhks",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        },
+        {
+          "url": "https://vid.best/watch/youtube-short-fe8ctyczjja",
+          "warnings": [
+            "short_review_needs_editorial_check"
+          ]
+        }
+      ],
+      "searchConsole": {
+        "status": "success",
+        "authenticated": true,
+        "propertyVerified": true,
+        "sitemapSubmitted": false,
+        "inspections": [],
+        "sitemapMode": "read_only",
+        "sitemapProcessing": {
+          "status": "verified",
+          "isPending": false,
+          "lastDownloaded": "2026-10-19T10:22:53.041Z",
+          "lastSubmitted": "2026-10-19T10:22:50.628Z",
+          "errors": 0,
+          "warnings": 0
+        },
+        "reviewSitemaps": [
+          {
+            "url": "https://vid.best/sitemaps/videos-1.xml",
+            "submitted": false,
+            "processing": {
+              "status": "verified",
+              "isPending": false,
+              "lastDownloaded": "2026-10-19T10:22:55.035Z",
+              "lastSubmitted": "2026-10-19T10:22:51.167Z",
+              "errors": 0,
+              "warnings": 20
+            }
+          },
+          {
+            "url": "https://vid.best/sitemaps/daily-weekly-best.xml",
+            "submitted": false,
+            "processing": {
+              "status": "verified",
+              "isPending": false,
+              "lastDownloaded": "2026-10-19T10:22:53.165Z",
+              "lastSubmitted": "2026-10-19T10:22:51.501Z",
+              "errors": 0,
+              "warnings": 0
+            }
+          }
+        ],
+        "totalReviews": 398,
+        "inspectionBudget": 0
+      },
+      "sourcePosterCounts": {
+        "ok": 336,
+        "http_error": 1,
+        "placeholder": 8,
+        "missing": 43
+      },
+      "limit": "Completed actual post-release audit, zero URL Inspections and zero sitemap submissions. Google download timestamps still predate these covers; no new indexing change or sitewide indexed count is established. Editorial warnings are internal heuristics, not Google/AdSense verdicts. Source-poster availability is separate from conceptual artwork, rights and source playback."
+    },
+    "browser": {
+      "art": {
+        "height": 297.15625,
+        "width": 409.40625,
+        "x": 854.5625,
+        "y": 466.078125
+      },
+      "caption": "Conceptual review artwork. This is not a frame from the source video.",
+      "checkedAt": "2026-10-20T08:05:22.997Z",
+      "frames": [],
+      "image": {
+        "complete": true,
+        "currentSrc": "https://vid.best/review-illustrations/ranking-funniest-human-fails-try-not-to-laugh-707278-v1.webp",
+        "naturalHeight": 941,
+        "naturalWidth": 1672,
+        "renderedWidth": 375
+      },
+      "review": {
+        "height": 1234.75,
+        "width": 746.5625,
+        "x": 84,
+        "y": 466.078125
+      },
+      "url": "https://vid.best/watch/ranking-funniest-human-fails-try-not-to-laugh-707278",
+      "viewport": {
+        "height": 936,
+        "width": 1363
+      },
+      "screenshot": "docs/review-images/batch10-live-desktop-20261020.jpg",
+      "limit": "Desktop 1363x936 sidebar decoding, matching layout and truthful caption verified. Existing 900px responsive CSS unchanged. No independent mobile viewport or continuous source playback/audio verification; no Play action was taken, and no iframe was present."
     }
   }
 }
