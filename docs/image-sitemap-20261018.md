@@ -1,5 +1,11 @@
 # Review artwork discovery and image sitemap (18 October 2026)
 
+## 20 October 2026: current inventory reconciliation and fresh existing-image checks
+
+Current owner main345d6bd/current100%Worker83c4c8b1 are preserved in existing PR227. Read-only D1:388published/388saved;90existing artwork guards match,289pending/nineheld (including new Saiyaara327/328). Fresh batch9 recheck2026-10-20T06:58:08.350Z verifies all ten existing image hashes/HTTP/MIME/watch/social/WebPage/maps/guardedpreviews under that current Worker. Root still5flaturlsets; image map345pages/435imageentries,43published YouTube pages currently lack valid image metadata/artwork. No new unique art or publication in this documentation-only checkpoint[read-only-preflight][seo-only].
+
+Latest actual audit39360176692/artifact12236219785:422pages/0technicalfailures at2026-10-20T02:42:03.381Z;0Inspections/0submissions, no new indexed-image count.40internal editorial-warning pages are not a Google/AdSense verdict. New owner publications86 are reconciled without any data/review/date/poster/player edit. Next finish PR227 exact-head CI/merge, then31missing-thumbnail TikTok themes before43YouTube omissions. Full dated evidence: docs/review-images/batch9-checkpoint-reconciliation-20261020.json.
+
 ## 19 October 2026: batch9 image discovery live, ninety conceptual covers
 
 PR225 merged8a14694989e627f293f5d9dd8a604ad65dbe0c1f; exact-headCI39250686556/mainCI39250867453/Deploy39250867522 passed. Ten new16:9 TikTok covers289/300/302/308/309/314/315/320/321/324 are published and live-verified individually:HTTP200/image-webp/exactbytes/SHA256, matching watchimg, OG/Twitter/WebPage ImageObject, guarded missing-preview fallback and image/video-map associations, with original dates/source VideoObject thumbnails preserved. Live proof at2026-10-19T16:05:05.842Z: root5flaturlsetchildren, image map297published pages/387imageentries; standalone/image-sitemap.xml remains inrobots. No nested sitemap index, fake freshness dates or original poster replacement. Five published YouTube267–271 still have no valid saved image/artwork, explaining302published versus297image-map pages.
