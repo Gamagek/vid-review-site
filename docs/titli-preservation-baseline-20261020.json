@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-10-20T08:57:21.252Z",
+  "saved": 388,
+  "published": 388,
+  "allNonCounterSha256": "308e8d4b33e4ba32d9ddddcaaf32ecb9be79d4de04835d4a4c5ad45354414e49",
+  "unaffectedRowsSha256": "9b94fff0cf4d9599df76caaa25af17644ffd14d7b3a6a54c3bca03738510114f",
+  "targetBeforeSha256": "a2f8db76102e1cb0342b0dddac476f342603bb3a1dd5b4cf1573d1dcba85fd74",
+  "targetAfterSha256": "b79573bf67dd3a6798e0b5c0489b471b365a112094c542238675b445f8739c52",
+  "expectedAllAfterSha256": "a540400218bc02106f43a1c1664f019a0deae9c593a0c7651bf9e271d4bffe19",
+  "preimageMismatches": [],
+  "guardedFields": 29,
+  "dates": {
+    "created_at": "2026-10-11T13:29:15.091Z",
+    "updated_at": "2026-10-11T13:29:15.091Z"
+  }
+}

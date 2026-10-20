@@ -3188,7 +3188,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Fresh read-only inventory/main/open-PR/Worker reconciliation first. Batch10 PR234 is merged and ten new covers are live verified (100/388published;279pending/nineheld). Do not regenerate or republish them. Prioritize next ten safe source/theme-verifiable entries among21remaining empty TikTok previews (292/295/297/298/299/301/303/304/305/306/307/310/311/312/316/317/318/319/323/325/326), avoiding real-person likenesses and unverifiable themes; then43YouTube image omissions before remaining distinct covers. Preserve all source/owner posters, D1/R2/reviews/SEO/dates/players/holds/owner main. Other-TikTok verified per-video Tagembed/Iframely mappings remain missing; do not invent credentials, signals, mapping URLs or reuse Saiyaara. Google audit39387320477 is zero-inspection/read-only and does not establish a new indexed count.",
+  "nextTask": "Image creation is paused by owner20October2026. Do not generate or resume artwork batches until an explicit owner request. Keep all388entries/100published covers and nineholds unchanged. Continue previously authorized non-image tasks: resume existing Titli135 source-context PR, then evidence-based editorial or bounded playback work. Missing verified per-video Tagembed/Iframely mappings remain an external limit; do not switch back to image creation.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -7883,5 +7883,11 @@
       "screenshot": "docs/review-images/batch10-live-desktop-20261020.jpg",
       "limit": "Desktop 1363x936 sidebar decoding, matching layout and truthful caption verified. Existing 900px responsive CSS unchanged. No independent mobile viewport or continuous source playback/audio verification; no Play action was taken, and no iframe was present."
     }
+  },
+  "imageCreationPause": {
+    "active": true,
+    "instructionDate": "2026-10-20",
+    "resumeRequires": "Explicit owner instruction",
+    "scope": "No image generation/editing or new image-production batches while paused. Preserve existing100artworks, all388queue entries, source/owner posters, manifest/provenance and image associations. Existing-image read-only verification for authorized non-image work remains allowed."
   }
 }

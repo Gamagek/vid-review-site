@@ -168,13 +168,7 @@
     {
       "recordId": 135,
       "sourceId": "V8zXLMIjlcw",
-      "task": "Next published Music135/Titli bounded listing/source-context task. Exact publisher page now verifies sourceID/title/performers/composer/Hindi+Tamil lyric credits; making page separately credits FarahKhan. Recheck fresh owner preimages before edits. Preserve six headings/order/substantial prose/SEOtitle/tags/IDs/dates/source/poster. No new audio, filming-location, scene, Sanskrit/Tamil meaning or musical-form observation from metadata; existing assertions still need evidence.",
-      "preparationSources": [
-        "https://www.tseries.com/videos/tseries/PL9bw4S5ePsEER6dV2jyn9SIPH_AWKZhQv/V8zXLMIjlcw",
-        "https://www.tseries.com/videos/tseries/PL9bw4S5ePsEH4rO3-BiW_LW9RloQ-4ZkV/vm4eWl7nvS4",
-        "https://music.apple.com/us/song/titli/1115905448"
-      ],
-      "preparationLimits": "Metadata only. The directYouTubefetch exposed footer/title only, not fresh player/channel/description evidence. Album catalogue3July2013 is not source-upload/site-publish date. Do not copy OneTwoThreeFour credits or equate music video/making/lyric/remix versions. No135public edit in this run."
+      "task": "Resume existing seo/titli-source-context-20261020 PR; three-field bounded correction prepared and tested. Verify current main/all29ownerpreimages, pass current PR head CI, merge/deploy only0047, verify live exact fields/allother387rows/old dates/unchanged image assets, then record results. Do not prepare a duplicate edit. Source footage/audio remain uninspected; existing manual holds and SEO title/tags persist."
     },
     {
       "recordIds": [
@@ -2120,7 +2114,46 @@
       "flags": []
     }
   ],
-  "preparedBatches": [],
+  "preparedBatches": [
+    {
+      "recordIds": [
+        135
+      ],
+      "branch": "seo/titli-source-context-20261020",
+      "status": "prepared_not_deployed",
+      "changedFields": [
+        "description",
+        "seo_description",
+        "review_text"
+      ],
+      "migration": "migrations/0047_titli_source_context.sql",
+      "changeFile": "content/editorial-quality/2026-10-20-titli.json",
+      "baselineFile": "docs/titli-preservation-baseline-20261020.json",
+      "baseline": {
+        "checkedAt": "2026-10-20T08:57:21.252Z",
+        "saved": 388,
+        "published": 388,
+        "allNonCounterSha256": "308e8d4b33e4ba32d9ddddcaaf32ecb9be79d4de04835d4a4c5ad45354414e49",
+        "unaffectedRowsSha256": "9b94fff0cf4d9599df76caaa25af17644ffd14d7b3a6a54c3bca03738510114f",
+        "targetBeforeSha256": "a2f8db76102e1cb0342b0dddac476f342603bb3a1dd5b4cf1573d1dcba85fd74",
+        "targetAfterSha256": "b79573bf67dd3a6798e0b5c0489b471b365a112094c542238675b445f8739c52",
+        "expectedAllAfterSha256": "a540400218bc02106f43a1c1664f019a0deae9c593a0c7651bf9e271d4bffe19",
+        "preimageMismatches": [],
+        "guardedFields": 29,
+        "dates": {
+          "created_at": "2026-10-11T13:29:15.091Z",
+          "updated_at": "2026-10-11T13:29:15.091Z"
+        }
+      },
+      "tests": {
+        "node": 432,
+        "python": 4,
+        "focused": 5,
+        "workerDryRun": true
+      },
+      "sourceLimits": "Retained sections1–5 scene/costume/location, vocal/instrument/tempo/genre assertions and section6 popularity/translation claims have not been independently re-verified. Preserve owner prose and SEO title/tags; the bounded public source-check limitation is not whole-review certification. Fresh authorized listening/viewing evidence is required before further correction."
+    }
+  ],
   "googleSnapshot": {
     "runId": 39114196048,
     "generatedAt": "2026-10-18T09:09:16.202Z",
@@ -2140,26 +2173,28 @@
   },
   "screeningVersion": 3,
   "latestPublicAudit": {
-    "runId": 39125781112,
-    "artifactId": 12135908326,
-    "zipSha256": "052363e661f39f6cde989bcb0717595b92ff393b14040e0bc8b42dc509e49a10",
-    "generatedAt": "2026-10-18T12:04:37.472Z",
-    "artifactCreatedAt": "2026-10-18T12:06:43Z",
-    "pages": 231,
+    "runId": 39387320477,
+    "artifactId": 12247239491,
+    "zipSha256": "08793f908bcbff902620f7afafaccfbfb39cd558c0dccb9d7d0a756433f37dbb",
+    "generatedAt": "2026-10-20T07:34:24.252Z",
+    "pages": 422,
     "technicalFailures": 0,
-    "libraryReviews": 200,
+    "libraryReviews": 388,
     "editorialReviews": 10,
+    "editorialWarningPages": 40,
+    "editorialWarningMessages": 41,
     "thumbnailCounts": {
-      "ok": 181,
-      "http_error": 11,
-      "placeholder": 8
+      "ok": 336,
+      "http_error": 1,
+      "placeholder": 8,
+      "missing": 43
     },
-    "matchingImageBodies": 189,
     "inspections": 0,
     "sitemapSubmissions": 0,
     "sitemapsProcessed": true,
-    "lastDownloaded": "2026-10-18T09:11:12.537Z",
-    "libraryWarnings": 20
+    "lastDownloaded": "2026-10-19T10:22:53.041Z",
+    "libraryWarnings": 20,
+    "limit": "Completed actual audit39387320477, consumed without another inspection/submission. Internal warnings are not Google/AdSense verdicts; no new indexed count established."
   },
   "completedPlayerIntegrations": [
     {
@@ -2296,5 +2331,22 @@
       "evidenceFile": "docs/tiktok-replay-cache-20261018.md",
       "nextTask": "Published Titli135 source-context work after fresh owner preimages, preserving six headings/substantial prose/SEOtitle/media/dates and all evidence holds."
     }
-  ]
+  ],
+  "currentDataSnapshot20261020": {
+    "checkedAt": "2026-10-20T08:57:21.252Z",
+    "saved": 388,
+    "published": 388,
+    "allNonCounterSha256": "308e8d4b33e4ba32d9ddddcaaf32ecb9be79d4de04835d4a4c5ad45354414e49",
+    "unaffectedRowsSha256": "9b94fff0cf4d9599df76caaa25af17644ffd14d7b3a6a54c3bca03738510114f",
+    "targetBeforeSha256": "a2f8db76102e1cb0342b0dddac476f342603bb3a1dd5b4cf1573d1dcba85fd74",
+    "targetAfterSha256": "b79573bf67dd3a6798e0b5c0489b471b365a112094c542238675b445f8739c52",
+    "expectedAllAfterSha256": "a540400218bc02106f43a1c1664f019a0deae9c593a0c7651bf9e271d4bffe19",
+    "preimageMismatches": [],
+    "guardedFields": 29,
+    "dates": {
+      "created_at": "2026-10-11T13:29:15.091Z",
+      "updated_at": "2026-10-11T13:29:15.091Z"
+    },
+    "scope": "Read-only current388published records; historical200-record screening counts remain dated, not rewritten as a current whole-library audit."
+  }
 }
