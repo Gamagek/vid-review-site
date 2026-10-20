@@ -121,5 +121,9 @@ test('Lazy Song server HTML, API, canonical, source/schema/social image and site
   const xml=await(await request('/sitemaps/videos-1.xml')).text();
   assert.ok(xml.includes(`<loc>${origin}/watch/${record.before.slug}</loc>`));
   assert.ok(xml.includes(`<lastmod>${record.before.updated_at}</lastmod>`));
+  const entry=[...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].find(x=>x[1].includes(`<loc>${origin}/watch/${record.before.slug}</loc>`))?.[1];
+  assert.ok(entry.includes(`<video:description>${escape(record.after.seo_description)}</video:description>`));
+  assert.ok(entry.includes(`<video:thumbnail_loc>${record.before.thumbnail_url}</video:thumbnail_loc>`));
+  assert.doesNotMatch(entry,/<video:publication_date>|<video:duration>/);
   assert.deepEqual(db.prepare('SELECT * FROM videos ORDER BY id').all(),after);
 });

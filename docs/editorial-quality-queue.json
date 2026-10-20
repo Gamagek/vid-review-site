@@ -147,6 +147,29 @@
       "remainingEvidenceHold": "Retained sections1–5 scene/costume/location, vocal/instrument/tempo/genre assertions and section6 popularity/translation claims have not been independently re-verified. Preserve owner prose and SEO title/tags; the bounded public source-check limitation is not whole-review certification. Fresh authorized listening/viewing evidence is required before further correction.",
       "evidenceFile": "docs/titli-live-verification-20261020.json",
       "laterDataObservationFile": "docs/titli-live-verification-20261020.json"
+    },
+    {
+      "recordIds": [
+        180
+      ],
+      "pullRequest": 242,
+      "reviewedHead": "c2b0b2ca219c93d8c2ccfe49b991b308f88ff5cf",
+      "mergeCommit": "fe42619c968a44cbad46d284aa910fea93f9fb59",
+      "workerVersion": "531f3fb2-ebcb-4bcb-8d16-629cd30a3eef",
+      "status": "bounded_source_context_deployed_and_live_verified",
+      "changedFields": [
+        "description",
+        "review_text",
+        "seo_description"
+      ],
+      "preservedHeadings": 4,
+      "originalDatesPreserved": true,
+      "sourcePosterSeoTitleTagsAndOtherFieldsPreserved": true,
+      "targetBeforeSha256": "1ebc1d263d691b55c70b4eec53f1cdf749cea50af64dc38b4281ce900b4d5330",
+      "targetAfterSha256": "41f11384a5324942969c155ac94bc52a7eb2e50d12598092eb0fd11f55906bb7",
+      "liveVerifiedAt": "2026-10-20T13:16:10.977Z",
+      "remainingEvidenceHold": "Retained sections1–3 single-take, set, Poreotics/costume/choreography, production-era/cost and audio character descriptions have not been independently re-verified. Preserve these owner paragraphs and existing SEO title/tags; source release labels do not certify footage/audio or whole-review accuracy. Fresh legitimate viewing/listening evidence is required before further correction.",
+      "evidenceFile": "docs/lazy-song-live-verification-20261020.json"
     }
   ],
   "topicHolds": {
@@ -201,10 +224,9 @@
   ],
   "nextTasks": [
     {
-      "task": "Finish only the prepared180Music three-field source-context correction after exact-head CI, guarded migration/deployment and live preservation verification. All four headings, opening/sections1–3 and all original dates/media/SEOtitle/tags remain unchanged. Do not repeat135orPR240. Google library-sitemap exact-error detail remains an external prerequisite; configured Sitemaps API has numeric counts, not category/line messages. Image creation stays paused and provider mappings remain unverified.",
-      "recordId": 180,
-      "evidenceFile": "docs/lazy-song-preservation-baseline-20261020.json",
-      "observedAt": "2026-10-20T13:06:36.951Z"
+      "task": "Do not repeat the completed180/135corrections orPR240. Exact Google library-sitemap1error/20warning detail remains an external prerequisite: owner-provided SearchConsole message and affected URL/line, or already-authorized detailed evidence; configured Sitemaps API lacks it. Continue a fresh source-verifiable unprotected non-image editorial task after current main/PR/Worker/D1 reconciliation. Preserve all owner headings/prose/identities/dates/holds. Image creation remains paused and provider mappings must not be invented; no repeated full Inspections or blind resubmission.",
+      "evidenceFile": "docs/lazy-song-live-verification-20261020.json",
+      "observedAt": "2026-10-20T13:14:24.489Z"
     },
     {
       "recordIds": [
@@ -726,10 +748,11 @@
       "slug": "bruno-mars-the-lazy-song-official-music-video",
       "category": "Music",
       "protectedTopic": false,
-      "contentSha256": "1a752614cc101bd678c43a2b73f640c54fb833a57a14c3fd5c2e2764a78f609b",
-      "flags": [
-        "generic_listing_intro"
-      ]
+      "contentSha256": "8ae0bae85f0c92442b0d27ac21b94a6f801d458abe3b3f70a89f005f54f01c4b",
+      "flags": [],
+      "lastBoundedCorrectionAt": "2026-10-20T13:16:10.977Z",
+      "evidenceFile": "docs/lazy-song-live-verification-20261020.json",
+      "remainingEvidenceHold": true
     },
     {
       "id": 179,
@@ -2176,25 +2199,7 @@
       "flags": []
     }
   ],
-  "preparedBatches": [
-    {
-      "recordIds": [
-        180
-      ],
-      "status": "prepared_not_deployed",
-      "changedFields": [
-        "description",
-        "review_text",
-        "seo_description"
-      ],
-      "preservedHeadings": 4,
-      "originalDatesPreserved": true,
-      "branch": "seo/lazy-song-source-context-20261020",
-      "evidenceFile": "content/editorial-quality/2026-10-20-lazy-song.json",
-      "baselineFile": "docs/lazy-song-preservation-baseline-20261020.json",
-      "remainingEvidenceHold": "Retained sections1–3 single-take, set, Poreotics/costume/choreography, production-era/cost and audio character descriptions have not been independently re-verified. Preserve these owner paragraphs and existing SEO title/tags; source release labels do not certify footage/audio or whole-review accuracy. Fresh legitimate viewing/listening evidence is required before further correction."
-    }
-  ],
+  "preparedBatches": [],
   "googleSnapshot": {
     "runId": 39114196048,
     "generatedAt": "2026-10-18T09:09:16.202Z",
@@ -2214,10 +2219,11 @@
   },
   "screeningVersion": 3,
   "latestPublicAudit": {
-    "runId": 39420225531,
-    "artifactId": 12262994432,
-    "zipSha256": "a17e8cbacfd6639a85fc6364821e7cc13516c36b046a5c5bafaee3f0d4fcc7be",
-    "generatedAt": "2026-10-20T12:10:42.930Z",
+    "runId": 39428631717,
+    "artifactId": 12266404120,
+    "zipBytes": 77874,
+    "zipSha256": "c0735a51cfa26b14120330d34f0a4ddf4b9a350edeb9b39d5841e38624c0ee42",
+    "generatedAt": "2026-10-20T13:14:24.489Z",
     "pages": 422,
     "libraryReviews": 388,
     "editorialReviews": 10,
@@ -2276,7 +2282,35 @@
     },
     "inspections": 0,
     "sitemapSubmissions": 0,
-    "limit": "Actual completed post-release zero-inspection audit. Internal warnings and source-image counts are not Google indexing/AdSense verdicts; existing100conceptual images are separate."
+    "targetPage": {
+      "url": "https://vid.best/watch/bruno-mars-the-lazy-song-official-music-video",
+      "errors": [],
+      "warnings": [],
+      "headStatus": 200,
+      "getStatus": 200,
+      "responseMs": 779,
+      "contentType": "text/html",
+      "canonical": "https://vid.best/watch/bruno-mars-the-lazy-song-official-music-video",
+      "title": "Epic Music Video Analysis! 🐒🎸Bruno Mars -The Lazy Song(Monkey Dance) | Vid.Best",
+      "links": [
+        "https://vid.best/",
+        "https://vid.best/category/music",
+        "https://vid.best/editorial",
+        "https://vid.best/watch/river-forest-calm-music-relaxation-study-nature-sound-mind",
+        "https://vid.best/watch/saiyaara-reprise-female-full-song-ahaan-aneet-tanishk-faheem-arslan-shreya-irshad",
+        "https://vid.best/watch/saiyaara-saiyaara-song-saiyaara-yrf-reels-officialteaser-sorts-ahaanpanday-viral",
+        "https://vid.best/watch/onerepublic-counting-stars-2013-official-video-visual-review",
+        "https://vid.best/watch/crazy-frog-axel-f-official-animated-music-video-review",
+        "https://vid.best/watch/cocomelon-bath-song-2018-hygiene-music-video-review",
+        "https://vid.best/videos",
+        "https://vid.best/about",
+        "https://vid.best/contact",
+        "https://vid.best/privacy",
+        "https://vid.best/terms"
+      ],
+      "reviewWords": 439
+    },
+    "limit": "Actual completed post-release read-only diagnostic; internal warnings/source-image totals are not Google indexing or AdSense verdicts.0Inspections is not0indexed. Source-image availability is separate from100conceptual artworks."
   },
   "completedPlayerIntegrations": [
     {
@@ -2497,6 +2531,41 @@
     "manualPrerequisite": "Owner-provided Search Console Sitemaps error detail (message and affected URL/line, if shown) for https://vid.best/sitemaps/videos-1.xml, or an already authorized method exposing that detail. No new browser/login/credential scope, resubmission, Indexing API or full Inspection attempted.",
     "documentationCheckedAt": "2026-10-20T13:06:36.951Z",
     "inspectionCalls": 0,
-    "sitemapSubmissions": 0
+    "sitemapSubmissions": 0,
+    "latestVerifiedObservation": {
+      "runId": 39428631717,
+      "generatedAt": "2026-10-20T13:14:24.489Z",
+      "library": {
+        "status": "verified",
+        "isPending": false,
+        "lastDownloaded": "2026-10-20T09:45:16.373Z",
+        "lastSubmitted": "2026-10-20T09:45:14.292Z",
+        "errors": 1,
+        "warnings": 20
+      },
+      "limit": "Error count and Google download timestamps unchanged from prior completed audit, still no category/line details or current whole-site indexed count."
+    }
+  },
+  "latestLazySongCorrection": {
+    "checkedAt": "2026-10-20T13:16:10.977Z",
+    "saved": 388,
+    "published": 388,
+    "allNonCounterSha256": "5fcfef2d0964f91eb38184077c032878170fa8b479cfae2038149c458a238033",
+    "unaffected387Sha256": "0e4b27406b8a3f47701045e5a75b834bc516c189ae107f6e55e8d76a7b8a114b",
+    "sourceUploadMetadataAbsent": true,
+    "evidenceFile": "docs/lazy-song-live-verification-20261020.json"
+  },
+  "latestPlaybackMappingCheck": {
+    "checkedAt": "2026-10-20T13:12:37.390Z",
+    "tiktokRows": 54,
+    "published": 54,
+    "tagembedOrIframelyMappingsInEmbedField": [],
+    "matchingAppSettingKeys": [],
+    "rightsFlaggedExistingCacheCandidates": [],
+    "queryWrites": [
+      0,
+      0
+    ],
+    "limits": "Existing cache flags are not playable-asset certification. No provider, raw asset, iframe/playback, retry/quota probe or writes. No secrets or arbitrary settings values read; no mapping invented."
   }
 }

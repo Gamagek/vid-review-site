@@ -1,0 +1,668 @@
+{
+  "date": "2026-10-20",
+  "status": "bounded_source_context_deployed_and_live_verified",
+  "checkedAt": "2026-10-20T13:16:10.977Z",
+  "release": {
+    "pullRequest": 242,
+    "url": "https://github.com/Gamagek/vid-review-site/pull/242",
+    "localCommit": "5edff2556c6a73309bcfaab421007331dd49c8ef",
+    "reviewedHead": "c2b0b2ca219c93d8c2ccfe49b991b308f88ff5cf",
+    "testedTree": "2a3f583e00aaad2917d25e9acd3f13478a5b1c26",
+    "headCI": {
+      "runId": 39428333650,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    "mergeCommit": "fe42619c968a44cbad46d284aa910fea93f9fb59",
+    "mergedAt": "2026-10-20T13:13:15Z",
+    "mainCI": {
+      "runId": 39428548764,
+      "conclusion": "success"
+    },
+    "deploy": {
+      "runId": 39428548743,
+      "jobId": 118647225784,
+      "conclusion": "success",
+      "url": "https://github.com/Gamagek/vid-review-site/actions/runs/39428548743",
+      "legacyBootstrap": "current schema; no bootstrap needed",
+      "appliedMigrations": [
+        "0048_lazy_song_source_context.sql"
+      ]
+    },
+    "workerVersion": "531f3fb2-ebcb-4bcb-8d16-629cd30a3eef",
+    "deploymentId": "e2b30483-570a-4421-958d-db17a93be707",
+    "deployedAt": "2026-10-20T13:13:45.520998Z",
+    "trafficPercent": 100,
+    "portainer": {
+      "runId": 39428548797,
+      "validate": "success",
+      "privilegedJobs": [
+        {
+          "name": "Read-only Portainer 524 incident status",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "preflight",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Deploy optional v5 internal services (one-time, live-merge)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "deploy",
+          "conclusion": "skipped"
+        }
+      ],
+      "automaticFlagChanged": false
+    },
+    "tests": {
+      "node": 442,
+      "python": 4,
+      "focused": 5,
+      "workerDryRun": "passed",
+      "ci": "actionlint/Compose, all tests and syntax checks passed"
+    }
+  },
+  "scope": "Only published Music180.description/review_text/seo_description. Replace the repeated generic listing and remove unsupported ranking/production-cost conclusions from one section4 paragraph in favour of bounded replay-appeal interpretation and source-specific version-choice guidance. Preserve opening, four headings/order, sections1–3, SEO title/tags, all identities/media/posters/dates/counters and every other record.",
+  "sourceEvidence": [
+    {
+      "url": "https://www.brunomars.com/video/lazy-song",
+      "checkedOn": "2026-10-20",
+      "verified": "The artist's official video page identifies video_Id fLexgOxsZu0, matching this exact source upload.",
+      "limits": "Page text/identity only, not fresh footage/audio, one-shot construction, Poreotics identity, choreography, location or budget verification. The page's2019CMS submission date is not a video or Vid.Best publish date."
+    },
+    {
+      "url": "https://www.brunomars.com/music/doo-wops-hooligans",
+      "checkedOn": "2026-10-20",
+      "verified": "Artist's Doo-Wops & Hooligans album page lists The Lazy Song and the same fLexgOxsZu0 video ID.",
+      "limits": "Catalogue association only; the2025CMS date is not the album/video release date. No dates or media fields changed."
+    },
+    {
+      "url": "https://www.brunomars.com/news/lazy-song-official-alternate-video-61486",
+      "checkedOn": "2026-10-20",
+      "verified": "Artist's news entry dated3June2011 separately announces The Lazy Song [Official Alternate Video].",
+      "limits": "Release-label evidence establishes a distinct alternate edition, not replacement/withdrawal, its guest identity, viewing comparison, audience statistics or greater artistic quality. Do not insert or reuse another video's media."
+    }
+  ],
+  "remainingReviewEvidenceHold": "Retained sections1–3 single-take, set, Poreotics/costume/choreography, production-era/cost and audio character descriptions have not been independently re-verified. Preserve these owner paragraphs and existing SEO title/tags; source release labels do not certify footage/audio or whole-review accuracy. Fresh legitimate viewing/listening evidence is required before further correction.",
+  "data": {
+    "beforeMerge": {
+      "checkedAt": "2026-10-20T13:13:14.003Z",
+      "saved": 388,
+      "published": 388,
+      "fields": [
+        "cache_attempts",
+        "cache_error",
+        "cache_next_attempt_at",
+        "cache_source_url",
+        "cache_status",
+        "cached_at",
+        "created_at",
+        "description",
+        "embed_url",
+        "featured",
+        "id",
+        "media_type",
+        "primary_category",
+        "published",
+        "r2_key",
+        "redistribution_certified",
+        "redistribution_certified_at",
+        "review_text",
+        "seo_description",
+        "seo_tags",
+        "seo_title",
+        "slug",
+        "source_page_url",
+        "source_url",
+        "subcategory",
+        "thumbnail_url",
+        "title",
+        "trending",
+        "updated_at"
+      ],
+      "allNonCounterSha256": "b854c4033bf425e28ff86478e9ec54ebb69846d54802f9223b5493add2d1347a",
+      "unaffected387Sha256": "0e4b27406b8a3f47701045e5a75b834bc516c189ae107f6e55e8d76a7b8a114b",
+      "targetSha256": "1ebc1d263d691b55c70b4eec53f1cdf749cea50af64dc38b4281ce900b4d5330",
+      "expectedTargetAfterSha256": "41f11384a5324942969c155ac94bc52a7eb2e50d12598092eb0fd11f55906bb7",
+      "expectedAllAfterSha256": "5fcfef2d0964f91eb38184077c032878170fa8b479cfae2038149c458a238033",
+      "preimageMismatches": [],
+      "sourceMetadata": [],
+      "migrations": [
+        "0001_initial.sql",
+        "0002_discovery_requests.sql",
+        "0003_security_rate_limits.sql",
+        "0004_maintenance_indexes.sql",
+        "0005_source_video_metadata.sql",
+        "0006_test_player_and_comment_images.sql",
+        "0007_universal_video_experience.sql",
+        "0008_verified_demo_metadata.sql",
+        "0009_app_settings.sql",
+        "0010_video_analysis.sql",
+        "0011_spirituality_buddhism.sql",
+        "0012_saiyaara_tiktok_correction.sql",
+        "0013_saiyaara_permanent_slug.sql",
+        "0013_media_cache_jobs.sql",
+        "0014_member_notifications.sql",
+        "0015_summer_inverted_tiktok.sql",
+        "0016_rights_certified_r2_cache.sql",
+        "0017_authorized_auto_cache.sql",
+        "0018_tiktok_oembed_cache.sql",
+        "0019_tiktok_oembed_backfill.sql",
+        "0020_member_personalization.sql",
+        "0021_facebook_reel_pending_drafts.sql",
+        "0022_facebook_readable_slugs.sql",
+        "0023_facebook_challenge_preview.sql",
+        "0024_digital_love_review_cover.sql",
+        "0025_lab_review_source_cover.sql",
+        "0026_gratitude_illustrated_cover.sql",
+        "0027_garden_illustrated_cover.sql",
+        "0028_nature_power_illustrated_cover.sql",
+        "0029_live_kindly_illustrated_cover.sql",
+        "0030_facebook_preview_jobs.sql",
+        "0031_past_present_progress_cover.sql",
+        "0032_animal_compassion_source_poster.sql",
+        "0033_trust_yourself_source_poster.sql",
+        "0034_some_meetings_source_poster.sql",
+        "0035_right_place_source_poster.sql",
+        "0036_anapanasati_source_poster.sql",
+        "0037_quiet_presence_source_poster.sql",
+        "0038_meri_aashiqui_illustrated_cover.sql",
+        "0039_top5_existing_source_poster.sql",
+        "0040_skateboard_symbolic_cover.sql",
+        "0041_source_based_editorial_quality.sql",
+        "0042_sia_source_context.sql",
+        "0043_fight_song_source_context.sql",
+        "0044_wahran_source_context.sql",
+        "0045_flying_source_context.sql",
+        "0046_quiet_presence_accuracy.sql",
+        "0047_titli_source_context.sql"
+      ],
+      "worker": [
+        {
+          "id": "2fffb841-d0cc-4e0e-97b6-545a1e0065e8",
+          "created_on": "2026-10-20T12:09:58.567488Z",
+          "versions": [
+            {
+              "version_id": "90c860b7-4351-4f55-9f01-c8fd710a9257",
+              "percentage": 100
+            }
+          ]
+        }
+      ],
+      "queryWrites": [
+        0,
+        0,
+        0
+      ]
+    },
+    "afterRelease": {
+      "checkedAt": "2026-10-20T13:14:19.326Z",
+      "saved": 388,
+      "published": 388,
+      "fields": [
+        "cache_attempts",
+        "cache_error",
+        "cache_next_attempt_at",
+        "cache_source_url",
+        "cache_status",
+        "cached_at",
+        "created_at",
+        "description",
+        "embed_url",
+        "featured",
+        "id",
+        "media_type",
+        "primary_category",
+        "published",
+        "r2_key",
+        "redistribution_certified",
+        "redistribution_certified_at",
+        "review_text",
+        "seo_description",
+        "seo_tags",
+        "seo_title",
+        "slug",
+        "source_page_url",
+        "source_url",
+        "subcategory",
+        "thumbnail_url",
+        "title",
+        "trending",
+        "updated_at"
+      ],
+      "allNonCounterSha256": "5fcfef2d0964f91eb38184077c032878170fa8b479cfae2038149c458a238033",
+      "unaffected387Sha256": "0e4b27406b8a3f47701045e5a75b834bc516c189ae107f6e55e8d76a7b8a114b",
+      "targetSha256": "41f11384a5324942969c155ac94bc52a7eb2e50d12598092eb0fd11f55906bb7",
+      "expectedTargetAfterSha256": "41f11384a5324942969c155ac94bc52a7eb2e50d12598092eb0fd11f55906bb7",
+      "expectedAllAfterSha256": "5fcfef2d0964f91eb38184077c032878170fa8b479cfae2038149c458a238033",
+      "preimageMismatches": [
+        "description",
+        "review_text",
+        "seo_description"
+      ],
+      "sourceMetadata": [],
+      "migrations": [
+        "0001_initial.sql",
+        "0002_discovery_requests.sql",
+        "0003_security_rate_limits.sql",
+        "0004_maintenance_indexes.sql",
+        "0005_source_video_metadata.sql",
+        "0006_test_player_and_comment_images.sql",
+        "0007_universal_video_experience.sql",
+        "0008_verified_demo_metadata.sql",
+        "0009_app_settings.sql",
+        "0010_video_analysis.sql",
+        "0011_spirituality_buddhism.sql",
+        "0012_saiyaara_tiktok_correction.sql",
+        "0013_saiyaara_permanent_slug.sql",
+        "0013_media_cache_jobs.sql",
+        "0014_member_notifications.sql",
+        "0015_summer_inverted_tiktok.sql",
+        "0016_rights_certified_r2_cache.sql",
+        "0017_authorized_auto_cache.sql",
+        "0018_tiktok_oembed_cache.sql",
+        "0019_tiktok_oembed_backfill.sql",
+        "0020_member_personalization.sql",
+        "0021_facebook_reel_pending_drafts.sql",
+        "0022_facebook_readable_slugs.sql",
+        "0023_facebook_challenge_preview.sql",
+        "0024_digital_love_review_cover.sql",
+        "0025_lab_review_source_cover.sql",
+        "0026_gratitude_illustrated_cover.sql",
+        "0027_garden_illustrated_cover.sql",
+        "0028_nature_power_illustrated_cover.sql",
+        "0029_live_kindly_illustrated_cover.sql",
+        "0030_facebook_preview_jobs.sql",
+        "0031_past_present_progress_cover.sql",
+        "0032_animal_compassion_source_poster.sql",
+        "0033_trust_yourself_source_poster.sql",
+        "0034_some_meetings_source_poster.sql",
+        "0035_right_place_source_poster.sql",
+        "0036_anapanasati_source_poster.sql",
+        "0037_quiet_presence_source_poster.sql",
+        "0038_meri_aashiqui_illustrated_cover.sql",
+        "0039_top5_existing_source_poster.sql",
+        "0040_skateboard_symbolic_cover.sql",
+        "0041_source_based_editorial_quality.sql",
+        "0042_sia_source_context.sql",
+        "0043_fight_song_source_context.sql",
+        "0044_wahran_source_context.sql",
+        "0045_flying_source_context.sql",
+        "0046_quiet_presence_accuracy.sql",
+        "0047_titli_source_context.sql",
+        "0048_lazy_song_source_context.sql"
+      ],
+      "worker": [
+        {
+          "id": "e2b30483-570a-4421-958d-db17a93be707",
+          "created_on": "2026-10-20T13:13:45.520998Z",
+          "versions": [
+            {
+              "version_id": "531f3fb2-ebcb-4bcb-8d16-629cd30a3eef",
+              "percentage": 100
+            }
+          ]
+        }
+      ],
+      "queryWrites": [
+        0,
+        0,
+        0
+      ]
+    },
+    "guardedNonCounterFields": 29,
+    "unchangedOtherRows": 387,
+    "onlyChangedRecord": 180,
+    "changedFields": [
+      "description",
+      "review_text",
+      "seo_description"
+    ],
+    "originalDatesPreserved": true,
+    "liveCountersExcludedAndNotWritten": true,
+    "exactExpectedAll388Match": true,
+    "sourceMetadataAbsentPreserved": true,
+    "hashMethod": "Rows ORDER BY id;29 non-counter keys sorted lexicographically in each row, then SHA-256 of UTF-8 JSON.stringify. Excludes views/reaction_count/comments_count only.",
+    "limit": "Dated direct observations, not a guarantee against later owner changes; never roll back unrelated activity."
+  },
+  "publicBefore": {
+    "checkedAt": "2026-10-20T13:09:50.788Z",
+    "phase": "before",
+    "id": 180,
+    "slug": "bruno-mars-the-lazy-song-official-music-video",
+    "url": "https://vid.best/watch/bruno-mars-the-lazy-song-official-music-video",
+    "preserved": {
+      "fieldsSha256": "e8a1c0c60791b6b49f98fea60e7ebe1d31096676f998d1359d25defa78edd896",
+      "canonical": "https://vid.best/watch/bruno-mars-the-lazy-song-official-music-video",
+      "h1Sha256": "9aa924530f4fb2e8352c387efe41f2a3a77d3b13fb8d35aad9703803655b9ead",
+      "playerHtmlSha256": "ff4352a76715f3f0fd046c7a948ed1122e7860228ad56a8de11ce0768f73ea29",
+      "figureHtmlSha256": "65a4bf03548236f536cb2fa945e667165aa0e043a390f8262f4dac145ba2897c",
+      "videoObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "imageObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "image": "https://i.ytimg.com/vi/fLexgOxsZu0/hqdefault.jpg",
+      "datePublished": "2026-10-13T18:29:20.812Z",
+      "dateModified": "2026-10-13T18:40:13.113Z",
+      "robots": null,
+      "cacheControl": "private, no-store",
+      "openingAndSections1To3Sha256": "5d81df8cfeb63e85dd78b18fb7cbfaad713a8abbb4606b28837904997f191e8e",
+      "headings": [
+        "​🎬 1. The Genius of the One-Shot Wonder",
+        "​🐵 2. The Iconic Primate Posse",
+        "​🛋️ 3. A Masterpiece of Minimalist Aesthetic",
+        "​🌟 4. A Timeless Pop Culture Phenomenon"
+      ]
+    },
+    "changedFields": [
+      "description",
+      "review_text",
+      "seo_description"
+    ],
+    "actualFieldsSha256": "988d00707c2f829ae04c9748b43d3b2bd901604f5aec043d7cd615be8b6b50a8",
+    "mapHashes": {
+      "/sitemap.xml": "f0c5c9ed92546fd1949d7c8281ccf1d3913c2bca942dc427cae055e4ed4a1dc4",
+      "/image-sitemap.xml": "b8d1243e337bc687688b7102be8ea688f36a0eb90bc7bd2d5349a2f3f6389fb2",
+      "/sitemaps/videos-1.xml": "df2c510e34c0c4867cb83cdb146e3d236ecda42f0b374fdb861ee67d99196db6",
+      "/sitemaps/images-1.xml": "f832ca83ab4a5a5951835ea3b4aa584354044a518ff215e091678c7fc7c54ca3",
+      "/robots.txt": "e20385da3c75570e7ee0eddc417ac71346cd7488a68b48e1fe9eedfbd0063050",
+      "/sitemaps/pages.xml": "94e999b5c18b13047b60f98eb4923263b081ead2584dbfeda36d159ec8f9d174",
+      "/sitemaps/categories.xml": "3decff6bbbefb5d1be27dd6c082f375761842cb19e0a7a3497b591fa0f29f914",
+      "/sitemaps/daily-weekly-best.xml": "5da196b1968f6df603e66608c1fbaa34ac3925a4941822a6ebbacff7e3710a40"
+    },
+    "rootChildren": 5,
+    "comparison": null,
+    "publicGets": 10,
+    "httpStatus": 200,
+    "inspectionCalls": 0,
+    "sitemapSubmissions": 0,
+    "providerPlayerRequests": 0,
+    "imageRequests": 0,
+    "imagesGenerated": 0,
+    "imagesEdited": 0,
+    "imagesPublished": 0,
+    "productionWrites": 0,
+    "limits": "Server/API/HTML/XML read-only checks, not fresh viewing/listening or Google indexed-count evidence. Existing source upload metadata remains absent; source-poster bytes were not fetched or replaced."
+  },
+  "publicAfter": {
+    "checkedAt": "2026-10-20T13:16:10.977Z",
+    "phase": "after",
+    "id": 180,
+    "slug": "bruno-mars-the-lazy-song-official-music-video",
+    "url": "https://vid.best/watch/bruno-mars-the-lazy-song-official-music-video",
+    "preserved": {
+      "fieldsSha256": "e8a1c0c60791b6b49f98fea60e7ebe1d31096676f998d1359d25defa78edd896",
+      "canonical": "https://vid.best/watch/bruno-mars-the-lazy-song-official-music-video",
+      "h1Sha256": "9aa924530f4fb2e8352c387efe41f2a3a77d3b13fb8d35aad9703803655b9ead",
+      "playerHtmlSha256": "ff4352a76715f3f0fd046c7a948ed1122e7860228ad56a8de11ce0768f73ea29",
+      "figureHtmlSha256": "65a4bf03548236f536cb2fa945e667165aa0e043a390f8262f4dac145ba2897c",
+      "videoObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "imageObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "image": "https://i.ytimg.com/vi/fLexgOxsZu0/hqdefault.jpg",
+      "datePublished": "2026-10-13T18:29:20.812Z",
+      "dateModified": "2026-10-13T18:40:13.113Z",
+      "robots": null,
+      "cacheControl": "private, no-store",
+      "openingAndSections1To3Sha256": "5d81df8cfeb63e85dd78b18fb7cbfaad713a8abbb4606b28837904997f191e8e",
+      "headings": [
+        "​🎬 1. The Genius of the One-Shot Wonder",
+        "​🐵 2. The Iconic Primate Posse",
+        "​🛋️ 3. A Masterpiece of Minimalist Aesthetic",
+        "​🌟 4. A Timeless Pop Culture Phenomenon"
+      ]
+    },
+    "changedFields": [
+      "description",
+      "review_text",
+      "seo_description"
+    ],
+    "actualFieldsSha256": "4fa86f93ea5b3f7c0f1a14737673179e7578addda27a6335bb529c11846b0589",
+    "mapHashes": {
+      "/sitemap.xml": "f0c5c9ed92546fd1949d7c8281ccf1d3913c2bca942dc427cae055e4ed4a1dc4",
+      "/image-sitemap.xml": "b8d1243e337bc687688b7102be8ea688f36a0eb90bc7bd2d5349a2f3f6389fb2",
+      "/sitemaps/videos-1.xml": "225fdd8872aa8135b3cd4a4214cb01e2a1f4bed7dc041fcb30c8f849996e0878",
+      "/sitemaps/images-1.xml": "f832ca83ab4a5a5951835ea3b4aa584354044a518ff215e091678c7fc7c54ca3",
+      "/robots.txt": "e20385da3c75570e7ee0eddc417ac71346cd7488a68b48e1fe9eedfbd0063050",
+      "/sitemaps/pages.xml": "94e999b5c18b13047b60f98eb4923263b081ead2584dbfeda36d159ec8f9d174",
+      "/sitemaps/categories.xml": "3decff6bbbefb5d1be27dd6c082f375761842cb19e0a7a3497b591fa0f29f914",
+      "/sitemaps/daily-weekly-best.xml": "5da196b1968f6df603e66608c1fbaa34ac3925a4941822a6ebbacff7e3710a40"
+    },
+    "rootChildren": 5,
+    "comparison": {
+      "allPassed": true,
+      "onlyThreeIntendedFieldsChanged": true,
+      "sevenMapsUnchanged": true,
+      "videoSitemapOnly180DescriptionUpdated": true
+    },
+    "publicGets": 10,
+    "httpStatus": 200,
+    "inspectionCalls": 0,
+    "sitemapSubmissions": 0,
+    "providerPlayerRequests": 0,
+    "imageRequests": 0,
+    "imagesGenerated": 0,
+    "imagesEdited": 0,
+    "imagesPublished": 0,
+    "productionWrites": 0,
+    "limits": "Server/API/HTML/XML read-only checks, not fresh viewing/listening or Google indexed-count evidence. Existing source upload metadata remains absent; source-poster bytes were not fetched or replaced."
+  },
+  "playbackMappings": {
+    "checkedAt": "2026-10-20T13:12:37.390Z",
+    "tiktokRows": 54,
+    "published": 54,
+    "tagembedOrIframelyMappingsInEmbedField": [],
+    "matchingAppSettingKeys": [],
+    "rightsFlaggedExistingCacheCandidates": [],
+    "queryWrites": [
+      0,
+      0
+    ],
+    "limits": "Existing cache flags are not playable-asset certification. No provider, raw asset, iframe/playback, retry/quota probe or writes. No secrets or arbitrary settings values read; no mapping invented."
+  },
+  "imagePause": {
+    "active": true,
+    "newGenerated": 0,
+    "newEdited": 0,
+    "newPublished": 0,
+    "newLiveVerified": 0,
+    "existingConceptualArtworks": 100,
+    "currentPublishedPages": 388,
+    "allExistingArtImagesManifestProvenanceQueueAndAssociationsPreserved": true,
+    "resumeRequiresExplicitOwnerRequest": true
+  },
+  "googleSitemapLimit": {
+    "observedOn": "2026-10-20",
+    "artifactRun": 39420225531,
+    "apiDocumentation": [
+      "https://developers.google.com/webmaster-tools/v1/sitemaps/get",
+      "https://developers.google.com/webmaster-tools/v1/sitemaps"
+    ],
+    "status": "exact_error_detail_unavailable_through_configured_api",
+    "detail": "The Sitemaps resource exposes numeric error/warning counts, timestamps and content-type totals, not error-category/line/detail messages. Do not use deprecated contents.indexed or infer0indexed from0Inspections.",
+    "manualPrerequisite": "Owner-provided Search Console Sitemaps error detail (message and affected URL/line, if shown) for https://vid.best/sitemaps/videos-1.xml, or an already authorized method exposing that detail. No new browser/login/credential scope, resubmission, Indexing API or full Inspection attempted.",
+    "latestVerifiedObservation": {
+      "runId": 39428631717,
+      "generatedAt": "2026-10-20T13:14:24.489Z",
+      "library": {
+        "status": "verified",
+        "isPending": false,
+        "lastDownloaded": "2026-10-20T09:45:16.373Z",
+        "lastSubmitted": "2026-10-20T09:45:14.292Z",
+        "errors": 1,
+        "warnings": 20
+      },
+      "limit": "Error count and Google download timestamps unchanged from prior completed audit, still no category/line details or current whole-site indexed count."
+    }
+  },
+  "latestCompletedAudit": {
+    "runId": 39428631717,
+    "artifactId": 12266404120,
+    "zipBytes": 77874,
+    "zipSha256": "c0735a51cfa26b14120330d34f0a4ddf4b9a350edeb9b39d5841e38624c0ee42",
+    "generatedAt": "2026-10-20T13:14:24.489Z",
+    "pages": 422,
+    "libraryReviews": 388,
+    "editorialReviews": 10,
+    "technicalFailures": 0,
+    "editorialWarningPages": 34,
+    "editorialWarningMessages": 35,
+    "thumbnailCounts": {
+      "ok": 336,
+      "http_error": 1,
+      "placeholder": 8,
+      "missing": 43
+    },
+    "searchConsole": {
+      "status": "success",
+      "authenticated": true,
+      "propertyVerified": true,
+      "sitemapSubmitted": false,
+      "inspections": [],
+      "sitemapMode": "read_only",
+      "sitemapProcessing": {
+        "status": "verified",
+        "isPending": false,
+        "lastDownloaded": "2026-10-20T09:45:17.780Z",
+        "lastSubmitted": "2026-10-20T09:45:13.976Z",
+        "errors": 0,
+        "warnings": 0
+      },
+      "reviewSitemaps": [
+        {
+          "url": "https://vid.best/sitemaps/videos-1.xml",
+          "submitted": false,
+          "processing": {
+            "status": "verified",
+            "isPending": false,
+            "lastDownloaded": "2026-10-20T09:45:16.373Z",
+            "lastSubmitted": "2026-10-20T09:45:14.292Z",
+            "errors": 1,
+            "warnings": 20
+          }
+        },
+        {
+          "url": "https://vid.best/sitemaps/daily-weekly-best.xml",
+          "submitted": false,
+          "processing": {
+            "status": "verified",
+            "isPending": false,
+            "lastDownloaded": "2026-10-20T09:45:17.804Z",
+            "lastSubmitted": "2026-10-20T09:45:14.528Z",
+            "errors": 0,
+            "warnings": 0
+          }
+        }
+      ],
+      "totalReviews": 398,
+      "inspectionBudget": 0
+    },
+    "inspections": 0,
+    "sitemapSubmissions": 0,
+    "targetPage": {
+      "url": "https://vid.best/watch/bruno-mars-the-lazy-song-official-music-video",
+      "errors": [],
+      "warnings": [],
+      "headStatus": 200,
+      "getStatus": 200,
+      "responseMs": 779,
+      "contentType": "text/html",
+      "canonical": "https://vid.best/watch/bruno-mars-the-lazy-song-official-music-video",
+      "title": "Epic Music Video Analysis! 🐒🎸Bruno Mars -The Lazy Song(Monkey Dance) | Vid.Best",
+      "links": [
+        "https://vid.best/",
+        "https://vid.best/category/music",
+        "https://vid.best/editorial",
+        "https://vid.best/watch/river-forest-calm-music-relaxation-study-nature-sound-mind",
+        "https://vid.best/watch/saiyaara-reprise-female-full-song-ahaan-aneet-tanishk-faheem-arslan-shreya-irshad",
+        "https://vid.best/watch/saiyaara-saiyaara-song-saiyaara-yrf-reels-officialteaser-sorts-ahaanpanday-viral",
+        "https://vid.best/watch/onerepublic-counting-stars-2013-official-video-visual-review",
+        "https://vid.best/watch/crazy-frog-axel-f-official-animated-music-video-review",
+        "https://vid.best/watch/cocomelon-bath-song-2018-hygiene-music-video-review",
+        "https://vid.best/videos",
+        "https://vid.best/about",
+        "https://vid.best/contact",
+        "https://vid.best/privacy",
+        "https://vid.best/terms"
+      ],
+      "reviewWords": 439
+    },
+    "limit": "Actual completed post-release read-only diagnostic; internal warnings/source-image totals are not Google indexing or AdSense verdicts.0Inspections is not0indexed. Source-image availability is separate from100conceptual artworks."
+  },
+  "postReleaseAudit": {
+    "runId": 39428631717,
+    "conclusion": "success",
+    "status": "completed_and_consumed",
+    "artifactId": 12266404120,
+    "zipSha256": "c0735a51cfa26b14120330d34f0a4ddf4b9a350edeb9b39d5841e38624c0ee42",
+    "generatedAt": "2026-10-20T13:14:24.489Z"
+  },
+  "nextTask": "Do not repeat the completed180/135corrections orPR240. Exact Google library-sitemap1error/20warning detail remains an external prerequisite: owner-provided SearchConsole message and affected URL/line, or already-authorized detailed evidence; configured Sitemaps API lacks it. Continue a fresh source-verifiable unprotected non-image editorial task after current main/PR/Worker/D1 reconciliation. Preserve all owner headings/prose/identities/dates/holds. Image creation remains paused and provider mappings must not be invented; no repeated full Inspections or blind resubmission.",
+  "verificationWrites": 0,
+  "r2Writes": 0,
+  "limit": "One bounded source-context correction, not full viewing/audio/creator/production-cost verification or a Google/AdSense verdict. API/source-page evidence does not establish actual playback. No current whole-site indexed-page count.",
+  "preChangeCompletedAudit": {
+    "runId": 39420225531,
+    "artifactId": 12262994432,
+    "zipSha256": "a17e8cbacfd6639a85fc6364821e7cc13516c36b046a5c5bafaee3f0d4fcc7be",
+    "generatedAt": "2026-10-20T12:10:42.930Z",
+    "pages": 422,
+    "libraryReviews": 388,
+    "editorialReviews": 10,
+    "technicalFailures": 0,
+    "editorialWarningPages": 34,
+    "editorialWarningMessages": 35,
+    "thumbnailCounts": {
+      "ok": 336,
+      "http_error": 1,
+      "placeholder": 8,
+      "missing": 43
+    },
+    "searchConsole": {
+      "status": "success",
+      "authenticated": true,
+      "propertyVerified": true,
+      "sitemapSubmitted": false,
+      "inspections": [],
+      "sitemapMode": "read_only",
+      "sitemapProcessing": {
+        "status": "verified",
+        "isPending": false,
+        "lastDownloaded": "2026-10-20T09:45:17.780Z",
+        "lastSubmitted": "2026-10-20T09:45:13.976Z",
+        "errors": 0,
+        "warnings": 0
+      },
+      "reviewSitemaps": [
+        {
+          "url": "https://vid.best/sitemaps/videos-1.xml",
+          "submitted": false,
+          "processing": {
+            "status": "verified",
+            "isPending": false,
+            "lastDownloaded": "2026-10-20T09:45:16.373Z",
+            "lastSubmitted": "2026-10-20T09:45:14.292Z",
+            "errors": 1,
+            "warnings": 20
+          }
+        },
+        {
+          "url": "https://vid.best/sitemaps/daily-weekly-best.xml",
+          "submitted": false,
+          "processing": {
+            "status": "verified",
+            "isPending": false,
+            "lastDownloaded": "2026-10-20T09:45:17.804Z",
+            "lastSubmitted": "2026-10-20T09:45:14.528Z",
+            "errors": 0,
+            "warnings": 0
+          }
+        }
+      ],
+      "totalReviews": 398,
+      "inspectionBudget": 0
+    },
+    "inspections": 0,
+    "sitemapSubmissions": 0,
+    "limit": "Actual completed post-release zero-inspection audit. Internal warnings and source-image counts are not Google indexing/AdSense verdicts; existing100conceptual images are separate."
+  }
+}

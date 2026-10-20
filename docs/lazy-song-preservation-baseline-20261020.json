@@ -135,7 +135,7 @@
     "pendingOnly": "0048_lazy_song_source_context.sql",
     "historicalRemoteOnly": "0013_media_cache_jobs.sql"
   },
-  "sourceMetadataLimit": "Fresh source metadata query returns no row for180. Preserve existing omission of VideoObject/video sitemap metadata; do not manufacture source publication/duration. Source poster and canonical review/image associations remain untouched.",
+  "sourceMetadataLimit": "Fresh source metadata query returns no row for180. Preserve existing omission of VideoObject and source-publication/duration metadata; do not manufacture dates. The existing video sitemap entry remains present and synchronizes only the intended SEO description change. Source poster and canonical review/image associations remain untouched.",
   "tests": {
     "focused": 5,
     "node": 442,
