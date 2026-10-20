@@ -4114,7 +4114,10 @@ async function videoSitemapResponse(request, env, page) {
     const illustration = reviewIllustration(row);
     const imageEntry = [...new Set([thumbnail, illustration ? `${base}${illustration.path}` : ""].filter(Boolean))]
       .map((image) => `<image:image><image:loc>${escapeXml(image)}</image:loc></image:image>`).join("");
-    return `<url><loc>${escapeXml(canonical)}</loc><lastmod>${escapeXml(row.updated_at)}</lastmod>${imageEntry}${videoEntry}</url>`;
+    // Only emit valid, timezone-qualified W3C lastmod; do not guess a timezone for legacy timestamps.
+    const validLastmod = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(String(row.updated_at || ""));
+    const lastmod = validLastmod ? `<lastmod>${escapeXml(row.updated_at)}</lastmod>` : "";
+    return `<url><loc>${escapeXml(canonical)}</loc>${lastmod}${imageEntry}${videoEntry}</url>`;
   }).join("");
   const body = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${homepage}${entries}</urlset>`;
   return new Response(body, {

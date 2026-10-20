@@ -2627,3 +2627,57 @@ test("Facebook preparation strips tracking and never treats a thumbnail page as 
     assert.equal(context.bucket.objects.size,0);
   } finally {globalThis.fetch=original;}
 });
+
+
+test("renamed YouTube Shorts preserve 301 redirects and only new canonical sitemap URLs", async () => {
+  const context = createTestContext();
+  const legacy = "youtube-short-x9876543210";
+  const readable = "soccer-ball-gags-and-balloon-startled-cat-reaction";
+  context.sqlite.prepare(`INSERT INTO videos (slug, title, source_url, embed_url, media_type, primary_category, subcategory,
+    description, thumbnail_url, published, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`)
+  .run(legacy, "Soccer Ball Gags and Balloon-Startled Cat Reaction",
+    "https://www.youtube.com/shorts/x9876543210", "https://www.youtube.com/embed/x9876543210",
+    "youtube", "Funny & Comedy", "Pranks", "Scene-specific video review",
+    "https://example.com/thumbnail-for-this-video.jpg", "2026-10-20T19:22:51.787Z");
+  const before = context.sqlite.prepare("SELECT * FROM videos WHERE slug=?").get(legacy);
+  context.sqlite.prepare("INSERT INTO video_slug_redirects (old_slug, video_id) VALUES (?, ?)").run(legacy, before.id);
+  context.sqlite.prepare("UPDATE videos SET slug=? WHERE id=?").run(readable, before.id);
+  const after = context.sqlite.prepare("SELECT * FROM videos WHERE id=?").get(before.id);
+  assert.equal(after.id, before.id);
+  assert.equal(after.created_at, before.created_at);
+  assert.equal(after.updated_at, before.updated_at);
+  assert.equal(after.title, before.title);
+  assert.equal(after.review_text, before.review_text);
+
+  const redirect = await send(context, `/watch/${legacy}?utm_source=old`);
+  assert.equal(redirect.status, 301);
+  assert.equal(redirect.headers.get("Location"), `https://example.com/watch/${readable}?utm_source=old`);
+  const review = await send(context, `/watch/${readable}`, { headers: { "User-Agent": "VidBest-SEO-Audit/1.0" } });
+  assert.equal(review.status, 200);
+  assert.match(await review.text(), new RegExp(`<link rel="canonical" href="https://example.com/watch/${readable}">`));
+
+  const sitemap = await seoEdge.fetch(new Request("https://vid.best/sitemaps/videos-1.xml"), context.env, context.ctx);
+  assert.equal(sitemap.status, 200);
+  const xml = await sitemap.text();
+  assert.ok(xml.includes(`<loc>https://vid.best/watch/${readable}</loc>`));
+  assert.ok(!xml.includes(`<loc>https://vid.best/watch/${legacy}</loc>`));
+  assert.ok(xml.includes("<lastmod>2026-10-20T19:22:51.787Z</lastmod>"));
+});
+
+test("video sitemap omits an invalid legacy SQLite lastmod without changing the stored publish date", async () => {
+  const context = createTestContext();
+  context.sqlite.prepare(`INSERT INTO videos (slug,title,source_url,embed_url,media_type,primary_category,subcategory,
+    description,thumbnail_url,published,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,1,?,?)`)
+  .run("legacy-timestamp-video", "Legacy Timestamp Video", "https://www.youtube.com/watch?v=legacy123",
+    "https://www.youtube.com/embed/legacy123", "youtube", "Education", "Tutorials & How-Tos",
+    "A unique description", "https://example.com/legacy-thumbnail.jpg",
+    "2026-08-05 23:15:09", "2026-08-05 23:15:09");
+  const response = await seoEdge.fetch(new Request("https://vid.best/sitemaps/videos-1.xml"), context.env, context.ctx);
+  assert.equal(response.status, 200);
+  const xml = await response.text();
+  assert.ok(xml.includes("https://vid.best/watch/legacy-timestamp-video"));
+  assert.ok(!xml.includes("<lastmod>2026-08-05 23:15:09</lastmod>"));
+  const db = context.sqlite.prepare("SELECT created_at, updated_at FROM videos WHERE slug=?").get("legacy-timestamp-video");
+  assert.equal(db.created_at, "2026-08-05 23:15:09");
+  assert.equal(db.updated_at, "2026-08-05 23:15:09");
+});
