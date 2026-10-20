@@ -192,13 +192,19 @@
       "recordId": 135,
       "reason": "Retained sections1–5 scene/costume/location, vocal/instrument/tempo/genre assertions and section6 popularity/translation claims have not been independently re-verified. Preserve owner prose and SEO title/tags; the bounded public source-check limitation is not whole-review certification. Fresh authorized listening/viewing evidence is required before further correction.",
       "notAnIndexingOrPolicyVerdict": true
+    },
+    {
+      "recordId": 180,
+      "reason": "Retained sections1–3 single-take, set, Poreotics/costume/choreography, production-era/cost and audio character descriptions have not been independently re-verified. Preserve these owner paragraphs and existing SEO title/tags; source release labels do not certify footage/audio or whole-review accuracy. Fresh legitimate viewing/listening evidence is required before further correction.",
+      "notAnIndexingOrPolicyVerdict": true
     }
   ],
   "nextTasks": [
     {
-      "task": "Do not repeat the completed saved-title correction. Investigate the stored library sitemap error1 through already authorized read-only error details if available; no empty production commit, blind resubmission, WAF/provider bypass or redundant full Inspections. Public XML/basic required-element checks pass but do not explain the Google error. If exact external error detail remains unavailable, record that limit and continue a small evidence-ready unprotected editorial task; verified provider mappings remain absent and image creation stays paused.",
-      "evidenceFile": "docs/watch-metadata-title-verification-20261020.json",
-      "observedAt": "2026-10-20T12:11:31.185Z"
+      "task": "Finish only the prepared180Music three-field source-context correction after exact-head CI, guarded migration/deployment and live preservation verification. All four headings, opening/sections1–3 and all original dates/media/SEOtitle/tags remain unchanged. Do not repeat135orPR240. Google library-sitemap exact-error detail remains an external prerequisite; configured Sitemaps API has numeric counts, not category/line messages. Image creation stays paused and provider mappings remain unverified.",
+      "recordId": 180,
+      "evidenceFile": "docs/lazy-song-preservation-baseline-20261020.json",
+      "observedAt": "2026-10-20T13:06:36.951Z"
     },
     {
       "recordIds": [
@@ -2170,7 +2176,25 @@
       "flags": []
     }
   ],
-  "preparedBatches": [],
+  "preparedBatches": [
+    {
+      "recordIds": [
+        180
+      ],
+      "status": "prepared_not_deployed",
+      "changedFields": [
+        "description",
+        "review_text",
+        "seo_description"
+      ],
+      "preservedHeadings": 4,
+      "originalDatesPreserved": true,
+      "branch": "seo/lazy-song-source-context-20261020",
+      "evidenceFile": "content/editorial-quality/2026-10-20-lazy-song.json",
+      "baselineFile": "docs/lazy-song-preservation-baseline-20261020.json",
+      "remainingEvidenceHold": "Retained sections1–3 single-take, set, Poreotics/costume/choreography, production-era/cost and audio character descriptions have not been independently re-verified. Preserve these owner paragraphs and existing SEO title/tags; source release labels do not certify footage/audio or whole-review accuracy. Fresh legitimate viewing/listening evidence is required before further correction."
+    }
+  ],
   "googleSnapshot": {
     "runId": 39114196048,
     "generatedAt": "2026-10-18T09:09:16.202Z",
@@ -2460,5 +2484,19 @@
     "afterReadAt": "2026-10-20T12:11:03.867Z",
     "earlierIndependentDataChangesPreserved": true,
     "evidenceFile": "docs/watch-metadata-title-verification-20261020.json"
+  },
+  "googleSitemapExternalLimit20261020": {
+    "observedOn": "2026-10-20",
+    "artifactRun": 39420225531,
+    "apiDocumentation": [
+      "https://developers.google.com/webmaster-tools/v1/sitemaps/get",
+      "https://developers.google.com/webmaster-tools/v1/sitemaps"
+    ],
+    "status": "exact_error_detail_unavailable_through_configured_api",
+    "detail": "The Sitemaps resource exposes numeric error/warning counts, timestamps and content-type totals, not error-category/line/detail messages. Do not use deprecated contents.indexed or infer0indexed from0Inspections.",
+    "manualPrerequisite": "Owner-provided Search Console Sitemaps error detail (message and affected URL/line, if shown) for https://vid.best/sitemaps/videos-1.xml, or an already authorized method exposing that detail. No new browser/login/credential scope, resubmission, Indexing API or full Inspection attempted.",
+    "documentationCheckedAt": "2026-10-20T13:06:36.951Z",
+    "inspectionCalls": 0,
+    "sitemapSubmissions": 0
   }
 }

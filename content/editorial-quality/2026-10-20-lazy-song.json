@@ -1,0 +1,232 @@
+{
+  "date": "2026-10-20",
+  "scope": "Only published Music180.description/review_text/seo_description. Replace the repeated generic listing and remove unsupported ranking/production-cost conclusions from one section4 paragraph in favour of bounded replay-appeal interpretation and source-specific version-choice guidance. Preserve opening, four headings/order, sections1–3, SEO title/tags, all identities/media/posters/dates/counters and every other record.",
+  "sourceEvidence": [
+    {
+      "url": "https://www.brunomars.com/video/lazy-song",
+      "checkedOn": "2026-10-20",
+      "verified": "The artist's official video page identifies video_Id fLexgOxsZu0, matching this exact source upload.",
+      "limits": "Page text/identity only, not fresh footage/audio, one-shot construction, Poreotics identity, choreography, location or budget verification. The page's2019CMS submission date is not a video or Vid.Best publish date."
+    },
+    {
+      "url": "https://www.brunomars.com/music/doo-wops-hooligans",
+      "checkedOn": "2026-10-20",
+      "verified": "Artist's Doo-Wops & Hooligans album page lists The Lazy Song and the same fLexgOxsZu0 video ID.",
+      "limits": "Catalogue association only; the2025CMS date is not the album/video release date. No dates or media fields changed."
+    },
+    {
+      "url": "https://www.brunomars.com/news/lazy-song-official-alternate-video-61486",
+      "checkedOn": "2026-10-20",
+      "verified": "Artist's news entry dated3June2011 separately announces The Lazy Song [Official Alternate Video].",
+      "limits": "Release-label evidence establishes a distinct alternate edition, not replacement/withdrawal, its guest identity, viewing comparison, audience statistics or greater artistic quality. Do not insert or reuse another video's media."
+    }
+  ],
+  "records": [
+    {
+      "id": 180,
+      "before": {
+        "cache_attempts": 0,
+        "cache_error": null,
+        "cache_next_attempt_at": null,
+        "cache_source_url": null,
+        "cache_status": "none",
+        "cached_at": null,
+        "created_at": "2026-10-13T18:29:20.812Z",
+        "description": "Get ready to kick your feet up and relax! 🌟 In this fresh, deeply analytical review, we explore the genius behind one of the most viewed pop music videos in YouTube history: Bruno Mars' The Lazy Song. We dive into the brilliant, minimalist one-shot camera technique that gives the video its authentic, home-movie feel. Furthermore, we unpack the hilarious choreography of the monkey-masked dance crew, Poreotics, and how their slapstick humor perfectly complements the track's laid-back, carefree vibe. Hit play to relive this nostalgic, legendary piece of pop culture and physical comedy! 🐵🎸🛋️✨",
+        "embed_url": "https://www.youtube-nocookie.com/embed/fLexgOxsZu0?rel=0&playsinline=1&enablejsapi=1&origin=https%3A%2F%2Fvid.best",
+        "featured": 0,
+        "id": 180,
+        "media_type": "youtube",
+        "primary_category": "Music",
+        "published": 1,
+        "r2_key": null,
+        "redistribution_certified": 0,
+        "redistribution_certified_at": null,
+        "review_text": "🐒🎸 Cinematic Deep Dive: The Ultimate \"Do Nothing\" Masterpiece! ✨\n\n​🎬 1. The Genius of the One-Shot Wonder\nThis legendary music video by Bruno Mars is a masterclass in stripped-down, high-concept visual storytelling. What makes it so incredibly captivating is that it is filmed as a single, continuous shot. There are no fancy cuts, no high-budget special effects, and no sprawling location changes. It’s just a camera stationed in a suburban bedroom, giving the entire video an intimate, impromptu, and authentic \"home movie\" feel that perfectly matches the core message of the song.\n\n​🐵 2. The Iconic Primate Posse\nThe video's most recognizable and hilarious element is, without a doubt, the backup dancers. Bruno is joined by the famous dance crew Poreotics, who are entirely disguised in cheap, goofy chimpanzee masks and flannel shirts. The contrast between Bruno's smooth, relaxed singing and the monkeys' synchronized, slapstick choreography—from dropping their pants to making ridiculous gestures—adds a surreal layer of comedy. Their deadpan animal expressions mixed with precise popping and locking make it impossible to look away.\n\n​🛋️ 3. A Masterpiece of Minimalist Aesthetic\nAt a time when pop stars were releasing multi-million dollar, CGI-heavy music videos, The Lazy Song took the exact opposite approach. The low-fi aesthetic—featuring an unmade bed, a simple guitar, and a group of friends just messing around in a regular house—was a breath of fresh air. It brilliantly visually translated the feeling of a lazy afternoon where you just want to lounge around in your underwear and do absolutely nothing.\n\n​🌟 4. A Timeless Pop Culture Phenomenon\nThis video remains an absolute titan of YouTube history. By leaning into physical comedy, a catchy acoustic reggae-pop beat, and an undeniably relatable concept, Bruno Mars created a visual that is both nostalgic and endlessly rewatchable. It proves that you don't need a massive budget to create an iconic piece of pop culture; you just need a great song, a fun idea, and some dancing monkeys!",
+        "seo_description": "Watch our deep dive into Bruno Mars' iconic music video for The Lazy Song! 🛋️ We analyze the brilliant one-shot cinematography and the hilarious monkey dancers.",
+        "seo_tags": "[\"bruno mars the lazy song\",\"lazy song monkeys\",\"bruno mars official video\",\"poreotics dance crew\",\"monkey dance video\",\"one shot music videos\",\"pop culture masterpieces\",\"classic youtube videos\",\"funny music videos\",\"bruno mars choreography\",\"lazy song analysis\",\"viral music videos\",\"minimalist cinematography\"]",
+        "seo_title": "Epic Music Video Analysis! 🐒🎸Bruno Mars -The Lazy Song(Monkey Dance)",
+        "slug": "bruno-mars-the-lazy-song-official-music-video",
+        "source_page_url": null,
+        "source_url": "https://youtu.be/fLexgOxsZu0?si=gxKM9OcYYubtTqf3",
+        "subcategory": "Music Videos",
+        "thumbnail_url": "https://i.ytimg.com/vi/fLexgOxsZu0/hqdefault.jpg",
+        "title": "⭐ Bruno Mars - The Lazy Song (Official Music Video) Epic Music Video Analysis! 🐒🎸 (Monkey Dance)",
+        "trending": 1,
+        "updated_at": "2026-10-13T18:40:13.113Z"
+      },
+      "after": {
+        "description": "🛋️ Bruno Mars' “The Lazy Song” appears on the artist's Doo-Wops & Hooligans page alongside the exact video linked here. This review looks at its do-nothing comic premise and minimalist appeal, with release notes that distinguish this music video from the separately announced official alternate edition. Choose the version first, then judge whether its humour rewards another watch. 🐒🎸",
+        "review_text": "🐒🎸 Cinematic Deep Dive: The Ultimate \"Do Nothing\" Masterpiece! ✨\n\n​🎬 1. The Genius of the One-Shot Wonder\nThis legendary music video by Bruno Mars is a masterclass in stripped-down, high-concept visual storytelling. What makes it so incredibly captivating is that it is filmed as a single, continuous shot. There are no fancy cuts, no high-budget special effects, and no sprawling location changes. It’s just a camera stationed in a suburban bedroom, giving the entire video an intimate, impromptu, and authentic \"home movie\" feel that perfectly matches the core message of the song.\n\n​🐵 2. The Iconic Primate Posse\nThe video's most recognizable and hilarious element is, without a doubt, the backup dancers. Bruno is joined by the famous dance crew Poreotics, who are entirely disguised in cheap, goofy chimpanzee masks and flannel shirts. The contrast between Bruno's smooth, relaxed singing and the monkeys' synchronized, slapstick choreography—from dropping their pants to making ridiculous gestures—adds a surreal layer of comedy. Their deadpan animal expressions mixed with precise popping and locking make it impossible to look away.\n\n​🛋️ 3. A Masterpiece of Minimalist Aesthetic\nAt a time when pop stars were releasing multi-million dollar, CGI-heavy music videos, The Lazy Song took the exact opposite approach. The low-fi aesthetic—featuring an unmade bed, a simple guitar, and a group of friends just messing around in a regular house—was a breath of fresh air. It brilliantly visually translated the feeling of a lazy afternoon where you just want to lounge around in your underwear and do absolutely nothing.\n\n​🌟 4. A Timeless Pop Culture Phenomenon\nReplay appeal is a matter of taste, not something a superlative or an unverified view-count claim proves. The do-nothing premise can offer light relief; a viewer who wants a developing story may find a repeated comic idea less rewarding. That is an interpretation of the premise, not a measured audience response or a statement about production cost. Version choice matters too: Bruno Mars' official video page and Doo-Wops & Hooligans album page both identify the upload linked here, while his news archive separately announces an official alternate video. An alternate release is not evidence that this upload was replaced or withdrawn. For a useful comparison, choose the artist's alternate-video page rather than treating every upload of the song as the same production, and ask whether the different interpretation changes the appeal of taking a day off.\n\nThis source check used the artist's release pages, without a fresh viewing or listen. It confirms catalogue and version identity, not the retained one-shot, set, dance-crew, costume or audio descriptions above; those observations still need an independent source check.",
+        "seo_description": "🛋️ Review Bruno Mars' The Lazy Song with album context, a balanced look at replay appeal, and guidance on the official music video versus its alternate edition."
+      }
+    }
+  ],
+  "reviewReplacement": {
+    "before": "This video remains an absolute titan of YouTube history. By leaning into physical comedy, a catchy acoustic reggae-pop beat, and an undeniably relatable concept, Bruno Mars created a visual that is both nostalgic and endlessly rewatchable. It proves that you don't need a massive budget to create an iconic piece of pop culture; you just need a great song, a fun idea, and some dancing monkeys!",
+    "after": "Replay appeal is a matter of taste, not something a superlative or an unverified view-count claim proves. The do-nothing premise can offer light relief; a viewer who wants a developing story may find a repeated comic idea less rewarding. That is an interpretation of the premise, not a measured audience response or a statement about production cost. Version choice matters too: Bruno Mars' official video page and Doo-Wops & Hooligans album page both identify the upload linked here, while his news archive separately announces an official alternate video. An alternate release is not evidence that this upload was replaced or withdrawn. For a useful comparison, choose the artist's alternate-video page rather than treating every upload of the song as the same production, and ask whether the different interpretation changes the appeal of taking a day off.\n\nThis source check used the artist's release pages, without a fresh viewing or listen. It confirms catalogue and version identity, not the retained one-shot, set, dance-crew, costume or audio descriptions above; those observations still need an independent source check."
+  },
+  "remainingReview": "Retained sections1–3 single-take, set, Poreotics/costume/choreography, production-era/cost and audio character descriptions have not been independently re-verified. Preserve these owner paragraphs and existing SEO title/tags; source release labels do not certify footage/audio or whole-review accuracy. Fresh legitimate viewing/listening evidence is required before further correction.",
+  "baseline": {
+    "checkedAt": "2026-10-20T12:57:01.118Z",
+    "saved": 388,
+    "published": 388,
+    "allNonCounterSha256": "b854c4033bf425e28ff86478e9ec54ebb69846d54802f9223b5493add2d1347a",
+    "unaffected387Sha256": "0e4b27406b8a3f47701045e5a75b834bc516c189ae107f6e55e8d76a7b8a114b",
+    "targetSha256": "1ebc1d263d691b55c70b4eec53f1cdf749cea50af64dc38b4281ce900b4d5330",
+    "fields": [
+      "cache_attempts",
+      "cache_error",
+      "cache_next_attempt_at",
+      "cache_source_url",
+      "cache_status",
+      "cached_at",
+      "created_at",
+      "description",
+      "embed_url",
+      "featured",
+      "id",
+      "media_type",
+      "primary_category",
+      "published",
+      "r2_key",
+      "redistribution_certified",
+      "redistribution_certified_at",
+      "review_text",
+      "seo_description",
+      "seo_tags",
+      "seo_title",
+      "slug",
+      "source_page_url",
+      "source_url",
+      "subcategory",
+      "thumbnail_url",
+      "title",
+      "trending",
+      "updated_at"
+    ],
+    "target": {
+      "cache_attempts": 0,
+      "cache_error": null,
+      "cache_next_attempt_at": null,
+      "cache_source_url": null,
+      "cache_status": "none",
+      "cached_at": null,
+      "created_at": "2026-10-13T18:29:20.812Z",
+      "description": "Get ready to kick your feet up and relax! 🌟 In this fresh, deeply analytical review, we explore the genius behind one of the most viewed pop music videos in YouTube history: Bruno Mars' The Lazy Song. We dive into the brilliant, minimalist one-shot camera technique that gives the video its authentic, home-movie feel. Furthermore, we unpack the hilarious choreography of the monkey-masked dance crew, Poreotics, and how their slapstick humor perfectly complements the track's laid-back, carefree vibe. Hit play to relive this nostalgic, legendary piece of pop culture and physical comedy! 🐵🎸🛋️✨",
+      "embed_url": "https://www.youtube-nocookie.com/embed/fLexgOxsZu0?rel=0&playsinline=1&enablejsapi=1&origin=https%3A%2F%2Fvid.best",
+      "featured": 0,
+      "id": 180,
+      "media_type": "youtube",
+      "primary_category": "Music",
+      "published": 1,
+      "r2_key": null,
+      "redistribution_certified": 0,
+      "redistribution_certified_at": null,
+      "review_text": "🐒🎸 Cinematic Deep Dive: The Ultimate \"Do Nothing\" Masterpiece! ✨\n\n​🎬 1. The Genius of the One-Shot Wonder\nThis legendary music video by Bruno Mars is a masterclass in stripped-down, high-concept visual storytelling. What makes it so incredibly captivating is that it is filmed as a single, continuous shot. There are no fancy cuts, no high-budget special effects, and no sprawling location changes. It’s just a camera stationed in a suburban bedroom, giving the entire video an intimate, impromptu, and authentic \"home movie\" feel that perfectly matches the core message of the song.\n\n​🐵 2. The Iconic Primate Posse\nThe video's most recognizable and hilarious element is, without a doubt, the backup dancers. Bruno is joined by the famous dance crew Poreotics, who are entirely disguised in cheap, goofy chimpanzee masks and flannel shirts. The contrast between Bruno's smooth, relaxed singing and the monkeys' synchronized, slapstick choreography—from dropping their pants to making ridiculous gestures—adds a surreal layer of comedy. Their deadpan animal expressions mixed with precise popping and locking make it impossible to look away.\n\n​🛋️ 3. A Masterpiece of Minimalist Aesthetic\nAt a time when pop stars were releasing multi-million dollar, CGI-heavy music videos, The Lazy Song took the exact opposite approach. The low-fi aesthetic—featuring an unmade bed, a simple guitar, and a group of friends just messing around in a regular house—was a breath of fresh air. It brilliantly visually translated the feeling of a lazy afternoon where you just want to lounge around in your underwear and do absolutely nothing.\n\n​🌟 4. A Timeless Pop Culture Phenomenon\nThis video remains an absolute titan of YouTube history. By leaning into physical comedy, a catchy acoustic reggae-pop beat, and an undeniably relatable concept, Bruno Mars created a visual that is both nostalgic and endlessly rewatchable. It proves that you don't need a massive budget to create an iconic piece of pop culture; you just need a great song, a fun idea, and some dancing monkeys!",
+      "seo_description": "Watch our deep dive into Bruno Mars' iconic music video for The Lazy Song! 🛋️ We analyze the brilliant one-shot cinematography and the hilarious monkey dancers.",
+      "seo_tags": "[\"bruno mars the lazy song\",\"lazy song monkeys\",\"bruno mars official video\",\"poreotics dance crew\",\"monkey dance video\",\"one shot music videos\",\"pop culture masterpieces\",\"classic youtube videos\",\"funny music videos\",\"bruno mars choreography\",\"lazy song analysis\",\"viral music videos\",\"minimalist cinematography\"]",
+      "seo_title": "Epic Music Video Analysis! 🐒🎸Bruno Mars -The Lazy Song(Monkey Dance)",
+      "slug": "bruno-mars-the-lazy-song-official-music-video",
+      "source_page_url": null,
+      "source_url": "https://youtu.be/fLexgOxsZu0?si=gxKM9OcYYubtTqf3",
+      "subcategory": "Music Videos",
+      "thumbnail_url": "https://i.ytimg.com/vi/fLexgOxsZu0/hqdefault.jpg",
+      "title": "⭐ Bruno Mars - The Lazy Song (Official Music Video) Epic Music Video Analysis! 🐒🎸 (Monkey Dance)",
+      "trending": 1,
+      "updated_at": "2026-10-13T18:40:13.113Z"
+    },
+    "targetChars": {
+      "description": 599,
+      "review_text": 2063,
+      "seo_description": 161
+    },
+    "migrations": [
+      "0001_initial.sql",
+      "0002_discovery_requests.sql",
+      "0003_security_rate_limits.sql",
+      "0004_maintenance_indexes.sql",
+      "0005_source_video_metadata.sql",
+      "0006_test_player_and_comment_images.sql",
+      "0007_universal_video_experience.sql",
+      "0008_verified_demo_metadata.sql",
+      "0009_app_settings.sql",
+      "0010_video_analysis.sql",
+      "0011_spirituality_buddhism.sql",
+      "0012_saiyaara_tiktok_correction.sql",
+      "0013_media_cache_jobs.sql",
+      "0013_saiyaara_permanent_slug.sql",
+      "0014_member_notifications.sql",
+      "0015_summer_inverted_tiktok.sql",
+      "0016_rights_certified_r2_cache.sql",
+      "0017_authorized_auto_cache.sql",
+      "0018_tiktok_oembed_cache.sql",
+      "0019_tiktok_oembed_backfill.sql",
+      "0020_member_personalization.sql",
+      "0021_facebook_reel_pending_drafts.sql",
+      "0022_facebook_readable_slugs.sql",
+      "0023_facebook_challenge_preview.sql",
+      "0024_digital_love_review_cover.sql",
+      "0025_lab_review_source_cover.sql",
+      "0026_gratitude_illustrated_cover.sql",
+      "0027_garden_illustrated_cover.sql",
+      "0028_nature_power_illustrated_cover.sql",
+      "0029_live_kindly_illustrated_cover.sql",
+      "0030_facebook_preview_jobs.sql",
+      "0031_past_present_progress_cover.sql",
+      "0032_animal_compassion_source_poster.sql",
+      "0033_trust_yourself_source_poster.sql",
+      "0034_some_meetings_source_poster.sql",
+      "0035_right_place_source_poster.sql",
+      "0036_anapanasati_source_poster.sql",
+      "0037_quiet_presence_source_poster.sql",
+      "0038_meri_aashiqui_illustrated_cover.sql",
+      "0039_top5_existing_source_poster.sql",
+      "0040_skateboard_symbolic_cover.sql",
+      "0041_source_based_editorial_quality.sql",
+      "0042_sia_source_context.sql",
+      "0043_fight_song_source_context.sql",
+      "0044_wahran_source_context.sql",
+      "0045_flying_source_context.sql",
+      "0046_quiet_presence_accuracy.sql",
+      "0047_titli_source_context.sql"
+    ],
+    "worker": [
+      {
+        "id": "2fffb841-d0cc-4e0e-97b6-545a1e0065e8",
+        "created_on": "2026-10-20T12:09:58.567488Z",
+        "versions": [
+          {
+            "version_id": "90c860b7-4351-4f55-9f01-c8fd710a9257",
+            "percentage": 100
+          }
+        ]
+      }
+    ],
+    "queryWrites": [
+      0,
+      0
+    ]
+  },
+  "imagePause": {
+    "active": true,
+    "ownerInstructionDate": "2026-10-20",
+    "generated": 0,
+    "edited": 0,
+    "published": 0,
+    "limit": "Preserve existing100artworks and388queue entries. No image generation/editing, preview substitution, source-poster or image association change."
+  },
+  "googleSitemapLimit": {
+    "observedOn": "2026-10-20",
+    "artifactRun": 39420225531,
+    "apiDocumentation": [
+      "https://developers.google.com/webmaster-tools/v1/sitemaps/get",
+      "https://developers.google.com/webmaster-tools/v1/sitemaps"
+    ],
+    "status": "exact_error_detail_unavailable_through_configured_api",
+    "detail": "The Sitemaps resource exposes numeric error/warning counts, timestamps and content-type totals, not error-category/line/detail messages. Do not use deprecated contents.indexed or infer0indexed from0Inspections.",
+    "manualPrerequisite": "Owner-provided Search Console Sitemaps error detail (message and affected URL/line, if shown) for https://vid.best/sitemaps/videos-1.xml, or an already authorized method exposing that detail. No new browser/login/credential scope, resubmission, Indexing API or full Inspection attempted."
+  },
+  "status": "prepared_not_deployed"
+}
+
