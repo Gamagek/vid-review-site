@@ -227,6 +227,12 @@
     "detail": "The Sitemaps resource exposes numeric error/warning counts, timestamps and content-type totals, not error-category/line/detail messages. Do not use deprecated contents.indexed or infer0indexed from0Inspections.",
     "manualPrerequisite": "Owner-provided Search Console Sitemaps error detail (message and affected URL/line, if shown) for https://vid.best/sitemaps/videos-1.xml, or an already authorized method exposing that detail. No new browser/login/credential scope, resubmission, Indexing API or full Inspection attempted."
   },
-  "status": "prepared_not_deployed"
+  "status": "bounded_source_context_deployed_and_live_verified",
+  "liveEvidence": {
+    "file": "docs/lazy-song-live-verification-20261020.json",
+    "pullRequest": 242,
+    "mergeCommit": "fe42619c968a44cbad46d284aa910fea93f9fb59",
+    "workerVersion": "531f3fb2-ebcb-4bcb-8d16-629cd30a3eef",
+    "checkedAt": "2026-10-20T13:16:10.977Z"
+  }
 }
-
