@@ -12,7 +12,33 @@ if(!/^gemini-[\w.-]+$/.test(values.model))throw Error('Invalid Gemini model');
 if(!process.env.GEMINI_API_KEY)throw Error('Missing GEMINI_API_KEY secret');
 const source='https://www.youtube.com/watch?v='+id;
 const prompt='Analyze the actual video, including observable scenes, on-screen text and clearly audible speech. Return JSON only: {accessible:boolean,observed_scenes:[{timestamp:string,description:string}],audio_summary:string,uncertainties:[string],editorial_outline:[{heading:string,notes:string}],suggested_title:string,suggested_description:string,seo_title:string,seo_description:string,seo_tags:[string]}. If video unavailable, accessible=false and do not invent details. Be precise; no fabricated quotes, scene descriptions or claims of human viewing. Distinguish effects and editing from real-world events. Editorial outline should have 3–6 substantive sections only if evidence supports them.';
-const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(values.model)+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':process.env.GEMINI_API_KEY},body:JSON.stringify({contents:[{parts:[{file_data:{file_uri:source}},{text:prompt}]}],generationConfig:{temperature:0.2,responseMimeType:'application/json',maxOutputTokens:4500}}),signal:AbortSignal.timeout(120000)});
+const apiRoot='https://generativelanguage.googleapis.com/v1beta/models';
+const headers={'Content-Type':'application/json','x-goog-api-key':process.env.GEMINI_API_KEY};
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+async function availableModels(){
+  const r=await fetch(apiRoot+'?pageSize=100',{headers:{'x-goog-api-key':process.env.GEMINI_API_KEY},signal:AbortSignal.timeout(20000)});
+  if(!r.ok)throw Error('Gemini models.list HTTP '+r.status);
+  const data=await r.json();
+  return (data.models||[]).filter(m=>m.supportedGenerationMethods?.includes('generateContent')).map(m=>m.name.replace(/^models\\//,''));
+}
+const candidates=[...new Set([values.model,...(process.env.GEMINI_FALLBACK_MODELS||'').split(',').map(x=>x.trim()).filter(Boolean)])];
+const supported=await availableModels();
+const choices=candidates.filter(m=>supported.includes(m));
+console.log('Available generateContent models:',supported.join(', '));
+if(!choices.length)throw Error('None of the requested models are available. Choose one of the listed models in the workflow input.');
+let response,selected;
+for(const model of choices){
+  for(let attempt=0;attempt<3;attempt++){
+    response=await fetch(apiRoot+'/'+encodeURIComponent(model)+':generateContent',{method:'POST',headers,body:JSON.stringify({contents:[{parts:[{file_data:{file_uri:source}},{text:prompt}]}],generationConfig:{temperature:0.2,responseMimeType:'application/json',maxOutputTokens:4500}}),signal:AbortSignal.timeout(120000)});
+    selected=model;
+    if(response.ok)break;
+    if(![429,500,502,503,504].includes(response.status))break;
+    if(attempt<2)await wait([3000,9000][attempt]);
+  }
+  if(response.ok)break;
+  if(![429,500,502,503,504].includes(response.status))break;
+}
+
 if(!response.ok){
   const body=(await response.text()).slice(0,1800).replace(/AIza[\\w-]+/g,'[REDACTED_API_KEY]');
   throw Error('Gemini API HTTP '+response.status+': '+body+' (no draft written)');
@@ -23,7 +49,7 @@ if(candidate?.finishReason&&candidate.finishReason!=='STOP')throw Error('Incompl
 const txt=candidate?.content?.parts?.map(p=>p.text||'').join('')||'';
 const analysis=JSON.parse(txt);
 if(analysis.accessible!==true||!Array.isArray(analysis.observed_scenes)||analysis.observed_scenes.length===0)throw Error('Insufficient verified video evidence; no draft written');
-const output={video_id:values['video-id']||null,source_url:source,model:values.model,generated_at:new Date().toISOString(),verified:false,requires_editorial_review:true,analysis};
+const output={video_id:values['video-id']||null,source_url:source,model:selected,generated_at:new Date().toISOString(),verified:false,requires_editorial_review:true,analysis};
 mkdirSync('editorial/gemini-evidence',{recursive:true});
 writeFileSync(values.out,JSON.stringify(output,null,2)+'\n',{flag:'w'});
 console.log('Evidence draft created; no D1 writes. Scenes:',analysis.observed_scenes.length);
