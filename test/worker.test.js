@@ -2635,7 +2635,7 @@ test("renamed YouTube Shorts preserve 301 redirects and only new canonical sitem
   const readable = "soccer-ball-gags-and-balloon-startled-cat-reaction";
   context.sqlite.prepare(`INSERT INTO videos (slug, title, source_url, embed_url, media_type, primary_category, subcategory,
     description, thumbnail_url, published, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`)
-  ).run(legacy, "Soccer Ball Gags and Balloon-Startled Cat Reaction",
+  .run(legacy, "Soccer Ball Gags and Balloon-Startled Cat Reaction",
     "https://www.youtube.com/shorts/x9876543210", "https://www.youtube.com/embed/x9876543210",
     "youtube", "Funny & Comedy", "Pranks", "Scene-specific video review",
     "https://example.com/thumbnail-for-this-video.jpg", "2026-10-20T19:22:51.787Z");
@@ -2664,7 +2664,7 @@ test("video sitemap omits an invalid legacy SQLite lastmod without changing the 
   const context = createTestContext();
   context.sqlite.prepare(`INSERT INTO videos (slug,title,source_url,embed_url,media_type,primary_category,subcategory,
     description,thumbnail_url,published,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,1,?,?)`)
-  ).run("legacy-timestamp-video", "Legacy Timestamp Video", "https://www.youtube.com/watch?v=legacy123",
+  .run("legacy-timestamp-video", "Legacy Timestamp Video", "https://www.youtube.com/watch?v=legacy123",
     "https://www.youtube.com/embed/legacy123", "youtube", "Education", "Tutorials & How-Tos",
     "A unique description", "https://example.com/legacy-thumbnail.jpg",
     "2026-08-05 23:15:09", "2026-08-05 23:15:09");
