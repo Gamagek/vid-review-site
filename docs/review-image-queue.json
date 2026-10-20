@@ -3188,7 +3188,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Image creation remains paused by owner20October2026; resume only on explicit owner instruction. Preserve all388queue entries/100existing artworks and nineholds. Titli135 PR236 has now deployed and passed exact D1/HTML/API/map/date verification; do not repeat its completed correction. Continue previously authorized non-image SEO: investigate the existing metadata title selection, or another source-verifiable unprotected editorial item. Verified per-video Tagembed/Iframely mappings remain absent; no artwork generation fallback.",
+  "nextTask": "Owner20October image-creation pause remains active: no image generation/editing or production batch until an explicit resume request. Preserve388queue entries/100artworks and all holds. Non-image PR240 saved-SEO-title renderer correction is now deployed and seven live metadata/preservation samples pass; do not repeat it. Continue authorized non-image work on the newly observed library-sitemap error1 using safe read-only diagnostics, or a source-verifiable unprotected editorial item when exact Google error details are unavailable. Verified Tagembed/Iframely mappings remain missing; never switch to artwork during the pause.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
