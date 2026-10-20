@@ -1,0 +1,47 @@
+name: Gemini Video Editorial Evidence
+on:
+  workflow_dispatch:
+    inputs:
+      youtube_url:
+        description: 'Public YouTube watch or Shorts URL'
+        required: true
+        type: string
+      vidbest_id:
+        description: 'Optional Vid.Best video ID (for tracking only)'
+        required: false
+        type: string
+      model:
+        description: 'Gemini model'
+        required: true
+        default: 'gemini-2.5-flash'
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: gemini-editorial-evidence
+  cancel-in-progress: false
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate syntax
+        run: node --check scripts/gemini-video-evidence.mjs
+      - name: Analyze public YouTube video (draft only)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          INPUT_URL: ${{ inputs.youtube_url }}
+          INPUT_ID: ${{ inputs.vidbest_id }}
+          INPUT_MODEL: ${{ inputs.model }}
+        run: |
+          test -n "$GEMINI_API_KEY" || { echo 'Configure GEMINI_API_KEY repository secret'; exit 1; }
+          node scripts/gemini-video-evidence.mjs --url "$INPUT_URL" --video-id "$INPUT_ID" --model "$INPUT_MODEL" --out gemini-evidence.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gemini-editorial-evidence
+          path: gemini-evidence.json
+          retention-days: 7
