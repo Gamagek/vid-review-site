@@ -11,7 +11,7 @@ on:
         required: false
         type: string
       model:
-        description: 'Gemini model'
+        description: 'Gemini model (check job logs for available models)'
         required: true
         default: 'gemini-3.8-flash'
         type: string
@@ -37,6 +37,7 @@ jobs:
           INPUT_URL: ${{ inputs.youtube_url }}
           INPUT_ID: ${{ inputs.vidbest_id }}
           INPUT_MODEL: ${{ inputs.model }}
+          GEMINI_FALLBACK_MODELS: ${{ vars.GEMINI_FALLBACK_MODELS }}
         run: |
           test -n "$GEMINI_API_KEY" || { echo 'Configure GEMINI_API_KEY repository secret'; exit 1; }
           node scripts/gemini-video-evidence.mjs --url "$INPUT_URL" --video-id "$INPUT_ID" --model "$INPUT_MODEL" --out gemini-evidence.json
