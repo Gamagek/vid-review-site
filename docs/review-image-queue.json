@@ -3188,7 +3188,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Image creation is paused by owner20October2026. Do not generate or resume artwork batches until an explicit owner request. Keep all388entries/100published covers and nineholds unchanged. Continue previously authorized non-image tasks: resume existing Titli135 source-context PR, then evidence-based editorial or bounded playback work. Missing verified per-video Tagembed/Iframely mappings remain an external limit; do not switch back to image creation.",
+  "nextTask": "Image creation remains paused by owner20October2026; resume only on explicit owner instruction. Preserve all388queue entries/100existing artworks and nineholds. Titli135 PR236 has now deployed and passed exact D1/HTML/API/map/date verification; do not repeat its completed correction. Continue previously authorized non-image SEO: investigate the existing metadata title selection, or another source-verifiable unprotected editorial item. Verified per-video Tagembed/Iframely mappings remain absent; no artwork generation fallback.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [

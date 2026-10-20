@@ -1,5 +1,11 @@
 # Non-Saiyaara TikTok playback: verified prerequisites
 
+## 20 October 2026: current prerequisites and owner image pause
+
+Image creation is paused until the owner explicitly requests resumption. All earlier instructions in this plan to continue artwork are deferred during the pause. Preserve existing100artworks and saved image queue progress; independent non-image SEO/editorial work may continue.
+
+Current main43a3279 was reconciled before PR236. Read-only D1 at2026-10-20T08:51:06.028Z has54TikTok records, no Tagembed/Iframely embed_url records and no matching app-setting keys. The source still supplies the Saiyaara-only2236794/5592899mapping, which must not be reused for another video. Record81reports complete/certified with no videos.r2_key; flags alone still do not verify an actual permitted playable raw asset. No provider/media request, new mapping, player-chain activation or6second detection is claimed. The existing origin/source/ID checks, cooldowns and source/rights/held-media exclusions remain unchanged.
+
 The owner requested the following order on19October2026: fast thumbnail; a per-video Tagembed mini preview/main player; gateway; Iframely; an additional raw-cache option only for an existing permitted playable cache. A6second decision should use real playback/error evidence. Metadata should be deduplicated and reusable, preferably one refresh per video/day. After this phase, continue original review artwork.
 
 ## Current evidence
