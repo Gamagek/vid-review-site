@@ -1,0 +1,42 @@
+name: Safe Editorial Updater Tests
+on:
+  pull_request:
+    paths:
+      - 'scripts/apply-verified-editorial.mjs'
+      - '.github/workflows/test-editorial-updater.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dry-run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check
+        run: node --check scripts/apply-verified-editorial.mjs
+      - name: Validate dry run and reject unsafe input
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs';
+          const base={id:278,source_url:'https://www.youtube.com/shorts/aU1Mew4bXCs',expected_review_text:'original',title:'Specific video review',description:'Verified video description',review_text:'Detailed verified editorial commentary. '.repeat(40),seo_title:'Specific video review',seo_description:'Verified video description',seo_tags:'["comedy","short video"]'};
+          writeFileSync('/tmp/editorial-valid.json',JSON.stringify([base]));
+          writeFileSync('/tmp/editorial-duplicate.json',JSON.stringify([base,base]));
+          writeFileSync('/tmp/editorial-unchanged.json',JSON.stringify([{...base,expected_review_text:base.review_text}]));
+          writeFileSync('/tmp/editorial-bad-date.json',JSON.stringify([{...base,source_url:'http://unsafe.example'}]));
+          JS
+          node scripts/apply-verified-editorial.mjs --input /tmp/editorial-valid.json --dry-run
+          for f in /tmp/editorial-duplicate.json /tmp/editorial-unchanged.json /tmp/editorial-bad-date.json; do
+            if node scripts/apply-verified-editorial.mjs --input "$f" --dry-run; then
+              echo "Unsafe fixture unexpectedly accepted: $f"
+              exit 1
+            fi
+          done
+          if node scripts/apply-verified-editorial.mjs --input /tmp/editorial-valid.json --apply; then
+            echo 'Apply unexpectedly worked without credentials'
+            exit 1
+          fi
