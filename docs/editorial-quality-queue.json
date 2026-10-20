@@ -122,6 +122,31 @@
       "targetFieldsSha256": "f84e06e2d074b70e1c76427b513b2291ebae2cb1507f1261e8f1e03f9c49fcb0",
       "liveVerifiedAt": "2026-10-18T08:19:16.660Z",
       "remainingEvidenceHold": "Original retained scene/sound assertions and Buddhist associations have not been independently re-verified in this pass. Preserve all three substantial owner-added qualifying paragraphs and the original section2/3 paragraphs. Public source/audio/footage and interpretation limits are explicit; this is not a whole-review or clinical/doctrinal certification. No source/media/SEO title/tags/date changes."
+    },
+    {
+      "recordIds": [
+        135
+      ],
+      "pullRequest": 236,
+      "reviewedHead": "6e25b8b025f7c93ae8f2dbe78dc3e113ace54534",
+      "mergeCommit": "ea56cb2ceeb0372e339ddf0bde3642d66a1b0a6d",
+      "workerVersion": "f90a3b40-daa8-40c8-9abf-ca756174dbf5",
+      "status": "bounded_source_context_deployed_and_live_verified",
+      "changedFields": [
+        "description",
+        "review_text",
+        "seo_description"
+      ],
+      "preservedHeadings": 6,
+      "originalDatesPreserved": true,
+      "sourcePosterSeoTitleTagsAndOtherFieldsPreserved": true,
+      "targetBeforeSha256": "a2f8db76102e1cb0342b0dddac476f342603bb3a1dd5b4cf1573d1dcba85fd74",
+      "targetAfterSha256": "b79573bf67dd3a6798e0b5c0489b471b365a112094c542238675b445f8739c52",
+      "afterListingReviewSha256": "29070be17fd46ac4e55999e14379105128bd5082af83fe86c0389c01bb1cdba4",
+      "liveVerifiedAt": "2026-10-20T09:05:39.541Z",
+      "remainingEvidenceHold": "Retained sections1–5 scene/costume/location, vocal/instrument/tempo/genre assertions and section6 popularity/translation claims have not been independently re-verified. Preserve owner prose and SEO title/tags; the bounded public source-check limitation is not whole-review certification. Fresh authorized listening/viewing evidence is required before further correction.",
+      "evidenceFile": "docs/titli-live-verification-20261020.json",
+      "laterDataObservationFile": "docs/titli-live-verification-20261020.json"
     }
   ],
   "topicHolds": {
@@ -162,13 +187,17 @@
       "recordId": 45,
       "reason": "Original retained scene/sound assertions and Buddhist associations have not been independently re-verified in this pass. Preserve all three substantial owner-added qualifying paragraphs and the original section2/3 paragraphs. Public source/audio/footage and interpretation limits are explicit; this is not a whole-review or clinical/doctrinal certification. No source/media/SEO title/tags/date changes.",
       "notAnIndexingOrPolicyVerdict": true
+    },
+    {
+      "recordId": 135,
+      "reason": "Retained sections1–5 scene/costume/location, vocal/instrument/tempo/genre assertions and section6 popularity/translation claims have not been independently re-verified. Preserve owner prose and SEO title/tags; the bounded public source-check limitation is not whole-review certification. Fresh authorized listening/viewing evidence is required before further correction.",
+      "notAnIndexingOrPolicyVerdict": true
     }
   ],
   "nextTasks": [
     {
-      "recordId": 135,
-      "sourceId": "V8zXLMIjlcw",
-      "task": "Resume existing seo/titli-source-context-20261020 PR; three-field bounded correction prepared and tested. Verify current main/all29ownerpreimages, pass current PR head CI, merge/deploy only0047, verify live exact fields/allother387rows/old dates/unchanged image assets, then record results. Do not prepare a duplicate edit. Source footage/audio remain uninspected; existing manual holds and SEO title/tags persist."
+      "task": "Review the existing watch-page document-title selection before any implementation: renderWatchHtml currently uses the first70characters of video.title, ignoring saved seo_title. Titli135 live HTML/API and unchanged src/index.js establish the difference; evaluate use of owner-authored SEO titles in metadata while preserving H1/video titles, protected owner wording, source identity and dates. This is a separate renderer investigation, not permission for bulk title rewrites or a claim that Google currently uses either title.",
+      "evidenceFile": "docs/titli-live-verification-20261020.json"
     },
     {
       "recordIds": [
@@ -1008,7 +1037,14 @@
       "contentSha256": "823d3b70e96d9a17939be58ef737154422acfeb28f43ca7a50ba9d9bbc9373f4",
       "flags": [
         "generic_listing_intro"
-      ]
+      ],
+      "resolution": {
+        "checkedAt": "2026-10-20T09:05:39.541Z",
+        "pr": 236,
+        "genericListingIntroResolved": true,
+        "currentContentSha256": "29070be17fd46ac4e55999e14379105128bd5082af83fe86c0389c01bb1cdba4",
+        "remainingViewingListeningHold": true
+      }
     },
     {
       "id": 134,
@@ -2114,46 +2150,7 @@
       "flags": []
     }
   ],
-  "preparedBatches": [
-    {
-      "recordIds": [
-        135
-      ],
-      "branch": "seo/titli-source-context-20261020",
-      "status": "prepared_not_deployed",
-      "changedFields": [
-        "description",
-        "seo_description",
-        "review_text"
-      ],
-      "migration": "migrations/0047_titli_source_context.sql",
-      "changeFile": "content/editorial-quality/2026-10-20-titli.json",
-      "baselineFile": "docs/titli-preservation-baseline-20261020.json",
-      "baseline": {
-        "checkedAt": "2026-10-20T08:57:21.252Z",
-        "saved": 388,
-        "published": 388,
-        "allNonCounterSha256": "308e8d4b33e4ba32d9ddddcaaf32ecb9be79d4de04835d4a4c5ad45354414e49",
-        "unaffectedRowsSha256": "9b94fff0cf4d9599df76caaa25af17644ffd14d7b3a6a54c3bca03738510114f",
-        "targetBeforeSha256": "a2f8db76102e1cb0342b0dddac476f342603bb3a1dd5b4cf1573d1dcba85fd74",
-        "targetAfterSha256": "b79573bf67dd3a6798e0b5c0489b471b365a112094c542238675b445f8739c52",
-        "expectedAllAfterSha256": "a540400218bc02106f43a1c1664f019a0deae9c593a0c7651bf9e271d4bffe19",
-        "preimageMismatches": [],
-        "guardedFields": 29,
-        "dates": {
-          "created_at": "2026-10-11T13:29:15.091Z",
-          "updated_at": "2026-10-11T13:29:15.091Z"
-        }
-      },
-      "tests": {
-        "node": 432,
-        "python": 4,
-        "focused": 5,
-        "workerDryRun": true
-      },
-      "sourceLimits": "Retained sections1–5 scene/costume/location, vocal/instrument/tempo/genre assertions and section6 popularity/translation claims have not been independently re-verified. Preserve owner prose and SEO title/tags; the bounded public source-check limitation is not whole-review certification. Fresh authorized listening/viewing evidence is required before further correction."
-    }
-  ],
+  "preparedBatches": [],
   "googleSnapshot": {
     "runId": 39114196048,
     "generatedAt": "2026-10-18T09:09:16.202Z",
@@ -2173,16 +2170,16 @@
   },
   "screeningVersion": 3,
   "latestPublicAudit": {
-    "runId": 39387320477,
-    "artifactId": 12247239491,
-    "zipSha256": "08793f908bcbff902620f7afafaccfbfb39cd558c0dccb9d7d0a756433f37dbb",
-    "generatedAt": "2026-10-20T07:34:24.252Z",
+    "runId": 39397811613,
+    "artifactId": 12252129316,
+    "zipSha256": "ad2298637791faf497e96405b0c5120e8fc6040fcdc0aa1e4cef32d811021056",
+    "generatedAt": "2026-10-20T09:03:25.542Z",
     "pages": 422,
     "technicalFailures": 0,
     "libraryReviews": 388,
     "editorialReviews": 10,
-    "editorialWarningPages": 40,
-    "editorialWarningMessages": 41,
+    "editorialWarningPages": 39,
+    "editorialWarningMessages": 40,
     "thumbnailCounts": {
       "ok": 336,
       "http_error": 1,
@@ -2191,10 +2188,51 @@
     },
     "inspections": 0,
     "sitemapSubmissions": 0,
-    "sitemapsProcessed": true,
-    "lastDownloaded": "2026-10-19T10:22:53.041Z",
-    "libraryWarnings": 20,
-    "limit": "Completed actual audit39387320477, consumed without another inspection/submission. Internal warnings are not Google/AdSense verdicts; no new indexed count established."
+    "searchConsole": {
+      "status": "success",
+      "authenticated": true,
+      "propertyVerified": true,
+      "sitemapSubmitted": false,
+      "inspections": [],
+      "sitemapMode": "read_only",
+      "sitemapProcessing": {
+        "status": "verified",
+        "isPending": false,
+        "lastDownloaded": "2026-10-19T10:22:53.041Z",
+        "lastSubmitted": "2026-10-19T10:22:50.628Z",
+        "errors": 0,
+        "warnings": 0
+      },
+      "reviewSitemaps": [
+        {
+          "url": "https://vid.best/sitemaps/videos-1.xml",
+          "submitted": false,
+          "processing": {
+            "status": "verified",
+            "isPending": false,
+            "lastDownloaded": "2026-10-19T10:22:55.035Z",
+            "lastSubmitted": "2026-10-19T10:22:51.167Z",
+            "errors": 0,
+            "warnings": 20
+          }
+        },
+        {
+          "url": "https://vid.best/sitemaps/daily-weekly-best.xml",
+          "submitted": false,
+          "processing": {
+            "status": "verified",
+            "isPending": false,
+            "lastDownloaded": "2026-10-19T10:22:53.165Z",
+            "lastSubmitted": "2026-10-19T10:22:51.501Z",
+            "errors": 0,
+            "warnings": 0
+          }
+        }
+      ],
+      "totalReviews": 398,
+      "inspectionBudget": 0
+    },
+    "limit": "Actual completed post-PR236 read-only audit. Internal warnings are not Google/AdSense verdicts; no new indexed count or source playback claim. Google download timestamps and warning counts must be read as dated observations."
   },
   "completedPlayerIntegrations": [
     {
@@ -2333,20 +2371,62 @@
     }
   ],
   "currentDataSnapshot20261020": {
-    "checkedAt": "2026-10-20T08:57:21.252Z",
     "saved": 388,
     "published": 388,
-    "allNonCounterSha256": "308e8d4b33e4ba32d9ddddcaaf32ecb9be79d4de04835d4a4c5ad45354414e49",
-    "unaffectedRowsSha256": "9b94fff0cf4d9599df76caaa25af17644ffd14d7b3a6a54c3bca03738510114f",
+    "unchangedOtherRecords": 387,
+    "baselineAt": "2026-10-20T08:57:21.252Z",
+    "postReleaseAt": "2026-10-20T09:03:48.776Z",
+    "baselineAllNonCounterSha256": "308e8d4b33e4ba32d9ddddcaaf32ecb9be79d4de04835d4a4c5ad45354414e49",
+    "actualAndExpectedAfterAllNonCounterSha256": "a540400218bc02106f43a1c1664f019a0deae9c593a0c7651bf9e271d4bffe19",
+    "unaffected387RowsSha256": "9b94fff0cf4d9599df76caaa25af17644ffd14d7b3a6a54c3bca03738510114f",
     "targetBeforeSha256": "a2f8db76102e1cb0342b0dddac476f342603bb3a1dd5b4cf1573d1dcba85fd74",
     "targetAfterSha256": "b79573bf67dd3a6798e0b5c0489b471b365a112094c542238675b445f8739c52",
-    "expectedAllAfterSha256": "a540400218bc02106f43a1c1664f019a0deae9c593a0c7651bf9e271d4bffe19",
-    "preimageMismatches": [],
+    "changedFields": [
+      "description",
+      "review_text",
+      "seo_description"
+    ],
+    "originalDatesUnchanged": true,
+    "allOtherTargetFieldsUnchanged": true,
+    "counterFieldsNotWritten": true,
+    "all100ArtworksManifestAndSourcePlayerCodeUnchanged": true,
+    "verificationWrites": 0,
+    "r2Writes": 0,
+    "scope": "Verified release changed only three intended fields of135. Historical200-record screening metrics remain dated; not a new whole-library duplicate or quality score."
+  },
+  "latestDataObservation20261020": {
+    "checkedAt": "2026-10-20T09:10:36.339Z",
+    "saved": 388,
+    "published": 388,
+    "allNonCounterSha256": "536b3a54bbeaddf2b73cb440f423e36ef6b52868af0dd300bfddddcc800547fb",
+    "unaffectedRowsSha256": "83de651e14ca285522c60b4ddff0431d9bc93309d7128885a544429fde422e50",
+    "targetBeforeSha256": "b79573bf67dd3a6798e0b5c0489b471b365a112094c542238675b445f8739c52",
+    "targetAfterSha256": "b79573bf67dd3a6798e0b5c0489b471b365a112094c542238675b445f8739c52",
+    "expectedAllAfterSha256": "536b3a54bbeaddf2b73cb440f423e36ef6b52868af0dd300bfddddcc800547fb",
+    "preimageMismatches": [
+      "description",
+      "review_text",
+      "seo_description"
+    ],
     "guardedFields": 29,
     "dates": {
       "created_at": "2026-10-11T13:29:15.091Z",
       "updated_at": "2026-10-11T13:29:15.091Z"
     },
-    "scope": "Read-only current388published records; historical200-record screening counts remain dated, not rewritten as a current whole-library audit."
+    "unrelatedAuditPageObservation": {
+      "checkedAt": "2026-10-20T09:11:42.777Z",
+      "record": {
+        "id": 400,
+        "slug": "youtube-short-fe8ctyczjja",
+        "title": "Unplugged Toaster, Ice Cream Sharing and Cow Surprise",
+        "source_url": "https://www.youtube.com/shorts/fe8CtYczJjA",
+        "created_at": "2026-10-19T18:32:41.874Z",
+        "updated_at": "2026-10-19T18:32:41.874Z",
+        "descriptionChars": 336,
+        "reviewChars": 3429,
+        "seoDescriptionChars": 151
+      }
+    },
+    "limit": "At09:03:48.776Z the release matched the exact expected three-field change and all other387rows. A later09:10:36.339Z read shows independent non-counter data changes outside135; Titli135still exactly matches its intended result and original dates. The completed migration targets only135. Preserve current out-of-scope changes; do not roll back or attribute them to this release. Actor/changed-field attribution is not established by these read-only hashes."
   }
 }
