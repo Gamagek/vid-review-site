@@ -1,0 +1,455 @@
+{
+  "status": "prepared; publication pending exact-head CI, merge, existing Worker deployment and after-release checks",
+  "preparedAt": "2026-10-20T12:05:16.246Z",
+  "scope": {
+    "runtimeFiles": [
+      "src/index.js"
+    ],
+    "behavior": "Use cleaned saved seo_title for document title, og:title, twitter:title and WebPage.name; fall back to cleaned display title when blank. Keep the existing70-character normalization bound.",
+    "preserved": [
+      "H1 and visible owner title",
+      "VideoObject name/source thumbnail/embed",
+      "player routes and provider identity",
+      "listing description and substantial review/headings/order",
+      "SEO field values and tags",
+      "canonical/slug/IDs",
+      "published and modified dates",
+      "all source/owner posters and existing100 artwork associations",
+      "drafts and source30/Saiyaara/Summer/removal/raw-rights holds",
+      "D1/R2 data, accounts, comments, reactions and security"
+    ],
+    "productionDataWrites": 0,
+    "sqlMigrationsAdded": 0,
+    "imagesCreated": 0,
+    "imagesEdited": 0,
+    "imageCreationPaused": true,
+    "limitation": "This repairs renderer selection of existing owner-authored metadata; it does not rewrite any title or certify saved editorial claims. Google may select a different title link."
+  },
+  "startingPoint": {
+    "main": "34d413d20a0786842be03b910f7e71fafe8e8466",
+    "mainTree": "42a11f8fbaee5e0fba7e4688d266b74cacb55768",
+    "ownerPR238Preserved": true,
+    "independentOpenPR239": "feature/gemini-drive-review-import; untouched",
+    "deploymentRun": 39404398529,
+    "workerVersion": "d142e195-29c7-4f57-afb1-72ecbd619717",
+    "deploymentId": "c8fd76f8-7d3c-4472-b0cd-64cfcfa8da16",
+    "deployedAt": "2026-10-20T09:57:35.85729Z"
+  },
+  "inventory": {
+    "checkedAt": "2026-10-20T12:03:04.239Z",
+    "saved": 388,
+    "published": 388,
+    "allNonCounterSha256": "914bf9f22d1269c2f25647f8837d316213accc80775d07c3bd693ea878e0705c",
+    "fields": [
+      "cache_attempts",
+      "cache_error",
+      "cache_next_attempt_at",
+      "cache_source_url",
+      "cache_status",
+      "cached_at",
+      "created_at",
+      "description",
+      "embed_url",
+      "featured",
+      "id",
+      "media_type",
+      "primary_category",
+      "published",
+      "r2_key",
+      "redistribution_certified",
+      "redistribution_certified_at",
+      "review_text",
+      "seo_description",
+      "seo_tags",
+      "seo_title",
+      "slug",
+      "source_page_url",
+      "source_url",
+      "subcategory",
+      "thumbnail_url",
+      "title",
+      "trending",
+      "updated_at"
+    ],
+    "artworks": 100,
+    "artworkIdentityMismatches": [],
+    "metadata": {
+      "nonemptySeoTitles": 388,
+      "changedMetadataTitles": 262
+    },
+    "providerCounts": {
+      "youtube": 312,
+      "raw": 2,
+      "tiktok": 54,
+      "facebook": 20
+    },
+    "tikTokMappings": {
+      "rows": 54,
+      "withProviderEmbedMappings": 0,
+      "settingKeys": []
+    },
+    "sample": [
+      {
+        "id": 4,
+        "slug": "sadahatama-oba-mage-theme-song",
+        "title": "Sadahatama Oba Mage Theme Song (සදහටම ඔබ මගේ තේමා ගීතය)",
+        "seo_title": "Sadahatama Oba Mage Theme Song (සදහටම ඔබ මගේ) - Ultimate Romantic Anth",
+        "created_at": "2026-09-16T16:22:59.366Z",
+        "updated_at": "2026-09-16T16:22:59.366Z"
+      },
+      {
+        "id": 8,
+        "slug": "saiyaara-a-cinematic-romance",
+        "title": "Saiyaara; A Cinematic Romance",
+        "seo_title": "Saiyaara; A Cinematic Romance",
+        "created_at": "2026-09-19T18:09:01.151Z",
+        "updated_at": "2026-09-22T20:12:03.346Z"
+      },
+      {
+        "id": 30,
+        "slug": "the-majestic-giant-dog-is-it-a-lion-or-a-puppy",
+        "title": "The Majestic Giant Dog: Is It a Lion or a Puppy",
+        "seo_title": "The Majestic Giant Dog: Is It a Lion or a Puppy?",
+        "created_at": "2026-09-25T18:29:01.605Z",
+        "updated_at": "2026-09-25T18:29:01.605Z"
+      },
+      {
+        "id": 73,
+        "slug": "summer-inverted-7332342275151760642",
+        "title": "The Ultimate TikTok Transition! ✨ Drives Success & Growth | Summer😊#Inverted",
+        "seo_title": "The Ultimate TikTok Transition! ✨ Drives Success & Growth",
+        "created_at": "2026-10-01T17:10:11.144Z",
+        "updated_at": "2026-10-03T13:26:38.648Z"
+      },
+      {
+        "id": 135,
+        "slug": "titli-chennai-express-full-video-song-shahrukh-khan-deepika-padukone-music-video-analysis-why-titli-",
+        "title": "🥰😍🤩 Titli Chennai Express Full Video Song | Shahrukh Khan, Deepika Padukone ❤ Music Video Analysis! 🦋 Why 'Titli' is a Bollywood Masterpiece 💛",
+        "seo_title": "🥰🤩Music Video Analysis! 🦋 Why 'Titli' is a Bollywood Masterpiece😍❤",
+        "created_at": "2026-10-11T13:29:15.091Z",
+        "updated_at": "2026-10-11T13:29:15.091Z"
+      },
+      {
+        "id": 286,
+        "slug": "ranking-funniest-human-fails-try-not-to-laugh-707278",
+        "title": "Ranking Funniest Human Fails — Try Not to Laugh",
+        "seo_title": "Ranking Funniest Human Fails — Try Not to Laugh | Vid.Best Review",
+        "created_at": "2026-10-19T11:49:28.051Z",
+        "updated_at": "2026-10-19T11:49:28.051Z"
+      },
+      {
+        "id": 400,
+        "slug": "youtube-short-fe8ctyczjja",
+        "title": "Unplugged Toaster, Ice Cream Sharing and Cow Surprise",
+        "seo_title": "Unplugged Toaster, Ice Cream & Cow Surprise | Video Review",
+        "created_at": "2026-10-19T18:32:41.874Z",
+        "updated_at": "2026-10-19T18:32:41.874Z"
+      }
+    ],
+    "queryWrites": [
+      0,
+      0,
+      0
+    ]
+  },
+  "migrations": {
+    "local": 47,
+    "remote": 48,
+    "pending": [],
+    "remoteOnly": [
+      "0013_media_cache_jobs.sql"
+    ]
+  },
+  "beforeLive": {
+    "checkedAt": "2026-10-20T12:04:45.741Z",
+    "phase": "before",
+    "rows": [
+      {
+        "id": 4,
+        "slug": "sadahatama-oba-mage-theme-song",
+        "url": "https://vid.best/watch/sadahatama-oba-mage-theme-song",
+        "metadataTitle": "Sadahatama Oba Mage Theme Song (සදහටම ඔබ මගේ තේමා ගීතය)",
+        "metadataMatchesSavedSeoTitle": false,
+        "ownerFieldsSha256": "730e02a964f7bf7fad8e5afd35aba9d35702422046d2f0d171e15cccbc75b661",
+        "h1Sha256": "2ea7de13724c1de9f3feb36a46fd42247b5f13528966e20cdf0156266ee2a521",
+        "reviewCopySha256": "f8b79c9bd9b4c7f22dee47b85bbd005a08238780c31c7b184f0d226f953ee2f0",
+        "listingDescriptionSha256": "2232065ff5b9ef41484101889bc5743b948396fb7ccb758d53c336ea8bcd3529",
+        "playerHtmlSha256": "3c6f9e032dfc49becc13a61e93ca185e9b5eccec56ca6f589b488d3fa614e2aa",
+        "figureHtmlSha256": "f8f2dae65b604b48c28e45609c177a422864eb3ff09878ec03f53b0bfec6f1c1",
+        "videoObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "image": "https://vid.best/review-illustrations/sadahatama-oba-mage-theme-song-v2.webp",
+        "imageObjectSha256": "ec55df2b33e9a046835739e4aa879bba6635b90bfcfffca8318031a23c42fde0",
+        "canonical": "https://vid.best/watch/sadahatama-oba-mage-theme-song",
+        "datePublished": "2026-09-16T16:22:59.366Z",
+        "dateModified": "2026-09-16T16:22:59.366Z",
+        "robots": null,
+        "cacheControl": "private, no-store"
+      },
+      {
+        "id": 8,
+        "slug": "saiyaara-a-cinematic-romance",
+        "url": "https://vid.best/watch/saiyaara-a-cinematic-romance",
+        "metadataTitle": "Saiyaara; A Cinematic Romance",
+        "metadataMatchesSavedSeoTitle": false,
+        "ownerFieldsSha256": "9b8b89ce9a905e3cb6bbb60e24c820a133ffdc57c95a3fb03095d9bfe1606651",
+        "h1Sha256": "817cb8d867d11229a549018e27321f3318404c1344427568ce1567698ecbca8e",
+        "reviewCopySha256": "60ae3a91ce387b7c8e9d981b9202484feeca827cfaa5a6bae78ce8bbfc1cedc0",
+        "listingDescriptionSha256": "8e84d41be08ef4b6b66a7df879b712eefb47e2fde7d86af41a5d39a7da34ede3",
+        "playerHtmlSha256": "35307d24d69ec796290a222f0f80fec10f5430912ee327a2d0a9459e04e2cb21",
+        "figureHtmlSha256": "598f350e649222a6961fa1c19b30594b6debdcad9c8e878aaa25e247d4bc2987",
+        "videoObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "image": "https://vid.best/api/tiktok/cached-poster?id=7669587518156705056",
+        "imageObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "canonical": "https://vid.best/watch/saiyaara-a-cinematic-romance",
+        "datePublished": "2026-09-19T18:09:01.151Z",
+        "dateModified": "2026-09-22T20:12:03.346Z",
+        "robots": null,
+        "cacheControl": "private, no-store"
+      },
+      {
+        "id": 30,
+        "slug": "the-majestic-giant-dog-is-it-a-lion-or-a-puppy",
+        "url": "https://vid.best/watch/the-majestic-giant-dog-is-it-a-lion-or-a-puppy",
+        "metadataTitle": "The Majestic Giant Dog: Is It a Lion or a Puppy",
+        "metadataMatchesSavedSeoTitle": false,
+        "ownerFieldsSha256": "ebac1ccefe0d50739362212d1727199ba2f7e44490c2668a1c3fb349af0470b2",
+        "h1Sha256": "711d9883e258f05350131b9d087ec9372e27fb5bd5cf01be292d5343841bccdb",
+        "reviewCopySha256": "f697850a65e035093d2185e826b7c694cc2bc3458f3d5f511eff0f34218bd308",
+        "listingDescriptionSha256": "06526dc06368fb2e8cde6cafcad003ad2a970f2c28d6be259d060b157b713531",
+        "playerHtmlSha256": "e6f692927f91ad5ac626e5433e8bf4e9b34d78ae72f86c7c62272c34aac59141",
+        "figureHtmlSha256": "498828369500b10d33dc280821abbf0b55c5a6c26f78885372af5e5176a415ec",
+        "videoObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "image": "https://vid.best/api/tiktok/cached-poster?id=7566832294409915678",
+        "imageObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "canonical": "https://vid.best/watch/the-majestic-giant-dog-is-it-a-lion-or-a-puppy",
+        "datePublished": "2026-09-25T18:29:01.605Z",
+        "dateModified": "2026-09-25T18:29:01.605Z",
+        "robots": null,
+        "cacheControl": "private, no-store"
+      },
+      {
+        "id": 73,
+        "slug": "summer-inverted-7332342275151760642",
+        "url": "https://vid.best/watch/summer-inverted-7332342275151760642",
+        "metadataTitle": "The Ultimate TikTok Transition! ✨ Drives Success & Growth | Summer😊#I",
+        "metadataMatchesSavedSeoTitle": false,
+        "ownerFieldsSha256": "5e64dc10fd7693481c44c25542ddaed222a1ff85f11752c5c99f28f1d8a10f58",
+        "h1Sha256": "49cab526344958659f06bcbd65bcb187926be7a30ed3688b1b4541f12f286310",
+        "reviewCopySha256": "f3d9cd61a5d913ab3967a753bafd9c275d9c1676662b384e5d87499ff3ac1a73",
+        "listingDescriptionSha256": "36b200142583c18390574c386690faa4f8c92806ac801e9fff4e590310e66d70",
+        "playerHtmlSha256": "276cf9c6f8260a3448922a0fe8e84ad33609301d54befd67f4c9edd6dabb7831",
+        "figureHtmlSha256": "256ca598d90263fd03a1ae94029bbfd1887275f5613d0fca4243cc9ffd270390",
+        "videoObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "image": "https://vid.best/api/tiktok/cached-poster?id=7332342275151760642",
+        "imageObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "canonical": "https://vid.best/watch/summer-inverted-7332342275151760642",
+        "datePublished": "2026-10-01T17:10:11.144Z",
+        "dateModified": "2026-10-03T13:26:38.648Z",
+        "robots": null,
+        "cacheControl": "private, no-store"
+      },
+      {
+        "id": 135,
+        "slug": "titli-chennai-express-full-video-song-shahrukh-khan-deepika-padukone-music-video-analysis-why-titli-",
+        "url": "https://vid.best/watch/titli-chennai-express-full-video-song-shahrukh-khan-deepika-padukone-music-video-analysis-why-titli-",
+        "metadataTitle": "🥰😍🤩 Titli Chennai Express Full Video Song | Shahrukh Khan, Deepika ",
+        "metadataMatchesSavedSeoTitle": false,
+        "ownerFieldsSha256": "724c1d7c93b1d632ea55792b06c970eedcd83cf5d97b2ad00fabc1396fa5e108",
+        "h1Sha256": "2811fbba8f14e6a9175b475fa729c813b86475f36d671ead2b57690279cb01b2",
+        "reviewCopySha256": "23ab2c45a3710cb1e3171d0644fa19ab2dd4d0dab908680315feb9e798d322cc",
+        "listingDescriptionSha256": "cf5d6bb2bac9ca811c89cd756136c484dd9c3c9798276f6ecb9242df398e1ca4",
+        "playerHtmlSha256": "2047661ee36c66bbb4eada91e1625acbf19c59b7cd6075fca4607c79c56b705b",
+        "figureHtmlSha256": "7be96fff526927df54d3746903a82e99cee36e4e3483ef1dbea9f989e71bf59c",
+        "videoObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "image": "https://i.ytimg.com/vi/V8zXLMIjlcw/hqdefault.jpg",
+        "imageObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "canonical": "https://vid.best/watch/titli-chennai-express-full-video-song-shahrukh-khan-deepika-padukone-music-video-analysis-why-titli-",
+        "datePublished": "2026-10-11T13:29:15.091Z",
+        "dateModified": "2026-10-11T13:29:15.091Z",
+        "robots": null,
+        "cacheControl": "private, no-store"
+      },
+      {
+        "id": 286,
+        "slug": "ranking-funniest-human-fails-try-not-to-laugh-707278",
+        "url": "https://vid.best/watch/ranking-funniest-human-fails-try-not-to-laugh-707278",
+        "metadataTitle": "Ranking Funniest Human Fails — Try Not to Laugh",
+        "metadataMatchesSavedSeoTitle": false,
+        "ownerFieldsSha256": "11ec159cc42969810aa06e6174acd0499688cb469595bfa8d0ca01bdf9386247",
+        "h1Sha256": "3fd9293e011cf0b221d6870c032321de054c36edbdcec71d3e2ea06bf7782d79",
+        "reviewCopySha256": "698c4af20b47cbce95ca3e097681bd0312507ebec9c6a1abb114b9d5d2c3928c",
+        "listingDescriptionSha256": "45177f6241c24ddf5f179f615da0cd95f6b9fa6bd6857cd92abd38f70118d3c7",
+        "playerHtmlSha256": "60741d1626e81afe02b03afab6d9e123a01a202a11ea97d80f933f4f5d4e65f5",
+        "figureHtmlSha256": "c5ca091c9f73ce2d630eb06820a5a8175950b80fcd1dc2828674b6c319dcfdad",
+        "videoObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "image": "https://vid.best/review-illustrations/ranking-funniest-human-fails-try-not-to-laugh-707278-v1.webp",
+        "imageObjectSha256": "ef33ed447118ea5b3eb2dcdd45ff63d27bca43212036855c29ce9f9a3266c186",
+        "canonical": "https://vid.best/watch/ranking-funniest-human-fails-try-not-to-laugh-707278",
+        "datePublished": "2026-10-19T11:49:28.051Z",
+        "dateModified": "2026-10-19T11:49:28.051Z",
+        "robots": null,
+        "cacheControl": "private, no-store"
+      },
+      {
+        "id": 400,
+        "slug": "youtube-short-fe8ctyczjja",
+        "url": "https://vid.best/watch/youtube-short-fe8ctyczjja",
+        "metadataTitle": "Unplugged Toaster, Ice Cream Sharing and Cow Surprise",
+        "metadataMatchesSavedSeoTitle": false,
+        "ownerFieldsSha256": "14daaf483d141b9564b0d73f7dd15f2dec1ac492979807ecb4a6888566b82507",
+        "h1Sha256": "2bddc59c2ee5516b15bf9fe682e3ca6cffc1a0e5424bd09a77d1ba5d9cc5dffa",
+        "reviewCopySha256": "676aa7789559c71188e348562ba94c0016e0426c58619027b61ab02ec43ac24f",
+        "listingDescriptionSha256": "4d82cb3dc85703165ac3abb3471b9144e338ac14059b6b77bf90a22cc44f67c6",
+        "playerHtmlSha256": "842d638fb3493373a013c159ae0d29826ae9343a765ec133d93d50a7464e1415",
+        "figureHtmlSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "videoObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "image": null,
+        "imageObjectSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+        "canonical": "https://vid.best/watch/youtube-short-fe8ctyczjja",
+        "datePublished": "2026-10-19T18:32:41.874Z",
+        "dateModified": "2026-10-19T18:32:41.874Z",
+        "robots": null,
+        "cacheControl": "private, no-store"
+      }
+    ],
+    "mapHashes": {
+      "/sitemap.xml": "f0c5c9ed92546fd1949d7c8281ccf1d3913c2bca942dc427cae055e4ed4a1dc4",
+      "/image-sitemap.xml": "b8d1243e337bc687688b7102be8ea688f36a0eb90bc7bd2d5349a2f3f6389fb2",
+      "/sitemaps/videos-1.xml": "df2c510e34c0c4867cb83cdb146e3d236ecda42f0b374fdb861ee67d99196db6",
+      "/sitemaps/images-1.xml": "f832ca83ab4a5a5951835ea3b4aa584354044a518ff215e091678c7fc7c54ca3",
+      "/robots.txt": "e20385da3c75570e7ee0eddc417ac71346cd7488a68b48e1fe9eedfbd0063050",
+      "/sitemaps/pages.xml": "94e999b5c18b13047b60f98eb4923263b081ead2584dbfeda36d159ec8f9d174",
+      "/sitemaps/categories.xml": "3decff6bbbefb5d1be27dd6c082f375761842cb19e0a7a3497b591fa0f29f914",
+      "/sitemaps/daily-weekly-best.xml": "5da196b1968f6df603e66608c1fbaa34ac3925a4941822a6ebbacff7e3710a40"
+    },
+    "rootChildren": 5,
+    "existingAssets": [
+      {
+        "id": 4,
+        "path": "/review-illustrations/sadahatama-oba-mage-theme-song-v2.webp",
+        "bytes": 93350,
+        "sha256": "15b0406387ae7f3b194225a0266e18100cd3ee1ec12030bc30536130aacedd1e",
+        "http": 200,
+        "mime": "image/webp"
+      },
+      {
+        "id": 286,
+        "path": "/review-illustrations/ranking-funniest-human-fails-try-not-to-laugh-707278-v1.webp",
+        "bytes": 144788,
+        "sha256": "3b30347e47ebafc35c516f7e498440cca6f94637c78787d37689a245f7dbb213",
+        "http": 200,
+        "mime": "image/webp"
+      }
+    ],
+    "comparison": null,
+    "publicGetCalls": 24,
+    "inspectionCalls": 0,
+    "sitemapSubmissions": 0,
+    "providerPlayerRequests": 0,
+    "imagesCreated": 0,
+    "imagesEdited": 0,
+    "productionWrites": 0,
+    "limit": "Server HTTP metadata/preservation checks only. No browser/player execution, Google indexing count or new artwork claim."
+  },
+  "tests": {
+    "focusedNode": 5,
+    "fullNode": 437,
+    "python": 4,
+    "workerDryRun": "passed; existing wrangler4.124.0",
+    "gitDiffCheck": "passed",
+    "writesRejectedInReadOnlyTestHarness": true,
+    "covered": [
+      "saved SEO title versus distinct display title",
+      "blank/whitespace/control-only fallback",
+      "Unicode, escaping and existing length bound",
+      "unchanged H1/review/player/VideoObject/source poster/dates/database",
+      "protected Comedy, Saiyaara and Summer player identities",
+      "HEAD, unpublished404 and noindex viewer preparation"
+    ]
+  },
+  "latestCompletedAudit": {
+    "runId": 39404485300,
+    "artifactId": 12255434022,
+    "zipSha256": "9f889ffd42f58ebea5d9b09128de25b8a73a7331b20672d523040806e1e61cdc",
+    "generatedAt": "2026-10-20T09:58:21.612Z",
+    "pages": 422,
+    "libraryReviews": 388,
+    "editorialReviews": 10,
+    "technicalFailures": 0,
+    "editorialWarningPages": 35,
+    "editorialWarningMessages": 36,
+    "thumbnailCounts": {
+      "ok": 336,
+      "http_error": 1,
+      "placeholder": 8,
+      "missing": 43
+    },
+    "searchConsole": {
+      "status": "success",
+      "authenticated": true,
+      "propertyVerified": true,
+      "sitemapSubmitted": false,
+      "inspections": [],
+      "sitemapMode": "read_only",
+      "sitemapProcessing": {
+        "status": "verified",
+        "isPending": false,
+        "lastDownloaded": "2026-10-20T09:45:17.780Z",
+        "lastSubmitted": "2026-10-20T09:45:13.976Z",
+        "errors": 0,
+        "warnings": 0
+      },
+      "reviewSitemaps": [
+        {
+          "url": "https://vid.best/sitemaps/videos-1.xml",
+          "submitted": false,
+          "processing": {
+            "status": "verified",
+            "isPending": false,
+            "lastDownloaded": "2026-10-20T09:45:16.373Z",
+            "lastSubmitted": "2026-10-20T09:45:14.292Z",
+            "errors": 1,
+            "warnings": 20
+          }
+        },
+        {
+          "url": "https://vid.best/sitemaps/daily-weekly-best.xml",
+          "submitted": false,
+          "processing": {
+            "status": "verified",
+            "isPending": false,
+            "lastDownloaded": "2026-10-20T09:45:17.804Z",
+            "lastSubmitted": "2026-10-20T09:45:14.528Z",
+            "errors": 0,
+            "warnings": 0
+          }
+        }
+      ],
+      "totalReviews": 398,
+      "inspectionBudget": 0
+    },
+    "inspectionCalls": 0,
+    "sitemapSubmissions": 0,
+    "limit": "Actual completed artifact, preceding this title change. Internal warning changes are independent activity, not a claimed effect. Zero inspections means no new indexed count, not zero indexed pages."
+  },
+  "issues": [
+    {
+      "type": "Google sitemap diagnostic",
+      "observedAt": "2026-10-20T09:58:21.612Z",
+      "detail": "Stored Search Console now reports library sitemap errors1/warnings20, lastDownloaded2026-10-20T09:45:16.373Z. Earlier09:03 report had errors0. Public422-page audit has0technical failures. Error category/details are not supplied by this stored API summary; no cause, fix, indexing change or resubmission is claimed."
+    },
+    {
+      "type": "External provider mapping limit",
+      "observedAt": "2026-10-20T12:03:04.239Z",
+      "detail": "54TikTok rows, no verified Tagembed/Iframely embed mapping or matching app-setting key. Do not reuse Saiyaara mappings or resume artwork while paused."
+    },
+    {
+      "type": "Independent Portainer read-only failure",
+      "runId": 39404398558,
+      "detail": "PR238 preflight timed out on read-only GET Docker containers; privileged deployment jobs skipped. No infrastructure settings changed. This SEO-only release will skip all four privileged jobs; repository-variable read is unavailable through the public GitHub fetch endpoint."
+    }
+  ],
+  "release": null,
+  "afterLive": null,
+  "nextTask": "Finish this prepared metadata-only PR safely, then inspect the reported library sitemap error using authorized zero-inspection diagnostics or choose one evidence-ready unprotected editorial item. Never resume image creation without explicit owner instruction."
+}

@@ -3032,7 +3032,9 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   const baseUrl = getBaseUrl(request, env);
   const playbackOrigin = new URL(request.url).origin;
   const canonical = `${baseUrl}/watch/${encodeURIComponent(video.slug)}`;
-  const title = cleanText(watchDisplayTitle(video), 70);
+  // Honor the saved editorial SEO title only in document/social/page metadata.
+  // Keep the owner's display title for the H1, source player and VideoObject.
+  const title = cleanText(video.seo_title, 70) || cleanText(watchDisplayTitle(video), 70);
   const description = cleanText(video.seo_description || video.description || `Discover ${video.title} on Vid.Best.`, 180);
   const tiktokId = video.provider === "tiktok" ? extractTikTokId(video.source_url) : "";
   const thumbnail = video.provider === "tiktok"
