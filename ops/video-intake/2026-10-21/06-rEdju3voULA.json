@@ -3,7 +3,7 @@
   "intake_sequence": 6,
   "intended_new_items": 38,
   "publication_date_sri_lanka": "2026-10-21",
-  "stage": "prepared_for_direct_d1_publication",
+  "stage": "draft_on_hold",
   "original_user_evidence": {
     "video_id": "rEdju3voULA",
     "source_url": "https://youtube.com/shorts/rEdju3voULA",
@@ -51,7 +51,7 @@
     "thumbnail_url": null,
     "featured": false,
     "trending": false,
-    "published": true
+    "published": false
   },
   "security": {
     "insert_only": true,
@@ -59,5 +59,12 @@
     "duplicate_key": "youtube:rEdju3voULA",
     "preserve_all_existing_dates": true,
     "do_not_assign_existing_d1_id": true
+  },
+  "publishing_hold": {
+    "enabled": true,
+    "require_explicit_user_release": true,
+    "db_insert_allowed": false,
+    "reason": "Owner explicitly requested all six new videos remain drafts until they say to publish.",
+    "publication_date_note": "2026-10-21 was the originally requested publication date, not evidence of actual publication."
   }
 }
