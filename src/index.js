@@ -3025,6 +3025,17 @@ function verifiedVideoFileUrl(value, base) {
   } catch { return ""; }
 }
 
+function indexableCategoryBreadcrumbUrl(baseUrl, video) {
+  // Preserve the first ten published reviews and all raw-media pages.
+  const original = `${baseUrl}/?category=${encodeURIComponent(video.primary_category)}`;
+  if (Number(video.id) <= 10 || video.media_type === "raw") return original;
+  // Keep this slug algorithm identical to categoryUrl() in seo-edge.js.
+  const slug = String(video.primary_category || "")
+    .normalize("NFKD").toLowerCase().replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "").slice(0, 100);
+  return slug ? `${baseUrl}/category/${encodeURIComponent(slug)}` : original;
+}
+
 function renderWatchHtml(video, request, env, scriptNonce) {
   const viewer = new URL(request.url).searchParams.get("viewer") === "1";
   const saiyaaraWidget = video.provider === "tiktok" &&
@@ -3106,11 +3117,32 @@ function renderWatchHtml(video, request, env, scriptNonce) {
         isPartOf: { "@id": `${baseUrl}#website` },
       },
       videoSchema,
+      // A Vid.Best editorial article is distinct from the third-party source video.
+      // Use the original Vid.Best publish date; do not invent a video upload date.
+      ...(Number(video.id) > 10 && video.media_type !== "raw" &&
+        String(video.review_text || "").trim().length >= 500 ? [{
+        "@type": "Article",
+        "@id": `${canonical}#review`,
+        headline: watchDisplayTitle(video),
+        description: cleanText(video.description || description, 320),
+        datePublished: video.created_at,
+        inLanguage: video.transcript_language || "en",
+        mainEntityOfPage: { "@id": canonical },
+        about: { "@id": `${canonical}#video` },
+        author: {
+          "@type": "Organization",
+          name: env.APP_NAME || "Vid.Best",
+          url: baseUrl,
+        },
+        publisher: { "@id": `${baseUrl}#organization` },
+        ...(sourceAttribution ? { isBasedOn: sourceAttribution } : {}),
+        ...(reviewImage ? { image: [reviewImage] } : {}),
+      }] : []),
       {
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: baseUrl },
-          { "@type": "ListItem", position: 2, name: video.primary_category, item: `${baseUrl}/?category=${encodeURIComponent(video.primary_category)}` },
+          { "@type": "ListItem", position: 2, name: video.primary_category, item: indexableCategoryBreadcrumbUrl(baseUrl, video) },
           { "@type": "ListItem", position: 3, name: video.title, item: canonical },
         ],
       },
