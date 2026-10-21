@@ -3004,6 +3004,17 @@ async function watchPage(request, env, ctx, slugInput) {
     const previewRow = tiktokId ? await readTikTokOEmbedCache(env, tiktokId) : null;
     video.tiktok_preview = tikTokPreviewFromRow(previewRow, previewRow ? "d1" : "missing");
   }
+  // Link related published editorial reviews in server-rendered HTML so Googlebot
+  // and visitors can navigate without waiting for client-side JavaScript.
+  // Protected originals and raw media keep their existing watch-page output.
+  if (Number(video.id) > 10 && video.media_type !== "raw" && video.primary_category) {
+    const related = await env.DB.prepare(
+      `SELECT id,slug,title FROM videos
+       WHERE published=1 AND id>10 AND id!=? AND media_type!='raw' AND primary_category=?
+       ORDER BY CASE WHEN subcategory=? THEN 0 ELSE 1 END, id DESC LIMIT 6`,
+    ).bind(Number(video.id), video.primary_category, video.subcategory).all();
+    video.relatedEditorialReviews = related.results || [];
+  }
   const viewer = new URL(request.url).searchParams.get("viewer") === "1";
   if (!viewer && request.method === "GET" && !isLikelyCrawler(request)) {
     ctx.waitUntil(env.DB.prepare("UPDATE videos SET views = views + 1 WHERE id = ?").bind(video.id).run());
@@ -3224,6 +3235,11 @@ function renderWatchHtml(video, request, env, scriptNonce) {
       ${video.review_text ? `<section class="review-copy"><h2>Review & discovery notes</h2>${paragraphs(video.review_text, REVIEW_TEXT_MAX_LENGTH)}</section>` : ""}
       ${video.transcript ? `<details class="transcript-panel"><summary>Read transcript</summary><div>${paragraphs(video.transcript)}</div></details>` : ""}
       <p class="review-source-note">Vid.Best provides commentary on external media, not a claim of original video authorship. <a href="/editorial">How our reviews work</a>.</p>
+      ${video.relatedEditorialReviews?.length ? `<nav class="related-reviews" aria-label="Related video reviews">
+        <h2>Explore related ${escapeHtml(video.primary_category)} reviews</h2>
+        <ul>${video.relatedEditorialReviews.map(item => `<li><a href="/watch/${encodeURIComponent(item.slug)}">${escapeHtml(item.title)}</a></li>`).join("")}</ul>
+        <p><a href="/videos">Browse all published reviews</a></p>
+      </nav>` : ""}
       <a class="source-link" href="${escapeHtml(video.source_page_url || video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open original source ↗</a>
     </article>
     ${reviewImage ? `<figure class="watch-review-art glass-panel" aria-label="Review image">
