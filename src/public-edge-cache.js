@@ -6,6 +6,10 @@ const EDGE_SECONDS = 300;
 const MAX_SNAPSHOT_SECONDS = 24 * 60 * 60;
 const MAX_BODY_BYTES = 1_500_000;
 const flights = new Map();
+const SAFE_HEADERS = [
+  "Content-Security-Policy", "Referrer-Policy", "Permissions-Policy",
+  "X-Frame-Options", "Cross-Origin-Opener-Policy", "X-Robots-Tag",
+];
 
 function policyFor(request) {
   if (request.method !== "GET" || request.headers.has("Authorization")) return null;
@@ -105,6 +109,9 @@ function fromSnapshot(saved) {
     "Cache-Control": "public, max-age=" + EDGE_SECONDS,
     "X-Content-Type-Options": "nosniff",
   });
+  for (const name of SAFE_HEADERS) {
+    if (saved.headers?.[name]) headers.set(name, saved.headers[name]);
+  }
   if (saved.robots) headers.set("X-Robots-Tag", saved.robots);
   return new Response(saved.body, { status: 200, headers });
 }
@@ -131,6 +138,7 @@ async function persist(env, ctx, policy, cacheKey, response, body, type, robots,
       await env.BUCKET.put(key, JSON.stringify({
         version: CACHE_VERSION, canonical: policy.canonical, timestamp: Date.now(),
         type, robots, body,
+        headers: Object.fromEntries(SAFE_HEADERS.map((name) => [name, response.headers.get(name) || ""])),
       }), { httpMetadata: { contentType: "application/json" } });
     })());
   }
