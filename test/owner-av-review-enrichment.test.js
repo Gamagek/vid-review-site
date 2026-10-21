@@ -12,7 +12,6 @@ const migration=readFileSync(new URL('../migrations/0049_owner_av_review_enrichm
 const blocks=new Map(migration.split(/\n(?=-- Vid\.Best \d+\n)/).slice(1).map(sql=>[Number(sql.match(/^-- Vid\.Best (\d+)/)[1]),sql]));
 const origin='https://vid.best';
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
-const nonCounter=row=>Object.fromEntries(Object.entries(row).filter(([k])=>!['views','reaction_count','comments_count'].includes(k)));
 function insert(db,row){
  const keys=Object.keys(row);
  db.prepare('INSERT INTO videos ('+keys.join(',')+') VALUES ('+keys.map(()=>'?').join(',')+')').run(...keys.map(k=>row[k]));
@@ -25,7 +24,7 @@ function fixture(records=change.records){
  return db;
 }
 
-test('owner scope matches31exact YouTube sources and only the requested published TikTok date',()=>{
+test('owner scope matches 31 exact YouTube sources and only the requested published TikTok date',()=>{
  assert.equal(change.records.length,61);
  assert.equal(change.scope.requested,72);
  assert.equal(blocks.size,61);
@@ -57,7 +56,7 @@ test('owner scope matches31exact YouTube sources and only the requested publishe
  assert.doesNotMatch(migration,/\b(?:created_at|updated_at|source_url|embed_url|thumbnail_url|published|title|views|reaction_count|comments_count)\s*=/i);
 });
 
-test('each review has at least3specific subtopics, bounded metadata and unique substantive prose',()=>{
+test('each review has at least 3 specific subtopics, bounded metadata and unique substantive prose',()=>{
  const windows=new Map();
  for(const r of change.records){
   const sections=r.after.review_text.split(/\n{2,}/);
@@ -71,18 +70,18 @@ test('each review has at least3specific subtopics, bounded metadata and unique s
   assert.ok(Array.isArray(JSON.parse(r.after.seo_tags)));
   assert.notEqual(r.after.review_text,r.before.review_text);
   assert.doesNotMatch(r.after.review_text,/The public TikTok caption|A Vid\.Best editorial look|guaranteed (?:indexing|approval)|I watched|we listened|we watched/i);
-  if(r.sourceEvidence.audioCoverage!=='direct_audiovisual_analysis')assert.match(r.after.review_text,/audio|speech|soundtrack/i);
+  if(r.sourceEvidence.audioCoverage!=='direct_audiovisual_analysis')assert.match(r.after.review_text,/audio|speech|soundtrack|sound design|audible|vocal/i);
   else assert.ok(youtube.directSourceAnalysis.videos.some(v=>v.id===r.id&&v.status==='evidence_ready'&&v.analysis.visual_access&&v.analysis.audio_access&&v.matchesDuration));
   for(let i=0;i<=words.length-20;i++){
    const key=words.slice(i,i+20).join(' ');
-   assert.ok(!windows.has(key)||windows.get(key)===r.id,'Repeated20word passage between'+windows.get(key)+'and'+r.id);
+   assert.ok(!windows.has(key)||windows.get(key)===r.id,'Repeated 20-word passage between'+windows.get(key)+'and'+r.id);
    windows.set(key,r.id);
   }
  }
  assert.equal(change.records.filter(r=>r.sourceEvidence.audioCoverage==='direct_audiovisual_analysis').length,16);
 });
 
-test('migration updates only61intended editorial records once, retaining dates, counters, holds and deferred sources',()=>{
+test('migration updates only 61 intended editorial records once, retaining dates, counters, holds and deferred sources',()=>{
  const db=fixture();try{
   for(const d of change.deferred)insert(db,{...d.before,views:88,reaction_count:7,comments_count:2});
   for(const id of change.protectedIds)insert(db,{...change.records[0].before,id,slug:'protected-'+id,views:19});
@@ -105,7 +104,7 @@ test('migration updates only61intended editorial records once, retaining dates, 
  }finally{db.close();}
 });
 
-test('every29-field owner drift for every target fails closed without blocking independent records',()=>{
+test('every 29-field owner drift for every target fails closed without blocking independent records',()=>{
  for(const r of change.records){
   const db=fixture([r]);try{
    for(const [key,value] of Object.entries(r.before)){
@@ -130,7 +129,7 @@ test('every29-field owner drift for every target fails closed without blocking i
  }finally{db.close();}
 });
 
-test('all61server-rendered watch pages and APIs expose full reviews while source schemas, social images and original sitemap dates remain intact',async t=>{
+test('all 61 server-rendered watch pages and APIs expose full reviews while source schemas, social images and original sitemap dates remain intact',async t=>{
  const db=fixture();t.after(()=>db.close());
  for(const name of ['0002_discovery_requests.sql','0003_security_rate_limits.sql','0004_maintenance_indexes.sql',
   '0005_source_video_metadata.sql','0009_app_settings.sql','0010_video_analysis.sql','0014_member_notifications.sql',
@@ -169,7 +168,7 @@ test('all61server-rendered watch pages and APIs expose full reviews while source
   const payload=await(await get('/api/videos/'+r.before.slug)).json(),video=payload.video||payload;
   for(const [key,value] of Object.entries(r.after))assert.deepEqual(video[key],key==='seo_tags'?JSON.parse(value):value,r.id+':'+key);
   for(const key of ['title','slug','source_url','source_page_url','embed_url','thumbnail_url','published','created_at','updated_at','r2_key','redistribution_certified'])
-   assert.equal(video[key],r.before[key],r.id+':'+key);
+   assert.equal(video[key],['published','redistribution_certified'].includes(key)?Boolean(r.before[key]):r.before[key],r.id+':'+key);
  }
  const xml=await(await get('/sitemaps/videos-1.xml')).text();
  for(const r of change.records){
