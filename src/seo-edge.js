@@ -449,6 +449,8 @@ async function splitImageSitemapPage(env, page, kind) {
     const canonical = `${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}`;
     return `<url><loc>${escapeXml(canonical)}</loc><image:image><image:loc>${escapeXml(imageUrl)}</image:loc></image:image></url>`;
   }).join("");
+  // Keep empty guessed sitemap segments out of the crawl inventory.
+  if (!entries) return new Response("No images in this sitemap segment", { status: 404 });
   const xml = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${entries}</urlset>`;
   return new Response(xml, { headers: standardHeaders("application/xml; charset=utf-8", "public, max-age=900") });
 }
