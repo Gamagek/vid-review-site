@@ -730,7 +730,8 @@ test("category pagination is crawlable, page-canonical, and preserves publicatio
   assert.match(secondHtml, /"position":31/);
   assert.match(secondHtml, /Page 2 of 2/);
   assert.doesNotMatch(secondHtml, /rel="next"/);
-  assert.equal((secondHtml.match(/class="video-tile glass-panel"/g) || []).length, 5);
+  const totalTechnology = context.sqlite.prepare("SELECT COUNT(*) AS total FROM videos WHERE published = 1 AND primary_category = ?").get("Technology").total;
+  assert.equal((secondHtml.match(/class="video-tile glass-panel"/g) || []).length, totalTechnology - 30);
 
   const beyond = await request(context, "https://vid.best/category/technology?page=99999");
   assert.equal(beyond.status, 404);
