@@ -25,6 +25,7 @@ const migrations = [
   "0020_member_personalization.sql",
   "0022_facebook_readable_slugs.sql",
   "0030_facebook_preview_jobs.sql",
+  "0050_five_comedy_review_refresh.sql",
 ];
 
 class TestD1Statement {
@@ -141,6 +142,83 @@ async function login(context) {
     headers: { Authorization: `Bearer ${secret}`, "CF-Connecting-IP": "192.0.2.1" },
   });
 }
+
+test("refreshes five comedy reviews while preserving their original dates and slugs", async () => {
+  const context = createTestContext();
+  const rows = [
+    {
+      slug: "whipped-cream-sneeze-barber-takeover-and-diy-gags",
+      title: "Whipped Cream Sneeze, Barber Takeover and DIY Gags",
+      source_url: "https://www.youtube.com/shorts/PCLXcrXkszI",
+      embed_url: "https://www.youtube.com/embed/PCLXcrXkszI",
+      created_at: "2026-10-19T18:29:27.410Z",
+    },
+    {
+      slug: "kitchen-singer-banana-tricks-and-ice-cream-face-prank",
+      title: "Kitchen Singer, Banana Tricks and Ice Cream Face Prank",
+      source_url: "https://www.youtube.com/shorts/I6fejmn7RJU",
+      embed_url: "https://www.youtube.com/embed/I6fejmn7RJU",
+      created_at: "2026-10-19T18:32:38.766Z",
+    },
+    {
+      slug: "milkshake-beard-dentist-joke-and-food-teasing",
+      title: "Milkshake Beard, Dentist Joke and Food Teasing",
+      source_url: "https://www.youtube.com/shorts/5f0Nr5Aaz_U",
+      embed_url: "https://www.youtube.com/embed/5f0Nr5Aaz_U",
+      created_at: "2026-10-19T18:29:28.509Z",
+    },
+    {
+      slug: "kitchen-dance-carton-splash-and-eye-drop-joke",
+      title: "Kitchen Dance, Carton Splash and Eye Drop Joke",
+      source_url: "https://www.youtube.com/shorts/nSJquJ0OPVc",
+      embed_url: "https://www.youtube.com/embed/nSJquJ0OPVc",
+      created_at: "2026-10-19T18:32:34.566Z",
+    },
+    {
+      slug: "soda-mop-prank-drink-spill-and-barber-surprise",
+      title: "Soda Mop Prank, Drink Spill and Barber Surprise",
+      source_url: "https://www.youtube.com/shorts/7P7ZTnnEEc4",
+      embed_url: "https://www.youtube.com/embed/7P7ZTnnEEc4",
+      created_at: "2026-10-19T18:29:27.788Z",
+    },
+  ];
+  const insert = context.sqlite.prepare(
+    `INSERT INTO videos (
+       slug, title, source_url, embed_url, media_type, primary_category, subcategory,
+       description, review_text, seo_title, seo_description, seo_tags, published,
+       created_at, updated_at
+     ) VALUES (?, ?, ?, ?, 'youtube', 'Funny & Comedy', 'Pranks',
+       'Old description', 'Old review', 'Old SEO title', 'Old SEO description', '[]', 1, ?, ?)`,
+  );
+  for (const row of rows) {
+    insert.run(
+      row.slug, row.title, row.source_url, row.embed_url, row.created_at, row.created_at,
+    );
+  }
+
+  const before = context.sqlite.prepare(
+    "SELECT slug, source_url, created_at, updated_at FROM videos ORDER BY slug",
+  ).all();
+  context.sqlite.exec(readFileSync(new URL("../migrations/0050_five_comedy_review_refresh.sql", import.meta.url), "utf8"));
+  const after = context.sqlite.prepare(
+    "SELECT slug, source_url, created_at, updated_at, description, review_text, seo_title, seo_description, seo_tags FROM videos ORDER BY slug",
+  ).all();
+
+  assert.equal(after.length, 5);
+  assert.deepEqual(
+    after.map(({ slug, source_url, created_at, updated_at }) => ({ slug, source_url, created_at, updated_at })),
+    before,
+  );
+  for (const row of after) {
+    assert.notEqual(row.description, "Old description");
+    assert.notEqual(row.review_text, "Old review");
+    assert.ok(row.review_text.match(/(?:^|\\n)\\d+\\./g)?.length >= 6, row.slug);
+    assert.ok(row.seo_title.length > 15 && row.seo_description.length > 80, row.slug);
+    const tags = JSON.parse(row.seo_tags);
+    assert.ok(tags.length >= 8, row.slug);
+    assert.equal(new Set(tags).size, tags.length, row.slug);
+  }
+});
 
 test("returns a clear configuration error when member email delivery is unavailable", async () => {
   const context = createTestContext();
