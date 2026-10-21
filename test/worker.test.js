@@ -212,7 +212,7 @@ test("refreshes five comedy reviews while preserving their original dates and sl
   for (const row of after) {
     assert.notEqual(row.description, "Old description");
     assert.notEqual(row.review_text, "Old review");
-    assert.ok(row.review_text.match(/(?:^|\\n)\\d+\\./g)?.length >= 6, row.slug);
+    assert.ok(row.review_text.match(/(?:^|\n)\d+\./g)?.length >= 6, row.slug);
     assert.ok(row.seo_title.length > 15 && row.seo_description.length > 80, row.slug);
     const tags = JSON.parse(row.seo_tags);
     assert.ok(tags.length >= 8, row.slug);
