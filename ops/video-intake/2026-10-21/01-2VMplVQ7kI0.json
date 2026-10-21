@@ -3,7 +3,7 @@
   "intake_sequence": 1,
   "intended_new_items": 38,
   "publication_date_sri_lanka": "2026-10-21",
-  "stage": "prepared_not_published",
+  "stage": "draft_on_hold",
   "prerequisite": "D1 quota reset plus backup, unique video-id/URL/slug check and baseline count verification",
   "original_user_evidence": {
     "video_id": "2VMplVQ7kI0",
@@ -51,7 +51,7 @@
     ],
     "featured": false,
     "trending": false,
-    "published": true
+    "published": false
   },
   "thumbnail_plan": {
     "use_verified_thumbnail_only": true,
@@ -67,5 +67,12 @@
     "preserve_original_publication_date_of_all_existing_records": true,
     "article_date_only_until_publish": "2026-10-21",
     "do_not_claim_creator_or_reaction_panel_identities_verified": true
+  },
+  "publishing_hold": {
+    "enabled": true,
+    "require_explicit_user_release": true,
+    "db_insert_allowed": false,
+    "reason": "Owner explicitly requested all six new videos remain drafts until they say to publish.",
+    "publication_date_note": "2026-10-21 was the originally requested publication date, not evidence of actual publication."
   }
 }
