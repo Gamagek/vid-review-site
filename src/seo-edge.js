@@ -349,7 +349,7 @@ async function combinedSitemap(env) {
   // Google does not support sitemap indexes nested inside another index.
   // Use split editorial/source sitemaps as the primary discovery index.
   // Keep /image-sitemap.xml and /sitemaps/images-N.xml working for existing GSC submissions.
-  const imagesEntry = distinctImageSitemapEntries(Number(row?.total || 0));
+  const imagesEntry = await distinctImageSitemapEntries(env);
 
   const editorialEntry = `<sitemap><loc>${CANONICAL_ORIGIN}/sitemaps/daily-weekly-best.xml</loc></sitemap>`;
   const body = `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${pagesEntry}${videoSitemaps}${imagesEntry}${categoryEntry}${editorialEntry}</sitemapindex>`;
@@ -362,12 +362,30 @@ async function combinedSitemap(env) {
 // Independently inspectable, topic-specific image catalogs.
 // A canonical review URL may appear in each catalog only for an image it actually displays.
 // The original combined image sitemap stays live for backward compatibility.
-function distinctImageSitemapEntries(total) {
-  const pages = Math.max(1, Math.ceil(total / IMAGES_PER_SITEMAP));
-  const sources = ["editorial", "source"];
-  return sources.flatMap(kind => Array.from({ length: pages }, (_, index) =>
-    `<sitemap><loc>${escapeXml(`${CANONICAL_ORIGIN}/sitemaps/images-${kind}-${index + 1}.xml`)}</loc></sitemap>`
-  )).join("");
+async function splitImageSitemapPages(env) {
+  // Inspect the exact published items in each 500-video sitemap segment.
+  // Some segments contain no registered editorial art (or no valid source poster).
+  // Never advertise such empty child XML files to Googlebot or the SEO audit.
+  const result = await env.DB.prepare(
+    `SELECT id,slug,title,published,media_type,source_url,thumbnail_url
+     FROM videos WHERE published=1 ORDER BY id ASC`,
+  ).all();
+  const pages = { editorial: new Set(), source: new Set() };
+  (result.results || []).forEach((row, index) => {
+    const page = Math.floor(index / IMAGES_PER_SITEMAP) + 1;
+    if (reviewIllustration(row)) pages.editorial.add(page);
+    if (crawlableImageUrl(row)) pages.source.add(page);
+  });
+  return pages;
+}
+
+async function distinctImageSitemapEntries(env) {
+  const pages = await splitImageSitemapPages(env);
+  return ["editorial", "source"].flatMap(kind =>
+    [...pages[kind]].sort((a, b) => a - b).map(page =>
+      `<sitemap><loc>${escapeXml(`${CANONICAL_ORIGIN}/sitemaps/images-${kind}-${page}.xml`)}</loc></sitemap>`
+    )
+  ).join("");
 }
 
 // Separate image sitemap for externally embedded and owner-created review posters.
@@ -380,10 +398,9 @@ function imageSitemapEntries(total) {
   ).join("");
 }
 async function splitImageSitemapIndex(env, kind) {
-  const row = await env.DB.prepare("SELECT COUNT(*) AS total FROM videos WHERE published = 1").first();
-  const pages = Math.max(1, Math.ceil(Number(row?.total || 0) / IMAGES_PER_SITEMAP));
-  const entries = Array.from({ length: pages }, (_, index) =>
-    `<sitemap><loc>${escapeXml(`${CANONICAL_ORIGIN}/sitemaps/images-${kind}-${index + 1}.xml`)}</loc></sitemap>`
+  const pages = await splitImageSitemapPages(env);
+  const entries = [...(pages[kind] || [])].sort((a, b) => a - b).map(page =>
+    `<sitemap><loc>${escapeXml(`${CANONICAL_ORIGIN}/sitemaps/images-${kind}-${page}.xml`)}</loc></sitemap>`
   ).join("");
   return new Response(
     `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries}</sitemapindex>`,
@@ -432,6 +449,8 @@ async function splitImageSitemapPage(env, page, kind) {
     const canonical = `${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}`;
     return `<url><loc>${escapeXml(canonical)}</loc><image:image><image:loc>${escapeXml(imageUrl)}</image:loc></image:image></url>`;
   }).join("");
+  // Keep empty guessed sitemap segments out of the crawl inventory.
+  if (!entries) return new Response("No images in this sitemap segment", { status: 404 });
   const xml = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${entries}</urlset>`;
   return new Response(xml, { headers: standardHeaders("application/xml; charset=utf-8", "public, max-age=900") });
 }

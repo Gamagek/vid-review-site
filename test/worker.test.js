@@ -2835,3 +2835,47 @@ test("crawlable related-review links appear for editable videos, not protected o
   assert.equal(protectedVideo.status, 200);
   assert.doesNotMatch(await protectedVideo.text(), /related-reviews/);
 });
+
+
+test("root and type-specific image indexes omit an empty final editorial image page", async () => {
+  const context = createTestContext();
+  const insert = context.sqlite.prepare(
+    "INSERT INTO videos (id,slug,title,source_url,media_type,primary_category," +
+    "subcategory,description,thumbnail_url,published) " +
+    "VALUES (?,?,?,?,'youtube','Music','Music Videos',?,?,1)",
+  );
+  for (let id = 1; id <= 500; id++) {
+    const artwork = id === 4;
+    insert.run(id, artwork ? "sadahatama-oba-mage-theme-song" : "video-" + id,
+      artwork ? "Sadahatama Oba Mage Theme Song (සදහටම ඔබ මගේ තේමා ගීතය)" : "Test video " + id,
+      artwork ? "https://youtu.be/Poa3bl3TJaU" : "https://www.youtube.com/watch?v=example" + id,
+      "Review description", artwork ? "https://i.ytimg.com/vi/Poa3bl3TJaU/hqdefault.jpg" : null);
+  }
+  insert.run(511, "jurassic-attack-2013-english-film-review",
+    "Jurassic Attack (2013) — English Dinosaur Survival Film Review",
+    "https://www.youtube.com/watch?v=LDIvjmxDJuc",
+    "Jurassic movie review", "https://i.ytimg.com/vi/LDIvjmxDJuc/hqdefault.jpg");
+
+  const root = await seoEdge.fetch(
+    new Request("https://vid.best/sitemap.xml"), context.env, context.ctx,
+  );
+  assert.equal(root.status, 200);
+  const xml = await root.text();
+  assert.match(xml, /sitemaps\/images-editorial-1\.xml/);
+  assert.doesNotMatch(xml, /sitemaps\/images-editorial-2\.xml/);
+  assert.match(xml, /sitemaps\/images-source-2\.xml/);
+  assert.match(xml, /sitemaps\/videos-1\.xml/);
+
+  const editorialIndex = await seoEdge.fetch(
+    new Request("https://vid.best/image-editorial-sitemap.xml"), context.env, context.ctx,
+  );
+  const indexXml = await editorialIndex.text();
+  assert.match(indexXml, /sitemaps\/images-editorial-1\.xml/);
+  assert.doesNotMatch(indexXml, /sitemaps\/images-editorial-2\.xml/);
+
+  const nonexistent = await seoEdge.fetch(
+    new Request("https://vid.best/sitemaps/images-editorial-2.xml"), context.env, context.ctx,
+  );
+  assert.equal(nonexistent.status, 404);
+  assert.match(await nonexistent.text(), /No images/);
+});
