@@ -8,6 +8,7 @@ import { dailyWeeklyBestResponse, dailyWeeklyBestSitemap } from "./daily-weekly-
 const CANONICAL_ORIGIN = "https://vid.best";
 const LEGACY_HOSTS = new Set(["home.vid.best", "www.vid.best"]);
 const MIN_INDEXABLE_CATEGORY_VIDEOS = 3;
+const CATEGORY_PAGE_SIZE = 30;
 const CATEGORY_DESCRIPTIONS = Object.freeze({
   "Entertainment, Movies & Games": "Explore movie trailers, film reviews, gameplay, esports, animation and pop culture video discoveries.",
   "Lifestyle, Health & Fitness": "Explore practical videos about fitness, food habits, mindfulness, daily life, fashion and healthy living.",
@@ -131,15 +132,15 @@ async function categoryStats(env) {
   return result.results || [];
 }
 
-async function categoryRows(env, category) {
+async function categoryRows(env, category, page = 1) {
   const result = await env.DB.prepare(
     `SELECT v.id, v.slug, v.title, v.description, v.review_text, v.thumbnail_url,
             v.subcategory, v.views, v.created_at, v.updated_at, v.source_url, v.media_type
      FROM videos v
      WHERE v.published = 1 AND v.primary_category = ?
-     ORDER BY v.featured DESC, v.trending DESC, v.reaction_count DESC, v.updated_at DESC, v.id DESC
-     LIMIT 30`,
-  ).bind(category).all();
+     ORDER BY v.created_at DESC, v.id DESC
+     LIMIT ? OFFSET ?`,
+  ).bind(category, CATEGORY_PAGE_SIZE, (page - 1) * CATEGORY_PAGE_SIZE).all();
   return result.results || [];
 }
 
@@ -151,7 +152,7 @@ function categoryCard(row) {
   const image = thumb
     ? `<img src="${escapeHtml(thumb)}" alt="${escapeHtml(row.title)} thumbnail" loading="lazy" decoding="async" width="640" height="360">`
     : `<span class="media-fallback" aria-hidden="true">▶</span>`;
-  const dateValue = row.updated_at || row.created_at || "";
+  const dateValue = row.created_at || "";
   let dateText = "";
   try {
     dateText = dateValue ? new Date(dateValue).toISOString().slice(0, 10) : "";
@@ -187,13 +188,15 @@ function publicThumbnail(row) {
   try { return new URL(value, CANONICAL_ORIGIN).href; } catch { return ""; }
 }
 
-function categoryPage(category, rows, total) {
-  const canonical = categoryUrl(category);
-  const description = `${CATEGORY_DESCRIPTIONS[category]} ${total.toLocaleString()} published review${total === 1 ? "" : "s"} are currently in this topic.`;
+function categoryPage(category, rows, total, page = 1) {
+  const categoryCanonical = categoryUrl(category);
+  const canonical = page === 1 ? categoryCanonical : `${categoryCanonical}?page=${page}`;
+  const pageSuffix = page === 1 ? "" : ` — Page ${page}`;
+  const description = `${CATEGORY_DESCRIPTIONS[category]} ${total.toLocaleString()} published review${total === 1 ? "" : "s"} are currently in this topic.${page > 1 ? ` Browse page ${page}.` : ""}`;
   const firstThumb = publicThumbnail(rows.find((row) => publicThumbnail(row)) || {});
   const itemList = rows.map((row, index) => ({
     "@type": "ListItem",
-    position: index + 1,
+    position: (page - 1) * CATEGORY_PAGE_SIZE + index + 1,
     name: row.title,
     url: `${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}`
   }));
@@ -213,7 +216,7 @@ function categoryPage(category, rows, total) {
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: CANONICAL_ORIGIN + "/" },
-          { "@type": "ListItem", position: 2, name: category, item: canonical }
+          { "@type": "ListItem", position: 2, name: category, item: categoryCanonical }
         ]
       },
       {
@@ -230,24 +233,28 @@ function categoryPage(category, rows, total) {
     .map((name) => `<a class="button ghost" href="${escapeHtml(categoryUrl(name))}">${escapeHtml(name)}</a>`)
     .join("");
   const cards = rows.map(categoryCard).join("");
+  const pageCount = Math.ceil(total / CATEGORY_PAGE_SIZE);
+  const pagination = pageCount > 1
+    ? `<nav aria-label="Category review pages">${page > 1 ? `<a rel="prev" href="${escapeHtml(page === 2 ? categoryCanonical : `${categoryCanonical}?page=${page - 1}`)}">Previous reviews</a> · ` : ""}<span>Page ${page} of ${pageCount}</span>${page < pageCount ? ` · <a rel="next" href="${escapeHtml(`${categoryCanonical}?page=${page + 1}`)}">More reviews</a>` : ""}</nav>`
+    : "";
 
   return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>${escapeHtml(category)} Video Reviews &amp; Discoveries | Vid.Best</title>
+  <title>${escapeHtml(category)} Video Reviews &amp; Discoveries${escapeHtml(pageSuffix)} | Vid.Best</title>
   <meta name="description" content="${escapeHtml(description.slice(0, 175))}">
   <meta name="robots" content="${noindex ? "noindex,follow" : "index,follow,max-image-preview:large,max-video-preview:-1,max-snippet:-1"}">
   <link rel="canonical" href="${escapeHtml(canonical)}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Vid.Best">
-  <meta property="og:title" content="${escapeHtml(category)} Video Reviews &amp; Discoveries | Vid.Best">
+  <meta property="og:title" content="${escapeHtml(category)} Video Reviews &amp; Discoveries${escapeHtml(pageSuffix)} | Vid.Best">
   <meta property="og:description" content="${escapeHtml(description.slice(0, 175))}">
   <meta property="og:url" content="${escapeHtml(canonical)}">
   ${firstThumb ? `<meta property="og:image" content="${escapeHtml(firstThumb)}">` : ""}
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="${escapeHtml(category)} Video Reviews &amp; Discoveries | Vid.Best">
+  <meta name="twitter:title" content="${escapeHtml(category)} Video Reviews &amp; Discoveries${escapeHtml(pageSuffix)} | Vid.Best">
   <meta name="twitter:description" content="${escapeHtml(description.slice(0, 175))}">
   ${firstThumb ? `<meta name="twitter:image" content="${escapeHtml(firstThumb)}">` : ""}
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -270,6 +277,7 @@ function categoryPage(category, rows, total) {
     <section class="comments-panel glass-panel" aria-labelledby="category-videos-heading">
       <div class="related-heading"><div><p class="eyebrow">Latest topic discoveries</p><h2 id="category-videos-heading">Videos in ${escapeHtml(category)}</h2></div></div>
       <div class="video-grid">${cards}</div>
+      ${pagination}
     </section>
     <nav class="related-panel glass-panel" aria-label="Other Vid.Best categories">
       <div class="related-heading"><div><p class="eyebrow">Continue exploring</p><h2>More topics</h2></div></div>
@@ -286,6 +294,13 @@ function categoryPage(category, rows, total) {
 }
 
 async function handleCategory(request, env, category) {
+  const url = new URL(request.url);
+  const rawPage = url.searchParams.get("page") || "1";
+  if (!/^[1-9]\d{0,4}$/.test(rawPage)) {
+    return htmlResponse('<meta name="robots" content="noindex"><h1>Category page not found</h1>', 404, "noindex,follow");
+  }
+  const page = Number(rawPage);
+  if (url.searchParams.has("page") && page === 1) return Response.redirect(categoryUrl(category), 301);
   const countRow = await env.DB.prepare(
     "SELECT COUNT(*) AS total FROM videos WHERE published = 1 AND primary_category = ?",
   ).bind(category).first();
@@ -299,9 +314,12 @@ async function handleCategory(request, env, category) {
     );
   }
 
-  const rows = await categoryRows(env, category);
+  if (page > Math.ceil(total / CATEGORY_PAGE_SIZE)) {
+    return htmlResponse('<meta name="robots" content="noindex"><h1>Category page not found</h1>', 404, "noindex,follow");
+  }
+  const rows = await categoryRows(env, category, page);
   return htmlResponse(
-    categoryPage(category, rows, total),
+    categoryPage(category, rows, total, page),
     200,
     total < MIN_INDEXABLE_CATEGORY_VIDEOS
       ? "noindex,follow"
