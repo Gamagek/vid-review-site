@@ -48,6 +48,62 @@ const result={checkedAt:new Date().toISOString(),saved:rows.length,published:row
  selected,held,migrations:payload.result[1].results.map(x=>x.name),queryRowsRead:payload.result.map(x=>x.meta?.rows_read??null),
  queryRowsWritten:payload.result.map(x=>x.meta?.rows_written??0),productionWrites:0,r2Writes:0,imageWrites:0};
 assert.ok(result.queryRowsWritten.every(x=>x===0));
+
+const changeURL=new URL('../content/editorial-quality/2026-10-21-owner-av-reviews.json',import.meta.url);
+if(fs.existsSync(changeURL)){
+ const change=JSON.parse(fs.readFileSync(changeURL,'utf8'));
+ const same=(row,expected)=>row&&fields.every(k=>row[k]===expected[k]);
+ const states=change.records.map(r=>{
+  const row=stable.find(v=>v.id===r.id);
+  return {id:r.id,state:same(row,{...r.before,...r.after})?'after':same(row,r.before)?'before':'conflict'};
+ });
+ const baselineIds=new Set(change.baseline.allBaselineIds);
+ const protectedHash=hash(stable.filter(r=>baselineIds.has(r.id)&&!ids.has(r.id)));
+ result.enrichment={states,before:states.filter(x=>x.state==='before').length,after:states.filter(x=>x.state==='after').length,
+  conflicts:states.filter(x=>x.state==='conflict').map(x=>x.id),unaffectedBaselineMatch:protectedHash===change.baseline.unaffectedNonCounterSha256,
+  additionalOwnerIds:stable.filter(r=>!baselineIds.has(r.id)).map(r=>r.id),deferred:change.deferred.map(r=>({id:r.id,unchanged:same(stable.find(v=>v.id===r.id),r.before),reason:r.reason})),publicChecks:[]};
+ assert.equal(result.enrichment.conflicts.length,0,'Concurrent owner edits in targeted records; do not publish stale preimages');
+ assert.ok(result.enrichment.unaffectedBaselineMatch,'Unrelated baseline changed; reconcile owner work before release verification');
+ const targets=result.enrichment.after===change.records.length?change.records:change.records.filter((r,i)=>i===0||r.id===394);
+ const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
+ let next=0;
+ async function publicCheck(){
+  while(next<targets.length){
+   const record=targets[next++],state=states.find(x=>x.id===record.id).state;
+   const expected=state==='after'?{...record.before,...record.after}:record.before;
+   const url='https://vid.best/watch/'+record.before.slug;
+   const response=await fetch(url,{headers:{'User-Agent':'VidBest-SEO-Audit/1.0 (owner-requested review verification)','Cache-Control':'no-cache'},signal:AbortSignal.timeout(30000)});
+   const html=await response.text();
+   const graphText=html.match(/<script\b[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/s)?.[1];
+   let graph=[];try{graph=JSON.parse(graphText)['@graph']||[];}catch{}
+   const page=graph.find(x=>x['@type']==='WebPage');
+   const sourceId=yt(record.before.source_url);
+   const check={id:record.id,url,state,http:response.status,
+    canonical:html.includes('<link rel="canonical" href="'+url+'">'),
+    description:html.includes(escape(expected.description)),seoDescription:html.includes(escape(expected.seo_description)),
+    review:expected.review_text.split(/\n{2,}/).every(p=>html.includes(escape(p))),
+    sourceIdentity:sourceId?html.includes(sourceId):html.includes(record.before.source_url.split('/').at(-1)),
+    dates:page?.datePublished===record.before.created_at&&page?.dateModified===record.before.updated_at};
+   result.enrichment.publicChecks.push(check);
+   assert.equal(check.http,200,'Watch HTTP status for '+record.id);
+   for(const k of ['canonical','description','seoDescription','review','sourceIdentity','dates'])assert.ok(check[k],'Public watch '+k+' mismatch for '+record.id);
+  }
+ }
+ await Promise.all(Array.from({length:Math.min(3,targets.length)},publicCheck));
+ result.enrichment.publicChecks.sort((a,b)=>a.id-b.id);
+}
+try{
+ const deploymentResponse=await fetch('https://api.cloudflare.com/client/v4/accounts/'+account+'/workers/scripts/vid-review-site/deployments',{
+  headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(30000)});
+ if(!deploymentResponse.ok){result.workerDeployment={http:deploymentResponse.status,verified:false};}
+ else{
+  const value=await deploymentResponse.json(),deployments=value.result?.deployments||value.result||[];
+  const latest=Array.isArray(deployments)?deployments[0]:null;
+  result.workerDeployment={verified:!!latest,http:deploymentResponse.status,id:latest?.id,created_on:latest?.created_on,source:latest?.source,
+   strategy:latest?.strategy,versions:latest?.versions?.map(v=>({version_id:v.version_id,percentage:v.percentage}))};
+ }
+}catch(error){result.workerDeployment={verified:false,error:error.name};}
+
 fs.writeFileSync('owner-review-baseline.json',JSON.stringify(result,null,2)+'\n');
 const encoded=Buffer.from(JSON.stringify(result)).toString('base64'),size=5000,n=Math.ceil(encoded.length/size);
 for(let i=0;i<n;i++)console.log('VIDBEST_BASELINE_CHUNK '+(i+1)+'/'+n+' '+encoded.slice(i*size,(i+1)*size));

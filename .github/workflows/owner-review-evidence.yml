@@ -37,7 +37,8 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
   audiovisual:
-    if: github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.head_ref, 'editorial/av-reviews-20261020')
+    # Reopening for publication verification must never repeat provider analysis.
+    if: github.event.action == 'opened' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'editorial/av-reviews-20261020'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
