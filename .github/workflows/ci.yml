@@ -31,6 +31,9 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Capture reserved publisher previews without modifying originals
+        if: github.event_name == 'pull_request' && github.event.pull_request.number == 255
+        run: node scripts/capture-review-source-images.mjs --emit-transfer
       - name: Validate production Docker Compose without starting services
         run: docker compose -f ops/portainer/vidbest-v56.yaml config --quiet
         env:
