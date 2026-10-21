@@ -91,9 +91,11 @@ export async function verifyMemberLogin(request, env) {
 }
 
 export async function getCurrentMember(request, env) {
-  await assertMemberSchema(env);
+  // Most visitors have no account cookie. Avoid querying sqlite_master on every
+  // anonymous homepage/mini-feed request (and tolerate missing member migrations).
   const session = readCookie(request, MEMBER_COOKIE);
   if (!session) return null;
+  await assertMemberSchema(env);
   const hash = await sha256Hex(session);
   const row = await env.DB.prepare(
     `SELECT m.id, m.email, m.display_name, m.email_notifications, m.category_filter
