@@ -1,0 +1,19 @@
+{
+  "name": "vidbest-vidnavigator-mcp-gateway",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "node --test test/*.test.js",
+    "check": "node --check src/index.js && node --check src/security.js && npm test"
+  },
+  "dependencies": {
+    "@cloudflare/workers-oauth-provider": "1.2.3"
+  },
+  "devDependencies": {
+    "wrangler": "^4.124.0"
+  },
+  "engines": { "node": ">=22" }
+}
