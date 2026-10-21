@@ -157,3 +157,31 @@ test("server-rendered homepage SEO HTML is eligible for edge/R2 and has browser 
     assert.equal(env.BUCKET.objects.size, 1);
   } finally { globalThis.caches = previous; }
 });
+
+test("canonical HTTP and www requests bypass cache so SEO redirects remain intact", async () => {
+  const env = { BUCKET: createR2() };
+  const ctx = createContext();
+  for (const url of ["http://vid.best/", "https://www.vid.best/", "http://vid.best/api/videos"]) {
+    assert.equal(await cachedPublicResponse(new Request(url), env, ctx, publicVideos), null);
+  }
+});
+
+test("R2 replay never refreshes the snapshot timestamp, allowing D1 refresh after five minutes", async () => {
+  const previous = globalThis.caches;
+  globalThis.caches = { default: createCache() };
+  try {
+    const ctx = createContext(), env = { BUCKET: createR2() };
+    const request = new Request("https://vid.best/api/videos?limit=18&sort=popular");
+    await cachedPublicResponse(request, env, ctx, publicVideos);
+    await ctx.flush();
+    const [[key, value]] = [...env.BUCKET.objects.entries()];
+    const oldSnapshot = JSON.parse(value);
+    oldSnapshot.timestamp -= 90_000;
+    env.BUCKET.objects.set(key, JSON.stringify(oldSnapshot));
+    globalThis.caches = { default: createCache() };
+    const freshFromR2 = await cachedPublicResponse(request, env, ctx, () => { throw Error("D1 must not be called"); });
+    assert.equal(freshFromR2.headers.get("X-VidBest-Edge-Cache"), "R2-FRESH");
+    await ctx.flush();
+    assert.equal(JSON.parse(env.BUCKET.objects.get(key)).timestamp, oldSnapshot.timestamp);
+  } finally { globalThis.caches = previous; }
+});
