@@ -1,0 +1,38 @@
+name: Deploy VidNavigator MCP Gateway
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-vidnavigator-mcp-gateway
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy independent OAuth MCP Worker
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: integrations/vidnavigator-mcp-gateway
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install gateway dependencies
+        run: npm install --no-audit --no-fund
+      - name: Run gateway security checks
+        run: npm run check
+      - name: Validate deployment configuration
+        run: |
+          ! grep -q 'REPLACE_WITH_OAUTH_KV_NAMESPACE_ID' wrangler.toml
+          ! grep -q 'https://REPLACE-ME.workers.dev' wrangler.toml
+      - name: Deploy only the VidNavigator gateway Worker
+        run: npx wrangler deploy --config wrangler.toml
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
