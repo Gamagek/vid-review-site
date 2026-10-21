@@ -2758,3 +2758,80 @@ test("category sitemap keeps verified lastmod dates and skips legacy SQLite time
   assert.match(xml, /<loc>https:\/\/vid\.best\/category\/music<\/loc><\/url>/);
   assert.doesNotMatch(xml, /<lastmod>2026-10-20 12:13:14<\/lastmod>/);
 });
+
+
+test("split image sitemaps keep original editorial art and YouTube thumbnails distinct", async () => {
+  const context = createTestContext();
+  const insert = context.sqlite.prepare(
+    "INSERT INTO videos (id,slug,title,source_url,embed_url,media_type,primary_category,subcategory," +
+    "description,thumbnail_url,published) VALUES (?,?,?,?,?,'youtube','Funny & Comedy','Pranks',?,?,1)",
+  );
+  insert.run(4, "sadahatama-oba-mage-theme-song",
+    "Sadahatama Oba Mage Theme Song (සදහටම ඔබ මගේ තේමා ගීතය)",
+    "https://youtu.be/Poa3bl3TJaU", "https://www.youtube.com/embed/Poa3bl3TJaU",
+    "A theme song review", "https://i.ytimg.com/vi/Poa3bl3TJaU/hqdefault.jpg");
+  insert.run(511, "jurassic-attack-2013-english-film-review",
+    "Jurassic Attack (2013) — English Dinosaur Survival Film Review",
+    "https://www.youtube.com/watch?v=LDIvjmxDJuc",
+    "https://www.youtube.com/embed/LDIvjmxDJuc",
+    "A movie review", "https://i.ytimg.com/vi/LDIvjmxDJuc/hqdefault.jpg");
+
+  const get = async (path) => {
+    const response = await seoEdge.fetch(
+      new Request("https://vid.best" + path), context.env, context.ctx,
+    );
+    assert.equal(response.status, 200, path);
+    return response.text();
+  };
+  const index = await get("/sitemap.xml");
+  assert.match(index, /sitemaps\/images-editorial-1\.xml/);
+  assert.match(index, /sitemaps\/images-source-1\.xml/);
+  assert.doesNotMatch(index, /sitemaps\/images-1\.xml/);
+
+  const editorial = await get("/sitemaps/images-editorial-1.xml");
+  assert.match(editorial, /<loc>https:\/\/vid\.best\/watch\/sadahatama-oba-mage-theme-song<\/loc>/);
+  assert.match(editorial, /<image:loc>https:\/\/vid\.best\/review-illustrations\/sadahatama-oba-mage-theme-song-v2\.webp<\/image:loc>/);
+  assert.doesNotMatch(editorial, /LDIvjmxDJuc/);
+
+  const source = await get("/sitemaps/images-source-1.xml");
+  assert.match(source, /<image:loc>https:\/\/i\.ytimg\.com\/vi\/LDIvjmxDJuc\/hqdefault\.jpg<\/image:loc>/);
+  assert.doesNotMatch(source, /review-illustrations\/sadahatama-oba-mage-theme-song-v2\.webp/);
+
+  const legacy = await get("/image-sitemap.xml");
+  assert.match(legacy, /sitemaps\/images-1\.xml/);
+});
+
+test("crawlable related-review links appear for editable videos, not protected originals", async () => {
+  const context = createTestContext();
+  const insert = context.sqlite.prepare(
+    "INSERT INTO videos (id,slug,title,source_url,embed_url,media_type,primary_category," +
+    "subcategory,description,review_text,published) " +
+    "VALUES (?,?,?,?,?,'youtube','Funny & Comedy','Pranks',?,?,1)",
+  );
+  const review = "Original review of a playful clip and its distinctive joke. ".repeat(12);
+  insert.run(4, "protected-video", "Protected original",
+    "https://www.youtube.com/watch?v=test004", "https://www.youtube.com/embed/test004",
+    "Original description", review);
+  for (const [id,slug,title] of [
+    [600,"funny-basketball-mishap","Basketball mishap comedy"],
+    [601,"kitchen-water-prank","Kitchen water prank"],
+    [602,"outdoor-comedy-fall","Outdoor comedy fall"],
+  ]) insert.run(id,slug,title,"https://www.youtube.com/watch?v=example"+id,
+      "https://www.youtube.com/embed/example"+id,"Specific "+title,review);
+
+  const editable = await send(context, "/watch/funny-basketball-mishap", {
+    headers: {"User-Agent":"Googlebot"},
+  });
+  assert.equal(editable.status, 200);
+  const html = await editable.text();
+  assert.match(html, /<nav class="related-reviews" aria-label="Related video reviews">/);
+  assert.match(html, /<a href="\/watch\/kitchen-water-prank">Kitchen water prank<\/a>/);
+  assert.match(html, /<a href="\/watch\/outdoor-comedy-fall">Outdoor comedy fall<\/a>/);
+  assert.match(html, /<a href="\/videos">Browse all published reviews<\/a>/);
+
+  const protectedVideo = await send(context, "/watch/protected-video", {
+    headers: {"User-Agent":"Googlebot"},
+  });
+  assert.equal(protectedVideo.status, 200);
+  assert.doesNotMatch(await protectedVideo.text(), /related-reviews/);
+});
