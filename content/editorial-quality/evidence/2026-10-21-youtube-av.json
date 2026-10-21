@@ -1,0 +1,492 @@
+{
+  "checkedAt": "2026-10-21T00:17:22.271Z",
+  "provider": "TwelveLabs",
+  "knowledgeStore": "ks_01a15559-eca4-7c42-93ca-5a0e68ef8e7f",
+  "sourceMappings": [
+    {
+      "vidbestId": 394,
+      "sourceId": "6iem4FnZLHg",
+      "sourceUrl": "https://www.youtube.com/shorts/6iem4FnZLHg",
+      "filter": {
+        "youtube_id": "6iem4FnZLHg"
+      },
+      "itemId": "ksi_01a1556a-8b4d-7e32-a13e-801989647b14"
+    },
+    {
+      "vidbestId": 393,
+      "sourceId": "WIovWE28BbQ",
+      "sourceUrl": "https://www.youtube.com/shorts/WIovWE28BbQ",
+      "filter": {
+        "youtube_id": "WIovWE28BbQ"
+      },
+      "itemId": "ksi_01a1556a-abde-7eb1-a745-8d6541752c51"
+    },
+    {
+      "vidbestId": 392,
+      "sourceId": "I6fejmn7RJU",
+      "sourceUrl": "https://www.youtube.com/shorts/I6fejmn7RJU",
+      "filter": {
+        "youtube_id": "I6fejmn7RJU"
+      },
+      "itemId": "ksi_01a1556a-9680-77e0-8c20-01d81343fd20"
+    },
+    {
+      "vidbestId": 391,
+      "sourceId": "q5T5MPaOgm0",
+      "sourceUrl": "https://www.youtube.com/shorts/q5T5MPaOgm0",
+      "filter": {
+        "youtube_id": "q5T5MPaOgm0"
+      },
+      "itemId": "ksi_01a1556a-7670-7800-8fba-5659a35e2b87"
+    },
+    {
+      "vidbestId": 390,
+      "sourceId": "4B4Iqf2sayE",
+      "sourceUrl": "https://www.youtube.com/shorts/4B4Iqf2sayE",
+      "filter": {
+        "youtube_id": "4B4Iqf2sayE"
+      },
+      "itemId": "ksi_01a1556a-6b66-7910-a1b9-5cf6150f8bd3"
+    },
+    {
+      "vidbestId": 389,
+      "sourceId": "Uvqz3mNxHME",
+      "sourceUrl": "https://www.youtube.com/shorts/Uvqz3mNxHME",
+      "filter": {
+        "youtube_id": "Uvqz3mNxHME"
+      },
+      "itemId": "ksi_01a1556a-5ee1-7c82-b67a-de0429c100f6"
+    },
+    {
+      "vidbestId": 388,
+      "sourceId": "nEmLhJL_yj8",
+      "sourceUrl": "https://www.youtube.com/shorts/nEmLhJL_yj8",
+      "filter": {
+        "youtube_id": "nEmLhJL_yj8"
+      },
+      "itemId": "ksi_01a1556a-6195-7e71-8070-70eaf7bcf811"
+    },
+    {
+      "vidbestId": 387,
+      "sourceId": "dFedVzeVXbc",
+      "sourceUrl": "https://www.youtube.com/shorts/dFedVzeVXbc",
+      "filter": {
+        "youtube_id": "dFedVzeVXbc"
+      },
+      "itemId": "ksi_01a1556a-5b39-7072-8d59-c67cf981c949"
+    },
+    {
+      "vidbestId": 386,
+      "sourceId": "H204j257esI",
+      "sourceUrl": "https://www.youtube.com/shorts/H204j257esI",
+      "filter": {
+        "youtube_id": "H204j257esI"
+      },
+      "itemId": "ksi_01a1556a-4542-70c1-b991-8f250ef292f9"
+    },
+    {
+      "vidbestId": 385,
+      "sourceId": "esaj4jjHEQs",
+      "sourceUrl": "https://www.youtube.com/shorts/esaj4jjHEQs",
+      "filter": {
+        "youtube_id": "esaj4jjHEQs"
+      },
+      "itemId": "ksi_01a1556a-27a9-7632-b2b5-0de3d0b9abb8"
+    },
+    {
+      "vidbestId": 384,
+      "sourceId": "Wld0h6JVjx4",
+      "sourceUrl": "https://www.youtube.com/shorts/Wld0h6JVjx4",
+      "filter": {
+        "youtube_id": "Wld0h6JVjx4"
+      },
+      "itemId": "ksi_01a1556a-4edd-7b50-b19d-a3e8c6cb3107"
+    },
+    {
+      "vidbestId": 383,
+      "sourceId": "YRnOKp__5Mw",
+      "sourceUrl": "https://www.youtube.com/shorts/YRnOKp__5Mw",
+      "filter": {
+        "youtube_id": "YRnOKp__5Mw"
+      },
+      "itemId": "ksi_01a1556a-2b20-74e0-ab0d-b0330995f26a"
+    },
+    {
+      "vidbestId": 382,
+      "sourceId": "K0coJchz6qE",
+      "sourceUrl": "https://www.youtube.com/shorts/K0coJchz6qE",
+      "filter": {
+        "youtube_id": "K0coJchz6qE"
+      },
+      "itemId": "ksi_01a15569-cd6f-7c70-b2c3-9702838ee1e5"
+    },
+    {
+      "vidbestId": 381,
+      "sourceId": "nSJquJ0OPVc",
+      "sourceUrl": "https://www.youtube.com/shorts/nSJquJ0OPVc",
+      "filter": {
+        "youtube_id": "nSJquJ0OPVc"
+      },
+      "itemId": "ksi_01a15569-f640-79b1-95b6-26d642582e6b"
+    },
+    {
+      "vidbestId": 380,
+      "sourceId": "7Fn26kyxQvo",
+      "sourceUrl": "https://www.youtube.com/shorts/7Fn26kyxQvo",
+      "filter": {
+        "youtube_id": "7Fn26kyxQvo"
+      },
+      "itemId": "ksi_01a15569-cb47-75a3-b383-6c72e44c98f6"
+    },
+    {
+      "vidbestId": 379,
+      "sourceId": "wi7a28NGsV4",
+      "sourceUrl": "https://www.youtube.com/shorts/wi7a28NGsV4",
+      "filter": {
+        "youtube_id": "wi7a28NGsV4"
+      },
+      "itemId": "ksi_01a15569-a29d-78d0-9211-b96c92231a2a"
+    },
+    {
+      "vidbestId": 378,
+      "sourceId": "QyyoHMPu18c",
+      "sourceUrl": "https://www.youtube.com/shorts/QyyoHMPu18c",
+      "filter": {
+        "youtube_id": "QyyoHMPu18c"
+      },
+      "itemId": "ksi_01a15569-a7de-7143-a3b7-6efb1e7479d3"
+    },
+    {
+      "vidbestId": 377,
+      "sourceId": "tbDbgPQkY3E",
+      "sourceUrl": "https://www.youtube.com/shorts/tbDbgPQkY3E",
+      "filter": {
+        "youtube_id": "tbDbgPQkY3E"
+      },
+      "itemId": "ksi_01a1556a-4f3e-7fc0-a169-50c1aa382bd5"
+    },
+    {
+      "vidbestId": 376,
+      "sourceId": "5f0Nr5Aaz_U",
+      "sourceUrl": "https://www.youtube.com/shorts/5f0Nr5Aaz_U",
+      "filter": {
+        "youtube_id": "5f0Nr5Aaz_U"
+      },
+      "itemId": "ksi_01a1556a-4362-75f0-a0e8-27492b0385b9"
+    },
+    {
+      "vidbestId": 375,
+      "sourceId": "gSHb7H3NxdQ",
+      "sourceUrl": "https://www.youtube.com/shorts/gSHb7H3NxdQ",
+      "filter": {
+        "youtube_id": "gSHb7H3NxdQ"
+      },
+      "itemId": "ksi_01a1556a-240a-7ef3-979e-0f555c919c52"
+    },
+    {
+      "vidbestId": 374,
+      "sourceId": "7P7ZTnnEEc4",
+      "sourceUrl": "https://www.youtube.com/shorts/7P7ZTnnEEc4",
+      "filter": {
+        "youtube_id": "7P7ZTnnEEc4"
+      },
+      "itemId": "ksi_01a1556a-105a-7fb2-9748-2db360d3eec9"
+    },
+    {
+      "vidbestId": 373,
+      "sourceId": "PCLXcrXkszI",
+      "sourceUrl": "https://www.youtube.com/shorts/PCLXcrXkszI",
+      "filter": {
+        "youtube_id": "PCLXcrXkszI"
+      },
+      "itemId": "ksi_01a1556a-044a-7180-b546-d67b64c17b3d"
+    },
+    {
+      "vidbestId": 372,
+      "sourceId": "gOaMJ2r7FHI",
+      "sourceUrl": "https://www.youtube.com/shorts/gOaMJ2r7FHI",
+      "filter": {
+        "youtube_id": "gOaMJ2r7FHI"
+      },
+      "itemId": "ksi_01a15569-f400-71b3-bad9-1ca0ef7b8f45"
+    },
+    {
+      "vidbestId": 371,
+      "sourceId": "2vuoqOmi6Uo",
+      "sourceUrl": "https://www.youtube.com/shorts/2vuoqOmi6Uo",
+      "filter": {
+        "youtube_id": "2vuoqOmi6Uo"
+      },
+      "itemId": "ksi_01a15569-f445-74d1-a5bb-b873091e33c6"
+    },
+    {
+      "vidbestId": 370,
+      "sourceId": "KeSsSUyz5ys",
+      "sourceUrl": "https://www.youtube.com/shorts/KeSsSUyz5ys",
+      "filter": {
+        "youtube_id": "KeSsSUyz5ys"
+      },
+      "itemId": "ksi_01a15569-c238-7003-a0f2-3afad5eb71e8"
+    },
+    {
+      "vidbestId": 369,
+      "sourceId": "bNykvcmIxi0",
+      "sourceUrl": "https://www.youtube.com/shorts/bNykvcmIxi0",
+      "filter": {
+        "youtube_id": "bNykvcmIxi0"
+      },
+      "itemId": "ksi_01a15569-992b-7af2-9a46-eadf70e9a299"
+    },
+    {
+      "vidbestId": 368,
+      "sourceId": "-9f4QBjAkHE",
+      "sourceUrl": "https://www.youtube.com/shorts/-9f4QBjAkHE",
+      "filter": {
+        "youtube_id": "-9f4QBjAkHE"
+      },
+      "itemId": "ksi_01a15569-656a-7900-843f-0c3f7297c3bd"
+    },
+    {
+      "vidbestId": 367,
+      "sourceId": "TsXGmtX5wDc",
+      "sourceUrl": "https://www.youtube.com/shorts/TsXGmtX5wDc",
+      "filter": {
+        "youtube_id": "TsXGmtX5wDc"
+      },
+      "itemId": "ksi_01a15569-a34e-7062-b234-4ab1d6f351ce"
+    },
+    {
+      "vidbestId": 366,
+      "sourceId": "6zUwetwrmQg",
+      "sourceUrl": "https://www.youtube.com/shorts/6zUwetwrmQg",
+      "filter": {
+        "youtube_id": "6zUwetwrmQg"
+      },
+      "itemId": "ksi_01a15569-81ea-7b31-b4a2-5c3dcb195936"
+    },
+    {
+      "vidbestId": 365,
+      "sourceId": "0naFqCsBjz0",
+      "sourceUrl": "https://www.youtube.com/shorts/0naFqCsBjz0",
+      "filter": {
+        "youtube_id": "0naFqCsBjz0"
+      },
+      "itemId": "ksi_01a15569-a56d-7c02-b346-012d2b952dd3"
+    },
+    {
+      "vidbestId": 364,
+      "sourceId": "FCUUoNmnaz4",
+      "sourceUrl": "https://www.youtube.com/shorts/FCUUoNmnaz4",
+      "filter": {
+        "youtube_id": "FCUUoNmnaz4"
+      },
+      "itemId": "ksi_01a15569-7e5d-77f2-b93e-078d0a819809"
+    }
+  ],
+  "videos": [
+    {
+      "vidbest_id": 394,
+      "item_id": "ksi_01a1556a-8b4d-7e32-a13e-801989647b14",
+      "visual_access": true,
+      "audio_access": true,
+      "duration_seconds": 41.610159,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 8,
+          "visible_action": "Split-screen opens. Three couch-side reactors watch while, below, a stylist shows a seated woman a phone image of a heavily made-up woman and begins working on her hair in a salon.",
+          "heard_audio": "Speech: no verified words in this interval. Laughter is described in the shot evidence. Music and specific effects are not separately verified.",
+          "uncertainty": "The precise hair treatment and any untranscribed dialogue are unknown."
+        },
+        {
+          "start_seconds": 8,
+          "end_seconds": 14,
+          "visible_action": "A rooster is brought close to a sleeping woman's face. She wakes, looks confused, then smiles as the bird is moved away; the reactors remain in the upper panel.",
+          "heard_audio": "Speech: no verified words. Laughter is described in the shot evidence; music and specific effects are not separately verified.",
+          "uncertainty": "The woman's exact reaction sounds and whether the rooster vocalizes are unknown."
+        },
+        {
+          "start_seconds": 14,
+          "end_seconds": 22,
+          "visible_action": "In another salon, a woman wipes a large oval mirror while another woman sits having her nails done. The cleaner finishes, stands, and points toward the seated woman, who laughs.",
+          "heard_audio": "Speech: no verified words. Laughter is described in the shot evidence; music and specific effects are not separately verified.",
+          "uncertainty": "The reason for the pointing gesture is not explicit."
+        },
+        {
+          "start_seconds": 22,
+          "end_seconds": 31,
+          "visible_action": "In a kitchen, a man wearing earphones yawns broadly while singing along and gesturing at the counter. A second man stands behind him and occasionally gestures.",
+          "heard_audio": "Speech/music: singing along to music is described in the shot evidence, but no words or track identity are verified. Effects are not separately verified.",
+          "uncertainty": "The song, lyrics, and the second man's intended reaction are unknown."
+        },
+        {
+          "start_seconds": 31,
+          "end_seconds": 38,
+          "visible_action": "Outdoors, a woman sticks out her tongue toward a man in a blue jersey. He looks confused and gestures with his hands.",
+          "heard_audio": "Speech: one brief utterance is transcribed as \"Whow.\" from 32.08 to 33.6. Music and effects are not separately verified.",
+          "uncertainty": "The utterance's speaker and the meaning of the exchange are not established."
+        },
+        {
+          "start_seconds": 38,
+          "end_seconds": 41,
+          "visible_action": "A woman in a pink headwrap leans over a sleeping man and touches his face. He wakes looking groggy and confused as the video ends.",
+          "heard_audio": "Speech: no verified words. Laughter is described in the shot evidence; music and effects are not separately verified.",
+          "uncertainty": "The man's exact vocal reaction is unknown."
+        }
+      ],
+      "audio_overview": "Audio is partially inspectable. One short utterance, \"Whow.\", is transcribed at 32.08–33.6. The indexed shot evidence describes laughter and singing along to music, but no dialogue beyond that utterance, music identity, or discrete sound effects are verified.",
+      "editing_observations": [
+        "The format repeatedly keeps the three reactors in an upper split-screen panel while changing the lower-panel gag.",
+        "Distinct lower-panel segments change at approximately 8.0, 14.0, 22.0, 31.0, and 38.0 seconds.",
+        "The 14.0-second transition has a detected picture cut at 14.4666666667 seconds; the 22.0-second transition has a detected cut at 22.0666666667 seconds; the final transition has a detected cut at 37.6 seconds.",
+        "The edit favors rapid gag turnover, with lower-panel segments lasting approximately 4–9 seconds and the final gag ending close to the video's 41.610159-second duration."
+      ],
+      "review_angles": [
+        "The compilation uses reaction framing as a recurring editorial counterpoint: each lower-panel setup is immediately paired with visible reactor laughter rather than allowed to play as a self-contained scene.",
+        "Several gags rely on abrupt reversals of expectation—an apparent sleeping moment becomes a rooster reveal, a grooming setup becomes a pointing exchange, and a sleeping man is awakened by face-touching.",
+        "The humor varies its physical scale: close interpersonal pranks and facial reactions sit alongside broader behavioral comedy such as exaggerated yawning and singing.",
+        "The rapid succession of salon, bedroom, kitchen, outdoor, and bedroom setups creates contrast through location and action rather than through a continuous narrative."
+      ],
+      "uncertainties": [
+        "Untranscribed speech, exact music content, and discrete sound effects remain unidentified.",
+        "The indexed evidence does not establish whether the visible interactions were staged or spontaneous.",
+        "The named entities in the indexed shot descriptions are not used here to identify on-screen individuals beyond their visible actions."
+      ],
+      "audioEvidenceStatus": "partial_transcript"
+    },
+    {
+      "vidbest_id": 393,
+      "item_id": "ksi_01a1556a-abde-7eb1-a745-8d6541752c51",
+      "visual_access": true,
+      "audio_access": true,
+      "duration_seconds": 42.260317,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 9,
+          "visible_action": "In a split-screen barber-shop scene, a barber gestures beside a bald man in a red cape. An older man enters, the seated man displays a phone image of a footballer, and he looks upward and laughs.",
+          "heard_audio": "Speech: the phrase \"Harland is lurking.\" is transcribed from 4.32 to 5.68. Laughter is described in the shot evidence. Music and effects are not separately verified.",
+          "uncertainty": "The phone image and the spelling/name in the spoken transcript are reported as indexed; the broader conversation is unknown."
+        },
+        {
+          "start_seconds": 9,
+          "end_seconds": 18,
+          "visible_action": "A young girl in white bear-print pajamas eats at a table while an older girl in pink pajamas watches behind her. The younger girl suddenly turns and runs off-screen left; the older girl looks surprised.",
+          "heard_audio": "Speech: no additional verified words. Laughter is described in the shot evidence; music and effects are not separately verified.",
+          "uncertainty": "The reason the girl runs and any accompanying vocal reaction are unknown."
+        },
+        {
+          "start_seconds": 18,
+          "end_seconds": 27,
+          "visible_action": "A woman in a black top and glasses mixes a white substance in a clear bowl. She looks up and speaks, then the substance is smeared across her face; she reacts with shock and gestures.",
+          "heard_audio": "Speech: visible speaking is described, but no words are transcribed. Laughter is described in the shot evidence; music and effects are not separately verified.",
+          "uncertainty": "The source of the face smear and the woman's exact words are unknown."
+        },
+        {
+          "start_seconds": 27,
+          "end_seconds": 42,
+          "visible_action": "At a restaurant, a woman in a yellow sweater and a man in black share food. She leans under the table; the camera shifts to reveal the man crawling underneath and eating food from her hand.",
+          "heard_audio": "Speech: no verified words. Laughter is described in the shot evidence; music and effects are not separately verified.",
+          "uncertainty": "The precise food and the couple's dialogue or intent are unknown."
+        }
+      ],
+      "audio_overview": "Audio is partially inspectable. The only verified spoken line is \"Harland is lurking.\" at 4.32–5.68. The shot evidence describes laughter and visible speaking in later scenes, but no additional dialogue, music identity, or discrete sound effects are verified.",
+      "editing_observations": [
+        "The upper reaction panel remains present while the lower panel moves through four unrelated short gags.",
+        "Lower-panel transitions occur at approximately 9.0, 18.0, and 27.0 seconds.",
+        "Detected picture cuts occur at 18.2 seconds and 27.0 seconds; the final restaurant gag occupies roughly the last 15 seconds and includes a camera-angle shift.",
+        "The edit escalates from a barber-shop reveal and a sudden run to a face smear, then gives the longest duration to the under-table restaurant reveal."
+      ],
+      "review_angles": [
+        "The strongest editorial pattern is delayed visual disclosure: the phone image, the sudden run, the face smear, and especially the under-table reveal all withhold the comic payoff until after a recognizable setup.",
+        "The compilation moves from social embarrassment to overt physical absurdity, ending with the man crawling under a restaurant table rather than simply reacting at the table.",
+        "The reaction panel supplies a consistent audience surrogate, but the lower-panel gags differ in pacing: the first three resolve quickly while the restaurant scene receives an extended reveal.",
+        "Food and appearance recur as comic anchors, from the barber-shop phone image and haircut context to the smeared white substance and shared restaurant food."
+      ],
+      "uncertainties": [
+        "Only one spoken line is available as a transcript; other speech is not recoverable from the supplied evidence.",
+        "The restaurant sign is visually described, but no conclusion is drawn about the venue beyond the visible sign.",
+        "No injury, motive, or off-screen action is established by the indexed scenes."
+      ],
+      "audioEvidenceStatus": "partial_transcript"
+    },
+    {
+      "vidbest_id": 392,
+      "item_id": "ksi_01a1556a-9680-77e0-8c20-01d81343fd20",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 45.209252,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 7,
+          "visible_action": "A man in grey sings and gestures dramatically in a kitchen while a man in black tries to cook and appears annoyed. Three reactors watch in the upper panel.",
+          "heard_audio": "Unavailable: no transcript or reliable audio-track characterization is available. The visible singing action is noted, but no words or sound properties are asserted.",
+          "uncertainty": "The song, lyrics, volume, and the cook's exact response are unknown."
+        },
+        {
+          "start_seconds": 7,
+          "end_seconds": 13,
+          "visible_action": "At an outdoor track, a man in a black jacket yells toward a man doing push-ups. The second man runs into a classroom and kicks a desk while a teacher holds a stick.",
+          "heard_audio": "Unavailable: no transcript or reliable audio-track characterization is available. No dialogue, music, or effects are asserted.",
+          "uncertainty": "The reason for the yelling, the desk kick, and the teacher's action are unknown."
+        },
+        {
+          "start_seconds": 13,
+          "end_seconds": 17,
+          "visible_action": "A man in purple holds green bananas in a banana grove. The scene cuts to a man in a green hoodie attempting to cut yellow bananas with a knife in a kitchen.",
+          "heard_audio": "Unavailable: no transcript or reliable audio-track characterization is available. No dialogue, music, or effects are asserted.",
+          "uncertainty": "The relationship between the two banana actions and the outcome of the cutting attempt are unknown."
+        },
+        {
+          "start_seconds": 17,
+          "end_seconds": 23,
+          "visible_action": "A woman gently strokes a young girl's head. The camera moves closer as the girl closes her eyes, then the scene cuts to a monkey being petted in a similar manner.",
+          "heard_audio": "Unavailable: no transcript or reliable audio-track characterization is available. No dialogue, music, or effects are asserted.",
+          "uncertainty": "The girl's and monkey's exact reactions and the setting of the monkey shot are unknown."
+        },
+        {
+          "start_seconds": 23,
+          "end_seconds": 33,
+          "visible_action": "A woman with a scarf and a bearded, tattooed man share a sandwich. She bites first; he takes a large bite, and she looks surprised as he continues eating.",
+          "heard_audio": "Unavailable: no transcript or reliable audio-track characterization is available. No dialogue, music, or effects are asserted.",
+          "uncertainty": "The sandwich exchange's intent and any spoken reaction are unknown."
+        },
+        {
+          "start_seconds": 33,
+          "end_seconds": 43,
+          "visible_action": "On a balcony, a man in orange and a woman in a white tank top eat ice-cream cones. She smears ice cream on his face; he reacts with surprise. The scene briefly cuts to a pigeon on a ledge before returning to the couple.",
+          "heard_audio": "Unavailable: no transcript or reliable audio-track characterization is available. No dialogue, music, or effects are asserted.",
+          "uncertainty": "The precise duration of the pigeon insert within this interval and the couple's vocal reactions are unknown."
+        },
+        {
+          "start_seconds": 43,
+          "end_seconds": 45,
+          "visible_action": "A pigeon remains perched on a concrete ledge against a cloudy sky while the reactors laugh above; the video ends.",
+          "heard_audio": "Unavailable: no transcript or reliable audio-track characterization is available. No dialogue, music, or effects are asserted.",
+          "uncertainty": "The pigeon insert's editorial meaning and any final audio sting are unknown."
+        }
+      ],
+      "audio_overview": "Unavailable. No transcript is available for this item, and the supplied evidence does not reliably characterize speech, music, or sound effects. The visible singing action must not be treated as verified audible content.",
+      "editing_observations": [
+        "The split-screen reaction format persists while seven short visual beats are presented below.",
+        "Lower-panel transitions occur at approximately 7.0, 13.0, 17.0, 23.0, 33.0, and 43.0 seconds.",
+        "Detected picture cuts occur at 13.1333333333 seconds and 16.6666666667 seconds; the latter falls within the head-stroking sequence and precedes the monkey comparison.",
+        "The final couple sequence is interrupted by a brief pigeon insert and then resolves into a separate pigeon-ending shot, creating a visual callback rather than a spoken conclusion."
+      ],
+      "review_angles": [
+        "The compilation repeatedly builds humor through visual analogy: the head-stroking action is transferred from a child to a monkey, while the banana shots juxtapose holding fruit with attempting to cut it.",
+        "Escalation comes from ordinary performance to exaggerated disruption: kitchen singing, push-ups and a desk kick, food handling, oversized sandwich bites, and ice cream smeared onto a face.",
+        "The brief pigeon inserts function as non-human punctuation, interrupting the couple's ice-cream gag and then becoming the closing image.",
+        "The reaction panel contrasts with the lower-panel variety: the same couch-side audience frames domestic, classroom, food, animal, and outdoor actions as one rapid visual-comedy sequence."
+      ],
+      "uncertainties": [
+        "All spoken content, music, laughter, and effects are unavailable for verification.",
+        "The indexed evidence does not establish whether the classroom, food, or couple interactions are staged.",
+        "The banana-cutting outcome, the reason for the track confrontation, and all off-screen responses remain unknown."
+      ],
+      "audioEvidenceStatus": "unavailable"
+    }
+  ],
+  "limits": "Identity matched for31sources. Initial3visual analyses retained; audio is partial or unavailable and needs explicit evidence before audio claims. No publication or D1/R2/image writes."
+}

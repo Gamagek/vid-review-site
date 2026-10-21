@@ -1,0 +1,61 @@
+name: Owner review evidence capture
+on:
+  pull_request:
+    types: [opened, reopened]
+    paths:
+      - content/editorial-quality/2026-10-20-owner-av-request.json
+      - scripts/capture-owner-review-baseline.mjs
+      - scripts/capture-owner-video-evidence.mjs
+      - .github/workflows/owner-review-evidence.yml
+permissions:
+  contents: read
+concurrency:
+  group: owner-review-evidence-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+jobs:
+  baseline:
+    if: github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.head_ref, 'editorial/av-reviews-20261020')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22'
+      - name: Validate capture script
+        run: node --check scripts/capture-owner-review-baseline.mjs
+      - name: Read exact published review preimages without mutations
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/capture-owner-review-baseline.mjs
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        if: always()
+        with:
+          name: owner-review-baseline
+          path: owner-review-baseline.json
+          if-no-files-found: ignore
+          retention-days: 7
+  audiovisual:
+    if: github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.head_ref, 'editorial/av-reviews-20261020')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '22'
+      - name: Validate source-analysis script
+        run: node --check scripts/capture-owner-video-evidence.mjs
+      - name: Analyze only the31owner-requested public sources
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_FALLBACK_MODELS: ${{ vars.GEMINI_FALLBACK_MODELS }}
+        run: node scripts/capture-owner-video-evidence.mjs
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        if: always()
+        with:
+          name: owner-video-evidence
+          path: owner-video-evidence.json
+          if-no-files-found: ignore
+          retention-days: 7
