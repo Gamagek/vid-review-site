@@ -198,7 +198,7 @@ test("refreshes five comedy reviews while preserving their original dates and sl
 
   const before = context.sqlite.prepare(
     "SELECT slug, source_url, created_at, updated_at FROM videos ORDER BY slug",
-  ).all();
+  ).all().map((row) => ({ ...row }));
   context.sqlite.exec(readFileSync(new URL("../migrations/0050_five_comedy_review_refresh.sql", import.meta.url), "utf8"));
   const after = context.sqlite.prepare(
     "SELECT slug, source_url, created_at, updated_at, description, review_text, seo_title, seo_description, seo_tags FROM videos ORDER BY slug",
