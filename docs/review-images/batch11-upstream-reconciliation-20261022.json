@@ -1,0 +1,36 @@
+{
+  "recordedAt": "2026-10-21T19:30:26Z",
+  "pr": 255,
+  "existingPreparationHead": "5b61421ada197c63750e6bff49e884c48a4db315",
+  "reconciledMain": "5b0313405cf6e7fc57931e86ba451a28a488e3e6",
+  "upstreamChange": "Preserve original created_at publication ordering in the crawlable review directory and recent homepage links, including the owner's regression test.",
+  "mergeConflicts": false,
+  "newGenerated": 0,
+  "newCommittedArtwork": 0,
+  "existingGeneratedAwaitingRelease": 10,
+  "mergedToMain": false,
+  "deployed": false,
+  "liveVerified": 0,
+  "validation": {
+    "localNodeTests": 465,
+    "localNodePass": 465,
+    "workerDryRun": true,
+    "all110ManifestAndPromptRecordsUnchanged": true,
+    "exactHeadCI": "pending for the reconciliation commit"
+  },
+  "currentProduction": {
+    "deployment": "8cdc8ea3-c1f6-4b2a-9aaf-4cf5b2f2d60f",
+    "version": "4a0764e2-4722-40bb-987b-e4e61d5d0757",
+    "percentage": 100,
+    "createdOn": "2026-10-21T18:56:21.88165Z",
+    "scope": "Independent upstream deployment; not an image-batch publication."
+  },
+  "releaseBlocker": {
+    "code": 7500,
+    "type": "D1 daily row-read quota",
+    "nextCheckNotBeforeUTC": "2026-10-22T00:00:00Z",
+    "queriesThisReconciliation": 0,
+    "limits": "Quota reset time has not occurred. Preserve the existing release hold; no D1 retry, merge/deploy, new image generation or invented current inventory count. Re-read current identity/preservation after the stated reset before release."
+  },
+  "nextTask": "Finish existing PR255 after fresh D1 reads, exact-head CI and live deployment/asset/watch/sitemap checks; do not duplicate or regenerate its ten artworks. Keep PR254 six-video drafts and all other holds untouched."
+}

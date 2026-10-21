@@ -380,6 +380,38 @@ test("the crawlable directory covers libraries beyond the old 200 review limit",
   assert.equal(duplicate.headers.get('Location'), 'https://vid.best/videos');
 });
 
+test("publication chronology stays stable when an older review is edited", async () => {
+  const context = createContext();
+  context.sqlite.prepare("UPDATE videos SET published=0").run();
+  const insert = context.sqlite.prepare(`
+    INSERT INTO videos (slug,title,source_url,media_type,primary_category,subcategory,
+                        published,created_at,updated_at)
+    VALUES (?, ?, ?, 'youtube', 'Technology', 'Software & Coding', 1, ?, ?)
+  `);
+  insert.run("older-published-review", "Older Published Review",
+    "https://youtube.com/watch?v=old", "2026-01-01T00:00:00.000Z", "2026-12-31T00:00:00.000Z");
+  insert.run("newer-published-review", "Newer Published Review",
+    "https://youtube.com/watch?v=new", "2026-06-01T00:00:00.000Z", "2026-06-01T00:00:00.000Z");
+
+  const directory = await request(context, "https://vid.best/videos");
+  assert.equal(directory.status, 200);
+  const html = await directory.text();
+  const older = html.indexOf('href="https://vid.best/watch/older-published-review"');
+  const newer = html.indexOf('href="https://vid.best/watch/newer-published-review"');
+  assert.ok(newer >= 0 && older > newer, "newer original publication should appear first, despite older review edit");
+
+  const homepage = await request(context, "https://vid.best/");
+  assert.equal(homepage.status, 200);
+  const homeHtml = await homepage.text();
+  const recent = homeHtml.match(/<section id="vidbest-recent-reviews"[\s\S]*?<\/section>/)?.[0] || "";
+  const recentNewer = recent.indexOf("/watch/newer-published-review");
+  const recentOlder = recent.indexOf("/watch/older-published-review");
+  assert.ok(recentNewer >= 0 && recentOlder > recentNewer, "recent links must use publication order");
+
+  assert.equal(context.sqlite.prepare("SELECT created_at FROM videos WHERE slug='older-published-review'").get().created_at,
+    "2026-01-01T00:00:00.000Z", "test and rendering cannot rewrite the original publish date");
+});
+
 test("a directory database failure returns retryable 503 instead of an empty indexable 200", async () => {
   const response = await request(createContext({ DB: { prepare() { throw new Error('DB unavailable'); } } }), 'https://vid.best/videos');
   assert.equal(response.status, 503);

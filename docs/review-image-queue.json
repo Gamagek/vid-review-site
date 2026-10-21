@@ -3574,7 +3574,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Finish existing PR255 / batch11 IDs135,131,132,119,130,134,36,98,115,86 before selecting or generating another batch. Ten actual artworks are prepared, not published. Complete passing exact-head CI/dry-run, wait for the D1 daily-read quota reset, re-check current protected data/target identities, then merge/deploy and verify all10image hashes plus source-first/artwork-second HTML and both split image maps. Preserve all100prior artworks and all holds. Reconcile the66remaining new queue entries after readable inventory returns. Do not regenerate these10.",
+  "nextTask": "Finish existing PR255 / batch11 IDs135,131,132,119,130,134,36,98,115,86 before selecting or generating another batch. Ten actual artworks are prepared, not published. Preserve the upstream publication-order fix5b03134; complete CI for its reconciliation, wait until at least2026-10-22T00:00:00Z for the stated D1 daily-read quota reset, re-check current protected data/target identities, then merge/deploy and verify all10image hashes plus source-first/artwork-second HTML and both split image maps. Preserve all100prior artworks and all holds. Reconcile the66remaining new queue entries after readable inventory returns. Do not regenerate these10.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -8323,12 +8323,14 @@
       "All10live asset/HTML/split-sitemap associations"
     ],
     "validation": {
-      "nodeTests": 464,
+      "nodeTests": 465,
       "workerDryRun": true,
       "assetHashesAndPreservation": true,
-      "exactHeadCI": "pending",
+      "exactHeadCI": "pending for upstream reconciliation; previous5b61421 passed CI39651665482",
       "pythonSuite": "required CI pending"
-    }
+    },
+    "reconciledMain": "5b0313405cf6e7fc57931e86ba451a28a488e3e6",
+    "upstreamReconciliation": "docs/review-images/batch11-upstream-reconciliation-20261022.json"
   },
   "lastImageProductionBatch": {
     "state": "prepared_release_blocked",
@@ -8369,12 +8371,14 @@
       "All10live asset/HTML/split-sitemap associations"
     ],
     "validation": {
-      "nodeTests": 464,
+      "nodeTests": 465,
       "workerDryRun": true,
       "assetHashesAndPreservation": true,
-      "exactHeadCI": "pending",
+      "exactHeadCI": "pending for upstream reconciliation; previous5b61421 passed CI39651665482",
       "pythonSuite": "required CI pending"
-    }
+    },
+    "reconciledMain": "5b0313405cf6e7fc57931e86ba451a28a488e3e6",
+    "upstreamReconciliation": "docs/review-images/batch11-upstream-reconciliation-20261022.json"
   },
   "ownerReconciliation20261021": {
     "authoritativeInventoryAt": "2026-10-21T17:41:22.163Z",
