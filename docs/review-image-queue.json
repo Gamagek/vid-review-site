@@ -8323,14 +8323,30 @@
       "All10live asset/HTML/split-sitemap associations"
     ],
     "validation": {
-      "nodeTests": 465,
+      "nodeTests": 467,
       "workerDryRun": true,
       "assetHashesAndPreservation": true,
-      "exactHeadCI": "pending for upstream reconciliation; previous5b61421 passed CI39651665482",
+      "exactHeadCI": "pending for final source-pairing head",
       "pythonSuite": "required CI pending"
     },
     "reconciledMain": "5b0313405cf6e7fc57931e86ba451a28a488e3e6",
-    "upstreamReconciliation": "docs/review-images/batch11-upstream-reconciliation-20261022.json"
+    "upstreamReconciliation": "docs/review-images/batch11-upstream-reconciliation-20261022.json",
+    "newSourceCopiesPrepared": 10,
+    "sourceCopies": "docs/review-images/batch11-source-copies-20261022.json",
+    "ownerImagePreference": "docs/review-images/source-pairs-and-branding-20261022.md",
+    "expectedPublishDates": {
+      "135": "2026-10-11T13:29:15.091Z",
+      "131": "2026-10-10T18:22:02.889Z",
+      "132": "2026-10-10T18:27:22.255Z",
+      "119": "2026-10-09T18:28:10.831Z",
+      "130": "2026-10-10T18:14:20.768Z",
+      "134": "2026-10-10T18:29:21.086Z",
+      "36": "2026-09-25T20:35:28.639Z",
+      "98": "2026-10-05T18:26:15.919Z",
+      "115": "2026-10-08T18:54:19.596Z",
+      "86": "2026-10-03T16:54:10.360Z"
+    },
+    "sourcePairingCheckpoint": "docs/review-images/batch11-source-pairing-checkpoint-20261022.json"
   },
   "lastImageProductionBatch": {
     "state": "prepared_release_blocked",
@@ -8371,14 +8387,30 @@
       "All10live asset/HTML/split-sitemap associations"
     ],
     "validation": {
-      "nodeTests": 465,
+      "nodeTests": 467,
       "workerDryRun": true,
       "assetHashesAndPreservation": true,
-      "exactHeadCI": "pending for upstream reconciliation; previous5b61421 passed CI39651665482",
+      "exactHeadCI": "pending for final source-pairing head",
       "pythonSuite": "required CI pending"
     },
     "reconciledMain": "5b0313405cf6e7fc57931e86ba451a28a488e3e6",
-    "upstreamReconciliation": "docs/review-images/batch11-upstream-reconciliation-20261022.json"
+    "upstreamReconciliation": "docs/review-images/batch11-upstream-reconciliation-20261022.json",
+    "newSourceCopiesPrepared": 10,
+    "sourceCopies": "docs/review-images/batch11-source-copies-20261022.json",
+    "ownerImagePreference": "docs/review-images/source-pairs-and-branding-20261022.md",
+    "expectedPublishDates": {
+      "135": "2026-10-11T13:29:15.091Z",
+      "131": "2026-10-10T18:22:02.889Z",
+      "132": "2026-10-10T18:27:22.255Z",
+      "119": "2026-10-09T18:28:10.831Z",
+      "130": "2026-10-10T18:14:20.768Z",
+      "134": "2026-10-10T18:29:21.086Z",
+      "36": "2026-09-25T20:35:28.639Z",
+      "98": "2026-10-05T18:26:15.919Z",
+      "115": "2026-10-08T18:54:19.596Z",
+      "86": "2026-10-03T16:54:10.360Z"
+    },
+    "sourcePairingCheckpoint": "docs/review-images/batch11-source-pairing-checkpoint-20261022.json"
   },
   "ownerReconciliation20261021": {
     "authoritativeInventoryAt": "2026-10-21T17:41:22.163Z",
@@ -8390,5 +8422,18 @@
     "status": "partial_due_to_D1_daily_read_quota",
     "limits": "Fresh501/501 inventory was read before quota exhaustion. Later60published identity rows yielded47previously unqueued entries. Queue now435entries;66inventory items remain unreconciled and require fresh reads after the quota reset. Counts are a dated snapshot, not a current live-query claim.",
     "newPublishedRowsRead": 60
+  },
+  "latestOwnerImagePreference": {
+    "recordedAt": "2026-10-22",
+    "sourceImage": "Keep the original/captured publisher image unchanged as image1; use an identity-guarded, byte-identical first-party copy when verified bytes are available. Retain the original D1/source VideoObject thumbnail URL.",
+    "artwork": "Image2: a distinctive cinematic anime/stylized interpretation of a genuinely verified scene or key idea. Only claim scene fidelity when inspection evidence exists; never pass conceptual artwork off as a source frame.",
+    "branding": {
+      "text": "vid.best",
+      "placement": "bottom-right",
+      "newGenerationPrompts": "Include the exact small vid.best watermark inside every future newly generated asset. No AI-generated wording.",
+      "existingPreparedBatch11": "Existing ten artwork bytes remain unchanged; a visible HTML/CSS watermark is placed over artwork in the watch-page display. This is not a baked-in watermark in those ten image files."
+    },
+    "discovery": "Both actual images in server-rendered watch HTML, source-first sidebar, split source/editorial and legacy combined maps; flat sitemap root; stable hash-named first-party copies. No indexing guarantee.",
+    "details": "docs/review-images/source-pairs-and-branding-20261022.md"
   }
 }

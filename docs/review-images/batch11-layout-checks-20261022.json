@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-21T22:47:02.383Z",
+  "scope": "Local fixture using actual current watch renderer/CSS and actual source/artwork bytes; not live deployment or provider playback. No source video frames/audio examined.",
+  "results": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "success": false,
+      "error": "Error: Cloudflare API error: POST /accounts/de9e41200f6bdfab80553c8eb08f9b16/browser-rendering/content returned HTTP 422: 6002: A timeout was reached. Check gotoOptions/waitForSelector/waitForTimeout/actionTimeout options",
+      "parseError": "SyntaxError: Unexpected token 'E', \"Error: Clo\"... is not valid JSON"
+    }
+  ]
+}

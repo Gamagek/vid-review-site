@@ -31,6 +31,27 @@ export function reviewIllustration(row) {
   return item;
 }
 
+// An unchanged, hash-checked publisher-preview copy may have a first-party URL.
+// A later owner poster edit immediately wins; never repoint VideoObject or D1.
+export function reviewSourcePreview(row, sourceUrl, origin) {
+  const image = reviewIllustration(row)?.sourceImage;
+  if (!image || !sourceUrl) return null;
+  try {
+    const source = new URL(sourceUrl);
+    if (source.protocol !== 'https:' || source.username || source.password) return null;
+    const sameSource = source.href === image.url;
+    const localCopy = sameSource && /^\/review-source-images\/[1-9]\d*-[a-f0-9]{16}\.jpg$/.test(image.path || '') &&
+      /^[a-f0-9]{64}$/.test(image.sha256 || '') &&
+      image.path === `/review-source-images/${row.id}-${image.sha256.slice(0,16)}.jpg` &&
+      image.bytes > 0 && image.bytes <= 150_000;
+    return {
+      url: localCopy ? new URL(image.path, origin).href : source.href,
+      width: sameSource ? image.width : 640,
+      height: sameSource ? image.height : 360,
+    };
+  } catch { return null; }
+}
+
 // Only the eight audited HTML-as-image placeholders opt in. A new owner
 // thumbnail disables this fallback as well as the usual title/source guards.
 export function reviewPreviewIllustration(row) {

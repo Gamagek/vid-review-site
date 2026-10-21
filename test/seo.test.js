@@ -636,6 +636,9 @@ test('source-associated review covers drive social images while preserving video
     const html = await (await request(context,'https://vid.best/watch/'+art.slug,{headers:{'User-Agent':'VidBest-SEO-Audit/1.0'}})).text();
     assert.ok(html.includes('src="https://vid.best'+art.path+'"'));
     assert.ok(html.includes(art.caption));
+    if (art.displayWatermark === 'vid.best') {
+      assert.match(html, /<span class="watch-review-watermark" aria-hidden="true">vid\.best<\/span>/);
+    }
     if (art.sourceImage) {
       const sidebar = html.match(/<aside class="watch-review-images"[\s\S]*?<\/aside>/)?.[0];
       assert.ok(sidebar, 'audited dual-image pages retain a separate source/artwork column');
@@ -671,6 +674,62 @@ test('source-associated review covers drive social images while preserving video
   context.sqlite.prepare('UPDATE videos SET published=0 WHERE id=4').run();
   const draftXml=await (await request(context,'https://vid.best/sitemaps/images-1.xml')).text();
   assert.ok(!draftXml.includes(manifest.find(row=>row.id===4).path));
+});
+
+test('unchanged first-party source copies pair with artwork in HTML and every matching image catalog', async (t) => {
+  t.mock.method(globalThis,'fetch',async()=>{throw Error('No provider traffic');});
+  const paired=JSON.parse(readFileSync(new URL('../src/review-illustrations.json',import.meta.url)))
+    .filter(item=>item.sourceImage?.path);
+  const context=createContext();
+  for(const art of paired) {
+    context.sqlite.prepare(`INSERT INTO videos
+      (id,slug,title,source_url,media_type,embed_url,primary_category,subcategory,description,thumbnail_url,published,created_at)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`).run(art.id,art.slug,art.expectedTitle,art.sourceUrl,'youtube',
+      'https://www.youtube-nocookie.com/embed/'+art.sourceImage.url.split('/')[4],
+      'Music','Music Videos','Original owner description',art.sourceImage.url,1,'2026-09-16T16:22:59.366Z');
+    context.sqlite.prepare('INSERT INTO video_source_metadata (video_id,source_published_at) VALUES (?,?)')
+      .run(art.id,'2026-01-01T00:00:00.000Z');
+  }
+  const before=context.sqlite.prepare('SELECT * FROM videos ORDER BY id').all();
+  const maps={};
+  for(const path of ['images-1','images-source-1','images-editorial-1','videos-1']) {
+    maps[path]=await(await request(context,'https://vid.best/sitemaps/'+path+'.xml')).text();
+  }
+  for(const art of paired) {
+    const original='https://vid.best'+art.sourceImage.path;
+    const artwork='https://vid.best'+art.path;
+    const html=await(await request(context,'https://vid.best/watch/'+art.slug,
+      {headers:{'User-Agent':'VidBest-SEO-Audit/1.0'}})).text();
+    const sidebar=html.match(/<aside class="watch-review-images"[\s\S]*?<\/aside>/)?.[0];
+    assert.ok(sidebar.indexOf('src="'+original+'"') < sidebar.indexOf('src="'+artwork+'"'));
+    assert.equal((sidebar.match(/<img /g)||[]).length,2);
+    assert.equal((sidebar.match(/watch-review-watermark/g)||[]).length,1,'Brand artwork only');
+    const sourceFigure=sidebar.match(/<figure[^>]*data-review-image="source"[\s\S]*?<\/figure>/)?.[0];
+    assert.doesNotMatch(sourceFigure,/watch-review-watermark/);
+    const graph=JSON.parse(html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)[1])['@graph'];
+    assert.deepEqual(graph.find(x=>x['@type']==='VideoObject').thumbnailUrl,[art.sourceImage.url]);
+    assert.equal(graph.find(x=>x['@type']==='WebPage').datePublished,'2026-09-16T16:22:59.366Z');
+    for(const key of ['images-1','videos-1']) {
+      assert.ok(maps[key].includes('<image:loc>'+original+'</image:loc>'));
+      assert.ok(maps[key].includes('<image:loc>'+artwork+'</image:loc>'));
+    }
+    assert.ok(maps['images-source-1'].includes('<image:loc>'+original+'</image:loc>'));
+    assert.ok(!maps['images-source-1'].includes('<image:loc>'+artwork+'</image:loc>'));
+    assert.ok(maps['images-editorial-1'].includes('<image:loc>'+artwork+'</image:loc>'));
+    assert.ok(!maps['images-editorial-1'].includes('<image:loc>'+original+'</image:loc>'));
+    assert.ok(maps['videos-1'].includes('<video:thumbnail_loc>'+art.sourceImage.url+'</video:thumbnail_loc>'));
+  }
+  assert.deepEqual(context.sqlite.prepare('SELECT * FROM videos ORDER BY id').all(),before);
+  const art=paired[0];
+  const replacement='https://vid.best/review-covers/new-owner-poster.webp';
+  context.sqlite.prepare('UPDATE videos SET thumbnail_url=? WHERE id=?').run(replacement,art.id);
+  const changed=await(await request(context,'https://vid.best/watch/'+art.slug,
+    {headers:{'User-Agent':'VidBest-SEO-Audit/1.0'}})).text();
+  assert.ok(changed.includes('src="'+replacement+'"'));
+  assert.ok(!changed.includes('src="https://vid.best'+art.sourceImage.path+'"'));
+  const xml=await(await request(context,'https://vid.best/sitemaps/images-source-1.xml')).text();
+  assert.ok(xml.includes('<image:loc>'+replacement+'</image:loc>'));
+  assert.ok(!xml.includes('<image:loc>https://vid.best'+art.sourceImage.path+'</image:loc>'));
 });
 
 test('public Facebook preview artwork is bounded to the audited placeholder and preserves later owner covers', async (t) => {

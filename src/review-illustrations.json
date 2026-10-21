@@ -1416,8 +1416,13 @@
     "sourceImage": {
       "url": "https://i.ytimg.com/vi/V8zXLMIjlcw/hqdefault.jpg",
       "width": 480,
-      "height": 360
-    }
+      "height": 360,
+      "path": "/review-source-images/135-74323cd12d612a63.jpg",
+      "bytes": 35065,
+      "sha256": "74323cd12d612a6315a862e934cde6698922b52161305749cf81faf8c1e94c2b",
+      "mime": "image/jpeg"
+    },
+    "displayWatermark": "vid.best"
   },
   {
     "id": 131,
@@ -1434,8 +1439,13 @@
     "sourceImage": {
       "url": "https://i.ytimg.com/vi/RgKAFK5djSk/hqdefault.jpg",
       "width": 480,
-      "height": 360
-    }
+      "height": 360,
+      "path": "/review-source-images/131-96a9eb357ca359ac.jpg",
+      "bytes": 14239,
+      "sha256": "96a9eb357ca359ac8fe4413505c7019e1496d77a3804fddd2a1b5694a327a309",
+      "mime": "image/jpeg"
+    },
+    "displayWatermark": "vid.best"
   },
   {
     "id": 132,
@@ -1452,8 +1462,13 @@
     "sourceImage": {
       "url": "https://i.ytimg.com/vi/Gp1RNYBckBs/hqdefault.jpg",
       "width": 480,
-      "height": 360
-    }
+      "height": 360,
+      "path": "/review-source-images/132-d90960001f87d802.jpg",
+      "bytes": 15600,
+      "sha256": "d90960001f87d8022af785c6b50c5a2727727d90b779685b345beab2b9c9d834",
+      "mime": "image/jpeg"
+    },
+    "displayWatermark": "vid.best"
   },
   {
     "id": 119,
@@ -1470,8 +1485,13 @@
     "sourceImage": {
       "url": "https://i.ytimg.com/vi/T5eQ-Vo_3EQ/hqdefault.jpg",
       "width": 480,
-      "height": 360
-    }
+      "height": 360,
+      "path": "/review-source-images/119-fdf0ef51d07853aa.jpg",
+      "bytes": 36103,
+      "sha256": "fdf0ef51d07853aa44ab102f8e224fdedb55f229d688515f9fdd71992051f53d",
+      "mime": "image/jpeg"
+    },
+    "displayWatermark": "vid.best"
   },
   {
     "id": 130,
@@ -1488,8 +1508,13 @@
     "sourceImage": {
       "url": "https://i.ytimg.com/vi/CevxZvSJLk8/hqdefault.jpg",
       "width": 480,
-      "height": 360
-    }
+      "height": 360,
+      "path": "/review-source-images/130-1c5072f1cf8acf4f.jpg",
+      "bytes": 23193,
+      "sha256": "1c5072f1cf8acf4f3d4a6477a5341a18a8ab5f73ba42dccef462da7ba465d1b5",
+      "mime": "image/jpeg"
+    },
+    "displayWatermark": "vid.best"
   },
   {
     "id": 134,
@@ -1506,8 +1531,13 @@
     "sourceImage": {
       "url": "https://i.ytimg.com/vi/ekr2nIex040/hqdefault.jpg",
       "width": 480,
-      "height": 360
-    }
+      "height": 360,
+      "path": "/review-source-images/134-c27c3ba0b9b33c69.jpg",
+      "bytes": 23509,
+      "sha256": "c27c3ba0b9b33c69ca4d85454c2071ec4d631ec1508e7b0fff09970c36049741",
+      "mime": "image/jpeg"
+    },
+    "displayWatermark": "vid.best"
   },
   {
     "id": 36,
@@ -1524,8 +1554,13 @@
     "sourceImage": {
       "url": "https://i.ytimg.com/vi/kPa7bsKwL-c/hqdefault.jpg",
       "width": 480,
-      "height": 360
-    }
+      "height": 360,
+      "path": "/review-source-images/36-51385a2a896fb77e.jpg",
+      "bytes": 24064,
+      "sha256": "51385a2a896fb77edc2d6f485cd2da6f61ecc205670c7d89ca33ef045e5d5809",
+      "mime": "image/jpeg"
+    },
+    "displayWatermark": "vid.best"
   },
   {
     "id": 98,
@@ -1542,8 +1577,13 @@
     "sourceImage": {
       "url": "https://i.ytimg.com/vi/YR12Z8f1Dh8/hqdefault.jpg",
       "width": 480,
-      "height": 360
-    }
+      "height": 360,
+      "path": "/review-source-images/98-0ecaaf61c969d8e7.jpg",
+      "bytes": 18161,
+      "sha256": "0ecaaf61c969d8e739e38faa5ebe76644a678003ea0b8e6cce2819845fdbb810",
+      "mime": "image/jpeg"
+    },
+    "displayWatermark": "vid.best"
   },
   {
     "id": 115,
@@ -1560,8 +1600,13 @@
     "sourceImage": {
       "url": "https://i.ytimg.com/vi/qoq8B8ThgEM/hqdefault.jpg",
       "width": 480,
-      "height": 360
-    }
+      "height": 360,
+      "path": "/review-source-images/115-02920ff51ebeba35.jpg",
+      "bytes": 18544,
+      "sha256": "02920ff51ebeba352454cad12bda3d6aa06d62121158f4962eec347ee80508ed",
+      "mime": "image/jpeg"
+    },
+    "displayWatermark": "vid.best"
   },
   {
     "id": 86,
@@ -1578,7 +1623,12 @@
     "sourceImage": {
       "url": "https://i.ytimg.com/vi/kJQP7kiw5Fk/hqdefault.jpg",
       "width": 480,
-      "height": 360
-    }
+      "height": 360,
+      "path": "/review-source-images/86-fde65350eaf8c380.jpg",
+      "bytes": 25889,
+      "sha256": "fde65350eaf8c380c30ac2610bdb426ae70c3d11a610290820c97825e1d9711b",
+      "mime": "image/jpeg"
+    },
+    "displayWatermark": "vid.best"
   }
 ]

@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import test from 'node:test';
 import illustrations from '../src/review-illustrations.json' with { type: 'json' };
-import { reviewIllustration, reviewPreviewIllustration, tikTokReviewPreviewIllustration, reviewIllustrationRedirect } from '../src/review-illustrations.js';
+import { reviewIllustration, reviewSourcePreview, reviewPreviewIllustration, tikTokReviewPreviewIllustration, reviewIllustrationRedirect } from '../src/review-illustrations.js';
 import worker from '../src/index.js';
 
 test('sidebar artwork assets have unique verified WebP bytes and complete bounded provenance', () => {
@@ -29,12 +29,44 @@ test('sidebar artwork assets have unique verified WebP bytes and complete bounde
     assert.equal(prompt.sha256, item.sha256);
     assert.ok(prompt.prompt.length > 100);
     assert.match(prompt.generationMode || prompts.generationMode, /built-in image_gen\.imagegen/);
+    if (item.sourceImage?.path) {
+      const source = item.sourceImage;
+      const original = readFileSync(new URL('../public' + source.path, import.meta.url));
+      assert.equal(original.readUInt16BE(0), 0xffd8, 'Source copies retain JPEG bytes');
+      assert.equal(original.length, source.bytes);
+      assert.equal(createHash('sha256').update(original).digest('hex'), source.sha256);
+      assert.ok(source.path.endsWith('-' + source.sha256.slice(0,16) + '.jpg'));
+      assert.equal(source.mime, 'image/jpeg');
+      assert.equal(prompt.sourcePreviewCopy.url, source.url);
+      assert.equal(prompt.sourcePreviewCopy.sha256, source.sha256);
+      assert.equal(prompt.sourcePreviewCopy.modified, false);
+    }
     if (item.previousPath) {
       const previous = prompt.history?.find(row => row.asset === 'public' + item.previousPath);
       assert.match(previous?.sha256 || '', /^[a-f0-9]{64}$/);
       assert.ok(previous.prompt.length > 100, 'retain the original generation prompt');
       assert.equal(prompt.referenceAsset.sha256, previous.sha256);
     }
+  }
+});
+
+test('first-party publisher copies follow exact source identity and yield to later owner posters', () => {
+  const paired = illustrations.filter(item => item.sourceImage?.path);
+  assert.equal(paired.length, 10);
+  for (const item of paired) {
+    const row = {id:item.id,slug:item.slug,title:item.expectedTitle,source_url:item.sourceUrl,published:1};
+    const before = structuredClone(row);
+    assert.deepEqual(reviewSourcePreview(row,item.sourceImage.url,'https://vid.best'), {
+      url:'https://vid.best'+item.sourceImage.path,width:item.sourceImage.width,height:item.sourceImage.height,
+    });
+    const owner = 'https://vid.best/media/uploads/new-owner-poster.webp';
+    assert.equal(reviewSourcePreview(row,owner,'https://vid.best').url,owner);
+    for (const change of [{title:'Changed owner title'},{slug:'changed-slug'},
+      {source_url:'https://youtu.be/otherVideo1'},{published:0}]) {
+      assert.equal(reviewSourcePreview({...row,...change},item.sourceImage.url,'https://vid.best'),null);
+    }
+    assert.equal(reviewSourcePreview(row,'data:image/jpeg;base64,unsafe','https://vid.best'),null);
+    assert.deepEqual(row,before);
   }
 });
 

@@ -7,7 +7,7 @@ const CACHE_VERSION = "v1";
 // A new artwork release must not inherit a fresh XML snapshot missing its images.
 // This non-security fingerprint only versions XML keys; API/browser policy is unchanged.
 const IMAGE_CATALOG_REVISION = illustrations.reduce((hash, item) => {
-  for (const char of `${item.id}:${item.path}:${item.sha256}`) {
+  for (const char of `${item.id}:${item.path}:${item.sha256}:${item.sourceImage?.path || ''}:${item.sourceImage?.sha256 || ''}`) {
     hash = Math.imul(hash ^ char.charCodeAt(0), 16777619) >>> 0;
   }
   return hash;

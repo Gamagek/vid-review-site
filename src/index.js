@@ -1,6 +1,6 @@
 import { analyzeYoutubeDraftWithGemini } from "./gemini-youtube-analysis.js";
 import { parseInstagramUrl } from "../public/instagram-utils.js";
-import { reviewIllustration, reviewPreviewIllustration, tikTokReviewPreviewIllustration, reviewIllustrationRedirect } from "./review-illustrations.js";
+import { reviewIllustration, reviewSourcePreview, reviewPreviewIllustration, tikTokReviewPreviewIllustration, reviewIllustrationRedirect } from "./review-illustrations.js";
 import { isLikelyCrawler } from "./crawlers.js";
 import { tikTokZeroRequestPlayer } from "./tiktok-zero-request-cache.js";
 import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStatus } from "./tiktok-cache-jobs.js";
@@ -3067,8 +3067,8 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   const reviewImage = illustration ? `${baseUrl}${illustration.path}` : thumbnail;
   // Audited dual-image entries keep the current owner/source preview first.
   // Artwork remains a separate illustration; no poster or player field is rewritten.
-  const sourceReviewImage = illustration?.sourceImage && thumbnail && thumbnail !== reviewImage
-    ? thumbnail : "";
+  const sourceReviewPreview = reviewSourcePreview(video, thumbnail, baseUrl);
+  const sourceReviewImage = sourceReviewPreview?.url !== reviewImage ? sourceReviewPreview?.url : "";
   // A Vid.Best review's creation date is not the original third-party video's
   // publication date. Google requires the *video* date when it is known.
   const uploadDate = video.source_published_at || (video.provider === "r2" ? video.created_at : "");
@@ -3187,7 +3187,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <meta name="twitter:image" content="${escapeHtml(reviewImage)}">
   ${illustration ? `<meta name="twitter:image:alt" content="${escapeHtml(illustration.alt)}">` : ""}
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/styles.css?v=20261021-dual-review-images1">
+  <link rel="stylesheet" href="/styles.css?v=20261022-source-pairs-watermark1">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   ${video.provider === "tiktok" ? '<script src="/tiktok-oembed-cache.js?v=20261018-replay" defer></script><script src="/tiktok-preview-service.js?v=20261018-replay" defer></script>' : ""}
   ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>' : ""}
@@ -3249,13 +3249,14 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     ${sourceReviewImage ? `<aside class="watch-review-images" aria-label="Source preview and conceptual review artwork">
       <figure class="watch-review-art glass-panel" data-review-image="source" aria-label="Source preview image">
         <a href="${escapeHtml(sourceReviewImage)}" target="_blank" rel="noopener noreferrer" aria-label="View source preview image">
-          <img src="${escapeHtml(sourceReviewImage)}" alt="${escapeHtml(`${video.title} — publisher preview image`)}" width="${illustration.sourceImage.url === sourceReviewImage ? illustration.sourceImage.width : 640}" height="${illustration.sourceImage.url === sourceReviewImage ? illustration.sourceImage.height : 360}" loading="lazy" decoding="async">
+          <img src="${escapeHtml(sourceReviewImage)}" alt="${escapeHtml(`${video.title} — publisher preview image`)}" width="${sourceReviewPreview.width}" height="${sourceReviewPreview.height}" loading="lazy" decoding="async">
         </a>
         <figcaption>Source/publisher preview image.</figcaption>
       </figure>` : ""}
     ${reviewImage ? `<figure class="watch-review-art glass-panel"${sourceReviewImage ? ' data-review-image="artwork"' : ""} aria-label="Review image">
-      <a href="${escapeHtml(reviewImage)}" target="_blank" rel="noopener noreferrer" aria-label="View review preview image">
+      <a${illustration ? ' class="watch-review-artwork-link"' : ""} href="${escapeHtml(reviewImage)}" target="_blank" rel="noopener noreferrer" aria-label="View review preview image">
         <img src="${escapeHtml(reviewImage)}" alt="${escapeHtml(illustration?.alt || `${video.title} — review preview image`)}" width="${illustration?.width || 640}" height="${illustration?.height || 360}" loading="lazy" decoding="async">
+        ${illustration?.displayWatermark === 'vid.best' ? '<span class="watch-review-watermark" aria-hidden="true">vid.best</span>' : ""}
       </a>
       <figcaption>${escapeHtml(illustration?.caption || "Preview artwork for this review. The original video remains with its publisher.")}</figcaption>
     </figure>` : ""}
@@ -4172,7 +4173,8 @@ async function videoSitemapResponse(request, env, page) {
       videoEntry = `<video:video><video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc><video:title>${escapeXml(row.title)}</video:title><video:description>${escapeXml(description)}</video:description>${location}${publicationDate}${duration ? `<video:duration>${duration}</video:duration>` : ""}</video:video>`;
     }
     const illustration = reviewIllustration(row);
-    const imageEntry = [...new Set([thumbnail, illustration ? `${base}${illustration.path}` : ""].filter(Boolean))]
+    const imageEntry = [...new Set([reviewSourcePreview(row, thumbnail, base)?.url || thumbnail,
+      illustration ? `${base}${illustration.path}` : ""].filter(Boolean))]
       .map((image) => `<image:image><image:loc>${escapeXml(image)}</image:loc></image:image>`).join("");
     // Only emit valid, timezone-qualified W3C lastmod; do not guess a timezone for legacy timestamps.
     const validLastmod = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(String(row.updated_at || ""));

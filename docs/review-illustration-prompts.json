@@ -3432,7 +3432,22 @@
         "sceneInterpretation": "golden butterfly above jasmine in an imagined sunlit garden, interpreting the Titli romance theme",
         "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
       },
-      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps.",
+      "sourcePreviewCopy": {
+        "id": 135,
+        "url": "https://i.ytimg.com/vi/V8zXLMIjlcw/hqdefault.jpg",
+        "path": "/review-source-images/135-74323cd12d612a63.jpg",
+        "bytes": 35065,
+        "sha256": "74323cd12d612a6315a862e934cde6698922b52161305749cf81faf8c1e94c2b",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-21T22:40:23.424Z",
+        "evidence": "docs/review-images/batch11-source-copies-20261022.json",
+        "note": "Unmodified original publisher preview bytes, not generated artwork or a newly captured video frame."
+      }
     },
     {
       "id": 131,
@@ -3465,7 +3480,22 @@
         "sceneInterpretation": "piano overlooking two coastal roads at sunrise, interpreting See You Again and its farewell theme",
         "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
       },
-      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps.",
+      "sourcePreviewCopy": {
+        "id": 131,
+        "url": "https://i.ytimg.com/vi/RgKAFK5djSk/hqdefault.jpg",
+        "path": "/review-source-images/131-96a9eb357ca359ac.jpg",
+        "bytes": 14239,
+        "sha256": "96a9eb357ca359ac8fe4413505c7019e1496d77a3804fddd2a1b5694a327a309",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-21T22:40:23.482Z",
+        "evidence": "docs/review-images/batch11-source-copies-20261022.json",
+        "note": "Unmodified original publisher preview bytes, not generated artwork or a newly captured video frame."
+      }
     },
     {
       "id": 132,
@@ -3498,7 +3528,22 @@
         "sceneInterpretation": "rose floating between lanterns in an invented moonlit courtyard, interpreting Guli Mata romance",
         "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
       },
-      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps.",
+      "sourcePreviewCopy": {
+        "id": 132,
+        "url": "https://i.ytimg.com/vi/Gp1RNYBckBs/hqdefault.jpg",
+        "path": "/review-source-images/132-d90960001f87d802.jpg",
+        "bytes": 15600,
+        "sha256": "d90960001f87d8022af785c6b50c5a2727727d90b779685b345beab2b9c9d834",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-21T22:40:23.496Z",
+        "evidence": "docs/review-images/batch11-source-copies-20261022.json",
+        "note": "Unmodified original publisher preview bytes, not generated artwork or a newly captured video frame."
+      }
     },
     {
       "id": 119,
@@ -3531,7 +3576,22 @@
         "sceneInterpretation": "empty convertible with suitcase and headphones on an invented mountain journey, interpreting the Bollywood travelling-song compilation",
         "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
       },
-      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps.",
+      "sourcePreviewCopy": {
+        "id": 119,
+        "url": "https://i.ytimg.com/vi/T5eQ-Vo_3EQ/hqdefault.jpg",
+        "path": "/review-source-images/119-fdf0ef51d07853aa.jpg",
+        "bytes": 36103,
+        "sha256": "fdf0ef51d07853aa44ab102f8e224fdedb55f229d688515f9fdd71992051f53d",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-21T22:40:23.546Z",
+        "evidence": "docs/review-images/batch11-source-copies-20261022.json",
+        "note": "Unmodified original publisher preview bytes, not generated artwork or a newly captured video frame."
+      }
     },
     {
       "id": 130,
@@ -3564,7 +3624,22 @@
         "sceneInterpretation": "peaceful tiger on a mossy log above an imagined jungle stream, interpreting the Roar jungle and confidence theme",
         "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
       },
-      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps.",
+      "sourcePreviewCopy": {
+        "id": 130,
+        "url": "https://i.ytimg.com/vi/CevxZvSJLk8/hqdefault.jpg",
+        "path": "/review-source-images/130-1c5072f1cf8acf4f.jpg",
+        "bytes": 23193,
+        "sha256": "1c5072f1cf8acf4f3d4a6477a5341a18a8ab5f73ba42dccef462da7ba465d1b5",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-21T22:40:23.562Z",
+        "evidence": "docs/review-images/batch11-source-copies-20261022.json",
+        "note": "Unmodified original publisher preview bytes, not generated artwork or a newly captured video frame."
+      }
     },
     {
       "id": 134,
@@ -3597,7 +3672,22 @@
         "sceneInterpretation": "empty pink rehearsal room with drum kit and guitar, interpreting the APT music-session motif",
         "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
       },
-      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps.",
+      "sourcePreviewCopy": {
+        "id": 134,
+        "url": "https://i.ytimg.com/vi/ekr2nIex040/hqdefault.jpg",
+        "path": "/review-source-images/134-c27c3ba0b9b33c69.jpg",
+        "bytes": 23509,
+        "sha256": "c27c3ba0b9b33c69ca4d85454c2071ec4d631ec1508e7b0fff09970c36049741",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-21T22:40:23.588Z",
+        "evidence": "docs/review-images/batch11-source-copies-20261022.json",
+        "note": "Unmodified original publisher preview bytes, not generated artwork or a newly captured video frame."
+      }
     },
     {
       "id": 36,
@@ -3630,7 +3720,22 @@
         "sceneInterpretation": "two microphones on an imagined empty retro stage, interpreting the Die With A Smile duet theme",
         "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
       },
-      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps.",
+      "sourcePreviewCopy": {
+        "id": 36,
+        "url": "https://i.ytimg.com/vi/kPa7bsKwL-c/hqdefault.jpg",
+        "path": "/review-source-images/36-51385a2a896fb77e.jpg",
+        "bytes": 24064,
+        "sha256": "51385a2a896fb77edc2d6f485cd2da6f61ecc205670c7d89ca33ef045e5d5809",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-21T22:40:23.605Z",
+        "evidence": "docs/review-images/batch11-source-copies-20261022.json",
+        "note": "Unmodified original publisher preview bytes, not generated artwork or a newly captured video frame."
+      }
     },
     {
       "id": 98,
@@ -3663,7 +3768,22 @@
         "sceneInterpretation": "microphone, pop filter and headphones in an invented recording booth, interpreting the Kolaveri Di studio-session motif",
         "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
       },
-      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps.",
+      "sourcePreviewCopy": {
+        "id": 98,
+        "url": "https://i.ytimg.com/vi/YR12Z8f1Dh8/hqdefault.jpg",
+        "path": "/review-source-images/98-0ecaaf61c969d8e7.jpg",
+        "bytes": 18161,
+        "sha256": "0ecaaf61c969d8e739e38faa5ebe76644a678003ea0b8e6cce2819845fdbb810",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-21T22:40:23.618Z",
+        "evidence": "docs/review-images/batch11-source-copies-20261022.json",
+        "note": "Unmodified original publisher preview bytes, not generated artwork or a newly captured video frame."
+      }
     },
     {
       "id": 115,
@@ -3696,7 +3816,22 @@
         "sceneInterpretation": "two original anonymous characters seen from behind sharing an umbrella, interpreting the Tujh Mein Rab Dikhta Hai romance theme",
         "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
       },
-      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps.",
+      "sourcePreviewCopy": {
+        "id": 115,
+        "url": "https://i.ytimg.com/vi/qoq8B8ThgEM/hqdefault.jpg",
+        "path": "/review-source-images/115-02920ff51ebeba35.jpg",
+        "bytes": 18544,
+        "sha256": "02920ff51ebeba352454cad12bda3d6aa06d62121158f4962eec347ee80508ed",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-21T22:40:23.634Z",
+        "evidence": "docs/review-images/batch11-source-copies-20261022.json",
+        "note": "Unmodified original publisher preview bytes, not generated artwork or a newly captured video frame."
+      }
     },
     {
       "id": 86,
@@ -3729,7 +3864,22 @@
         "sceneInterpretation": "guitar and percussion in an invented colorful courtyard, interpreting the Despacito social-music mood",
         "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
       },
-      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps.",
+      "sourcePreviewCopy": {
+        "id": 86,
+        "url": "https://i.ytimg.com/vi/kJQP7kiw5Fk/hqdefault.jpg",
+        "path": "/review-source-images/86-fde65350eaf8c380.jpg",
+        "bytes": 25889,
+        "sha256": "fde65350eaf8c380c30ac2610bdb426ae70c3d11a610290820c97825e1d9711b",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-21T22:40:23.648Z",
+        "evidence": "docs/review-images/batch11-source-copies-20261022.json",
+        "note": "Unmodified original publisher preview bytes, not generated artwork or a newly captured video frame."
+      }
     }
   ],
   "ownerDesignPreference": {

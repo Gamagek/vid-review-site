@@ -4,11 +4,12 @@ import crypto from 'node:crypto';
 
 const ORIGIN = 'https://vid.best';
 const allArt = JSON.parse(fs.readFileSync(new URL('../src/review-illustrations.json', import.meta.url)));
+const productionQueue = JSON.parse(fs.readFileSync(new URL('../docs/review-image-queue.json', import.meta.url)));
 const idsArg = process.argv.find(value => value.startsWith('--ids='));
 const latest = process.argv.includes('--batch=latest');
 assert.ok(!(idsArg && latest), 'Choose explicit IDs or the latest production batch');
 const requested = idsArg ? idsArg.slice(6).split(',').map(Number) : latest
-  ? JSON.parse(fs.readFileSync(new URL('../docs/review-image-queue.json', import.meta.url))).lastImageProductionBatch?.recordIds : null;
+  ? productionQueue.lastImageProductionBatch?.recordIds : null;
 assert.ok(!requested || requested.every(id => Number.isSafeInteger(id) && id > 0), 'Use published illustration IDs');
 const art = requested ? allArt.filter(item => requested.includes(item.id)) : allArt.slice(-10);
 assert.ok(art.length > 0 && art.length <= 10, 'Verify one batch of up to ten illustrations');
@@ -20,6 +21,23 @@ const get = async path => {
   const response = await fetch(url, {headers, redirect: 'manual', signal: AbortSignal.timeout(20000)});
   assert.equal(response.status, 200, url.pathname);
   return response;
+};
+const verifyImageBytes = async (path, expected, mime) => {
+  const response = await get(path);
+  assert.equal(response.headers.get('content-type')?.split(';')[0], mime);
+  assert.ok(!/noindex|none/i.test(response.headers.get('x-robots-tag') || ''), 'Image must allow indexing');
+  if (response.headers.has('content-length')) assert.equal(Number(response.headers.get('content-length')), expected.bytes);
+  const chunks = []; let length = 0;
+  const reader = response.body.getReader();
+  while (true) {
+    const {done, value} = await reader.read();
+    if (done) break;
+    length += value.length;
+    if (length > expected.bytes) { await reader.cancel(); throw Error('Oversized asset'); }
+    chunks.push(value);
+  }
+  assert.equal(length, expected.bytes);
+  assert.equal(crypto.createHash('sha256').update(Buffer.concat(chunks)).digest('hex'), expected.sha256);
 };
 const locations = xml => [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
 const xmlEscape = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
@@ -58,21 +76,7 @@ try {
 
   for (const item of art) {
     try {
-      const response = await get(item.path);
-      assert.equal(response.headers.get('content-type')?.split(';')[0], 'image/webp');
-      if (response.headers.has('content-length')) assert.equal(Number(response.headers.get('content-length')), item.bytes);
-      const chunks = []; let length = 0;
-      const reader = response.body.getReader();
-      while (true) {
-        const {done, value} = await reader.read();
-        if (done) break;
-        length += value.length;
-        if (length > item.bytes) { await reader.cancel(); throw Error('Oversized asset'); }
-        chunks.push(value);
-      }
-      const bytes = Buffer.concat(chunks);
-      assert.equal(length, item.bytes);
-      assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'), item.sha256);
+      await verifyImageBytes(item.path, item, 'image/webp');
       if (item.previousPath) {
         const previous = await fetch(ORIGIN + item.previousPath, {headers, redirect: 'manual', signal: AbortSignal.timeout(20000)});
         assert.equal(previous.status, 301);
@@ -84,10 +88,15 @@ try {
       const html = await (await get(canonical)).text();
       assert.ok(html.includes('src="' + image + '"'));
       assert.ok(html.includes(item.caption));
+      if (item.displayWatermark === 'vid.best') {
+        assert.ok(html.includes('<span class="watch-review-watermark" aria-hidden="true">vid.best</span>'));
+      }
       assert.ok(!/AI[\s-]*generated/i.test(item.alt + item.caption));
       const schema = JSON.parse(html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)[1]);
       const page = schema['@graph'].find(node => node['@type'] === 'WebPage');
       const video = schema['@graph'].find(node => node['@type'] === 'VideoObject');
+      const originalPublished = productionQueue.lastImageProductionBatch?.expectedPublishDates?.[item.id];
+      if (originalPublished) assert.equal(page.datePublished, originalPublished, 'Original review publication date');
       assert.equal(page.image.contentUrl, image);
       assert.equal(page.primaryImageOfPage, image);
       assert.ok(!video?.thumbnailUrl?.includes(image));
@@ -97,17 +106,24 @@ try {
       assert.ok(hasImage(editorial, canonical, image));
       assert.ok(hasImage(videos, canonical, image));
       let dualImage = false;
+      let sourceCopyVerified = false;
+      const sourceImageUrl = item.sourceImage?.path ? ORIGIN + item.sourceImage.path : item.sourceImage?.url;
       if (item.sourceImage) {
+        if (item.sourceImage.path) {
+          await verifyImageBytes(item.sourceImage.path, item.sourceImage, 'image/jpeg');
+          sourceCopyVerified = true;
+        }
         const sidebar = html.match(/<aside class="watch-review-images"[\s\S]*?<\/aside>/)?.[0];
         assert.ok(sidebar, 'Both images must be server rendered');
         assert.ok(sidebar.indexOf('data-review-image="source"') < sidebar.indexOf('data-review-image="artwork"'));
         assert.equal((sidebar.match(/<img /g) || []).length, 2);
-        assert.ok(sidebar.includes('src="' + item.sourceImage.url.replaceAll('&', '&amp;') + '"'));
+        assert.ok(sidebar.includes('src="' + sourceImageUrl.replaceAll('&', '&amp;') + '"'));
         assert.ok(sidebar.includes('src="' + image + '"'));
         assert.ok(video.thumbnailUrl.includes(item.sourceImage.url), 'Original source thumbnail preserved');
-        assert.ok(hasImage(combined, canonical, item.sourceImage.url));
-        assert.ok(hasImage(source, canonical, item.sourceImage.url));
-        assert.ok(!hasImage(editorial, canonical, item.sourceImage.url));
+        assert.ok(hasImage(combined, canonical, sourceImageUrl));
+        assert.ok(hasImage(source, canonical, sourceImageUrl));
+        assert.ok(hasImage(videos, canonical, sourceImageUrl));
+        assert.ok(!hasImage(editorial, canonical, sourceImageUrl));
         assert.ok(!hasImage(source, canonical, image));
         dualImage = true;
       }
@@ -119,7 +135,9 @@ try {
       result.results.push({id: item.id, slug: item.slug, assetPath: item.path, status: 200, mime: 'image/webp',
         bytes: item.bytes, sha256: item.sha256, pageAssociation: true, socialMetadataAssociation: true,
         imageSitemapAssociation: true, separatedEditorialAndSourceMaps: true,
-        dualImageSourceFirst: dualImage, sourceImage: item.sourceImage?.url || null,
+        dualImageSourceFirst: dualImage, sourceImage: sourceImageUrl || null,
+        sourceCopyVerified, sourceCopySha256: sourceCopyVerified ? item.sourceImage.sha256 : null,
+        artworkDisplayWatermark: item.displayWatermark || null,
         videoThumbnailUnchanged: true, datePublished: page.datePublished, dateModified: page.dateModified});
     } catch (error) {
       result.failures.push({id: item.id, error: String(error)});

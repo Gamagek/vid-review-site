@@ -651,6 +651,22 @@ select:disabled { opacity: .52; }
   border-radius: var(--radius-xl);
 }
 .watch-review-art a { display: block; }
+.watch-review-artwork-link { position: relative; overflow: hidden; border-radius: 14px; line-height: 0; }
+.watch-review-watermark {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 4px 7px;
+  border-radius: 5px;
+  background: rgba(6,9,18,.58);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: .02em;
+  text-shadow: 0 1px 3px #000;
+  pointer-events: none;
+}
 .watch-review-art img {
   width: 100%;
   height: auto;
