@@ -33,11 +33,16 @@ for (const id of ids) {
   const item = manifest.find(row => row.id === id);
   assert.ok(item?.sourceImage, 'Only the reserved, audited source/artwork pairs');
   const source = new URL(item.sourceUrl);
-  assert.ok(['www.youtube.com', 'youtube.com'].includes(source.hostname));
-  const videoId = source.searchParams.get('v') || source.pathname.match(/^\/(?:shorts|embed)\/([\w-]{11})$/)?.[1];
+  assert.ok(['www.youtube.com', 'youtube.com', 'youtu.be'].includes(source.hostname));
+  const videoId = source.hostname === 'youtu.be' ? source.pathname.slice(1)
+    : source.searchParams.get('v') || source.pathname.match(/^\/(?:shorts|embed)\/([\w-]{11})$/)?.[1];
   assert.match(videoId || '', /^[\w-]{11}$/);
   const url = new URL(item.sourceImage.url);
   assert.equal(url.href, `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`, 'Exact same-video publisher preview');
+  if (process.argv.includes('--validate-only')) {
+    console.log(JSON.stringify({id, url: url.href, identityGuard: true}));
+    continue;
+  }
   const response = await fetch(url, {redirect: 'error', signal: AbortSignal.timeout(20000)});
   assert.equal(response.status, 200, `Source ${id}`);
   assert.equal(response.headers.get('content-type')?.split(';')[0], 'image/jpeg');
