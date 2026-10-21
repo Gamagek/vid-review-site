@@ -1,0 +1,62 @@
+{
+  "intake_batch": "2026-10-21-new-38",
+  "intake_sequence": 5,
+  "intended_new_items": 38,
+  "publication_date_sri_lanka": "2026-10-21",
+  "stage": "prepared_for_direct_d1_publication",
+  "original_user_evidence": {
+    "video_id": "IUHFgfy6OxM",
+    "source_url": "https://youtube.com/shorts/IUHFgfy6OxM",
+    "original_video_title": "#trend",
+    "creator_name_reported": "Tom react",
+    "duration_seconds_reported": 45,
+    "analysis_source": "User-provided multimodal scene notes; source was not independently replayed",
+    "reaction_panel_identities": "Not independently verified",
+    "scenes_reported": [
+      "Boiled egg and splash",
+      "Yellow balloon white powder burst",
+      "Carton pushed and liquid spilled",
+      "Night pavement slide beside currency-looking notes",
+      "Moving black trash-bag disguise",
+      "Older man startled on sofa and cup spills"
+    ]
+  },
+  "vidbest_insert_payload": {
+    "slug": "egg-splash-flour-balloon-trash-bag-and-sofa-pranks",
+    "title": "Egg Splash, Flour Balloon & Surprise Sofa Scare",
+    "source_url": "https://www.youtube.com/shorts/IUHFgfy6OxM",
+    "embed_url": "https://www.youtube.com/embed/IUHFgfy6OxM",
+    "media_type": "youtube",
+    "primary_category": "Funny & Comedy",
+    "subcategory": "Memes & Compilation",
+    "description": "😂 Kitchen surprises turn messy as an egg splashes, a yellow balloon releases white powder and a drink carton gets pushed into someone's face. A nighttime slide, moving trash-bag disguises and a spilled cup on the sofa complete this quick split-screen comedy compilation.",
+    "review_text": "1. A Boiled Egg Becomes a Face-Splash Gag\n\nAn everyday kitchen moment turns into a slapstick surprise. A woman peels a boiled egg, and a man wearing a green Rare Rabbit shirt steps nearby. Yellow egg-like liquid suddenly splashes across his forehead or face. The sharp change from a quiet food-preparation scene to his messy reaction gives the opener a quick punchline. The clip does not make clear whether it is the yolk itself or another liquid, so the humour rests on what appears on screen rather than an invented cause.\n\n2. A Yellow Balloon Sends Powder Flying\n\nThe next joke takes place in a living room, where two people handle a yellow balloon. When it bursts or is struck, a cloud of white powder rises and covers the woman's face. Its visual appeal comes from the sudden contrast between a bright balloon and a cloud spreading across the shot. The material is described as flour in the scene notes, but the exact substance is not established independently; it would be unsafe to imitate such a prank near another person's eyes or airway.\n\n3. A Drink Carton at the Kitchen Counter\n\nAnother food-related sketch shows a man and woman holding small cartons close to their mouths. A quick push sends one carton towards the woman's face, resulting in a spill and a startled response. A squishing sound effect and fast cut emphasise the comic timing. Unlike the balloon's single dramatic puff, this scene uses a familiar packet and the surprise of something suddenly being moved.\n\n4. A Nighttime Slide by Scattered Notes\n\nThe compilation then jumps outdoors at night. A man slides along a paved surface close to items that look like banknotes arranged on the ground. This brief sequence adds a different kind of physical joke after the messy indoor moments. The authenticity of the notes and any supposed motivation for the movement are not clear, so the scene is best appreciated simply as an odd, fast-moving visual gag.\n\n5. Moving Trash Bags on the Street\n\nA street scene introduces black plastic rubbish bags that appear to come alive when concealed people move inside them. Nearby waste-collection vehicles and ordinary street activity provide the background. The joke works through disguise: a familiar object unexpectedly behaves like a person. The cut is short, so it does not establish how everyone nearby reacts or whether anyone is genuinely fooled.\n\n6. The Sofa Startle Ends in a Spilled Cup\n\nThe finale returns to a living-room sofa. An older man holding a paper cup is surprised by someone wearing a bright pink top. His abrupt movement sends the drink spilling and he brings his hands towards his head. This sequence offers the clearest final setup and payoff: a relaxed seated moment becomes a noisy reaction. The laughter above the video supports the fast-paced comedy without verifying who appears in the reaction panel.\n\nFinal Verdict\n\nThe egg splash, balloon burst and carton prank form a run of messy domestic jokes before the edit shifts to a nighttime slide and moving trash bags. The sofa startle brings the focus back to a familiar household surprise. What holds the Short together is the variety of quick reversals, sound effects and split-screen laughter rather than a single connected storyline.",
+    "seo_title": "Egg Splash, Flour Balloon & Sofa Scare | Comedy Short",
+    "seo_description": "An egg splashes in a kitchen, a yellow balloon bursts into powder, a drink carton spills, and a sofa scare closes this rapid prank compilation.",
+    "seo_tags": [
+      "boiled egg splash kitchen skit",
+      "green shirt egg yolk reaction",
+      "yellow balloon powder burst",
+      "white powder face surprise",
+      "drink carton push prank",
+      "kitchen drink spill reaction",
+      "nighttime pavement slide joke",
+      "currency notes street slide",
+      "moving black trash bag disguise",
+      "rubbish bin street comedy",
+      "paper cup sofa scare",
+      "pink top living room startle"
+    ],
+    "thumbnail_url": null,
+    "featured": false,
+    "trending": false,
+    "published": true
+  },
+  "security": {
+    "insert_only": true,
+    "never_modify_earliest_10_or_raw_media": true,
+    "duplicate_key": "youtube:IUHFgfy6OxM",
+    "preserve_all_existing_dates": true,
+    "do_not_assign_existing_d1_id": true
+  }
+}
