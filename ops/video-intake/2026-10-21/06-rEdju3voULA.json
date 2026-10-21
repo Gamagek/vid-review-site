@@ -1,0 +1,63 @@
+{
+  "intake_batch": "2026-10-21-new-38",
+  "intake_sequence": 6,
+  "intended_new_items": 38,
+  "publication_date_sri_lanka": "2026-10-21",
+  "stage": "prepared_for_direct_d1_publication",
+  "original_user_evidence": {
+    "video_id": "rEdju3voULA",
+    "source_url": "https://youtube.com/shorts/rEdju3voULA",
+    "original_video_title": "#trend",
+    "creator_name_reported": "Tom react",
+    "duration_seconds_reported": 44,
+    "analysis_source": "User-provided multimodal scene notes; source was not independently replayed",
+    "reaction_panel_identities": "Not independently verified",
+    "scenes_reported": [
+      "Kneeling man startled beside cups in park",
+      "Game On hai bed challenge",
+      "Pink packages and kitchen spray",
+      "Cherry feeding tease",
+      "Watermelon supermarket",
+      "Blanket wake-up tap",
+      "White robe doorway cream smash"
+    ]
+  },
+  "vidbest_insert_payload": {
+    "slug": "park-cup-bed-challenge-cherry-prank-and-doorway-cream-smash",
+    "title": "Park Cup Prank, Bed Challenge & Doorway Cream Smash",
+    "source_url": "https://www.youtube.com/shorts/rEdju3voULA",
+    "embed_url": "https://www.youtube.com/embed/rEdju3voULA",
+    "media_type": "youtube",
+    "primary_category": "Funny & Comedy",
+    "subcategory": "Memes & Compilation",
+    "description": "😂 A man gets surprised beside cups in a park, a bedroom challenge sends someone tumbling backwards, and a kitchen spray and cherry-feeding tease keep the gags moving. After a quick watermelon and wake-up prank, a messy doorway cream-smash provides the finale.",
+    "review_text": "1. A Surprise Among Cups in the Park\n\nThe compilation begins outdoors, where a man kneels on a paved surface and interacts with cups arranged nearby. Another person approaches and appears to tap or startle him, prompting a comic response. The unfamiliar setup makes the reaction the focus: viewers see someone concentrating on the cups before the sudden interruption changes the moment. The exact game or task involving the cups is not established by the short excerpt.\n\n2. A Bed Challenge Goes Off Balance\n\nThe next sequence moves to a bedroom, where three young men engage in a playful wrestling or push-up-style challenge on and around a bed. The on-screen phrase Game On hai sets an energetic tone. Their movement quickly becomes chaotic, and one participant falls backwards off the mattress. It is the contrast between the confident challenge setup and the awkward ending that makes this physical-comedy moment memorable.\n\n3. Pink Packages and an Unexpected Kitchen Spray\n\nTwo women stand at a kitchen counter holding pink packages near their mouths. One suddenly moves towards or startles the other, and a burst or spray of contents follows. The brief Spanish caption adds another layer to the edit, while the actual comedy comes from the sudden mess and surprised expression. The contents of the packages cannot be identified reliably from the available description, so this review avoids presenting them as a specific drink or product.\n\n4. The Cherry Tease at the Table\n\nThe joke shifts to a table with a plate of cherries. A woman offers a cherry to a man, then pulls it back or changes the gesture just as he expects to receive it. His exaggerated response supplies the punchline. The scene works through a very small betrayal of expectation: an ordinary act of sharing fruit turns into a teasing prank without needing elaborate props.\n\n5. A Watermelon and a Wake-Up Surprise\n\nA brief supermarket cut shows a man examining or balancing a fresh watermelon among produce. It is followed by a bedroom scene in which a woman surprises a man lying beside her under a blanket with a playful slap or tap. His startled movement turns the quiet bedroom setup into another fast reaction gag. Neither short segment establishes a wider story, but both help maintain the compilation's constant rhythm.\n\n6. A Doorway Cream Smash Provides the Finale\n\nIn the last extended scene, several men in white traditional robes gather near an indoor doorway. A gesture or playful interaction leads to a plate of white cream-like material or powder being pushed or thrown into someone's face. The visual splat and surrounding reactions deliver the clearest closing moment. The video does not establish the exact substance, and the joke is better described through the sudden visual result than through unsupported claims about anyone's intentions.\n\nFinal Verdict\n\nThis 44-second montage moves from a curious park-side cup interruption to bedroom slapstick, a kitchen spray, a cherry-feeding tease and a messy doorway finale. Its strength lies in small setups with quick reversals. Rapid editing and an overlaid laughing group give the otherwise unrelated clips a shared playful mood, without requiring verified celebrity identities or invented dialogue.",
+    "seo_title": "Park Cup Prank, Bed Challenge & Cream Smash Finale",
+    "seo_description": "A park cup surprise, bedroom challenge fall, kitchen spray, cherry tease and doorway cream prank bring quick twists to a reaction comedy Short.",
+    "seo_tags": [
+      "park pavement cups surprise",
+      "kneeling park prank reaction",
+      "Game On hai bed challenge",
+      "bedroom backward fall gag",
+      "pink package kitchen spray",
+      "Spanish caption comedy montage",
+      "cherry feeding tease prank",
+      "supermarket watermelon moment",
+      "blanket wake up tap",
+      "white thobe doorway joke",
+      "cream splash doorway finale",
+      "Tom react multi clip comedy"
+    ],
+    "thumbnail_url": null,
+    "featured": false,
+    "trending": false,
+    "published": true
+  },
+  "security": {
+    "insert_only": true,
+    "never_modify_earliest_10_or_raw_media": true,
+    "duplicate_key": "youtube:rEdju3voULA",
+    "preserve_all_existing_dates": true,
+    "do_not_assign_existing_d1_id": true
+  }
+}
