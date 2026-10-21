@@ -551,7 +551,8 @@ test("image sitemap and semantic review cover use canonical URLs and never list 
       'raw','Music','Music Videos','Unpublished content','https://vid.best/review-covers/draft.webp',0)`).run();
 
   const root = await (await request(context, "https://vid.best/sitemap.xml")).text();
-  assert.match(root, /<loc>https:\/\/vid\.best\/sitemaps\/images-1\.xml<\/loc>/);
+  assert.match(root, /<loc>https:\/\/vid\.best\/sitemaps\/images-editorial-1\.xml<\/loc>/);
+  assert.match(root, /<loc>https:\/\/vid\.best\/sitemaps\/images-source-1\.xml<\/loc>/);
   assert.doesNotMatch(root, /<loc>https:\/\/vid\.best\/image-sitemap\.xml<\/loc>/, "an index must not nest another index");
   for (const [, childUrl] of root.matchAll(/<loc>([^<]+)<\/loc>/g)) {
     const child = await (await request(context, childUrl)).text();
