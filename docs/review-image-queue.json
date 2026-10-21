@@ -8323,13 +8323,13 @@
       "All10live asset/HTML/split-sitemap associations"
     ],
     "validation": {
-      "nodeTests": 467,
+      "nodeTests": 468,
       "workerDryRun": true,
       "assetHashesAndPreservation": true,
-      "exactHeadCI": "pending for final source-pairing head",
+      "exactHeadCI": "pending for editorial upstream merge head",
       "pythonSuite": "required CI pending"
     },
-    "reconciledMain": "5b0313405cf6e7fc57931e86ba451a28a488e3e6",
+    "reconciledMain": "fe12eaa1049b948ee049f60d3ef2f61be079c2aa",
     "upstreamReconciliation": "docs/review-images/batch11-upstream-reconciliation-20261022.json",
     "newSourceCopiesPrepared": 10,
     "sourceCopies": "docs/review-images/batch11-source-copies-20261022.json",
@@ -8346,7 +8346,8 @@
       "115": "2026-10-08T18:54:19.596Z",
       "86": "2026-10-03T16:54:10.360Z"
     },
-    "sourcePairingCheckpoint": "docs/review-images/batch11-source-pairing-checkpoint-20261022.json"
+    "sourcePairingCheckpoint": "docs/review-images/batch11-source-pairing-checkpoint-20261022.json",
+    "editorialUpstreamReconciliation": "docs/review-images/batch11-editorial-upstream-reconciliation-20261022.json"
   },
   "lastImageProductionBatch": {
     "state": "prepared_release_blocked",
@@ -8387,13 +8388,13 @@
       "All10live asset/HTML/split-sitemap associations"
     ],
     "validation": {
-      "nodeTests": 467,
+      "nodeTests": 468,
       "workerDryRun": true,
       "assetHashesAndPreservation": true,
-      "exactHeadCI": "pending for final source-pairing head",
+      "exactHeadCI": "pending for editorial upstream merge head",
       "pythonSuite": "required CI pending"
     },
-    "reconciledMain": "5b0313405cf6e7fc57931e86ba451a28a488e3e6",
+    "reconciledMain": "fe12eaa1049b948ee049f60d3ef2f61be079c2aa",
     "upstreamReconciliation": "docs/review-images/batch11-upstream-reconciliation-20261022.json",
     "newSourceCopiesPrepared": 10,
     "sourceCopies": "docs/review-images/batch11-source-copies-20261022.json",
@@ -8410,7 +8411,8 @@
       "115": "2026-10-08T18:54:19.596Z",
       "86": "2026-10-03T16:54:10.360Z"
     },
-    "sourcePairingCheckpoint": "docs/review-images/batch11-source-pairing-checkpoint-20261022.json"
+    "sourcePairingCheckpoint": "docs/review-images/batch11-source-pairing-checkpoint-20261022.json",
+    "editorialUpstreamReconciliation": "docs/review-images/batch11-editorial-upstream-reconciliation-20261022.json"
   },
   "ownerReconciliation20261021": {
     "authoritativeInventoryAt": "2026-10-21T17:41:22.163Z",
