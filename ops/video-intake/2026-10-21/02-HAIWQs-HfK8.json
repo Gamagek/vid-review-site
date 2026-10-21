@@ -1,0 +1,59 @@
+{
+  "intake_batch": "2026-10-21-new-38",
+  "intake_sequence": 2,
+  "intended_new_items": 38,
+  "publication_date_sri_lanka": "2026-10-21",
+  "stage": "prepared_for_direct_d1_publication",
+  "original_user_evidence": {
+    "video_id": "HAIWQs-HfK8",
+    "source_url": "https://youtube.com/shorts/HAIWQs-HfK8?si=_HD1eq7twoGG5I6t",
+    "duration_seconds_reported": 41,
+    "creator_name_reported": "Tom react",
+    "identity_status": "Reaction-panel identities not independently verified",
+    "scene_outline": [
+      "Yellow saree and green sponge inside iPhone box",
+      "Barbershop hairstyle reference and comic disagreement",
+      "Feeding skit with exaggerated face",
+      "Sliding plate across kitchen floor and startled drop",
+      "Kitchen counter surprise"
+    ],
+    "analysis_source": "user-supplied multimodal scene notes, not independently replayed"
+  },
+  "vidbest_insert_payload": {
+    "slug": "fake-iphone-sponge-haircut-mix-up-and-kitchen-pranks",
+    "title": "Fake iPhone Sponge, Haircut Mix-Up & Kitchen Pranks",
+    "source_url": "https://www.youtube.com/shorts/HAIWQs-HfK8",
+    "embed_url": "https://www.youtube.com/embed/HAIWQs-HfK8",
+    "media_type": "youtube",
+    "primary_category": "Funny & Comedy",
+    "subcategory": "Memes & Compilation",
+    "description": "😂 An iPhone gift box reveals a green cleaning sponge, a barbershop haircut reference sparks a mock argument, and three kitchen scenes turn into unexpected reactions. This split-screen YouTube Short connects five compact jokes with fast cuts, lively music and laughter.",
+    "review_text": "1. The iPhone Box With an Unexpected Surprise\n\nThe compilation opens beside an outdoor washing area, where a woman wearing a yellow saree receives what appears to be an iPhone box. Instead of an expensive device, the box reveals a green sponge. The joke is built on expectation and contrast: the familiar packaging suggests a desirable gift, while the ordinary cleaning item delivers a playful visual reversal. The woman's reaction matters more than any elaborate explanation of the trick.\n\n2. A Haircut Reference Meets Barbershop Confusion\n\nThe next scene moves to a barbershop, where a customer is shown an example hairstyle on a smartphone. Text visible on the phone refers to cute Korean haircuts for men. The interaction soon becomes a comic disagreement, with a mock slap adding a quick burst of slapstick. The humour comes from the gap between a neat hairstyle reference and the increasingly chaotic exchange in the chair. The clip does not clearly establish the final haircut result, so it would be misleading to invent one.\n\n3. A Kitchen Feeding Moment Takes a Strange Turn\n\nAnother short indoor scene centers on food and the faces of the people nearby. While a man is being offered a bite by a woman, another person's exaggerated open-mouthed expression interrupts the ordinary moment. This is reaction comedy in miniature: the setting is familiar, the feeding gesture is simple, and the unexpected face transforms it into a joke. The sequence works without requiring any definite explanation of the food or the participants' intentions.\n\n4. The Sliding Plate Surprise\n\nThe most physical kitchen prank begins when a woman sends a plate of food sliding across the floor. A man is startled and drops what he is holding as the plate moves through the scene. The unexpected motion, the sudden noise and the visible loss of composure carry the gag. It is a short example of how prank editing makes an everyday domestic space feel unpredictable. The exact objects the man drops are not fully established by the available scene account.\n\n5. A Final Startle at the Kitchen Counter\n\nThe compilation closes with a second kitchen-style surprise. A man abruptly startles a woman while she is busy handling items at a counter. Her sudden response and the accompanying bursts of laughter give the sequence its closing punchline. The edit places this jump-scare-like moment at the end, when viewers are already primed for another surprise. It does not show what happens after the reaction, so the conclusion belongs to the quick comic exchange itself.\n\n6. Why the Split-Screen Reaction Format Works\n\nA group of laughing viewers remains visible in the upper portion of the vertical video, while the lower portion moves between the washing area, barbershop and kitchens. Rapid cuts, short exclamations, music and laughter keep the unrelated sketches connected. The comic formula changes from a gift-box misdirection to a haircut disagreement, then to food-related startle moments. Although the supplied analysis names particular actors in the upper panel, those identities are not independently established here and are unnecessary to understand the humour.\n\nFinal Verdict\n\nThis forty-one-second Short combines five compact everyday pranks, each relying on a different unexpected response. The green sponge inside an iPhone box is its clearest expectation-versus-reality joke; the haircut exchange and kitchen surprises supply a faster, more physical rhythm. With its constant reaction overlay, the video feels like a playful montage designed for quick laughs rather than a continuous narrative. Its strongest quality is the variety of reactions across very ordinary settings.",
+    "seo_title": "Fake iPhone Sponge, Haircut Mix-Up & Kitchen Pranks",
+    "seo_description": "An iPhone box hides a green sponge, a haircut request sparks confusion, and three kitchen surprises power this quick split-screen comedy montage.",
+    "seo_tags": [
+      "iphone box green sponge prank",
+      "yellow saree fake gift reaction",
+      "Korean haircut reference joke",
+      "barbershop haircut misunderstanding",
+      "mock slap barbershop skit",
+      "kitchen feeding face reaction",
+      "sliding plate floor surprise",
+      "kitchen counter jump scare",
+      "Tom react split screen compilation",
+      "quick cut prank montage",
+      "green cleaning sponge gift",
+      "five scene reaction comedy"
+    ],
+    "thumbnail_url": null,
+    "featured": false,
+    "trending": false,
+    "published": true
+  },
+  "security": {
+    "insert_only": true,
+    "never_modify_earliest_10_or_raw_media": true,
+    "duplicate_key": "youtube:HAIWQs-HfK8",
+    "leave_source_video_upload_date_null": true
+  }
+}
