@@ -1,0 +1,19 @@
+name = "vidnavigator-mcp-gateway"
+main = "src/index.js"
+compatibility_date = "2026-10-21"
+compatibility_flags = ["global_fetch_strictly_public"]
+workers_dev = true
+
+[vars]
+# Change this to the EXACT deployed public URL shown by Wrangler (no trailing slash).
+PUBLIC_ORIGIN = "https://REPLACE-ME.workers.dev"
+# Exact GitHub user permitted to connect. Case-insensitive comparison.
+ALLOWED_GITHUB_LOGIN = "Gamagek"
+
+# Populate ID using: npx wrangler kv namespace create OAUTH_KV
+[[kv_namespaces]]
+binding = "OAUTH_KV"
+id = "REPLACE_WITH_OAUTH_KV_NAMESPACE_ID"
+
+[observability]
+enabled = true
