@@ -4043,5 +4043,14 @@
       "retryAfter": "2026-10-22T00:32:49Z",
       "item_id": "ksi_01a15be1-fd22-71d3-bf5a-c10eaf7ec4c7"
     }
-  ]
+  ],
+  "dateInterpretation": {
+    "environmentDate": "2026-10-21",
+    "literalYesterday": "2026-10-20",
+    "literalYesterdayPublishedTikTok": 0,
+    "selectedLatestPublishedBatchLocalDate": "2026-10-19",
+    "selectedBatchCount": 41,
+    "checkedAt": "2026-10-21T01:02:47.140Z",
+    "interpretation": "The owner asks to enrich TikTok reviews as well. Since no TikTok review was published20October, use the latest published41-review batch from19October; this is a documented interpretation of the relative date, not an exact date supplied by the owner."
+  }
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "ownerRequestLocalDate": "2026-10-20",
+  "ownerRequestLocalDate": "2026-10-21",
   "requestedTikTokLocalDate": "2026-10-19",
   "minimumSubtopics": 3,
   "ownerRequest": "මේ විඩීයෝවල ප්‍රමාණවත් review නැහැ අනෙක් වීඩියෝ structure මෙන් මේවායේ content audio විශ්ලේෂණය කරලා real review දෙන්න tiktok විඩීයෝත් එහෙමයි ඊයේ publish කළ, 3rd partt plugin or connector එක්කින් හරි unique fresh real true review සකසන්ම sub topic අවම 3 ක් සහිත review ලෙස, adsense under review ඒක නිසා මේක ගැන හොඳින් බලන්න\n\n\nVid.Best ID 394 — https://www.youtube.com/shorts/6iem4FnZLHg\nVid.Best ID 393 — https://www.youtube.com/shorts/WIovWE28BbQ\nVid.Best ID 392 — https://www.youtube.com/shorts/I6fejmn7RJU\nVid.Best ID 391 — https://www.youtube.com/shorts/q5T5MPaOgm0\nVid.Best ID 390 — https://www.youtube.com/shorts/4B4Iqf2sayE\nVid.Best ID 389 — https://www.youtube.com/shorts/Uvqz3mNxHME\nVid.Best ID 388 — https://www.youtube.com/shorts/nEmLhJL_yj8\nVid.Best ID 387 — https://www.youtube.com/shorts/dFedVzeVXbc\nVid.Best ID 386 — https://www.youtube.com/shorts/H204j257esI\nVid.Best ID 385 — https://www.youtube.com/shorts/esaj4jjHEQs\nVid.Best ID 384 — https://www.youtube.com/shorts/Wld0h6JVjx4\nVid.Best ID 383 — https://www.youtube.com/shorts/YRnOKp__5Mw\nVid.Best ID 382 — https://www.youtube.com/shorts/K0coJchz6qE\nVid.Best ID 381 — https://www.youtube.com/shorts/nSJquJ0OPVc\nVid.Best ID 380 — https://www.youtube.com/shorts/7Fn26kyxQvo\nVid.Best ID 379 — https://www.youtube.com/shorts/wi7a28NGsV4\nVid.Best ID 378 — https://www.youtube.com/shorts/QyyoHMPu18c\nVid.Best ID 377 — https://www.youtube.com/shorts/tbDbgPQkY3E\nVid.Best ID 376 — https://www.youtube.com/shorts/5f0Nr5Aaz_U\nVid.Best ID 375 — https://www.youtube.com/shorts/gSHb7H3NxdQ\nVid.Best ID 374 — https://www.youtube.com/shorts/7P7ZTnnEEc4\nVid.Best ID 373 — https://www.youtube.com/shorts/PCLXcrXkszI\nVid.Best ID 372 — https://www.youtube.com/shorts/gOaMJ2r7FHI\nVid.Best ID 371 — https://www.youtube.com/shorts/2vuoqOmi6Uo\nVid.Best ID 370 — https://www.youtube.com/shorts/KeSsSUyz5ys\nVid.Best ID 369 — https://www.youtube.com/shorts/bNykvcmIxi0\nVid.Best ID 368 — https://www.youtube.com/shorts/-9f4QBjAkHE\nVid.Best ID 367 — https://www.youtube.com/shorts/TsXGmtX5wDc\nVid.Best ID 366 — https://www.youtube.com/shorts/6zUwetwrmQg\nVid.Best ID 365 — https://www.youtube.com/shorts/0naFqCsBjz0\nVid.Best ID 364 — https://www.youtube.com/shorts/FCUUoNmnaz4",
@@ -258,6 +258,15 @@
     "all media/cache/rights fields"
   ],
   "imageCreationPaused": true,
-  "explicitComedyScope": "This owner request authorizes review enrichment only for the31listed IDs and eligible published TikTok reviews from19October2026SriLanka. Other protected Funny & Comedy copy and all explicit source/media holds remain outside scope.",
-  "publication": "Require source-specific evidence, current preimages, guarded migration, passing CI/dry-run and live verification. No AdSense review request or indexing promise."
+  "explicitComedyScope": "The owner specifically asks for review enrichment of the31listed YouTube sources and TikTok reviews. The selected41-review TikTok batch is the latest published batch (19October), because current D1 has no20October TikTok publication. This is an explicit interpretation of the relative date. All unlisted/protected reviews and source/media holds remain excluded.",
+  "publication": "Require source-specific evidence, current preimages, guarded migration, passing CI/dry-run and live verification. No AdSense review request or indexing promise.",
+  "dateInterpretation": {
+    "environmentDate": "2026-10-21",
+    "literalYesterday": "2026-10-20",
+    "literalYesterdayPublishedTikTok": 0,
+    "selectedLatestPublishedBatchLocalDate": "2026-10-19",
+    "selectedBatchCount": 41,
+    "checkedAt": "2026-10-21T01:02:47.140Z",
+    "interpretation": "The owner asks to enrich TikTok reviews as well. Since no TikTok review was published20October, use the latest published41-review batch from19October; this is a documented interpretation of the relative date, not an exact date supplied by the owner."
+  }
 }

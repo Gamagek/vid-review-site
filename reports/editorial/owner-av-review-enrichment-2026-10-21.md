@@ -1,6 +1,6 @@
 # Owner-requested source-grounded review enrichment
 
-The exact request is retained in content/editorial-quality/2026-10-20-owner-av-request.json. The 21 October read-only inventory found500 saved and500 published reviews. Scope:31 explicit YouTube Shorts and41 eligible TikToks published 19 October in Sri Lanka. This specific owner request authorizes these Funny & Comedy review edits; other reviews and media holds remain protected.
+The exact request is retained in content/editorial-quality/2026-10-20-owner-av-request.json. The 21 October read-only inventory found500 saved and500 published reviews. Scope:31 explicit YouTube Shorts and41 eligible TikToks published 19 October in Sri Lanka. A fresh calendar check at2026-10-21T01:02:47.140Zfound no TikTok publication on20October; the latest published batch is the41from19October. The owner's relative-date wording is interpreted as that latest batch and is recorded as an interpretation, not a date explicitly supplied by the owner. This specific owner request authorizes these Funny & Comedy review edits; other reviews and media holds remain protected.
 
 ## Reviewed additions
 
