@@ -104,6 +104,10 @@ try{
  }
 }catch(error){result.workerDeployment={verified:false,error:error.name};}
 
+
+result.tiktokCalendar=Object.fromEntries([...new Set(stable.filter(r=>r.media_type==='tiktok'&&r.published===1).map(r=>new Date(Date.parse(r.created_at)+330*60000).toISOString().slice(0,10)))].sort().map(day=>[day,stable.filter(r=>r.media_type==='tiktok'&&r.published===1&&new Date(Date.parse(r.created_at)+330*60000).toISOString().slice(0,10)===day).length]));
+result.tiktokPublishedOn20October=stable.filter(r=>r.media_type==='tiktok'&&r.published===1&&new Date(Date.parse(r.created_at)+330*60000).toISOString().slice(0,10)==='2026-10-20'&&!privateMedia(r));
+
 fs.writeFileSync('owner-review-baseline.json',JSON.stringify(result,null,2)+'\n');
 const encoded=Buffer.from(JSON.stringify(result)).toString('base64'),size=5000,n=Math.ceil(encoded.length/size);
 for(let i=0;i<n;i++)console.log('VIDBEST_BASELINE_CHUNK '+(i+1)+'/'+n+' '+encoded.slice(i*size,(i+1)*size));
