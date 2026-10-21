@@ -309,12 +309,21 @@ async function handleCategory(request, env, category) {
   );
 }
 
+function verifiedSitemapLastmod(value) {
+  const candidate = String(value || "");
+  // Google's sitemap date should be a real, timezone-qualified W3C timestamp.
+  // In particular, do not emit legacy SQLite date strings or invented edit dates.
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(candidate) ||
+      !Number.isFinite(Date.parse(candidate))) return "";
+  return `<lastmod>${escapeXml(candidate)}</lastmod>`;
+}
+
 async function categorySitemap(env) {
   const stats = await categoryStats(env);
   const entries = stats
     .filter((row) => Number(row?.total || 0) >= MIN_INDEXABLE_CATEGORY_VIDEOS)
     .map((row) =>
-      `<url><loc>${escapeXml(categoryUrl(row.primary_category))}</loc>${row.lastmod ? `<lastmod>${escapeXml(row.lastmod)}</lastmod>` : ""}</url>`
+      `<url><loc>${escapeXml(categoryUrl(row.primary_category))}</loc>${verifiedSitemapLastmod(row.lastmod)}</url>`
     )
     .join("");
   const body = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries}</urlset>`;
@@ -338,7 +347,9 @@ async function combinedSitemap(env) {
     : "";
   const pagesEntry = `<sitemap><loc>${escapeXml(CANONICAL_ORIGIN + "/sitemaps/pages.xml")}</loc></sitemap>`;
   // Google does not support sitemap indexes nested inside another index.
-  const imagesEntry = imageSitemapEntries(Number(row?.total || 0));
+  // Use split editorial/source sitemaps as the primary discovery index.
+  // Keep /image-sitemap.xml and /sitemaps/images-N.xml working for existing GSC submissions.
+  const imagesEntry = distinctImageSitemapEntries(Number(row?.total || 0));
 
   const editorialEntry = `<sitemap><loc>${CANONICAL_ORIGIN}/sitemaps/daily-weekly-best.xml</loc></sitemap>`;
   const body = `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${pagesEntry}${videoSitemaps}${imagesEntry}${categoryEntry}${editorialEntry}</sitemapindex>`;
@@ -346,6 +357,17 @@ async function combinedSitemap(env) {
     status: 200,
     headers: standardHeaders("application/xml; charset=utf-8", "public, max-age=900")
   });
+}
+
+// Independently inspectable, topic-specific image catalogs.
+// A canonical review URL may appear in each catalog only for an image it actually displays.
+// The original combined image sitemap stays live for backward compatibility.
+function distinctImageSitemapEntries(total) {
+  const pages = Math.max(1, Math.ceil(total / IMAGES_PER_SITEMAP));
+  const sources = ["editorial", "source"];
+  return sources.flatMap(kind => Array.from({ length: pages }, (_, index) =>
+    `<sitemap><loc>${escapeXml(`${CANONICAL_ORIGIN}/sitemaps/images-${kind}-${index + 1}.xml`)}</loc></sitemap>`
+  )).join("");
 }
 
 // Separate image sitemap for externally embedded and owner-created review posters.
@@ -357,6 +379,18 @@ function imageSitemapEntries(total) {
     `<sitemap><loc>${escapeXml(`${CANONICAL_ORIGIN}/sitemaps/images-${index + 1}.xml`)}</loc></sitemap>`
   ).join("");
 }
+async function splitImageSitemapIndex(env, kind) {
+  const row = await env.DB.prepare("SELECT COUNT(*) AS total FROM videos WHERE published = 1").first();
+  const pages = Math.max(1, Math.ceil(Number(row?.total || 0) / IMAGES_PER_SITEMAP));
+  const entries = Array.from({ length: pages }, (_, index) =>
+    `<sitemap><loc>${escapeXml(`${CANONICAL_ORIGIN}/sitemaps/images-${kind}-${index + 1}.xml`)}</loc></sitemap>`
+  ).join("");
+  return new Response(
+    `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries}</sitemapindex>`,
+    { headers: standardHeaders("application/xml; charset=utf-8", "public, max-age=900") },
+  );
+}
+
 async function imageSitemapIndex(env) {
   const row = await env.DB.prepare(
     "SELECT COUNT(*) AS total FROM videos WHERE published = 1"
@@ -376,6 +410,30 @@ function crawlableImageUrl(row) {
     if (url.protocol !== "https:" || url.username || url.password) return "";
     return url.toString();
   } catch { return ""; }
+}
+
+async function splitImageSitemapPage(env, page, kind) {
+  if (!Number.isSafeInteger(page) || page < 1 || page > 10000 ||
+      !["editorial", "source"].includes(kind)) {
+    return new Response("Image sitemap not found", { status: 404 });
+  }
+  const result = await env.DB.prepare(
+    `SELECT id,slug,title,published,media_type,source_url,thumbnail_url,updated_at
+     FROM videos WHERE published=1 ORDER BY id ASC LIMIT ? OFFSET ?`,
+  ).bind(IMAGES_PER_SITEMAP, (page - 1) * IMAGES_PER_SITEMAP).all();
+  const rows = result.results || [];
+  if (page > 1 && !rows.length) return new Response("Image sitemap not found", { status: 404 });
+  const entries = rows.map(row => {
+    const illustration = kind === "editorial" ? reviewIllustration(row) : null;
+    const imageUrl = kind === "editorial" ?
+      (illustration ? `${CANONICAL_ORIGIN}${illustration.path}` : "") :
+      crawlableImageUrl(row);
+    if (!imageUrl) return "";
+    const canonical = `${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}`;
+    return `<url><loc>${escapeXml(canonical)}</loc><image:image><image:loc>${escapeXml(imageUrl)}</image:loc></image:image></url>`;
+  }).join("");
+  const xml = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${entries}</urlset>`;
+  return new Response(xml, { headers: standardHeaders("application/xml; charset=utf-8", "public, max-age=900") });
 }
 
 async function imageSitemapPage(env, page) {
@@ -652,6 +710,13 @@ const seoWorker = {
 
     if (url.pathname === "/sitemaps/pages.xml" && ["GET", "HEAD"].includes(request.method)) {
       return pagesSitemap();
+    }
+
+    if (["GET", "HEAD"].includes(request.method)) {
+      if (url.pathname === "/image-editorial-sitemap.xml") return splitImageSitemapIndex(env, "editorial");
+      if (url.pathname === "/image-source-sitemap.xml") return splitImageSitemapIndex(env, "source");
+      const typedImagePage = url.pathname.match(/^\/sitemaps\/images-(editorial|source)-([1-9]\d*)\.xml$/);
+      if (typedImagePage) return splitImageSitemapPage(env, Number(typedImagePage[2]), typedImagePage[1]);
     }
 
     if (url.pathname === "/image-sitemap.xml" && ["GET", "HEAD"].includes(request.method)) {

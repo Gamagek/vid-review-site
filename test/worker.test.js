@@ -2681,3 +2681,157 @@ test("video sitemap omits an invalid legacy SQLite lastmod without changing the 
   assert.equal(db.created_at, "2026-08-05 23:15:09");
   assert.equal(db.updated_at, "2026-08-05 23:15:09");
 });
+
+
+test("editorial SEO schema links a real indexable category and preserves protected pages", async () => {
+  const context = createTestContext();
+  const publishDate = "2026-10-15T12:00:00.000Z";
+  const changedDate = "2026-10-15T15:00:00.000Z";
+  const insert = context.sqlite.prepare(
+    "INSERT INTO videos " +
+    "(id, slug, title, source_url, embed_url, media_type, primary_category, " +
+    "subcategory, description, review_text, thumbnail_url, published, created_at, updated_at) " +
+    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)",
+  );
+  const longReview = "A specific editorial description of the scene and its context. ".repeat(13);
+  insert.run(42, "editorial-review-42", "An original editorial review",
+    "https://www.youtube.com/watch?v=example42", "https://www.youtube.com/embed/example42",
+    "youtube", "Funny & Comedy", "Pranks", "A carefully described scene",
+    longReview, "https://example.com/editorial-image.jpg", publishDate, changedDate);
+  insert.run(3, "protected-review-3", "Protected original video",
+    "https://www.youtube.com/watch?v=example03", "https://www.youtube.com/embed/example03",
+    "youtube", "Funny & Comedy", "Pranks", "Preserve original review metadata",
+    longReview, "https://example.com/protected-image.jpg", publishDate, changedDate);
+  insert.run(88, "protected-raw-88", "Protected raw media",
+    "https://example.com/video.mp4", "https://example.com/video.mp4",
+    "raw", "Funny & Comedy", "Pranks", "Preserve original raw media metadata",
+    longReview, "https://example.com/raw-image.jpg", publishDate, changedDate);
+
+  const schemaFor = async (slug) => {
+    const response = await send(context, "/watch/" + slug);
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    return JSON.parse(html.match(/<script\b[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/s)[1])["@graph"];
+  };
+  const graph = await schemaFor("editorial-review-42");
+  const video = graph.find((entry) => entry["@type"] === "VideoObject");
+  const article = graph.find((entry) => entry["@type"] === "Article");
+  const breadcrumb = graph.find((entry) => entry["@type"] === "BreadcrumbList");
+  assert.equal(video.name, "An original editorial review");
+  assert.equal(article["@id"], "https://example.com/watch/editorial-review-42#review");
+  assert.equal(article.headline, "An original editorial review");
+  assert.equal(article.datePublished, publishDate);
+  assert.equal(article.author.name, context.env.APP_NAME);
+  assert.deepEqual(article.about, { "@id": "https://example.com/watch/editorial-review-42#video" });
+  assert.equal(breadcrumb.itemListElement[1].item, "https://example.com/category/funny-comedy");
+  assert.equal(article.dateModified, undefined);
+  assert.equal(graph.find((entry) => entry["@type"] === "WebPage").dateModified, changedDate);
+
+  for (const slug of ["protected-review-3", "protected-raw-88"]) {
+    const protectedGraph = await schemaFor(slug);
+    assert.equal(protectedGraph.some((entry) => entry["@type"] === "Article"), false);
+    assert.equal(protectedGraph.find((entry) => entry["@type"] === "BreadcrumbList")
+      .itemListElement[1].item, "https://example.com/?category=Funny%20%26%20Comedy");
+  }
+});
+
+test("category sitemap keeps verified lastmod dates and skips legacy SQLite timestamps", async () => {
+  const context = createTestContext();
+  const insert = context.sqlite.prepare(
+    "INSERT INTO videos (slug,title,source_url,media_type,primary_category,subcategory,published,updated_at) " +
+    "VALUES (?,?,?,'youtube',?,'Pranks',1,?)",
+  );
+  for (let i = 1; i <= 3; i++) {
+    insert.run("test-comedy-" + i, "Funny clip " + i,
+      "https://www.youtube.com/watch?v=test" + i,
+      "Funny & Comedy", "2026-10-20T12:13:14.000Z");
+    insert.run("test-music-" + i, "Music clip " + i,
+      "https://www.youtube.com/watch?v=music" + i,
+      "Music", "2026-10-20 12:13:14");
+  }
+  const response = await seoEdge.fetch(
+    new Request("https://vid.best/sitemaps/categories.xml"), context.env, context.ctx,
+  );
+  assert.equal(response.status, 200);
+  const xml = await response.text();
+  assert.match(xml, /<loc>https:\/\/vid\.best\/category\/funny-comedy<\/loc><lastmod>2026-10-20T12:13:14\.000Z<\/lastmod>/);
+  assert.match(xml, /<loc>https:\/\/vid\.best\/category\/music<\/loc><\/url>/);
+  assert.doesNotMatch(xml, /<lastmod>2026-10-20 12:13:14<\/lastmod>/);
+});
+
+
+test("split image sitemaps keep original editorial art and YouTube thumbnails distinct", async () => {
+  const context = createTestContext();
+  const insert = context.sqlite.prepare(
+    "INSERT INTO videos (id,slug,title,source_url,embed_url,media_type,primary_category,subcategory," +
+    "description,thumbnail_url,published) VALUES (?,?,?,?,?,'youtube','Funny & Comedy','Pranks',?,?,1)",
+  );
+  insert.run(4, "sadahatama-oba-mage-theme-song",
+    "Sadahatama Oba Mage Theme Song (සදහටම ඔබ මගේ තේමා ගීතය)",
+    "https://youtu.be/Poa3bl3TJaU", "https://www.youtube.com/embed/Poa3bl3TJaU",
+    "A theme song review", "https://i.ytimg.com/vi/Poa3bl3TJaU/hqdefault.jpg");
+  insert.run(511, "jurassic-attack-2013-english-film-review",
+    "Jurassic Attack (2013) — English Dinosaur Survival Film Review",
+    "https://www.youtube.com/watch?v=LDIvjmxDJuc",
+    "https://www.youtube.com/embed/LDIvjmxDJuc",
+    "A movie review", "https://i.ytimg.com/vi/LDIvjmxDJuc/hqdefault.jpg");
+
+  const get = async (path) => {
+    const response = await seoEdge.fetch(
+      new Request("https://vid.best" + path), context.env, context.ctx,
+    );
+    assert.equal(response.status, 200, path);
+    return response.text();
+  };
+  const index = await get("/sitemap.xml");
+  assert.match(index, /sitemaps\/images-editorial-1\.xml/);
+  assert.match(index, /sitemaps\/images-source-1\.xml/);
+  assert.doesNotMatch(index, /sitemaps\/images-1\.xml/);
+
+  const editorial = await get("/sitemaps/images-editorial-1.xml");
+  assert.match(editorial, /<loc>https:\/\/vid\.best\/watch\/sadahatama-oba-mage-theme-song<\/loc>/);
+  assert.match(editorial, /<image:loc>https:\/\/vid\.best\/review-illustrations\/sadahatama-oba-mage-theme-song-v2\.webp<\/image:loc>/);
+  assert.doesNotMatch(editorial, /LDIvjmxDJuc/);
+
+  const source = await get("/sitemaps/images-source-1.xml");
+  assert.match(source, /<image:loc>https:\/\/i\.ytimg\.com\/vi\/LDIvjmxDJuc\/hqdefault\.jpg<\/image:loc>/);
+  assert.doesNotMatch(source, /review-illustrations\/sadahatama-oba-mage-theme-song-v2\.webp/);
+
+  const legacy = await get("/image-sitemap.xml");
+  assert.match(legacy, /sitemaps\/images-1\.xml/);
+});
+
+test("crawlable related-review links appear for editable videos, not protected originals", async () => {
+  const context = createTestContext();
+  const insert = context.sqlite.prepare(
+    "INSERT INTO videos (id,slug,title,source_url,embed_url,media_type,primary_category," +
+    "subcategory,description,review_text,published) " +
+    "VALUES (?,?,?,?,?,'youtube','Funny & Comedy','Pranks',?,?,1)",
+  );
+  const review = "Original review of a playful clip and its distinctive joke. ".repeat(12);
+  insert.run(4, "protected-video", "Protected original",
+    "https://www.youtube.com/watch?v=test004", "https://www.youtube.com/embed/test004",
+    "Original description", review);
+  for (const [id,slug,title] of [
+    [600,"funny-basketball-mishap","Basketball mishap comedy"],
+    [601,"kitchen-water-prank","Kitchen water prank"],
+    [602,"outdoor-comedy-fall","Outdoor comedy fall"],
+  ]) insert.run(id,slug,title,"https://www.youtube.com/watch?v=example"+id,
+      "https://www.youtube.com/embed/example"+id,"Specific "+title,review);
+
+  const editable = await send(context, "/watch/funny-basketball-mishap", {
+    headers: {"User-Agent":"Googlebot"},
+  });
+  assert.equal(editable.status, 200);
+  const html = await editable.text();
+  assert.match(html, /<nav class="related-reviews" aria-label="Related video reviews">/);
+  assert.match(html, /<a href="\/watch\/kitchen-water-prank">Kitchen water prank<\/a>/);
+  assert.match(html, /<a href="\/watch\/outdoor-comedy-fall">Outdoor comedy fall<\/a>/);
+  assert.match(html, /<a href="\/videos">Browse all published reviews<\/a>/);
+
+  const protectedVideo = await send(context, "/watch/protected-video", {
+    headers: {"User-Agent":"Googlebot"},
+  });
+  assert.equal(protectedVideo.status, 200);
+  assert.doesNotMatch(await protectedVideo.text(), /related-reviews/);
+});
