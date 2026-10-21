@@ -40,7 +40,7 @@ jobs:
             exit 0
           fi
           changes="$(git diff --name-only "$BEFORE_SHA" HEAD)"
-          if printf '%s\\n' "$changes" | grep -Eq '^(migrations/|scripts/bootstrap-legacy-d1\\.mjs$|wrangler\\.toml$)'; then
+          if printf '%s\n' "$changes" | grep -Eq '^(migrations/|scripts/bootstrap-legacy-d1\.mjs$|wrangler\.toml$)'; then
             echo "schema_changes=true" >> "$GITHUB_OUTPUT"
           else
             echo "schema_changes=false" >> "$GITHUB_OUTPUT"
