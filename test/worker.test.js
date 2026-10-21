@@ -2681,3 +2681,80 @@ test("video sitemap omits an invalid legacy SQLite lastmod without changing the 
   assert.equal(db.created_at, "2026-08-05 23:15:09");
   assert.equal(db.updated_at, "2026-08-05 23:15:09");
 });
+
+
+test("editorial SEO schema links a real indexable category and preserves protected pages", async () => {
+  const context = createTestContext();
+  const publishDate = "2026-10-15T12:00:00.000Z";
+  const changedDate = "2026-10-15T15:00:00.000Z";
+  const insert = context.sqlite.prepare(
+    "INSERT INTO videos " +
+    "(id, slug, title, source_url, embed_url, media_type, primary_category, " +
+    "subcategory, description, review_text, thumbnail_url, published, created_at, updated_at) " +
+    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)",
+  );
+  const longReview = "A specific editorial description of the scene and its context. ".repeat(13);
+  insert.run(42, "editorial-review-42", "An original editorial review",
+    "https://www.youtube.com/watch?v=example42", "https://www.youtube.com/embed/example42",
+    "youtube", "Funny & Comedy", "Pranks", "A carefully described scene",
+    longReview, "https://example.com/editorial-image.jpg", publishDate, changedDate);
+  insert.run(3, "protected-review-3", "Protected original video",
+    "https://www.youtube.com/watch?v=example03", "https://www.youtube.com/embed/example03",
+    "youtube", "Funny & Comedy", "Pranks", "Preserve original review metadata",
+    longReview, "https://example.com/protected-image.jpg", publishDate, changedDate);
+  insert.run(88, "protected-raw-88", "Protected raw media",
+    "https://example.com/video.mp4", "https://example.com/video.mp4",
+    "raw", "Funny & Comedy", "Pranks", "Preserve original raw media metadata",
+    longReview, "https://example.com/raw-image.jpg", publishDate, changedDate);
+
+  const schemaFor = async (slug) => {
+    const response = await send(context, "/watch/" + slug);
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    return JSON.parse(html.match(/<script\b[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/s)[1])["@graph"];
+  };
+  const graph = await schemaFor("editorial-review-42");
+  const video = graph.find((entry) => entry["@type"] === "VideoObject");
+  const article = graph.find((entry) => entry["@type"] === "Article");
+  const breadcrumb = graph.find((entry) => entry["@type"] === "BreadcrumbList");
+  assert.equal(video.name, "An original editorial review");
+  assert.equal(article["@id"], "https://example.com/watch/editorial-review-42#review");
+  assert.equal(article.headline, "An original editorial review");
+  assert.equal(article.datePublished, publishDate);
+  assert.equal(article.author.name, "Vid.Best");
+  assert.deepEqual(article.about, { "@id": "https://example.com/watch/editorial-review-42#video" });
+  assert.equal(breadcrumb.itemListElement[1].item, "https://example.com/category/funny-comedy");
+  assert.equal(article.dateModified, undefined);
+  assert.equal(graph.find((entry) => entry["@type"] === "WebPage").dateModified, changedDate);
+
+  for (const slug of ["protected-review-3", "protected-raw-88"]) {
+    const protectedGraph = await schemaFor(slug);
+    assert.equal(protectedGraph.some((entry) => entry["@type"] === "Article"), false);
+    assert.equal(protectedGraph.find((entry) => entry["@type"] === "BreadcrumbList")
+      .itemListElement[1].item, "https://example.com/?category=Funny%20%26%20Comedy");
+  }
+});
+
+test("category sitemap keeps verified lastmod dates and skips legacy SQLite timestamps", async () => {
+  const context = createTestContext();
+  const insert = context.sqlite.prepare(
+    "INSERT INTO videos (slug,title,source_url,media_type,primary_category,subcategory,published,updated_at) " +
+    "VALUES (?,?,?,'youtube',?,'Pranks',1,?)",
+  );
+  for (let i = 1; i <= 3; i++) {
+    insert.run("test-comedy-" + i, "Funny clip " + i,
+      "https://www.youtube.com/watch?v=test" + i,
+      "Funny & Comedy", "2026-10-20T12:13:14.000Z");
+    insert.run("test-music-" + i, "Music clip " + i,
+      "https://www.youtube.com/watch?v=music" + i,
+      "Music", "2026-10-20 12:13:14");
+  }
+  const response = await seoEdge.fetch(
+    new Request("https://vid.best/sitemaps/categories.xml"), context.env, context.ctx,
+  );
+  assert.equal(response.status, 200);
+  const xml = await response.text();
+  assert.match(xml, /<loc>https:\/\/vid\.best\/category\/funny-comedy<\/loc><lastmod>2026-10-20T12:13:14\.000Z<\/lastmod>/);
+  assert.match(xml, /<loc>https:\/\/vid\.best\/category\/music<\/loc><\/url>/);
+  assert.doesNotMatch(xml, /<lastmod>2026-10-20 12:13:14<\/lastmod>/);
+});
