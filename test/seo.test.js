@@ -694,3 +694,49 @@ test("image/video sitemaps and watch metadata use stable first-party TikTok post
   const owned = await (await request(context,'https://vid.best/sitemaps/images-1.xml')).text();
   assert.match(owned,/https:\/\/vid\.best\/review-covers\/owner-original\.webp/);
 });
+
+
+test("category pagination is crawlable, page-canonical, and preserves publication dates", async () => {
+  const context = createContext();
+  for (let i = 1; i <= 35; i += 1) {
+    const day = String(Math.min(i, 28)).padStart(2, "0");
+    context.sqlite.prepare(
+      `INSERT INTO videos (
+        slug, title, source_url, media_type, primary_category, subcategory,
+        description, review_text, published, created_at, updated_at
+      ) VALUES (?, ?, ?, 'raw', 'Technology', 'Web Development', ?, ?, 1, ?, ?)`
+    ).run(
+      `technology-paging-${i}`,
+      `Technology paging review ${i}`,
+      `https://example.com/test-${i}.mp4`,
+      `Description ${i}`,
+      `Review ${i}`,
+      `2026-09-${day}T00:00:00.000Z`,
+      "2026-10-21T12:00:00.000Z",
+    );
+  }
+  const first = await request(context, "https://vid.best/category/technology");
+  const firstHtml = await first.text();
+  assert.equal(first.status, 200);
+  assert.match(firstHtml, /rel="next" href="https:\/\/vid\.best\/category\/technology\?page=2"/);
+  assert.match(firstHtml, /<time datetime="2026-09-/);
+  assert.equal((firstHtml.match(/class="video-tile glass-panel"/g) || []).length, 30);
+
+  const second = await request(context, "https://vid.best/category/technology?page=2");
+  const secondHtml = await second.text();
+  assert.equal(second.status, 200);
+  assert.match(secondHtml, /rel="canonical" href="https:\/\/vid\.best\/category\/technology\?page=2"/);
+  assert.match(secondHtml, /rel="prev" href="https:\/\/vid\.best\/category\/technology"/);
+  assert.match(secondHtml, /"position":31/);
+  assert.match(secondHtml, /Page 2 of 2/);
+  assert.doesNotMatch(secondHtml, /rel="next"/);
+  const totalTechnology = context.sqlite.prepare("SELECT COUNT(*) AS total FROM videos WHERE published = 1 AND primary_category = ?").get("Technology").total;
+  assert.equal((secondHtml.match(/class="video-tile glass-panel"/g) || []).length, totalTechnology - 30);
+
+  const beyond = await request(context, "https://vid.best/category/technology?page=99999");
+  assert.equal(beyond.status, 404);
+  assert.match(beyond.headers.get("X-Robots-Tag"), /noindex/);
+  const pageOneRedirect = await request(context, "https://vid.best/category/technology?page=1");
+  assert.equal(pageOneRedirect.status, 301);
+  assert.equal(pageOneRedirect.headers.get("Location"), "https://vid.best/category/technology");
+});
