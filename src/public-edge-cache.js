@@ -146,8 +146,14 @@ async function persist(env, ctx, policy, cacheKey, response, body, type, robots,
   const work = Promise.allSettled(tasks).then((settled) => {
     if (settled.some((task) => task.status === "rejected")) console.warn("A public cache write was deferred");
   });
-  if (ctx?.waitUntil) ctx.waitUntil(work);
-  else await work;
+  if (ctx?.waitUntil) {
+    try { ctx.waitUntil(work); }
+    catch {
+      // A disabled background-task context must never turn a successful sitemap,
+      // homepage or public API response into HTTP 500.
+      await work;
+    }
+  } else await work;
 }
 
 async function resolveMiss(request, env, ctx, handler, policy) {
