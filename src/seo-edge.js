@@ -313,7 +313,7 @@ function verifiedSitemapLastmod(value) {
   const candidate = String(value || "");
   // Google's sitemap date should be a real, timezone-qualified W3C timestamp.
   // In particular, do not emit legacy SQLite date strings or invented edit dates.
-  if (!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$/.test(candidate) ||
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(candidate) ||
       !Number.isFinite(Date.parse(candidate))) return "";
   return `<lastmod>${escapeXml(candidate)}</lastmod>`;
 }
