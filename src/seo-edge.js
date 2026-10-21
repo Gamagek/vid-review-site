@@ -519,7 +519,7 @@ async function videoIndexPage(request, env) {
   const result = await env.DB.prepare(
     `SELECT id, slug, title, primary_category, subcategory, description, thumbnail_url, source_url, media_type
      FROM videos WHERE published = 1
-     ORDER BY updated_at DESC, id DESC LIMIT ? OFFSET ?`,
+     ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?`,
   ).bind(pageSize + 1, (page - 1) * pageSize).all();
   const found = result.results || [];
   const hasNext = found.length > pageSize;
@@ -575,7 +575,7 @@ async function enrichHomepageHtml(html, env) {
     const [stats, result] = await Promise.all([
       categoryStats(env),
       env.DB.prepare(`SELECT slug, title FROM videos WHERE published = 1
-        ORDER BY updated_at DESC, id DESC LIMIT 12`).all(),
+        ORDER BY created_at DESC, id DESC LIMIT 12`).all(),
     ]);
     categories = CATEGORY_ORDER.filter((name) => stats.some((row) =>
       row.primary_category === name && Number(row.total) > 0));
