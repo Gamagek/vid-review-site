@@ -10,6 +10,8 @@ const flights = new Map();
 function policyFor(request) {
   if (request.method !== "GET" || request.headers.has("Authorization")) return null;
   const url = new URL(request.url);
+  // Never intercept HTTP/www canonical redirects with a cached 200 response.
+  if (url.protocol !== "https:" || url.hostname !== "vid.best") return null;
   const path = url.pathname;
   let kind = "";
   let snapshot = true;
@@ -112,7 +114,7 @@ function edgeCache() {
   catch { return null; }
 }
 
-async function persist(env, ctx, policy, cacheKey, response, body, type, robots) {
+async function persist(env, ctx, policy, cacheKey, response, body, type, robots, writeSnapshot = true) {
   const tasks = [];
   const cache = edgeCache();
   if (cache) {
@@ -123,7 +125,7 @@ async function persist(env, ctx, policy, cacheKey, response, body, type, robots)
     headers.delete("Content-Length");
     tasks.push(cache.put(cacheKey, new Response(body, { status: 200, headers })));
   }
-  if (policy.snapshot && env.BUCKET?.put) {
+  if (writeSnapshot && policy.snapshot && env.BUCKET?.put) {
     tasks.push((async () => {
       const key = await snapshotKey(policy);
       await env.BUCKET.put(key, JSON.stringify({
@@ -155,7 +157,8 @@ async function resolveMiss(request, env, ctx, handler, policy) {
   const saved = await loadSnapshot(env, policy);
   if (saved && Date.now() - saved.timestamp <= EDGE_SECONDS * 1000) {
     const response = fromSnapshot(saved);
-    await persist(env, ctx, policy, cacheKey, response, saved.body, saved.type, saved.robots);
+    // Serving an existing R2 snapshot must NOT reset its age indefinitely.
+    await persist(env, ctx, policy, cacheKey, response, saved.body, saved.type, saved.robots, false);
     return browserResponse(response, "R2-FRESH");
   }
 
