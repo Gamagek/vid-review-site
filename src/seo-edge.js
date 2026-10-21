@@ -309,12 +309,21 @@ async function handleCategory(request, env, category) {
   );
 }
 
+function verifiedSitemapLastmod(value) {
+  const candidate = String(value || "");
+  // Google's sitemap date should be a real, timezone-qualified W3C timestamp.
+  // In particular, do not emit legacy SQLite date strings or invented edit dates.
+  if (!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$/.test(candidate) ||
+      !Number.isFinite(Date.parse(candidate))) return "";
+  return `<lastmod>${escapeXml(candidate)}</lastmod>`;
+}
+
 async function categorySitemap(env) {
   const stats = await categoryStats(env);
   const entries = stats
     .filter((row) => Number(row?.total || 0) >= MIN_INDEXABLE_CATEGORY_VIDEOS)
     .map((row) =>
-      `<url><loc>${escapeXml(categoryUrl(row.primary_category))}</loc>${row.lastmod ? `<lastmod>${escapeXml(row.lastmod)}</lastmod>` : ""}</url>`
+      `<url><loc>${escapeXml(categoryUrl(row.primary_category))}</loc>${verifiedSitemapLastmod(row.lastmod)}</url>`
     )
     .join("");
   const body = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries}</urlset>`;
