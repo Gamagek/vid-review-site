@@ -1,0 +1,63 @@
+{
+  "intake_batch": "2026-10-21-new-38",
+  "intake_sequence": 3,
+  "intended_new_items": 38,
+  "publication_date_sri_lanka": "2026-10-21",
+  "stage": "prepared_for_direct_d1_publication",
+  "original_user_evidence": {
+    "video_id": "XEzXmXGjsys",
+    "source_url": "https://youtube.com/shorts/XEzXmXGjsys?si=07gS9uXNQwYCB4vc",
+    "original_video_title": "#trend",
+    "creator_name_reported": "Tom react",
+    "duration_seconds_reported": 39,
+    "analysis_source": "User-provided frame/audio notes, not independently replayed",
+    "reaction_panel_identities": "Unverified",
+    "scenes_reported": [
+      "Barbershop haircut reference",
+      "Tea and biscuits",
+      "Courtyard dance",
+      "Drawing-floor surprise",
+      "Watermelon lift",
+      "Blanket tussle",
+      "Horror movie jump scare and scattered popcorn"
+    ]
+  },
+  "vidbest_insert_payload": {
+    "slug": "haircut-tea-biscuits-and-horror-movie-popcorn-chaos",
+    "title": "Haircut Mix-Up, Tea Biscuits & Horror Movie Popcorn Chaos",
+    "source_url": "https://www.youtube.com/shorts/XEzXmXGjsys",
+    "embed_url": "https://www.youtube.com/embed/XEzXmXGjsys",
+    "media_type": "youtube",
+    "primary_category": "Funny & Comedy",
+    "subcategory": "Memes & Compilation",
+    "description": "A barbershop haircut joke leads into a tea-and-biscuit moment, courtyard dancing, a watermelon lift and bedroom comedy before a horror-movie scare sends popcorn flying. A split-screen reaction panel keeps the quick scenes connected.",
+    "review_text": "1. Barbershop Haircut Surprise\n\nIn a barbershop, a stylist playfully taps a customer on the head. The next close-up features a smartphone image of a blond-haired style, followed by an exaggerated facial expression. The scene relies on an expectation-versus-reality joke: a polished haircut reference contrasts with the awkward reaction in the chair. The brief moment does not show enough of the final haircut to make claims about its result.\n\n2. A Tea-and-Biscuit Moment\n\nThe mood changes to a woman in a pink hijab sitting at a table, dipping round biscuits into tea. This everyday snack routine provides a quieter contrast to the physical jokes elsewhere in the montage. The laugh track and reaction panel make it part of the compilation, though the available description does not explain a specific hidden prank in the tea scene.\n\n3. Dancing and the Drawing-Floor Surprise\n\nA woman dances outdoors beside papers scattered across a paved courtyard. A quick edit then cuts indoors, where a person is lying on the floor near a child who is busy drawing. An unexpected poke prompts a startled reaction. The two short scenes use motion and surprise in different ways, changing the pace before the next sequence.\n\n4. Watermelon Lift and Blanket Tussle\n\nA woman lifts a large green watermelon in a produce-storage space, offering a brief physical-comedy moment. Next, two people tussle playfully under grey bedding. The montage places an everyday object joke next to a familiar bedroom skit, with movement and lively sound cues keeping the mood light. Nothing in the provided observations establishes an actual fight.\n\n5. Horror Movie Night Goes Chaotic\n\nThe final scene is the strongest punchline. A group sits together on a living-room carpet, watching television with snacks and other items nearby. A sudden frightening moment on screen triggers shouts and hurried reactions. Popcorn scatters and metal vessels move as the group loses its composure. This sequence has a clear setup and an energetic payoff, which makes it a memorable closer.\n\n6. The Reaction-Panel Editing\n\nA laughing group occupies the upper portion of the vertical split-screen, with the main mini-sketches below. The edit uses rapid scene changes, music and reaction sounds to keep the unrelated situations connected. Rather than depending on a verified identity for anyone in the upper panel, the humour comes from their expressions and the changing incidents in the lower clips.\n\nFinal Verdict\n\nThis comedy Short moves from a barbershop misunderstanding to a tea break, an outdoor dance, a floor surprise and playful physical moments. Its biggest joke arrives with the horror-movie jump scare and scattered popcorn. The changing settings and reaction-panel edits make the compilation energetic without requiring an invented storyline or unverified dialogue.",
+    "seo_title": "Haircut Gag, Tea Biscuits & Horror Movie Jump Scare",
+    "seo_description": "A haircut joke, tea-and-biscuit scene, dancing, watermelon lifting and a horror-movie jump scare combine in this split-screen comedy Short.",
+    "seo_tags": [
+      "barbershop haircut reference joke",
+      "pink hijab tea biscuit scene",
+      "round biscuits dipped in tea",
+      "courtyard dance scattered papers",
+      "drawing floor surprise",
+      "large green watermelon lift",
+      "grey blanket wrestling sketch",
+      "horror movie night jump scare",
+      "popcorn scattered living room",
+      "metal vessels startled response",
+      "Tom react comedy montage",
+      "short split screen reaction edit"
+    ],
+    "thumbnail_url": null,
+    "featured": false,
+    "trending": false,
+    "published": true
+  },
+  "security": {
+    "insert_only": true,
+    "never_modify_earliest_10_or_raw_media": true,
+    "duplicate_key": "youtube:XEzXmXGjsys",
+    "preserve_all_existing_dates": true,
+    "do_not_assign_existing_d1_id": true
+  }
+}
