@@ -1,0 +1,3265 @@
+{
+  "scopeLocalDate": "2026-10-19",
+  "existingIdentityMatches": [
+    {
+      "id": 289,
+      "source_url": "https://www.tiktok.com/@gtb13/video/7655759307648126241",
+      "hits": [
+        {
+          "item_id": "ksi_01a15659-fa66-77d1-a641-33ee357140c3",
+          "asset_type": "video",
+          "rank": 1,
+          "matches": [
+            {
+              "start_sec": 28.466667,
+              "end_sec": 34.866665,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 19.4,
+              "end_sec": 24.8,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 34.866665,
+              "end_sec": 41.466667,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 10.866667,
+              "end_sec": 19.4,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 24.8,
+              "end_sec": 28.466667,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 0,
+              "end_sec": 10.866667,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            }
+          ]
+        }
+      ],
+      "applied": {
+        "modalities": [
+          "visual",
+          "audio"
+        ],
+        "group_by": "item",
+        "limit": 2,
+        "metadata_filter": {
+          "vidbest_id": {
+            "eq": "289",
+            "in": null
+          },
+          "source_url": {
+            "eq": "https://www.tiktok.com/@gtb13/video/7655759307648126241",
+            "in": null
+          }
+        },
+        "enrichment_filter": null,
+        "location": null
+      },
+      "error": false
+    },
+    {
+      "id": 300,
+      "source_url": "https://www.tiktok.com/@auskiee/video/7596930548979748114",
+      "hits": [
+        {
+          "item_id": "ksi_01a1565a-0bac-7293-8200-35a091997e24",
+          "asset_type": "video",
+          "rank": 1,
+          "matches": [
+            {
+              "start_sec": 5.9333334,
+              "end_sec": 10.733334,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 0,
+              "end_sec": 5.9333334,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 10.733334,
+              "end_sec": 22.4,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            }
+          ]
+        }
+      ],
+      "applied": {
+        "modalities": [
+          "visual",
+          "audio"
+        ],
+        "group_by": "item",
+        "limit": 2,
+        "metadata_filter": {
+          "vidbest_id": {
+            "eq": "300",
+            "in": null
+          },
+          "source_url": {
+            "eq": "https://www.tiktok.com/@auskiee/video/7596930548979748114",
+            "in": null
+          }
+        },
+        "enrichment_filter": null,
+        "location": null
+      },
+      "error": false
+    },
+    {
+      "id": 302,
+      "source_url": "https://www.tiktok.com/@rankxpress/video/7666547918270139665",
+      "hits": [
+        {
+          "item_id": "ksi_01a15659-fc6f-7383-856a-bf404b0e38ff",
+          "asset_type": "video",
+          "rank": 1,
+          "matches": [
+            {
+              "start_sec": 19.266666,
+              "end_sec": 24.066668,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 13.6,
+              "end_sec": 19.266666,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 28.6,
+              "end_sec": 34.066666,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 0,
+              "end_sec": 5.4666667,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 8.666667,
+              "end_sec": 13.6,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 5.4666667,
+              "end_sec": 8.666667,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 34.066666,
+              "end_sec": 38.8,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 24.066668,
+              "end_sec": 28.6,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            }
+          ]
+        }
+      ],
+      "applied": {
+        "modalities": [
+          "visual",
+          "audio"
+        ],
+        "group_by": "item",
+        "limit": 2,
+        "metadata_filter": {
+          "vidbest_id": {
+            "eq": "302",
+            "in": null
+          },
+          "source_url": {
+            "eq": "https://www.tiktok.com/@rankxpress/video/7666547918270139665",
+            "in": null
+          }
+        },
+        "enrichment_filter": null,
+        "location": null
+      },
+      "error": false
+    },
+    {
+      "id": 308,
+      "source_url": "https://www.tiktok.com/@hayden.greene2/video/7698017351173672206",
+      "hits": [
+        {
+          "item_id": "ksi_01a15659-fa0a-7570-9f7c-b2b81524a848",
+          "asset_type": "video",
+          "rank": 1,
+          "matches": [
+            {
+              "start_sec": 0,
+              "end_sec": 12.866667,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 44.066666,
+              "end_sec": 51,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 35.4,
+              "end_sec": 44.066666,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 60.366665,
+              "end_sec": 64.76667,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 51,
+              "end_sec": 55.066666,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 55.066666,
+              "end_sec": 60.366665,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 28.666666,
+              "end_sec": 35.4,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 24.6,
+              "end_sec": 28.666666,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 12.866667,
+              "end_sec": 18.666666,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 18.666666,
+              "end_sec": 24.6,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            }
+          ]
+        }
+      ],
+      "applied": {
+        "modalities": [
+          "visual",
+          "audio"
+        ],
+        "group_by": "item",
+        "limit": 2,
+        "metadata_filter": {
+          "vidbest_id": {
+            "eq": "308",
+            "in": null
+          },
+          "source_url": {
+            "eq": "https://www.tiktok.com/@hayden.greene2/video/7698017351173672206",
+            "in": null
+          }
+        },
+        "enrichment_filter": null,
+        "location": null
+      },
+      "error": false
+    },
+    {
+      "id": 309,
+      "source_url": "https://www.tiktok.com/@nickjay090/video/7619798841587453205",
+      "hits": [
+        {
+          "item_id": "ksi_01a1565a-03e1-7733-a1d9-03d956dc02cd",
+          "asset_type": "video",
+          "rank": 1,
+          "matches": [
+            {
+              "start_sec": 19.6,
+              "end_sec": 29.4,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 0,
+              "end_sec": 9.8,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 9.8,
+              "end_sec": 19.6,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            }
+          ]
+        }
+      ],
+      "applied": {
+        "modalities": [
+          "visual",
+          "audio"
+        ],
+        "group_by": "item",
+        "limit": 2,
+        "metadata_filter": {
+          "vidbest_id": {
+            "eq": "309",
+            "in": null
+          },
+          "source_url": {
+            "eq": "https://www.tiktok.com/@nickjay090/video/7619798841587453205",
+            "in": null
+          }
+        },
+        "enrichment_filter": null,
+        "location": null
+      },
+      "error": false
+    },
+    {
+      "id": 314,
+      "source_url": "https://www.tiktok.com/@yeahthegrays/video/7185122463775345921",
+      "hits": [
+        {
+          "item_id": "ksi_01a1565a-0765-7072-ac5c-acaf1c2ac527",
+          "asset_type": "video",
+          "rank": 1,
+          "matches": [
+            {
+              "start_sec": 0,
+              "end_sec": 7.4,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            }
+          ]
+        }
+      ],
+      "applied": {
+        "modalities": [
+          "visual",
+          "audio"
+        ],
+        "group_by": "item",
+        "limit": 2,
+        "metadata_filter": {
+          "vidbest_id": {
+            "eq": "314",
+            "in": null
+          },
+          "source_url": {
+            "eq": "https://www.tiktok.com/@yeahthegrays/video/7185122463775345921",
+            "in": null
+          }
+        },
+        "enrichment_filter": null,
+        "location": null
+      },
+      "error": false
+    },
+    {
+      "id": 315,
+      "source_url": "https://www.tiktok.com/@sleepynessisgood/video/7694090749192703250",
+      "hits": [
+        {
+          "item_id": "ksi_01a1565a-0b24-7f41-81a5-72e67e5e4fab",
+          "asset_type": "video",
+          "rank": 1,
+          "matches": [
+            {
+              "start_sec": 0,
+              "end_sec": 8.2,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 8.2,
+              "end_sec": 16.333334,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 16.333334,
+              "end_sec": 24.466667,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            }
+          ]
+        }
+      ],
+      "applied": {
+        "modalities": [
+          "visual",
+          "audio"
+        ],
+        "group_by": "item",
+        "limit": 2,
+        "metadata_filter": {
+          "vidbest_id": {
+            "eq": "315",
+            "in": null
+          },
+          "source_url": {
+            "eq": "https://www.tiktok.com/@sleepynessisgood/video/7694090749192703250",
+            "in": null
+          }
+        },
+        "enrichment_filter": null,
+        "location": null
+      },
+      "error": false
+    },
+    {
+      "id": 320,
+      "source_url": "https://www.tiktok.com/@funnyjoke007/video/7291587429008428330",
+      "hits": [
+        {
+          "item_id": "ksi_01a1565a-0f6a-7d60-9acd-a973dfe53890",
+          "asset_type": "video",
+          "rank": 1,
+          "matches": [
+            {
+              "start_sec": 53.383335,
+              "end_sec": 62.566666,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 36.233334,
+              "end_sec": 44.2,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 20.3,
+              "end_sec": 28.266666,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 44.2,
+              "end_sec": 53.383335,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 28.266666,
+              "end_sec": 36.233334,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 12.333333,
+              "end_sec": 20.3,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 0,
+              "end_sec": 12.333333,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            }
+          ]
+        }
+      ],
+      "applied": {
+        "modalities": [
+          "visual",
+          "audio"
+        ],
+        "group_by": "item",
+        "limit": 2,
+        "metadata_filter": {
+          "vidbest_id": {
+            "eq": "320",
+            "in": null
+          },
+          "source_url": {
+            "eq": "https://www.tiktok.com/@funnyjoke007/video/7291587429008428330",
+            "in": null
+          }
+        },
+        "enrichment_filter": null,
+        "location": null
+      },
+      "error": false
+    },
+    {
+      "id": 321,
+      "source_url": "https://www.tiktok.com/@funnyvideoo.2/video/7688990993961487630",
+      "hits": [
+        {
+          "item_id": "ksi_01a1565a-1b9c-76e2-acce-f3b89e2f9fe5",
+          "asset_type": "video",
+          "rank": 1,
+          "matches": [
+            {
+              "start_sec": 18,
+              "end_sec": 23.8,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 14.666667,
+              "end_sec": 18,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 0,
+              "end_sec": 5.4,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 5.4,
+              "end_sec": 11.266666,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 11.266666,
+              "end_sec": 14.666667,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            }
+          ]
+        }
+      ],
+      "applied": {
+        "modalities": [
+          "visual",
+          "audio"
+        ],
+        "group_by": "item",
+        "limit": 2,
+        "metadata_filter": {
+          "vidbest_id": {
+            "eq": "321",
+            "in": null
+          },
+          "source_url": {
+            "eq": "https://www.tiktok.com/@funnyvideoo.2/video/7688990993961487630",
+            "in": null
+          }
+        },
+        "enrichment_filter": null,
+        "location": null
+      },
+      "error": false
+    },
+    {
+      "id": 324,
+      "source_url": "https://www.tiktok.com/@funny.wold7/video/7676460259359067422",
+      "hits": [
+        {
+          "item_id": "ksi_01a1565a-173a-77c2-8c75-72b947889c87",
+          "asset_type": "video",
+          "rank": 1,
+          "matches": [
+            {
+              "start_sec": 7.6666665,
+              "end_sec": 15.266666,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            },
+            {
+              "start_sec": 0,
+              "end_sec": 7.6666665,
+              "modalities": [
+                "audio",
+                "visual"
+              ]
+            }
+          ]
+        }
+      ],
+      "applied": {
+        "modalities": [
+          "visual",
+          "audio"
+        ],
+        "group_by": "item",
+        "limit": 2,
+        "metadata_filter": {
+          "vidbest_id": {
+            "eq": "324",
+            "in": null
+          },
+          "source_url": {
+            "eq": "https://www.tiktok.com/@funny.wold7/video/7676460259359067422",
+            "in": null
+          }
+        },
+        "enrichment_filter": null,
+        "location": null
+      },
+      "error": false
+    }
+  ],
+  "privateAnalysisIngestion": [
+    {
+      "input_index": 0,
+      "source": "https://www.tiktok.com/@brunavanessafatima/video/7683247291393707278",
+      "outcome": "added",
+      "asset_id": "6ad8081e0ca748ea3c080539",
+      "item_id": "ksi_01a15bdf-c3aa-7c10-a37e-4fbcf12f3340",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 286
+    },
+    {
+      "input_index": 1,
+      "source": "https://www.tiktok.com/@fmw560/video/7636459888750742806",
+      "outcome": "added",
+      "asset_id": "6ad8081e030b76724d10ca89",
+      "item_id": "ksi_01a15bdf-c152-7dc0-b32f-587a185d512c",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 287
+    },
+    {
+      "input_index": 2,
+      "source": "https://www.tiktok.com/@nn.ediitz/video/7598252716497898784",
+      "outcome": "added",
+      "asset_id": "6ad8081c500e82756f2c1247",
+      "item_id": "ksi_01a15bdf-b999-73f2-a83f-17fee28f7d4f",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 288
+    },
+    {
+      "input_index": 3,
+      "source": "https://www.tiktok.com/@dakidbk/video/7620254113292356877",
+      "outcome": "added",
+      "asset_id": "6ad808150ca748ea3c080523",
+      "item_id": "ksi_01a15bdf-a8a0-7370-850b-08e55e8ce134",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 290
+    },
+    {
+      "input_index": 4,
+      "source": "https://www.tiktok.com/@laughloungh/video/7615725868547050782",
+      "outcome": "added",
+      "asset_id": "6ad808169c038876f3560c34",
+      "item_id": "ksi_01a15bdf-a36d-7840-98d6-faecd035bb5d",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 291
+    },
+    {
+      "input_index": 0,
+      "source": "https://www.tiktok.com/@tom.laugh.react/video/7572238931136089351",
+      "outcome": "added",
+      "asset_id": "6ad8085065b4aff96dc5193d",
+      "item_id": "ksi_01a15be0-86a2-74c0-be38-153946306bcc",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 292
+    },
+    {
+      "input_index": 1,
+      "source": "https://www.tiktok.com/@tomreactsofficiall/video/7620518085929356566",
+      "outcome": "added",
+      "asset_id": "6ad80851968fe117efe4637d",
+      "item_id": "ksi_01a15be0-8aec-77d3-9464-f8a0203160f6",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 293
+    },
+    {
+      "input_index": 2,
+      "source": "https://www.tiktok.com/@shortfuel2/video/7591013499602537740",
+      "outcome": "added",
+      "asset_id": "6ad8084e0ca748ea3c08056b",
+      "item_id": "ksi_01a15be0-7c38-7371-9d27-a04b0cc8249a",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 294
+    },
+    {
+      "input_index": 3,
+      "source": "https://www.tiktok.com/@liz_luana.mirella/video/7677305031917309197",
+      "outcome": "added",
+      "asset_id": "6ad8084d500e82756f2c1271",
+      "item_id": "ksi_01a15be0-7e2e-71b2-9b34-414cc27eaf6f",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 295
+    },
+    {
+      "input_index": 4,
+      "source": "https://www.tiktok.com/@taivelao/video/7602607842209647879",
+      "outcome": "added",
+      "asset_id": "6ad80850500e82756f2c1273",
+      "item_id": "ksi_01a15be0-8768-7260-8562-e3eaa41c9c5a",
+      "status": "queued",
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 296
+    },
+    {
+      "input_index": 0,
+      "source": "https://www.tiktok.com/@nexoratrading0/video/7693140516917071126",
+      "outcome": "added",
+      "asset_id": "6ad80863030b76724d10cabf",
+      "item_id": "ksi_01a15be0-d207-7f13-83e4-86257f102851",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 297
+    },
+    {
+      "input_index": 1,
+      "source": "https://www.tiktok.com/@tomreactsofficiall/video/7619146384524053782",
+      "outcome": "added",
+      "asset_id": "6ad80866960d8ea7bdcdaa24",
+      "item_id": "ksi_01a15be0-dae1-7e02-a78f-14af1cd7db3a",
+      "status": "queued",
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 298
+    },
+    {
+      "input_index": 2,
+      "source": "https://www.tiktok.com/@lifeinoymyakon1/video/7678791214279298335",
+      "outcome": "added",
+      "asset_id": "6ad80864030b76724d10cac1",
+      "item_id": "ksi_01a15be0-d403-7c62-90f4-221e625164c0",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 299
+    },
+    {
+      "input_index": 3,
+      "source": "https://www.tiktok.com/@rank.wave8/video/7657231633648553234",
+      "outcome": "added",
+      "asset_id": "6ad808630ca748ea3c080576",
+      "item_id": "ksi_01a15be0-d274-7a90-80c8-f5e012ffb158",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 301
+    },
+    {
+      "input_index": 4,
+      "source": "https://www.tiktok.com/@trynotlaughq/video/7054469792694062337",
+      "outcome": "added",
+      "asset_id": "6ad808644a68f3b4031f30ef",
+      "item_id": "ksi_01a15be0-d243-7e63-923d-f6405154f722",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 303
+    },
+    {
+      "input_index": 0,
+      "source": "https://www.tiktok.com/@ratedr7_/video/7686107307696082198",
+      "outcome": "added",
+      "asset_id": "6ad80874500e82756f2c128a",
+      "item_id": "ksi_01a15be1-0f38-7230-83cd-e0a4274ee2de",
+      "status": "queued",
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 304
+    },
+    {
+      "input_index": 1,
+      "source": "https://www.tiktok.com/@funnyvide.o/video/7691988745846820116",
+      "outcome": "added",
+      "asset_id": "6ad80872960d8ea7bdcdaa28",
+      "item_id": "ksi_01a15be1-0bc9-72a0-b98c-47e23490d6b9",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 305
+    },
+    {
+      "input_index": 2,
+      "source": "https://www.tiktok.com/@snipvr.fx_8/video/7656830266924715282",
+      "outcome": "added",
+      "asset_id": "6ad80873960d8ea7bdcdaa2a",
+      "item_id": "ksi_01a15be1-0eea-72e2-8cd4-1d450c91daee",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 306
+    },
+    {
+      "input_index": 3,
+      "source": "https://www.tiktok.com/@small.sin96/video/7685303031960800532",
+      "outcome": "rejected",
+      "asset_id": null,
+      "item_id": null,
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": false,
+      "error": "could not retrieve the media at this link — it may be private, age-restricted, region-blocked, or removed, or link to a profile, channel, or playlist instead of one video or post",
+      "detail": null,
+      "id": 307
+    },
+    {
+      "input_index": 4,
+      "source": "https://www.tiktok.com/@tiktokeur2377/video/7697311624666828053",
+      "outcome": "added",
+      "asset_id": "6ad80872968fe117efe4638e",
+      "item_id": "ksi_01a15be1-09a1-75e1-ad80-328ee0b0d816",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 310
+    },
+    {
+      "input_index": 0,
+      "source": "https://www.tiktok.com/@buzzyfunny/video/7685445419706354966",
+      "outcome": "added",
+      "asset_id": "6ad80882500e82756f2c12ad",
+      "item_id": "ksi_01a15be1-49be-74a2-8845-445eb875e27e",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 311
+    },
+    {
+      "input_index": 1,
+      "source": "https://www.tiktok.com/@ara_1210201/video/7609296768089509141",
+      "outcome": "added",
+      "asset_id": "6ad80882968fe117efe463b0",
+      "item_id": "ksi_01a15be1-46ce-70c0-8d70-decdf16eb075",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 312
+    },
+    {
+      "input_index": 2,
+      "source": "https://www.tiktok.com/@dyraze0/video/7636632146215472391",
+      "outcome": "added",
+      "asset_id": "6ad808844a68f3b4031f3110",
+      "item_id": "ksi_01a15be1-4f5b-7492-8992-45ff8a00820e",
+      "status": "queued",
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 313
+    },
+    {
+      "input_index": 3,
+      "source": "https://www.tiktok.com/@andypraisecomedies/video/7664613638174477588",
+      "outcome": "added",
+      "asset_id": "6ad808845411fa6e602ca1ed",
+      "item_id": "ksi_01a15be1-51f4-7f71-89d5-ca89e6f97992",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 316
+    },
+    {
+      "input_index": 4,
+      "source": "https://www.tiktok.com/@funboxz8/video/7689086718640672031",
+      "outcome": "rejected",
+      "asset_id": null,
+      "item_id": null,
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": false,
+      "error": "could not retrieve the media at this link — it may be private, age-restricted, region-blocked, or removed, or link to a profile, channel, or playlist instead of one video or post",
+      "detail": null,
+      "id": 317
+    },
+    {
+      "input_index": 0,
+      "source": "https://www.tiktok.com/@stygian_gad/video/7687358434269793556",
+      "outcome": "added",
+      "asset_id": "6ad808995411fa6e602ca210",
+      "item_id": "ksi_01a15be1-ccf6-7083-bb08-09dc40aa7c13",
+      "status": "queued",
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 318
+    },
+    {
+      "input_index": 1,
+      "source": "https://www.tiktok.com/@animalsbytwins/video/7636132123878935829",
+      "outcome": "added",
+      "asset_id": "6ad808955411fa6e602ca20a",
+      "item_id": "ksi_01a15be1-b404-7962-bd4f-c5accc465962",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 319
+    },
+    {
+      "input_index": 2,
+      "source": "https://www.tiktok.com/@warface2991/video/7216300787679448325",
+      "outcome": "added",
+      "asset_id": "6ad808965411fa6e602ca20e",
+      "item_id": "ksi_01a15be1-c137-7c81-a3d3-340703b9ad2d",
+      "status": "queued",
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 322
+    },
+    {
+      "input_index": 3,
+      "source": "https://www.tiktok.com/@funny.me054/video/7673580033587399966",
+      "outcome": "added",
+      "asset_id": "6ad808959c038876f3560cd1",
+      "item_id": "ksi_01a15be1-b590-7280-a44e-406c37c02d02",
+      "status": "queued",
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 323
+    },
+    {
+      "input_index": 4,
+      "source": "https://www.tiktok.com/@funnyworldchanel36/video/7692336499693489414",
+      "outcome": "added",
+      "asset_id": "6ad80896500e82756f2c12d5",
+      "item_id": "ksi_01a15be1-b7dd-75c3-a4b9-fa5c9380c186",
+      "status": null,
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 325
+    },
+    {
+      "input_index": 0,
+      "source": "https://www.tiktok.com/@mememadness28/video/7689441426307927327",
+      "outcome": "added",
+      "asset_id": "6ad808ac5411fa6e602ca222",
+      "item_id": "ksi_01a15be1-fd22-71d3-bf5a-c10eaf7ec4c7",
+      "status": "queued",
+      "already_existed": false,
+      "error_code": null,
+      "retriable": null,
+      "error": null,
+      "detail": null,
+      "id": 326
+    }
+  ],
+  "readyItems": [
+    {
+      "item_id": "ksi_01a15bdf-c3aa-7c10-a37e-4fbcf12f3340",
+      "asset_id": "6ad8081e0ca748ea3c080539",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:32:33.965927Z",
+      "updated_at": "2026-10-21T00:32:37.267931Z",
+      "metadata": {},
+      "asset": {
+        "title": "Try Not to Laugh - Ranking Funniest Human Fails 😂 #shorts  #usa",
+        "duration_sec": 22.366667,
+        "size_bytes": 5937576
+      }
+    },
+    {
+      "item_id": "ksi_01a15bdf-b999-73f2-a83f-17fee28f7d4f",
+      "asset_id": "6ad8081c500e82756f2c1247",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:32:31.425029Z",
+      "updated_at": "2026-10-21T00:32:34.69135Z",
+      "metadata": {},
+      "asset": {
+        "title": "... #meme #funny #memes #trynottolaugh #brainrot",
+        "duration_sec": 9.938005,
+        "size_bytes": 417635
+      }
+    },
+    {
+      "item_id": "ksi_01a15bdf-a8a0-7370-850b-08e55e8ce134",
+      "asset_id": "6ad808150ca748ea3c080523",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:32:27.241735Z",
+      "updated_at": "2026-10-21T00:32:34.967604Z",
+      "metadata": {},
+      "asset": {
+        "title": "Try not to laugh #xbyzca #funnyclips #memes #fypppp",
+        "duration_sec": 22.2,
+        "size_bytes": 1103079
+      }
+    },
+    {
+      "item_id": "ksi_01a15bdf-a36d-7840-98d6-faecd035bb5d",
+      "asset_id": "6ad808169c038876f3560c34",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:32:25.748751Z",
+      "updated_at": "2026-10-21T00:32:34.674103Z",
+      "metadata": {},
+      "asset": {
+        "title": "Try Not To Laugh 😂 Funniest Epic Fails of 2026 #Funny #EpicFails #Viral #funnyvideos #comedy",
+        "duration_sec": 22.5,
+        "size_bytes": 3108755
+      }
+    },
+    {
+      "item_id": "ksi_01a15be0-86a2-74c0-be38-153946306bcc",
+      "asset_id": "6ad8085065b4aff96dc5193d",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:33:23.883882Z",
+      "updated_at": "2026-10-21T00:33:25.694604Z",
+      "metadata": {},
+      "asset": {
+        "title": "try not to laugh challenge . . . #funnyvideo #tomholland #veryfunny #reactionvideo #fyp",
+        "duration_sec": 31.1,
+        "size_bytes": 3527037
+      }
+    },
+    {
+      "item_id": "ksi_01a15be0-8aec-77d3-9464-f8a0203160f6",
+      "asset_id": "6ad80851968fe117efe4637d",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:33:24.949559Z",
+      "updated_at": "2026-10-21T00:33:28.402314Z",
+      "metadata": {},
+      "asset": {
+        "title": "Try Not To Laugh part 6 😂 | 10 Funniest Videos on the Internet #funny #funnyvideo #reactionvideo",
+        "duration_sec": 79.066666,
+        "size_bytes": 4568638
+      }
+    },
+    {
+      "item_id": "ksi_01a15be0-7c38-7371-9d27-a04b0cc8249a",
+      "asset_id": "6ad8084e0ca748ea3c08056b",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:33:21.230097Z",
+      "updated_at": "2026-10-21T00:33:25.856192Z",
+      "metadata": {},
+      "asset": {
+        "title": "Top 3 best random try not laugh videos #funnyvideos #funny #meme #trynottolaugh",
+        "duration_sec": 20.16,
+        "size_bytes": 1212847
+      }
+    },
+    {
+      "item_id": "ksi_01a15be0-7e2e-71b2-9b34-414cc27eaf6f",
+      "asset_id": "6ad8084d500e82756f2c1271",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:33:21.704677Z",
+      "updated_at": "2026-10-21T00:33:25.925755Z",
+      "metadata": {},
+      "asset": {
+        "title": "Welp 💀 #funny  #dontlaught  #funnyclips  #laugher  #memeclip  #movie  #viral  #comedy",
+        "duration_sec": 28.666668,
+        "size_bytes": 1424989
+      }
+    },
+    {
+      "item_id": "ksi_01a15be0-8768-7260-8562-e3eaa41c9c5a",
+      "asset_id": "6ad80850500e82756f2c1273",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:33:24.063993Z",
+      "updated_at": "2026-10-21T00:33:24.063993Z",
+      "metadata": {},
+      "asset": {
+        "title": "3/2/2026 thử thách cấm cười 😂 #taivelao #tàivẽláo #xuhuongtiktok #viral",
+        "duration_sec": 28.163992,
+        "size_bytes": 2708813
+      }
+    },
+    {
+      "item_id": "ksi_01a15be0-d207-7f13-83e4-86257f102851",
+      "asset_id": "6ad80863030b76724d10cabf",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:33:43.192477Z",
+      "updated_at": "2026-10-21T00:33:47.677785Z",
+      "metadata": {},
+      "asset": {
+        "title": "Thappar Mai Turbo Khul Gaye 😂#viral #comedy #animals #foryoupage #foryoupage❤️❤️",
+        "duration_sec": 23.381994,
+        "size_bytes": 1372363
+      }
+    },
+    {
+      "item_id": "ksi_01a15be0-d243-7e63-923d-f6405154f722",
+      "asset_id": "6ad808644a68f3b4031f30ef",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:33:43.224412Z",
+      "updated_at": "2026-10-21T00:33:47.431274Z",
+      "metadata": {},
+      "asset": {
+        "title": "if you laugh you have to follow",
+        "duration_sec": 6.339002,
+        "size_bytes": 257295
+      }
+    },
+    {
+      "item_id": "ksi_01a15be1-0f38-7230-83cd-e0a4274ee2de",
+      "asset_id": "6ad80874500e82756f2c128a",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:33:58.863898Z",
+      "updated_at": "2026-10-21T00:33:58.863898Z",
+      "metadata": {},
+      "asset": {
+        "title": "Don’t you dare laugh! 🤣🙏",
+        "duration_sec": 47.966667,
+        "size_bytes": 2689736
+      }
+    },
+    {
+      "item_id": "ksi_01a15be1-0bc9-72a0-b98c-47e23490d6b9",
+      "asset_id": "6ad80872960d8ea7bdcdaa28",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:33:57.960758Z",
+      "updated_at": "2026-10-21T00:34:01.33748Z",
+      "metadata": {},
+      "asset": {
+        "title": "funny video 🤣😂 #trynottolaugh #funnyvideoscomedy #chupmithabadi #funnyvideo #meme",
+        "duration_sec": 21.6,
+        "size_bytes": 1530523
+      }
+    },
+    {
+      "item_id": "ksi_01a15be1-09a1-75e1-ad80-328ee0b0d816",
+      "asset_id": "6ad80872968fe117efe4638e",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:33:57.398189Z",
+      "updated_at": "2026-10-21T00:34:01.433277Z",
+      "metadata": {},
+      "asset": {
+        "title": "Tom Holland React To Funny Animation Video 😂🔥 _ try not to laugh 😁 #tomholland #funny #shorts #viral (1)",
+        "duration_sec": 35.165012,
+        "size_bytes": 1564089
+      }
+    },
+    {
+      "item_id": "ksi_01a15be1-49be-74a2-8845-445eb875e27e",
+      "asset_id": "6ad80882500e82756f2c12ad",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:34:13.80173Z",
+      "updated_at": "2026-10-21T00:34:17.571534Z",
+      "metadata": {},
+      "asset": {
+        "title": "Try Not To Laugh Challenge 😂 Funniest Videos of the Week 2026 😆 Part 50 #frypgシ #foryou #fry #funnyreaction #funny #viral",
+        "duration_sec": 27.678005,
+        "size_bytes": 5090775
+      }
+    },
+    {
+      "item_id": "ksi_01a15be1-51f4-7f71-89d5-ca89e6f97992",
+      "asset_id": "6ad808845411fa6e602ca1ed",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:34:15.884876Z",
+      "updated_at": "2026-10-21T00:34:20.346962Z",
+      "metadata": {},
+      "asset": {
+        "title": "😂 I Dreamt They Cut Off My Balls! #AndyPraiseComedies #ComedySkit #FunnyVideo #Dream #POV",
+        "duration_sec": 31.973879,
+        "size_bytes": 5310183
+      }
+    },
+    {
+      "item_id": "ksi_01a15bdf-c152-7dc0-b32f-587a185d512c",
+      "asset_id": "6ad8081e030b76724d10ca89",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:32:33.355417Z",
+      "updated_at": "2026-10-21T00:32:34.91639Z",
+      "metadata": {},
+      "asset": {
+        "title": "Try Not To Laugh Top 100 Funniest Videos Ever | Funny Videos Compilation#FYP #LondonComedy #LOL #fmw560 #tiktokuk",
+        "duration_sec": 46.18399,
+        "size_bytes": 2426614
+      }
+    },
+    {
+      "item_id": "ksi_01a15be1-0eea-72e2-8cd4-1d450c91daee",
+      "asset_id": "6ad80873960d8ea7bdcdaa2a",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:33:58.767039Z",
+      "updated_at": "2026-10-21T00:34:01.085303Z",
+      "metadata": {},
+      "asset": {
+        "title": "ranking top 5 try not to laugh moments. #viralvideo #trending #fyppp #foryoupage #foryou #fyp #funnyvideos #funny #ranking",
+        "duration_sec": 46.378006,
+        "size_bytes": 2915318
+      }
+    },
+    {
+      "item_id": "ksi_01a15be1-46ce-70c0-8d70-decdf16eb075",
+      "asset_id": "6ad80882968fe117efe463b0",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:34:13.047231Z",
+      "updated_at": "2026-10-21T00:34:17.396796Z",
+      "metadata": {},
+      "asset": {
+        "title": "#funny#meme#masukberandafyp #4upage #xyzbca",
+        "duration_sec": 42.333332,
+        "size_bytes": 4818800
+      }
+    },
+    {
+      "item_id": "ksi_01a15be1-4f5b-7492-8992-45ff8a00820e",
+      "asset_id": "6ad808844a68f3b4031f3110",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:34:15.251013Z",
+      "updated_at": "2026-10-21T00:34:15.251013Z",
+      "metadata": {},
+      "asset": {
+        "title": "Trying not to laugh but FAIL 😂 #fyp #viral #funny #couple #douyin",
+        "duration_sec": 25.866667,
+        "size_bytes": 1652343
+      }
+    },
+    {
+      "item_id": "ksi_01a15be1-b404-7962-bd4f-c5accc465962",
+      "asset_id": "6ad808955411fa6e602ca20a",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:34:41.02298Z",
+      "updated_at": "2026-10-21T00:34:43.837747Z",
+      "metadata": {},
+      "asset": {
+        "title": "When your friend makes a joke and you don’t get it…but you still laugh like it’s the funniest thing ever😂😂#fyppppppppppppppppppppppp",
+        "duration_sec": 7.546009,
+        "size_bytes": 874325
+      }
+    },
+    {
+      "item_id": "ksi_01a15be1-c137-7c81-a3d3-340703b9ad2d",
+      "asset_id": "6ad808965411fa6e602ca20e",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:34:44.402692Z",
+      "updated_at": "2026-10-21T00:34:44.402692Z",
+      "metadata": {},
+      "asset": {
+        "title": "#dance #funny  #joke",
+        "duration_sec": 67.75501,
+        "size_bytes": 7366209
+      }
+    },
+    {
+      "item_id": "ksi_01a15be1-b590-7280-a44e-406c37c02d02",
+      "asset_id": "6ad808959c038876f3560cd1",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:34:41.425182Z",
+      "updated_at": "2026-10-21T00:34:41.425182Z",
+      "metadata": {},
+      "asset": {
+        "title": "Wait for the ending, it gets crazier! 💀 Double tap if you laughed! 😂👇 #comedy #funny #memes #funnyvideos #usacomedy #ukcomedy #comedytiktok #viral #trending #fyp #foryou #foryoupage #humor #relatable #joke #shorts #entertainment #dontletthisflop #xyzbca #",
+        "duration_sec": 24.637007,
+        "size_bytes": 1898546
+      }
+    },
+    {
+      "item_id": "ksi_01a15be1-b7dd-75c3-a4b9-fa5c9380c186",
+      "asset_id": "6ad80896500e82756f2c12d5",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:34:42.06622Z",
+      "updated_at": "2026-10-21T00:34:46.976208Z",
+      "metadata": {},
+      "asset": {
+        "title": "#funny #Funny #funnyvideos #comedy #joke",
+        "duration_sec": 24.449001,
+        "size_bytes": 3973361
+      }
+    },
+    {
+      "item_id": "ksi_01a15be0-dae1-7e02-a78f-14af1cd7db3a",
+      "asset_id": "6ad80866960d8ea7bdcdaa24",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:33:45.444526Z",
+      "updated_at": "2026-10-21T00:33:45.444526Z",
+      "metadata": {},
+      "asset": {
+        "title": "Try Not To Laugh Challenge Part 2 😂 | 3 Funniest Videos on the Internet #funny #funnyvideo  #shorts  Welcome back to TomReactsOfficial! This is Part 2 of our Try Not To Laugh Challenge, featuring 3 of the funniest videos on the internet. These viral clips",
+        "duration_sec": 41.433334,
+        "size_bytes": 2167675
+      }
+    },
+    {
+      "item_id": "ksi_01a15be0-d403-7c62-90f4-221e625164c0",
+      "asset_id": "6ad80864030b76724d10cac1",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:33:43.646872Z",
+      "updated_at": "2026-10-21T00:33:47.971295Z",
+      "metadata": {},
+      "asset": {
+        "title": "Try Not To Laugh 😂 Funny Fails Compilation Video 2026 | Funny Memes #funny #comdey #fyp #viral #laugh",
+        "duration_sec": 42.233334,
+        "size_bytes": 4896911
+      }
+    },
+    {
+      "item_id": "ksi_01a15be0-d274-7a90-80c8-f5e012ffb158",
+      "asset_id": "6ad808630ca748ea3c080576",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:33:43.263674Z",
+      "updated_at": "2026-10-21T00:33:47.69334Z",
+      "metadata": {},
+      "asset": {
+        "title": "Try not to laugh😂 #ranking",
+        "duration_sec": 25.8,
+        "size_bytes": 1266032
+      }
+    },
+    {
+      "item_id": "ksi_01a15be1-ccf6-7083-bb08-09dc40aa7c13",
+      "asset_id": "6ad808995411fa6e602ca210",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:34:47.423069Z",
+      "updated_at": "2026-10-21T00:34:47.423069Z",
+      "metadata": {},
+      "asset": {
+        "title": "This dude is so clever 🤧🤣. Some jokes never get old. #Fyp #fyp #Viral #viral",
+        "duration_sec": 106.69501,
+        "size_bytes": 3318746
+      }
+    },
+    {
+      "item_id": "ksi_01a15be1-fd22-71d3-bf5a-c10eaf7ec4c7",
+      "asset_id": "6ad808ac5411fa6e602ca222",
+      "asset_type": "video",
+      "status": "ready",
+      "created_at": "2026-10-21T00:34:59.724219Z",
+      "updated_at": "2026-10-21T00:34:59.724219Z",
+      "metadata": {},
+      "asset": {
+        "title": "#Funny #FunnyVideos #Comedy #ComedyTok #FunnyTikTok #LOL #Viral #ViralVideo #FYP #ForYou #ForYouPage #Trending #TikTokComedy #Humor #LaughOutLoud",
+        "duration_sec": 13.366667,
+        "size_bytes": 2046755
+      }
+    }
+  ],
+  "groundedVisualEvidence": [
+    {
+      "vidbest_id": 289,
+      "item_id": "ksi_01a15659-fa66-77d1-a641-33ee357140c3",
+      "visual_access": true,
+      "audio_access": true,
+      "duration_seconds": 41.517007,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 2,
+          "visible_action": "Title card introduces a cat segment; a dark-colored cat looks toward a television, then turns and walks away.",
+          "heard_audio": "Transcript: [source speech not reproduced]",
+          "uncertainty": "The transcript is the only available speech evidence; the visual record does not establish who or what produced the words."
+        },
+        {
+          "start_seconds": 2,
+          "end_seconds": 11,
+          "visible_action": "A hand brings a black Batman-style mask toward a tortoiseshell cat and places it over the cat's head; the cat looks around while wearing it.",
+          "heard_audio": "Transcript includes [source speech not reproduced]; language and meaning are not established here.",
+          "uncertainty": "The cat's tolerance is visually observable, but intent, comfort, and staging are not established. On-screen text is visual, not audible evidence."
+        },
+        {
+          "start_seconds": 11,
+          "end_seconds": 20,
+          "visible_action": "A white cat repeatedly scratches and paws at a glass door or window while a person in blue shorts passes in the background.",
+          "heard_audio": "The transcript overlaps this interval with [source speech not reproduced]; no additional audible event is reliably identified.",
+          "uncertainty": "The reason for the scratching and the relationship between the visible people and cat are unknown."
+        },
+        {
+          "start_seconds": 20,
+          "end_seconds": 24,
+          "visible_action": "Night-vision footage shows a cat sitting on the floor in a dark room; its eyes reflect brightly as it faces toward the camera.",
+          "heard_audio": "Transcript: [source speech not reproduced] at 21.6–22.4.",
+          "uncertainty": "The short transcript may be a name or partial word; no broader spoken context is available."
+        },
+        {
+          "start_seconds": 24,
+          "end_seconds": 28,
+          "visible_action": "A cat in a playpen jumps beside a cardboard box and knocks it over, causing the box to collapse.",
+          "heard_audio": "No reliable transcribed speech is available for this scene.",
+          "uncertainty": "No ASR evidence does not prove silence; the cause of the jump is not established."
+        },
+        {
+          "start_seconds": 28,
+          "end_seconds": 41,
+          "visible_action": "One cat approaches extremely close to the lens until its face fills and overexposes the image; afterward, a black-and-white cat on a couch turns to face the camera.",
+          "heard_audio": "Transcript: [source speech not reproduced] followed by [source speech not reproduced] The first phrase is retained as transcribed and not interpreted.",
+          "uncertainty": "The visible close-up and head turn are clear, but the animals' intentions and the reason for the camera reaction are not established."
+        }
+      ],
+      "audio_overview": "Audio access is available through sparse transcript segments. The reliably transcribed material is [source speech not reproduced] [source speech not reproduced] [source speech not reproduced] [source speech not reproduced] and [source speech not reproduced] These do not provide continuous coverage, and no ASR evidence does not prove silence.",
+      "editing_observations": [
+        "A rapid compilation structure uses hard visual transitions between unrelated cat clips.",
+        "On-screen labels and comedic captions frame ordinary movements as punchlines, while night vision and overexposure create tonal variation.",
+        "The final segment supplies explicit narration after the visual reaction, making the edit more explanatory than the preceding clips."
+      ],
+      "review_angles": [
+        "The strongest comic mechanism is juxtaposition: minor animal movements are repeatedly reframed by captions, masks, unusual lighting, or proximity to the lens.",
+        "The compilation favors immediate visual readability over sustained setup or payoff.",
+        "Because the audio evidence is sparse and multilingual, the review should prioritize observable actions and captions rather than infer a continuous soundtrack or dialogue."
+      ],
+      "uncertainties": [
+        "The shot captions identify several cats with labels, but those labels do not establish identity beyond the on-screen or extracted descriptions.",
+        "No conclusions are made about staging, consent, welfare, intent, or outcomes."
+      ]
+    },
+    {
+      "vidbest_id": 300,
+      "item_id": "ksi_01a1565a-0bac-7293-8200-35a091997e24",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 22.466667,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "visible_action": "In a living room, a child in a white shirt with red cuffs energetically holds a blue box and moves in front of the camera while an adult seated on a couch maintains a largely stoic expression; another child is visible seated nearby.",
+          "heard_audio": "No transcript is available.",
+          "uncertainty": "The expression and movement are visual only; no spoken words, tone, or sounds can be reliably reported. No ASR does not prove silence."
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 22,
+          "visible_action": "The edit cuts to a close-up of an adult wearing headphones in a dim room. The adult looks toward the camera, shakes the head slightly, looks aside and upward, and ends with a slight visible smirk before looking away.",
+          "heard_audio": "No transcript is available.",
+          "uncertainty": "The reaction is visually observable, but its cause, meaning, and any audible response are unknown."
+        }
+      ],
+      "audio_overview": "Audio access is false for this item: no transcript is available. Spoken words, music, sound effects, and silence cannot be reliably characterized.",
+      "editing_observations": [
+        "The two-shot structure establishes energetic foreground action, then cuts to a reaction close-up.",
+        "A slight zoom toward the seated adult concentrates attention on the facial reaction before the cut.",
+        "The second segment functions as commentary through reaction editing, but the absence of audio evidence limits claims about the exchange."
+      ],
+      "review_angles": [
+        "The clip's humor is constructed primarily through contrast between energetic movement and restrained visible reactions.",
+        "The reaction shot supplies the apparent punchline, but without audio evidence its interpretation remains deliberately open.",
+        "The edit is efficient and legible, though the short setup limits development beyond the expression-based gag."
+      ],
+      "uncertainties": [
+        "No claims are made about what anyone said, heard, intended, or felt.",
+        "The visible reactions do not establish staging, consent, or the outcome of the interaction."
+      ]
+    },
+    {
+      "vidbest_id": 302,
+      "item_id": "ksi_01a15659-fc6f-7383-856a-bf404b0e38ff",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 38.932993,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 5,
+          "visible_action": "In two rapid snowy setups, a child pokes a crouching man with a yellow shovel and he jumps; then snow collapses from a trash can onto another man’s face, prompting a wiping reaction.",
+          "heard_audio": "No transcribed audio returned for these moments; visible reactions are not evidence of audible sound.",
+          "uncertainty": "The transcript does not cover the actions or any nonverbal sounds."
+        },
+        {
+          "start_seconds": 5,
+          "end_seconds": 13,
+          "visible_action": "A woman slips and falls into a snowbank at night; in a separate yard, a man kicks a snow-covered tree and snow falls onto a nearby woman, who flinches and covers her head.",
+          "heard_audio": "The word [source speech not reproduced] is transcribed at 5.68–6.24 seconds. No other audio is transcribed in this scene.",
+          "uncertainty": "The isolated transcription may not clearly describe the visible action; no inference is made about surrounding speech or sounds."
+        },
+        {
+          "start_seconds": 13,
+          "end_seconds": 19,
+          "visible_action": "A first-person camera shows a person sliding uncontrollably down a snowy hill while another person is visible farther downhill.",
+          "heard_audio": "[source speech not reproduced] is transcribed at 15.52–16.24 seconds.",
+          "uncertainty": "The visual account shows sliding and camera shake, but the transcript does not establish additional sounds."
+        },
+        {
+          "start_seconds": 19,
+          "end_seconds": 28,
+          "visible_action": "A person attempts a jump or split on a snowy slope and falls onto their back; a separate clip shows a dancing man slipping on ice and landing backward with his arms raised.",
+          "heard_audio": "[source speech not reproduced] is transcribed at 19.76–20.16 seconds and [source speech not reproduced] at 22.64–23.04 seconds. No audio is transcribed for the dancing sequence.",
+          "uncertainty": "The counted words do not fully clarify the attempted movement; visible falls should not be treated as proof of impact sounds."
+        },
+        {
+          "start_seconds": 28,
+          "end_seconds": 34,
+          "visible_action": "A snowball hits a man in the back; he turns, laughs visibly, then lifts a large chunk of snow and dumps it over a crouching woman.",
+          "heard_audio": "[source speech not reproduced] is transcribed at 28.64–29.28 seconds.",
+          "uncertainty": "The wording appears uncertain or contextually unclear; visible laughter is not treated as an audible laugh."
+        },
+        {
+          "start_seconds": 34,
+          "end_seconds": 38,
+          "visible_action": "A man throws powder snow upward, producing a rainbow-shaped arc against a snowy sunset landscape.",
+          "heard_audio": "[source speech not reproduced] is transcribed at 38.08–38.32 seconds.",
+          "uncertainty": "The utterance occurs near the end of the visual event; no other audio is transcribed."
+        }
+      ],
+      "audio_overview": "audio_access is false because available ASR is sparse. The only reportable speech is [source speech not reproduced] [source speech not reproduced] [source speech not reproduced] [source speech not reproduced] [source speech not reproduced] and [source speech not reproduced] No ASR never proves silence, and visible mouths, laughter, or reactions are not treated as audible evidence.",
+      "editing_observations": [
+        "The piece is structured as a rapid ranking-style compilation, with distinct clips changing roughly every 2–8 seconds.",
+        "It alternates static observational views with handheld or point-of-view footage, making camera instability part of the comic timing in several moments.",
+        "The final snow-arc image slows the gag rhythm into a visually composed closing beat."
+      ],
+      "review_angles": [
+        "Its strongest critical feature is compression: surprise, failed balance, and snow-triggered reactions are delivered through short visual setups with little narrative overhead.",
+        "The compilation depends heavily on the contrast between calm snowy compositions and abrupt bodily reactions, though the repeated fall-and-impact pattern can become mechanically predictable.",
+        "The final image broadens the tone from mishap compilation to visual spectacle, giving the sequence a more composed ending."
+      ],
+      "uncertainties": [
+        "Shot captions describe visible actions, but they do not establish intent, staging, consent, injury, or outcomes beyond what is directly shown.",
+        "Sparse ASR prevents conclusions about continuous dialogue, music, ambient sound, or silence."
+      ]
+    },
+    {
+      "vidbest_id": 308,
+      "item_id": "ksi_01a15659-fa0a-7570-9f7c-b2b81524a848",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 64.807007,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 12,
+          "visible_action": "A person folds two yellow pills into a red gelatinous treat and offers it to a dog; the dog eats the treat, spits out the pills, and sniffs them on the floor.",
+          "heard_audio": "No transcribed audio returned for this scene; the dog’s eating or spitting is visual evidence only.",
+          "uncertainty": "The captions describe the pill-removal action, but no audible response is established."
+        },
+        {
+          "start_seconds": 12,
+          "end_seconds": 24,
+          "visible_action": "A brown dog licks peanut butter from a spoon containing hidden pills; a husky then licks peanut butter from a spoon while a person discusses placing medicine toward the back of the throat.",
+          "heard_audio": "[source speech not reproduced] is transcribed at 13.04–13.44 seconds. [source speech not reproduced] is transcribed at 15.84–18.72. [source speech not reproduced] is transcribed at 18.72–22.32, followed by [source speech not reproduced] at 22.88–24.40.",
+          "uncertainty": "The transcript supports spoken instructions and reassurance, but not untranscribed handling sounds or the dogs’ vocalizations."
+        },
+        {
+          "start_seconds": 24,
+          "end_seconds": 35,
+          "visible_action": "A dog wearing a shirt eats a peanut-butter treat described as medicine-free; then a large black dog is fed pills and a person sprays its mouth, with “GOOD.” appearing onscreen.",
+          "heard_audio": "[source speech not reproduced] is transcribed at 24.96–28.80. [source speech not reproduced] is transcribed at 36.24–37.92 only outside this scene’s main action.",
+          "uncertainty": "The visible pill-feeding and spray action is not supplemented by complete audio evidence."
+        },
+        {
+          "start_seconds": 35,
+          "end_seconds": 44,
+          "visible_action": "A dog in an orange harness eats a treat offered by a person and then looks around.",
+          "heard_audio": "[source speech not reproduced] is transcribed at 36.24–37.92.",
+          "uncertainty": "No additional speech or dog sounds are transcribed."
+        },
+        {
+          "start_seconds": 44,
+          "end_seconds": 55,
+          "visible_action": "A Golden Retriever takes chicken containing a pill, spits it out, and looks toward the camera; in a subsequent close-up, the dog licks medicine from a syringe.",
+          "heard_audio": "No transcribed audio returned for these actions.",
+          "uncertainty": "The captions support the visible rejection and syringe-licking, but not audible reactions or swallowing sounds."
+        },
+        {
+          "start_seconds": 55,
+          "end_seconds": 64,
+          "visible_action": "A black dog turns away from a blue pill; a blue heeler also turns away from an offered treat, accompanied by onscreen text reading “Almost tricked him” and “Nope Not today mom.”",
+          "heard_audio": "[source speech not reproduced] is transcribed at 55.68–55.92, [source speech not reproduced] at 57.36–57.92, and [source speech not reproduced] at 62.64–63.12. A separate very short transcription at 60.64–61.12 is [source speech not reproduced].",
+          "uncertainty": "The short phrases, especially “He went it?” and “Medi,” are unclear in context; visible refusal is not treated as audible communication."
+        }
+      ],
+      "audio_overview": "audio_access is false because ASR is incomplete despite several transcribed lines. Reportable speech includes instructions about peanut butter and medicine, brief reactions, and fragmentary utterances. No ASR never proves silence; dog behavior and visible mouth movement are not audio evidence.",
+      "editing_observations": [
+        "The video uses a repeated vignette structure: setup, attempted concealment or delivery, then acceptance or refusal.",
+        "It cuts between dogs, food vehicles, camera heights, and framing sizes, creating variation within a tightly repeated premise.",
+        "Onscreen captions add punchlines and editorial framing, especially where the visual result contradicts the attempted trick."
+      ],
+      "review_angles": [
+        "The central comic mechanism is failed concealment: the dogs’ visible rejection repeatedly undercuts the human explanation or promise.",
+        "The strongest sequences are those with a clear visual reversal, such as pills spat onto the floor or chicken rejected after the setup.",
+        "Repetition supplies the format’s cohesion but also limits escalation; several clips revisit the same acceptance-versus-refusal beat without a clearly different dramatic consequence."
+      ],
+      "uncertainties": [
+        "Shot captions do not establish intent, staging, consent, medical outcome, or whether any animal experienced harm.",
+        "Sparse ASR prevents conclusions about continuous narration, music, ambient sound, or silence."
+      ]
+    },
+    {
+      "vidbest_id": 309,
+      "item_id": "ksi_01a1565a-03e1-7733-a1d9-03d956dc02cd",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 29.535011,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 29,
+          "visible_action": "A static eye-level close-up shows a blue acoustic guitar being strummed. A small light-colored dog with a dark collar enters beside it; around 16 seconds, the dog visibly opens its mouth, tilts its head back, and continues the behavior while the person plays.",
+          "heard_audio": "No transcript is available, so spoken words and other audio content are unknown.",
+          "uncertainty": "The visual description reports apparent dog vocalization and guitar playing, but audio cannot be verified; the absence of a transcript does not establish silence."
+        }
+      ],
+      "audio_overview": "audio_access is false. No reliable speech or other audio evidence is available.",
+      "editing_observations": [
+        "One continuous shot is reported, with no detected camera cut.",
+        "The clip uses an eye-level, static close-up throughout.",
+        "On-screen text reads “Bro hired a backup singer” with emojis."
+      ],
+      "review_angles": [
+        "Close-up framing emphasizes the guitar and the dog.",
+        "The camera remains static at eye level.",
+        "No appearance-based identity is asserted."
+      ],
+      "uncertainties": [
+        "No transcript is available; spoken content and audio events are unknown.",
+        "The shot summary describes apparent rhythmic vocalization, but this is not treated as verified audible sound."
+      ]
+    },
+    {
+      "vidbest_id": 314,
+      "item_id": "ksi_01a1565a-0765-7072-ac5c-acaf1c2ac527",
+      "visual_access": true,
+      "audio_access": true,
+      "duration_seconds": 7.451995,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 2,
+          "visible_action": "A static eye-level medium shot shows a toddler in a light blue shirt and white pants holding a brown chicken in a barnyard. On-screen text prompts the child to tell a joke.",
+          "heard_audio": "[source speech not reproduced]",
+          "uncertainty": "The transcript identifies the prompt as spoken by an off-screen speaker; the child’s response is not captured in this segment."
+        },
+        {
+          "start_seconds": 2,
+          "end_seconds": 5,
+          "visible_action": "The camera moves closer as the child looks down toward the chicken. On-screen text presents a chicken-joke setup.",
+          "heard_audio": "The transcript reports [source speech not reproduced] but this does not clearly match the displayed joke setup.",
+          "uncertainty": "Speech attribution and exact wording beyond the reliable transcript are uncertain."
+        },
+        {
+          "start_seconds": 5,
+          "end_seconds": 7,
+          "visible_action": "The camera zooms into a high-angle close-up of the child’s face as the child looks up. On-screen text displays “Becauuuuuuse” with a laughing emoji.",
+          "heard_audio": "[source speech not reproduced]",
+          "uncertainty": "The visual caption presents a punchline, but that punchline is not present in the available transcript."
+        }
+      ],
+      "audio_overview": "audio_access is true. Reliable ASR captures an off-screen prompt, [source speech not reproduced] the segment [source speech not reproduced] and [source speech not reproduced] No additional speech is asserted.",
+      "editing_observations": [
+        "Three reported shots progress from medium shot to closer framing and then a tight close-up.",
+        "The first shot is static and eye-level; the second is handheld and high-angle; the third uses a high-angle zoom-in.",
+        "On-screen text supplies the joke setup and displayed punchline."
+      ],
+      "review_angles": [
+        "The framing progressively tightens on the child.",
+        "The camera angle shifts from eye level to high angle.",
+        "The final shot emphasizes the child’s face rather than the chicken."
+      ],
+      "uncertainties": [
+        "The available ASR conflicts with or omits portions of the displayed joke text.",
+        "No claims are made about staging, consent, identity, or outcome."
+      ]
+    },
+    {
+      "vidbest_id": 315,
+      "item_id": "ksi_01a1565a-0b24-7f41-81a5-72e67e5e4fab",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 24.566667,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 3,
+          "visible_action": "At night, a handheld medium shot shows two people near a white car. One asks about speaking English; the other visibly responds. On-screen text comments on someone using his whole vocabulary.",
+          "heard_audio": "ASR reliably captures a phrase equivalent to [source speech not reproduced] No reliable transcription is available for the other response.",
+          "uncertainty": "Visual descriptions are grounded in the shot record; the other person’s spoken reply is not reliably captured by ASR."
+        },
+        {
+          "start_seconds": 3,
+          "end_seconds": 24,
+          "visible_action": "The video cuts to a relatively static eye-level close-up of a young man outdoors at night. He recites a sequence of English greetings, numbers, place names, brand names, and celebrity names, then continues gesturing toward the camera.",
+          "heard_audio": "ASR reliably captures greetings, counting from one through seven with repeated numbers, and terms including New York, Washington, Miami, iPhone, McDonald’s, Amazon, and a name rendered as [source speech not reproduced] Later speech is unclear.",
+          "uncertainty": "The shot caption includes additional later phrases, but the available ASR does not reliably support paraphrasing them."
+        }
+      ],
+      "audio_overview": "Audio access is false because ASR is sparse. Some speech is reliably transcribed in the opening and most of the close-up recitation; absent ASR is not treated as evidence of silence.",
+      "editing_observations": [
+        "Two principal shots: a 0.0–3.0-second handheld medium shot followed by a hard cut to a 3.0–24.0-second close-up.",
+        "The second shot remains relatively static while the spoken-word sequence continues."
+      ],
+      "review_angles": [
+        "Chronological interaction: opening nighttime exchange, then extended word recitation.",
+        "Camera coverage shifts from a wider handheld interaction view to a tighter, static face-centered view.",
+        "Do not infer identity, staging, consent, or audible laughter/music/effects from the available evidence."
+      ],
+      "uncertainties": [
+        "ASR does not reliably capture all dialogue, especially the opening reply and later close-up phrases.",
+        "No conclusions are made about the people’s real-world identities or circumstances."
+      ]
+    },
+    {
+      "vidbest_id": 320,
+      "item_id": "ksi_01a1565a-0f6a-7d60-9acd-a973dfe53890",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 62.67,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 13,
+          "visible_action": "In a static eye-level medium shot, a person demonstrates a blackboard exercise: the number 1 is embellished into a candle, then the number 2 into a swan on water.",
+          "heard_audio": "No reliable speech transcription is available for this interval.",
+          "uncertainty": "The visual record supports the drawing actions; audio content cannot be determined from absent reliable ASR."
+        },
+        {
+          "start_seconds": 13,
+          "end_seconds": 25,
+          "visible_action": "The number 3 is expanded into a butterfly. The person then crouches to transform the number 4 into a sailboat; a detected camera cut occurs at 20.3 seconds.",
+          "heard_audio": "ASR begins at 16.16 seconds but is garbled and does not support a reliable paraphrase.",
+          "uncertainty": "The speech transcript in this interval is unintelligible; no audible laughter, music, or effects are inferred."
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 40,
+          "visible_action": "The person turns the number 5 into a cat face and the number 6 into a fish, stepping back briefly after completing the drawings.",
+          "heard_audio": "ASR is present across part of this interval but is unintelligible; no reliable spoken content is reported.",
+          "uncertainty": "Visual actions are supported by the shot descriptions, while the audio wording remains unclear."
+        },
+        {
+          "start_seconds": 40,
+          "end_seconds": 50,
+          "visible_action": "The number 7 is developed into a rabbit, with the person crouching and adding facial and body details.",
+          "heard_audio": "The available ASR remains garbled and cannot be reliably paraphrased.",
+          "uncertainty": "No claim is made about untranscribed audio or whether the person is speaking continuously."
+        },
+        {
+          "start_seconds": 50,
+          "end_seconds": 62,
+          "visible_action": "The number 8 becomes a flower, and the final number 9 becomes a bird. The person stands back and gestures toward the completed board near the end.",
+          "heard_audio": "ASR contains unclear fragments, including short non-English and English-like strings, but none supports a dependable account of the spoken content.",
+          "uncertainty": "The final visual gesture is described without inferring intent, outcome, or audience response."
+        }
+      ],
+      "audio_overview": "Audio access is false because the returned ASR is sparse and largely unintelligible. No silence, music, laughter, or sound effects are inferred from the visual shot captions.",
+      "editing_observations": [
+        "The video uses a largely continuous static medium-shot setup across the drawing demonstration.",
+        "Shot changes align with transitions between number-drawing steps; the detected finer camera cut at 20.3 seconds is used as the critical boundary.",
+        "The demonstration proceeds sequentially from numbers 1 through 9."
+      ],
+      "review_angles": [
+        "Primary review angle: stepwise transformation of numerals into recognizable drawings.",
+        "Camera coverage is consistently eye-level and medium, keeping the demonstrator and blackboard visible.",
+        "The critical visual progression is candle, swan, butterfly, sailboat, cat, fish, rabbit, flower, and bird.",
+        "Audio should be reviewed separately from the visuals because reliable speech access is limited."
+      ],
+      "uncertainties": [
+        "ASR does not provide reliable dialogue for most of the video.",
+        "Descriptions do not establish identity, staging, consent, medical circumstances, or real-world outcomes.",
+        "No audible qualities are inferred where ASR is absent or unintelligible."
+      ]
+    },
+    {
+      "vidbest_id": 321,
+      "item_id": "ksi_01a1565a-1b9c-76e2-acce-f3b89e2f9fe5",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 23.962993,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 5.5,
+          "visible_action": "A man in a cap pulls a fishing net from a small boat. The video cuts to a static black-and-white drawing of a person falling backward toward water while a crocodile-like creature emerges.",
+          "heard_audio": "Sparse, unclear speech is transcribed approximately as [source speech not reproduced] from about 2.16–5.52 seconds; not reliable enough to paraphrase.",
+          "uncertainty": "The drawing is clearly visible, but the exact spoken wording is unintelligible."
+        },
+        {
+          "start_seconds": 5.5,
+          "end_seconds": 11,
+          "visible_action": "In a barn-like setting, a large brown bull rears against a metal barrier and contacts a chair held behind a counter. The video cuts to a drawing of a person and a charging bull near a window and chair.",
+          "heard_audio": "Sparse speech is transcribed approximately as [source speech not reproduced] from about 5.84–8.24 seconds; the sentence is incomplete.",
+          "uncertainty": "The setting and exact contact are described only from the visible footage; the drawing is an illustrative sketch."
+        },
+        {
+          "start_seconds": 11,
+          "end_seconds": 16,
+          "visible_action": "A man seated at a table lowers a skewer of food toward a dog on the floor. The video cuts to a drawing of a person feeding a dog.",
+          "heard_audio": "No reliable speech was captured for this interval. No conclusion about silence is made.",
+          "uncertainty": "The location is only an apparent cafe or shop based on the image."
+        },
+        {
+          "start_seconds": 16,
+          "end_seconds": 19.5,
+          "visible_action": "A monitor displays two people indoors; one gestures. The video cuts to a drawing of two figures seated at a desk, one appearing to smile and the other appearing surprised.",
+          "heard_audio": "No intelligible speech was captured for this interval. No conclusion about silence is made.",
+          "uncertainty": "The monitor content is viewed indirectly, so details are limited."
+        },
+        {
+          "start_seconds": 19.5,
+          "end_seconds": 23,
+          "visible_action": "Two men approach one another in a narrow outdoor passage. One walks away from the camera; the other approaches and visibly kicks him from behind, after which the first person stumbles. The video cuts to a drawing emphasizing the kick.",
+          "heard_audio": "A short, unclear utterance is transcribed approximately as [source speech not reproduced] from about 22.40–23.00 seconds.",
+          "uncertainty": "The final live-action moment ends before the full video duration reported for the item."
+        }
+      ],
+      "audio_overview": "Audio access is false because the available ASR is sparse and partly unintelligible. Only the approximate transcriptions noted in the scenes are available; no music, laughter, or sound effects are asserted.",
+      "editing_observations": [
+        "The clip alternates short live-action excerpts with black-and-white sketch illustrations.",
+        "Cuts occur roughly every five to six seconds, with live-action footage generally followed by a static drawing.",
+        "A ranking-style text overlay is visible during the opening segment."
+      ],
+      "review_angles": [
+        "Opening: mostly static view of a person in a boat.",
+        "Bull segment: handheld and slightly shaky view near the barrier.",
+        "Dog segment: mostly static view with slight camera movement following the hand.",
+        "Monitor and drawings: static, front-facing views.",
+        "Final segment: rear-following perspective as the two people approach."
+      ],
+      "uncertainties": [
+        "Descriptions are limited to visible actions and do not establish identities, staging, consent, medical facts, or eventual outcomes.",
+        "The available audio evidence is sparse; absent ASR does not imply silence."
+      ]
+    },
+    {
+      "vidbest_id": 324,
+      "item_id": "ksi_01a1565a-173a-77c2-8c75-72b947889c87",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 15.30195,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 1,
+          "visible_action": "A man stands barefoot beside large reddish-brown rocks on a paved path, while a boy stands beside him. The man gestures toward the camera.",
+          "heard_audio": "A speaker is transcribed as [source speech not reproduced] from about 1.0–1.8 seconds.",
+          "uncertainty": "The speech transcription is brief and no broader meaning is inferred."
+        },
+        {
+          "start_seconds": 1,
+          "end_seconds": 7.5,
+          "visible_action": "The man sits on a rock holding a yellow bottle and a long brown bread-like object. The boy approaches with energetic movements and takes the object at about four seconds.",
+          "heard_audio": "A second speaker is transcribed approximately as [source speech not reproduced] from about 3.3–4.6 seconds. The translation is uncertain and is not used to infer context.",
+          "uncertainty": "The object is described by appearance only; no claim is made about what it is or why it is taken."
+        },
+        {
+          "start_seconds": 7.5,
+          "end_seconds": 11,
+          "visible_action": "The man stands and gestures toward the boy, then looks down at his hands and gestures as if showing something small or empty.",
+          "heard_audio": "No reliable speech was captured for this interval. No conclusion about silence is made.",
+          "uncertainty": "The gestures’ meaning is not established."
+        },
+        {
+          "start_seconds": 11,
+          "end_seconds": 15,
+          "visible_action": "The boy turns and runs away along the paved path. The man remains near the rocks, looks after him, and then tilts his head upward.",
+          "heard_audio": "A speaker is transcribed only as an unclear [source speech not reproduced] from about 11.7–15.0 seconds.",
+          "uncertainty": "The reason for either person’s movement or expression is not established."
+        }
+      ],
+      "audio_overview": "Audio access is false because the available ASR is sparse. The clip contains only brief, partly uncertain speech transcriptions; no music, laughter, or effects are inferred, and absent ASR does not imply silence.",
+      "editing_observations": [
+        "The clip uses a cut or transition between the opening standing shot and the seated-rock shot.",
+        "The remainder appears to stay in the same outdoor setting with a mostly continuous, static camera view.",
+        "No additional edit is established from the available observations."
+      ],
+      "review_angles": [
+        "Opening: static wide view showing the path, rocks, people, road, vegetation, and buildings.",
+        "Middle: mostly static view of the seated man and approaching boy.",
+        "Later: static view down the path as the boy moves away and the man remains near the rocks."
+      ],
+      "uncertainties": [
+        "Descriptions are limited to visible actions and do not establish identities, staging, consent, medical facts, or outcomes.",
+        "The available audio evidence is sparse; absent ASR does not imply silence."
+      ]
+    },
+    {
+      "vidbest_id": 286,
+      "item_id": "ksi_01a15bdf-c3aa-7c10-a37e-4fbcf12f3340",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 22.366667,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 6,
+          "visible_action": "A person lies in a narrow concrete drainage ditch with flowing water and eats from a large green leaf placed on their chest. A reaction-video overlay remains visible in the lower-right corner. On-screen text labels this segment as a ranked unexpected-ending entry about mukbang.",
+          "heard_audio": "No reliable speech transcript for this interval; audio content is unknown.",
+          "uncertainty": "The visual source does not establish what the person is eating, why they are in the ditch, or what happens beyond this shot."
+        },
+        {
+          "start_seconds": 6,
+          "end_seconds": 11,
+          "visible_action": "An indoor basketball game plays on a wooden court. Players in orange and blue uniforms move beneath a wall marked “TROJANS.” The reaction overlay remains in the lower-right. On-screen text labels it as a basketball entry and asks whether it is a game-winning play.",
+          "heard_audio": "No reliable speech transcript for most of this interval; audio content is otherwise unknown.",
+          "uncertainty": "The visible footage does not establish the play’s result or whether it is a decisive game winner."
+        },
+        {
+          "start_seconds": 11,
+          "end_seconds": 16,
+          "visible_action": "At an outdoor hibachi grill at night, a chef stands beside a woman in a white top who uses tongs during a fire-show performance. The reaction overlay remains visible.",
+          "heard_audio": "A speaker makes a brief comparison involving sugar and taste.",
+          "uncertainty": "The transcript does not identify the speaker or fully explain the fire-show action."
+        },
+        {
+          "start_seconds": 16,
+          "end_seconds": 22,
+          "visible_action": "A young man with dyed light hair sits at a table and drinks from a large plastic bottle labeled “Blue Sure.” On-screen text identifies him as Lamine Yamal. The reaction overlay remains in the lower-right.",
+          "heard_audio": "Speech includes a phrase naming or wordplaying on the seated man’s name, followed later by a brief affirmative response.",
+          "uncertainty": "The transcript is sparse; wording, speaker identity, and the reason for the reaction are not fully established."
+        }
+      ],
+      "audio_overview": "Audio access is false because the available ASR is sparse. Reliable evidence supports only brief speech during the hibachi and final segments; untranscribed intervals are unknown, not presumed silent. No music, laughter, sound effects, or other audio are asserted.",
+      "editing_observations": [
+        "A fast ranked-compilation structure moves through four distinct clips in descending on-screen positions from 5 to 2.",
+        "Hard cuts separate the drainage-ditch, basketball, hibachi, and bottle-drinking segments.",
+        "A persistent reaction-video overlay and changing on-screen labels provide continuity across otherwise unrelated clips.",
+        "The footage uses varied visual treatment: shaky handheld imagery in the opening clip, then mostly static or conventional views."
+      ],
+      "review_angles": [
+        "Strength: strong variety and immediate visual hooks across four short clips.",
+        "Strength: persistent ranking labels and reaction overlay make the compilation format clear.",
+        "Weakness: the rapid structure gives little context or resolution for any individual clip.",
+        "Weakness: sparse speech evidence limits interpretation of the intended punchlines and audio-driven humor."
+      ],
+      "uncertainties": [
+        "The tool-provided shot timeline ends at 22.0 seconds while the reported media duration is 22.366667 seconds; the final fraction is not assigned to a separate scene.",
+        "No conclusions are made about staging, consent, injury, or outcomes."
+      ]
+    },
+    {
+      "vidbest_id": 288,
+      "item_id": "ksi_01a15bdf-b999-73f2-a83f-17fee28f7d4f",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 9.938005,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 6,
+          "visible_action": "Inside a car, an older man with gray hair and a patterned shirt appears in close-up, raises a hand, and makes an animated open-mouth expression. The camera is static. A TikTok watermark and username are visible along the left side.",
+          "heard_audio": "No transcript is available; spoken content and all other audio are unknown.",
+          "uncertainty": "The visual evidence does not establish what is being said, the context of the gesture, or the person’s emotional state beyond the visible expression and movement."
+        },
+        {
+          "start_seconds": 6,
+          "end_seconds": 9,
+          "visible_action": "The image cuts to a static black end card with a centered TikTok logo and the username shown beneath it in a search-bar-style graphic.",
+          "heard_audio": "No transcript is available; audio content is unknown and this is not treated as silence.",
+          "uncertainty": "The end card’s branding purpose is visually apparent, but no audio or additional context is established."
+        }
+      ],
+      "audio_overview": "Audio access is false: no transcript is available. Speech, music, laughter, effects, and silence are all unknown rather than inferred.",
+      "editing_observations": [
+        "The edit is a simple two-part structure: a six-second reaction shot followed by a branded end card.",
+        "A hard cut around six seconds abruptly ends the car close-up and shifts to static branding.",
+        "The static camera and tight framing concentrate attention on the subject’s gesture and expression."
+      ],
+      "review_angles": [
+        "Strength: immediate, readable visual reaction with minimal setup.",
+        "Strength: short duration and direct framing support quick social-media viewing.",
+        "Weakness: without reliable audio, the central joke or trigger cannot be determined.",
+        "Weakness: the end card occupies a substantial portion of the short runtime and provides little narrative development."
+      ],
+      "uncertainties": [
+        "The tool-provided shot timeline ends at 9.0 seconds while the reported media duration is 9.938005 seconds; the final fraction is not assigned to a separate scene.",
+        "No claims are made about identity, staging, consent, or injury outcomes."
+      ]
+    },
+    {
+      "vidbest_id": 290,
+      "item_id": "ksi_01a15bdf-a8a0-7370-850b-08e55e8ce134",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 22.2,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 4,
+          "visible_action": "Split-screen layout: an adult reactor wearing headphones watches in the upper panel while a person sits up in bed and appears to speak in the lower panel; “TRY NOT TO LAUGH” text is visible.",
+          "heard_audio": "Sparse ASR captures an unclear brief utterance around 2.64–4.08 seconds. Other audio is not reliably characterized.",
+          "uncertainty": "Visual observations are clear; the spoken content and all untranscribed audio are unknown."
+        },
+        {
+          "start_seconds": 4,
+          "end_seconds": 10,
+          "visible_action": "The lower panel cuts to an extreme close-up of another person who smiles and appears to speak; the reactor remains visible above.",
+          "heard_audio": "No reliable audio characterization beyond the sparse ASR noted in the first scene.",
+          "uncertainty": "The apparent speech is visually observed but not transcribed reliably."
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 18,
+          "visible_action": "The lower panel returns to the person in bed, who looks around and smiles; the reactor’s visible expression shifts toward a slight smile.",
+          "heard_audio": "Audio is not reliably characterized.",
+          "uncertainty": "Visible expressions do not establish what was heard or said."
+        },
+        {
+          "start_seconds": 18,
+          "end_seconds": 22,
+          "visible_action": "The reactor covers their face with one hand; the lower panel remains on the person in bed, with a play-button icon appearing over the image.",
+          "heard_audio": "Audio is not reliably characterized.",
+          "uncertainty": "The play-button overlay suggests the embedded lower-panel clip is paused or ended, but its exact cause is not confirmed."
+        }
+      ],
+      "audio_overview": "Audio access is false because ASR is sparse: only an unclear brief utterance is available, and no dependable account of the remaining audio can be made.",
+      "editing_observations": [
+        "Persistent split-screen reaction format.",
+        "Static upper-panel reactor is intercut with lower-panel source footage.",
+        "Visible transitions occur at approximately 4.466666666666667 and 10.066666666666666 seconds.",
+        "The ending uses a visible play-button overlay and shifts emphasis to the reactor."
+      ],
+      "review_angles": [
+        "Strength: clear reaction-video structure and readable visual escalation from watching to a visible loss of composure.",
+        "Strength: split-screen keeps the source clip and reactor response simultaneously legible.",
+        "Weakness: the source clip is small in the split-screen layout, limiting visual detail.",
+        "Weakness: the ending overlay may make the final state feel abrupt."
+      ],
+      "uncertainties": [
+        "Speech content is not reliably available; no conclusions are made about laughter, music, effects, or silence.",
+        "The people are described only by visible actions and presentation, not identity.",
+        "No conclusion is made about staging, consent, or outcomes beyond what is visibly shown."
+      ]
+    },
+    {
+      "vidbest_id": 291,
+      "item_id": "ksi_01a15bdf-a36d-7840-98d6-faecd035bb5d",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 22.5,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 4,
+          "visible_action": "A baby sitting on a beige couch holds a green plush cactus in an orange pot, looks at it, and knocks it over.",
+          "heard_audio": "No transcript is available; spoken content and other audio are unknown.",
+          "uncertainty": "The action is visually clear, but audio cannot be characterized."
+        },
+        {
+          "start_seconds": 4,
+          "end_seconds": 6,
+          "visible_action": "Brief close-up of an adult in a green collared shirt and patterned tie looking downward with a visibly strained or exasperated expression.",
+          "heard_audio": "No transcript is available; audio is unknown.",
+          "uncertainty": "The expression is described visually and does not establish an emotional cause."
+        },
+        {
+          "start_seconds": 6,
+          "end_seconds": 11,
+          "visible_action": "A baby on a grey play mat reaches toward a standing green cactus toy and then visibly cries.",
+          "heard_audio": "No transcript is available; audio is unknown.",
+          "uncertainty": "Crying is described as a visual presentation; its audible presence is not asserted."
+        },
+        {
+          "start_seconds": 11,
+          "end_seconds": 12,
+          "visible_action": "Brief return to the adult in the green shirt and tie looking downward.",
+          "heard_audio": "No transcript is available; audio is unknown.",
+          "uncertainty": "The reason for the cutaway is not confirmed."
+        },
+        {
+          "start_seconds": 12,
+          "end_seconds": 15,
+          "visible_action": "A baby at a small wooden table holds the cactus toy, visibly cries, and throws the toy off the table.",
+          "heard_audio": "No transcript is available; audio is unknown.",
+          "uncertainty": "Only the visible throw is established; no outcome beyond the shown action is inferred."
+        },
+        {
+          "start_seconds": 15,
+          "end_seconds": 16,
+          "visible_action": "Another brief cutaway shows the adult in the green shirt and tie looking downward.",
+          "heard_audio": "No transcript is available; audio is unknown.",
+          "uncertainty": "The cutaway’s purpose is not confirmed."
+        }
+      ],
+      "audio_overview": "Audio access is false. No transcript is available, so speech, music, laughter, sound effects, and silence are all unknown.",
+      "editing_observations": [
+        "Fast compilation structure alternating baby-and-toy vignettes with repeated adult reaction cutaways.",
+        "The cactus toy provides a recurring visual motif across distinct setups.",
+        "Cuts are brief and build repetition before the later toy-throwing and final vignette.",
+        "The provided shot record ends at 22.0 seconds, while the actual duration is 22.5 seconds; the final half-second is not separately characterized here."
+      ],
+      "review_angles": [
+        "Strength: recurring toy motif creates visual continuity across otherwise separate clips.",
+        "Strength: short reaction cutaways provide a clear editorial counterpoint to the baby scenes.",
+        "Weakness: rapid alternation leaves limited time to establish context for each vignette.",
+        "Weakness: the cause of the adult’s reactions and the audio-driven comedic intent cannot be verified."
+      ],
+      "uncertainties": [
+        "No transcript is available, so all audio content is unknown.",
+        "Visible crying is not treated as evidence of audible crying or silence.",
+        "No face-based identity, staging, consent, injury outcome, or emotional cause is inferred."
+      ]
+    },
+    {
+      "vidbest_id": 292,
+      "item_id": "ksi_01a15be0-86a2-74c0-be38-153946306bcc",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 31.1,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 6,
+          "visible_action": "Split-screen: people sit on a couch in the upper panel while, below, a person holds a baby and raises a green tablet case toward the baby.",
+          "heard_audio": "No reliably captured audio for this interval.",
+          "uncertainty": "People are described only by visible clothing and position; identities and intent are not established."
+        },
+        {
+          "start_seconds": 6,
+          "end_seconds": 9,
+          "visible_action": "The lower panel cuts to a car interior. A person hands the green tablet case to a child in a car seat, who holds it up.",
+          "heard_audio": "No reliably captured audio for this interval.",
+          "uncertainty": "The child’s reaction is described only from visible expression and movement."
+        },
+        {
+          "start_seconds": 9,
+          "end_seconds": 19,
+          "visible_action": "The lower panel cuts to an indoor group scene. Two people confront each other while others stand nearby; a person enters holding the green case, and the group shifts position.",
+          "heard_audio": "No reliably captured audio for this interval.",
+          "uncertainty": "The visual record does not establish whether this is staged, consensual, or physically harmful."
+        },
+        {
+          "start_seconds": 19,
+          "end_seconds": 27,
+          "visible_action": "The lower panel cuts to an ice rink. One skater lifts another while moving and spinning; the lifted skater loses balance and is caught during the descent.",
+          "heard_audio": "A partial ASR segment is captured from 20.08–24.56: [source speech not reproduced] Another partial segment is captured from 24.96–27.12: [source speech not reproduced].",
+          "uncertainty": "The partial ASR may not represent all audio; no additional audio qualities are inferred."
+        },
+        {
+          "start_seconds": 27,
+          "end_seconds": 31.1,
+          "visible_action": "The lower panel cuts to a close-up of a person covering their face, then lowering their hand and looking toward the camera; the upper panel continues showing the seated viewers.",
+          "heard_audio": "No reliably captured audio for this interval.",
+          "uncertainty": "The visible expression is described without inferring emotion or intent."
+        }
+      ],
+      "audio_overview": "audio_access is false because ASR is sparse. Only the two partial speech segments listed in the scene review were reliably captured; no music, laughter, effects, or silence are inferred.",
+      "editing_observations": [
+        "Persistent split-screen layout with viewers in the upper panel and changing clips in the lower panel.",
+        "Visible lower-panel cuts occur around 6, 9, 19, and 27 seconds.",
+        "The final segment includes a close-up and a slight angle change near the end."
+      ],
+      "review_angles": [
+        "Chronological visual-action review",
+        "Split-screen and clip-transition analysis"
+      ],
+      "uncertainties": [
+        "Audio coverage is incomplete.",
+        "No people are identified from faces.",
+        "Intent, staging, consent, and injury outcomes are not established."
+      ]
+    },
+    {
+      "vidbest_id": 293,
+      "item_id": "ksi_01a15be0-8aec-77d3-9464-f8a0203160f6",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 79.066667,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 8,
+          "visible_action": "Split-screen: three viewers occupy the upper panel while, below, a person approaches another outdoors, makes contact near the other person’s neck, and both end with one person falling backward.",
+          "heard_audio": "No reliably captured audio for this interval.",
+          "uncertainty": "The visual record does not establish intent, staging, consent, or injury."
+        },
+        {
+          "start_seconds": 8,
+          "end_seconds": 22,
+          "visible_action": "The lower panel successively shows a person in a green jacket laughing and falling backward, then a person in a fish mask seated at a desk holding an item near the mask’s mouth.",
+          "heard_audio": "No reliably captured audio for this interval.",
+          "uncertainty": "The action involving the item is described without determining what it is or whether drinking occurs."
+        },
+        {
+          "start_seconds": 22,
+          "end_seconds": 32,
+          "visible_action": "In a kitchen, three people play a hand-based game; one person moves back against a counter while another reacts.",
+          "heard_audio": "No reliably captured audio for this interval.",
+          "uncertainty": "The precise rules and intent of the interaction are not established."
+        },
+        {
+          "start_seconds": 32,
+          "end_seconds": 54,
+          "visible_action": "The lower panel shows a close-up involving a stretched lower lip, then a bearded person making a face; a barber trims a client’s hairline; a cat reacts to a nearby socked foot.",
+          "heard_audio": "A partial ASR segment is captured from 40.64–41.44: [source speech not reproduced]. Another partial segment is captured from 45.44–47.12: [source speech not reproduced]",
+          "uncertainty": "The ASR is sparse and multilingual; no broader audio content is inferred."
+        },
+        {
+          "start_seconds": 54,
+          "end_seconds": 62,
+          "visible_action": "Outdoors, a black-and-white goat reaches over a fence toward a man’s face; the man recoils and moves away.",
+          "heard_audio": "No reliably captured audio for this interval.",
+          "uncertainty": "The visual record does not establish whether contact occurs or why either subject moves."
+        },
+        {
+          "start_seconds": 62,
+          "end_seconds": 79.066667,
+          "visible_action": "A child sits on a kitchen counter holding a microphone; a man places a tablet in a bin; the child later appears by a pot. The video then cuts to a batting-cage scene, a close-up of a person at a mixer, and a person singing into a microphone before an end graphic.",
+          "heard_audio": "A partial ASR segment is captured from 62.72–65.04: [source speech not reproduced]",
+          "uncertainty": "Only the quoted speech is reliably captured; the displayed actions do not establish context or intent."
+        }
+      ],
+      "audio_overview": "audio_access is false because ASR is sparse. Three partial speech segments are reliably captured and listed above; no music, laughter, effects, or silence are inferred.",
+      "editing_observations": [
+        "Persistent split-screen layout with viewers in the upper panel and changing clips in the lower panel.",
+        "The lower panel uses rapid sequential cuts between numbered or distinct comic clips.",
+        "Additional internal cuts occur within the lip, barber, kitchen, batting-cage, mixer, and microphone segments.",
+        "The video ends with an on-screen thank-you graphic."
+      ],
+      "review_angles": [
+        "Chronological visual-action review",
+        "Compilation structure and rapid-cut editing"
+      ],
+      "uncertainties": [
+        "Audio coverage is incomplete.",
+        "No people are identified from faces.",
+        "Intent, staging, consent, and injury outcomes are not established."
+      ]
+    },
+    {
+      "vidbest_id": 294,
+      "item_id": "ksi_01a15be0-7c38-7371-9d27-a04b0cc8249a",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 20.16,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 10,
+          "visible_action": "A shirtless man in white underwear dances on a patterned rug while several people stand nearby. On-screen text introduces the first segment and includes “1 goo goo ga ga.”",
+          "heard_audio": "Speech is captured from 3.28–9.68: [source speech not reproduced]",
+          "uncertainty": "The people’s identities and relationships are not established. The text and audio do not establish intent or staging."
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 16,
+          "visible_action": "A black-and-white dog runs toward the camera on a paved path, stops, and opens its mouth toward the lens. On-screen text labels the segment “2 bro screaming.”",
+          "heard_audio": "No speech was reliably captured for this interval.",
+          "uncertainty": "The cause or character of the dog’s vocalization is not established."
+        },
+        {
+          "start_seconds": 16,
+          "end_seconds": 20,
+          "visible_action": "A man lies on a bed with patterned sheets. After the on-screen text “Wait for it...” and “3 bro got jumpscare by his own fart,” he sits up abruptly.",
+          "heard_audio": "No speech was reliably captured for this interval.",
+          "uncertainty": "The source of the apparent startle is not independently established; the description follows the visible action and on-screen text."
+        }
+      ],
+      "audio_overview": "Audio access is false because ASR coverage is sparse overall. One spoken passage was reliably captured from 3.28–9.68; no music, laughter, effects, or silence are inferred.",
+      "editing_observations": [
+        "Three numbered segments are joined in chronological order.",
+        "The first segment uses a mostly static medium view; the dog segment changes to handheld outdoor footage; the final segment returns to a static bed view.",
+        "On-screen captions identify or frame each segment."
+      ],
+      "review_angles": [
+        "Chronological visual-action review",
+        "Caption and segment-structure review",
+        "Conservative audio evidence review"
+      ],
+      "uncertainties": [
+        "Audio evidence is incomplete outside the captured speech segment.",
+        "No people are identified from faces.",
+        "The on-screen claim about the final event is not independently verified."
+      ]
+    },
+    {
+      "vidbest_id": 295,
+      "item_id": "ksi_01a15be0-7e2e-71b2-9b34-414cc27eaf6f",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 28.666667,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 3,
+          "visible_action": "A split screen shows two seated men wearing headphones in the upper panel while a mud-covered figure crawls through a sandy-looking environment below. Text reads, “When you calls your bro for help but even he makes it more worse.”",
+          "heard_audio": "No speech was reliably captured for this interval.",
+          "uncertainty": "The caption’s scenario is not independently established."
+        },
+        {
+          "start_seconds": 3,
+          "end_seconds": 6,
+          "visible_action": "The lower panel cuts to a baboon sitting in a rocky enclosure and looking toward the camera; the two men remain in the upper panel, with one beginning to smile.",
+          "heard_audio": "No speech was reliably captured for this interval.",
+          "uncertainty": "The men’s identities and relationships are not established."
+        },
+        {
+          "start_seconds": 6,
+          "end_seconds": 10,
+          "visible_action": "A hand reaches toward a round fruit on a tree branch, followed by the baboon holding and eating the fruit. The upper-panel viewers react visibly.",
+          "heard_audio": "No speech was reliably captured for this interval.",
+          "uncertainty": "The viewers’ expressions are visible, but their exact reactions or intent are not established."
+        },
+        {
+          "start_seconds": 10,
+          "end_seconds": 14,
+          "visible_action": "The baboon looks around and reaches toward the rocky enclosure walls while the two upper-panel viewers continue visibly reacting.",
+          "heard_audio": "No speech was reliably captured for this interval.",
+          "uncertainty": "No conclusion is made about the baboon’s motivation or the viewers’ unshown audio reaction."
+        },
+        {
+          "start_seconds": 14,
+          "end_seconds": 18,
+          "visible_action": "The lower panel cuts to a close-up of a mud-covered figure facing the camera, opening their mouth; the two viewers remain above.",
+          "heard_audio": "A brief ASR fragment, [source speech not reproduced] was captured at 17.36–17.60; no broader speech is reliably established.",
+          "uncertainty": "The figure’s expression and vocalization cannot be interpreted beyond what is visibly shown."
+        },
+        {
+          "start_seconds": 18,
+          "end_seconds": 28,
+          "visible_action": "The lower panel rapidly cycles through several figures, including people in different clothing and a person lying in mud, then returns to a close-up of the mud-covered figure. The upper-panel viewers remain present.",
+          "heard_audio": "No speech was reliably captured for this interval.",
+          "uncertainty": "The montage does not establish the identities, sequence context, or outcomes for the briefly shown figures."
+        }
+      ],
+      "audio_overview": "Audio access is false because only a very brief ASR fragment was captured at 17.36–17.60. Music, laughter, effects, and silence are not inferred.",
+      "editing_observations": [
+        "The video uses a persistent split-screen reaction layout.",
+        "The lower panel alternates between longer shots and rapid montage cuts while the upper reaction panel continues.",
+        "On-screen text appears at the opening to frame the clip."
+      ],
+      "review_angles": [
+        "Chronological split-screen action review",
+        "Reaction-layout and montage editing review",
+        "Conservative audio evidence review"
+      ],
+      "uncertainties": [
+        "Audio coverage is insufficient to characterize the soundtrack.",
+        "No people are identified from faces.",
+        "No intent, staging, consent, injury, or outcome is asserted beyond visible actions."
+      ]
+    },
+    {
+      "vidbest_id": 296,
+      "item_id": "ksi_01a15be0-8768-7260-8562-e3eaa41c9c5a",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 28.163991,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 2,
+          "visible_action": "A person in a white outfit shifts weight and turns slightly in a studio.",
+          "heard_audio": "Not reliably captured.",
+          "uncertainty": "The description does not establish the person's identity or intent."
+        },
+        {
+          "start_seconds": 2,
+          "end_seconds": 5.5,
+          "visible_action": "The video cuts to a cartoon-style drawing in a similar pose; a green cloud graphic appears behind the lower back area as the image zooms slightly.",
+          "heard_audio": "Not reliably captured.",
+          "uncertainty": "The graphic's meaning is not established."
+        },
+        {
+          "start_seconds": 5.5,
+          "end_seconds": 12,
+          "visible_action": "The video returns to the person dancing with hip and arm movements; both hands are raised near the head around 9 seconds.",
+          "heard_audio": "Not reliably captured.",
+          "uncertainty": "Specific movements between the described points are summarized visually."
+        },
+        {
+          "start_seconds": 12,
+          "end_seconds": 15.5,
+          "visible_action": "The video cuts back to the cartoon drawing with the hands-raised pose, then zooms toward the face.",
+          "heard_audio": "Not reliably captured.",
+          "uncertainty": "No identity is assigned to the drawn or live-action figure."
+        },
+        {
+          "start_seconds": 15.5,
+          "end_seconds": 22,
+          "visible_action": "The live-action footage returns; the person turns partly sideways and continues dancing. A small cartoon-cat image overlays the lower-left area from about 16.5 to 18.5 seconds.",
+          "heard_audio": "Not reliably captured.",
+          "uncertainty": "The overlay's purpose is not established."
+        },
+        {
+          "start_seconds": 22,
+          "end_seconds": 28.163991,
+          "visible_action": "The video cuts to the cartoon drawing in side profile with one leg raised; the green cloud changes into a brown pile graphic around 25 seconds while the camera zooms toward it.",
+          "heard_audio": "Not reliably captured.",
+          "uncertainty": "The depicted event is graphic/cartoon imagery; no real-world outcome is established."
+        }
+      ],
+      "audio_overview": "Audio was not reliably accessible for grounded review; no speech, music, laughter, effects, or silence are asserted.",
+      "editing_observations": [
+        "Alternates repeatedly between live-action dance footage and cartoon drawings.",
+        "Uses zoom-ins on the cartoon artwork.",
+        "Adds a small cartoon-cat overlay during the later live-action section.",
+        "Changes the cartoon lower-background graphic near the end."
+      ],
+      "review_angles": [
+        "Visual comparison of live-action poses with matching cartoon poses.",
+        "Live-action dance intercut with crude cartoon visual gags."
+      ],
+      "uncertainties": [
+        "Audio could not be reliably verified.",
+        "No person is identified from appearance.",
+        "Intent, staging, consent, and injury outcomes are not established."
+      ]
+    },
+    {
+      "vidbest_id": 297,
+      "item_id": "ksi_01a15be0-d207-7f13-83e4-86257f102851",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 23.381995,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 3,
+          "visible_action": "A split-screen appears: a person wearing headphones drinks from a clear cup in the upper panel while a cat and dog face each other on carpeted stairs in the lower panel.",
+          "heard_audio": "Not reliably captured.",
+          "uncertainty": "The people and animals are not assigned identities or motives."
+        },
+        {
+          "start_seconds": 3,
+          "end_seconds": 8,
+          "visible_action": "The upper-panel person lowers the cup and watches. In the lower panel, the dog approaches the cat, turns, and runs up the stairs, disappearing around 7 seconds.",
+          "heard_audio": "Not reliably captured.",
+          "uncertainty": "The reason for the dog's movement is not established."
+        },
+        {
+          "start_seconds": 8,
+          "end_seconds": 12,
+          "visible_action": "The upper-panel person continues watching. The cat looks up the stairs and begins walking upward.",
+          "heard_audio": "Not reliably captured.",
+          "uncertainty": "The viewer's expression is described only visually."
+        },
+        {
+          "start_seconds": 12,
+          "end_seconds": 19,
+          "visible_action": "The cat continues up the stairs toward a closed wooden door while the upper-panel person watches.",
+          "heard_audio": "Not reliably captured.",
+          "uncertainty": "No claim is made about what is behind the door."
+        },
+        {
+          "start_seconds": 19,
+          "end_seconds": 23.381995,
+          "visible_action": "The cat reaches the top landing near the door and turns to look back down the stairs; the upper-panel person remains in the top panel.",
+          "heard_audio": "Not reliably captured.",
+          "uncertainty": "The cat's intent is not established."
+        }
+      ],
+      "audio_overview": "Audio was not reliably accessible for grounded review; no speech, music, laughter, effects, or silence are asserted.",
+      "editing_observations": [
+        "Uses a persistent top-and-bottom split-screen layout.",
+        "Maintains yellow center text reading \"Try Not To Laugh\" with laughing emojis.",
+        "Shows the reaction panel above the animal footage throughout the described clip."
+      ],
+      "review_angles": [
+        "Parallel reaction-panel and animal-action presentation.",
+        "Escalation from the animals facing each other to the dog leaving and the cat following."
+      ],
+      "uncertainties": [
+        "Speech-like content was reported by automated analysis but is not treated as reliable audio evidence here.",
+        "No people or animals are identified by name.",
+        "Intent, staging, consent, and injury outcomes are not established."
+      ]
+    },
+    {
+      "vidbest_id": 303,
+      "item_id": "ksi_01a15be0-d243-7e63-923d-f6405154f722",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 6.339002,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 2,
+          "visible_action": "Close-up of a baby’s face; a blue object is placed at the nostril.",
+          "heard_audio": "Unknown; no speech or audio is reliably captured.",
+          "uncertainty": "Audio is unavailable; the object’s identity and purpose are not established."
+        },
+        {
+          "start_seconds": 2,
+          "end_seconds": 4.5,
+          "visible_action": "The blue object is removed while the baby looks upward with wide eyes.",
+          "heard_audio": "Unknown; no speech or audio is reliably captured.",
+          "uncertainty": "Audio is unavailable."
+        },
+        {
+          "start_seconds": 4.5,
+          "end_seconds": 6,
+          "visible_action": "The baby scrunches their face, closes their eyes, and opens their mouth.",
+          "heard_audio": "Unknown; no speech or audio is reliably captured.",
+          "uncertainty": "The visible expression is described without inferring cause or outcome."
+        }
+      ],
+      "audio_overview": "audio_access is false. No transcript is available, so speech and other audio cannot be reliably reported; this does not establish silence.",
+      "editing_observations": [
+        "Static close-up framing throughout the visible segment.",
+        "Text overlays at the top read “TRY NOT TO LAUGH” with laughing emojis and “MODE : MEDIUM.”"
+      ],
+      "review_angles": [
+        "Close-up view centered on the baby’s face."
+      ],
+      "uncertainties": [
+        "No reliable audio evidence is available.",
+        "The blue object is not identified beyond its visible appearance."
+      ]
+    },
+    {
+      "vidbest_id": 304,
+      "item_id": "ksi_01a15be1-0f38-7230-83cd-e0a4274ee2de",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 47.966667,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 5,
+          "visible_action": "Split-screen: an adult holds a smartphone and looks down; a child lies in bed and looks toward a device in front of them.",
+          "heard_audio": "Unknown; no speech or audio is reliably captured.",
+          "uncertainty": "Audio is unavailable; no identities or intentions are inferred."
+        },
+        {
+          "start_seconds": 5,
+          "end_seconds": 30,
+          "visible_action": "The split-screen ends. The adult appears in a close-up, looking toward the camera with minor blinking and gaze shifts.",
+          "heard_audio": "Unknown; no speech or audio is reliably captured.",
+          "uncertainty": "Audio is unavailable."
+        },
+        {
+          "start_seconds": 30.2,
+          "end_seconds": 32.5,
+          "visible_action": "The adult continues looking toward the camera with a closed mouth.",
+          "heard_audio": "Unknown; no speech or audio is reliably captured.",
+          "uncertainty": "Audio is unavailable."
+        },
+        {
+          "start_seconds": 32.5,
+          "end_seconds": 38.5,
+          "visible_action": "The adult looks down briefly, returns their gaze forward, and moves their mouth while facing the camera.",
+          "heard_audio": "Unknown; no speech or audio is reliably captured.",
+          "uncertainty": "Mouth movement is visible, but speech cannot be confirmed."
+        },
+        {
+          "start_seconds": 38.5,
+          "end_seconds": 44,
+          "visible_action": "The adult looks down briefly, looks back up, and shows a slight smile with minimal mouth movement.",
+          "heard_audio": "Unknown; no speech or audio is reliably captured.",
+          "uncertainty": "No cause or intent is inferred from the expression."
+        },
+        {
+          "start_seconds": 44,
+          "end_seconds": 46.8,
+          "visible_action": "The adult looks down and to the side, then looks back up and to the left while moving their mouth.",
+          "heard_audio": "Unknown; no speech or audio is reliably captured.",
+          "uncertainty": "Mouth movement is visible, but speech cannot be confirmed."
+        }
+      ],
+      "audio_overview": "audio_access is false. No transcript is available, so speech and other audio cannot be reliably reported; this does not establish silence.",
+      "editing_observations": [
+        "The video opens with a split-screen layout.",
+        "A visible cut changes to a single close-up after the opening section.",
+        "The later section is described as one continuous static medium close-up with no visible captions or overlays."
+      ],
+      "review_angles": [
+        "Opening split-screen contrasts two views.",
+        "Later framing is a static medium close-up against a brick wall and door frame."
+      ],
+      "uncertainties": [
+        "No reliable audio evidence is available.",
+        "People are described only by visible actions and are not identified."
+      ]
+    },
+    {
+      "vidbest_id": 287,
+      "item_id": "ksi_01a15bdf-c152-7dc0-b32f-587a185d512c",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 46.183991,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 6,
+          "visible_action": "At an outdoor event, a cheerleader stands on a tall ladder held by several people; the ladder tips and she falls. On-screen text says she is okay.",
+          "heard_audio": "No reliable speech reported.",
+          "uncertainty": "The visual shows the fall and on-screen reassurance; no outcome beyond the displayed text is inferred."
+        },
+        {
+          "start_seconds": 6,
+          "end_seconds": 16,
+          "visible_action": "In a backyard, a sprinkler sprays a seated woman, who falls from her chair onto the grass while a seated man watches. On-screen text says she is okay.",
+          "heard_audio": "No reliable speech reported.",
+          "uncertainty": "No injury or outcome is inferred beyond the on-screen text."
+        },
+        {
+          "start_seconds": 16,
+          "end_seconds": 25,
+          "visible_action": "A man in a blue suit walks along a sidewalk as a small dog holding a hose sprays water into his face; he recoils and turns away.",
+          "heard_audio": "A voiceover paraphrases that the dog wanted to ensure the man washed his face before work.",
+          "uncertainty": "The purpose of the action is presented only as voiceover commentary."
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 36,
+          "visible_action": "A large owl lands on a seated man's head while he is on a riding mower; he loses balance, falls onto the grass, and gets up. On-screen text says he is okay.",
+          "heard_audio": "A voice says, in paraphrase, that an owl encounter is unbelievable.",
+          "uncertainty": "No injury or outcome is inferred beyond the on-screen text."
+        },
+        {
+          "start_seconds": 36,
+          "end_seconds": 46,
+          "visible_action": "A woman carrying a paper grocery bag trips onto a porch and briefly obscures the doorbell camera; she sits down, takes out a carrot, and begins eating it while facing the camera.",
+          "heard_audio": "Reliable speech includes remarks equivalent to [source speech not reproduced] and that a girl cannot lose her teeth on the porch.",
+          "uncertainty": "The final words are partially unclear in the transcript."
+        }
+      ],
+      "audio_overview": "Audio access is marked false because ASR is sparse. Only the reliable spoken paraphrases noted in the scenes are reported; music, laughter, effects, and silence are not inferred.",
+      "editing_observations": [
+        "A short-form compilation uses hard cuts between five unrelated outdoor mishap clips.",
+        "On-screen reassurance text recurs after several incidents.",
+        "The dog, owl, and porch segments include voiceover or dialogue, while other segments have no reliably reported speech."
+      ],
+      "review_angles": [
+        "Chronological visible-action review",
+        "Short-form compilation structure",
+        "Recurring on-screen reassurance"
+      ],
+      "uncertainties": [
+        "Audio information is limited by sparse ASR.",
+        "No identities, staging, consent, injuries, or eventual outcomes are inferred."
+      ]
+    },
+    {
+      "vidbest_id": 298,
+      "item_id": "ksi_01a15be0-dae1-7e02-a78f-14af1cd7db3a",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 41.433333,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 3,
+          "visible_action": "A seated reactor on a couch covers his mouth while trying not to laugh; the screen displays “TRY NOT TO LAUGH.”",
+          "heard_audio": "No reliable speech reported.",
+          "uncertainty": "The visual shows a laughter reaction; no specific audio is inferred."
+        },
+        {
+          "start_seconds": 3,
+          "end_seconds": 13,
+          "visible_action": "A split-screen shows three seated reactors above security-camera footage. A passerby trips over a small cat and falls onto the street.",
+          "heard_audio": "No reliable speech reported.",
+          "uncertainty": "The footage is presented as security-camera video; no cause or outcome beyond the visible fall is inferred."
+        },
+        {
+          "start_seconds": 13,
+          "end_seconds": 18,
+          "visible_action": "The lower panel shows a white dog standing on its hind legs, holding a smartphone, and tilting its head back.",
+          "heard_audio": "No reliable speech reported.",
+          "uncertainty": "The visual does not establish why the dog is holding the phone or reacting."
+        },
+        {
+          "start_seconds": 18,
+          "end_seconds": 21,
+          "visible_action": "The view returns to the three reactors, who visibly laugh on the couch.",
+          "heard_audio": "No reliable speech reported.",
+          "uncertainty": "No laughter audio is inferred from the visual reaction."
+        },
+        {
+          "start_seconds": 21,
+          "end_seconds": 30,
+          "visible_action": "In the lower panel, a seated man eating outdoors is struck on the back of the head by a passerby; he reacts and spits out food.",
+          "heard_audio": "The transcript is present but not reliably interpretable for this scene.",
+          "uncertainty": "The spoken language/transcript is unclear, so it is not paraphrased."
+        },
+        {
+          "start_seconds": 30,
+          "end_seconds": 41.433333,
+          "visible_action": "The reactors visibly laugh again, then the lower panel shows a person receiving a haircut in which a large patch of hair is shaved off; the person looks up afterward.",
+          "heard_audio": "No reliable speech reported.",
+          "uncertainty": "No injury, intent, staging, or outcome is inferred."
+        }
+      ],
+      "audio_overview": "Audio access is marked false because ASR is sparse and the only returned speech is not reliably interpretable. Music, laughter, effects, and silence are not inferred.",
+      "editing_observations": [
+        "The video alternates between a three-person reaction shot and split-screen user-generated clips.",
+        "Reaction shots recur after the first, second, and third featured clips.",
+        "The clips are connected by abrupt cuts and a persistent reaction-video format."
+      ],
+      "review_angles": [
+        "Reaction-video editing",
+        "Alternation between hosts and embedded clips",
+        "Visible slapstick and animal moments"
+      ],
+      "uncertainties": [
+        "The only returned transcript is not reliably interpretable and is not paraphrased.",
+        "No identities are inferred from faces.",
+        "No staging, consent, injury, or outcome is inferred."
+      ]
+    },
+    {
+      "vidbest_id": 299,
+      "item_id": "ksi_01a15be0-d403-7c62-90f4-221e625164c0",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 42.233333,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 25,
+          "visible_action": "In a room, a shirtless person holds an electric hair clipper, jerks backward, drops it, and falls. They get up, pick it up, try again, and fall a second time.",
+          "heard_audio": "No reliable speech paraphrase is available for this interval.",
+          "uncertainty": "The visual sequence is clear; audio details beyond reliable speech are unavailable."
+        },
+        {
+          "start_seconds": 25,
+          "end_seconds": 28,
+          "visible_action": "Outdoors beside a narrow canal, a person in a pink shirt runs along the edge, attempts to jump across, slips, and falls into the water, producing a splash.",
+          "heard_audio": "No reliable speech paraphrase is available for this interval.",
+          "uncertainty": "The visible action is clear; the person's condition and the outcome after the fall are not established."
+        },
+        {
+          "start_seconds": 28,
+          "end_seconds": 42,
+          "visible_action": "In a muddy field, two people ride a dirt bike into a deep puddle. The passenger gets off while the driver tries to free the bike, then removes their helmet and runs across the field.",
+          "heard_audio": "A brief unclear spoken line is transcribed as asking, approximately, what someone is doing around there.",
+          "uncertainty": "The transcript wording is unclear; no identity, staging, or outcome beyond the visible sequence is established."
+        }
+      ],
+      "audio_overview": "Audio access is limited by sparse ASR. One unclear spoken line is available during the motorcycle sequence; no music, laughter, effects, or silence are inferred.",
+      "editing_observations": [
+        "The video uses three consecutive comedic segments separated by hard cuts at approximately 25 and 28 seconds.",
+        "On-screen challenge text and laughing emojis remain over the visible clips.",
+        "The first segment is longest, followed by two shorter outdoor segments."
+      ],
+      "review_angles": [
+        "Chronological visual-action review",
+        "Segment structure and hard-cut editing",
+        "Limited reliable speech evidence"
+      ],
+      "uncertainties": [
+        "Sparse ASR prevents a complete audio assessment.",
+        "No identity is inferred from appearance.",
+        "Consent, staging, injury, and eventual outcomes are not established."
+      ]
+    },
+    {
+      "vidbest_id": 301,
+      "item_id": "ksi_01a15be0-d274-7a90-80c8-f5e012ffb158",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 25.8,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 5,
+          "visible_action": "A black dog places its head into the circular opening of a gray washing machine, then pulls back with a bald human mask visible on its head.",
+          "heard_audio": "No transcript is available; spoken audio is unknown.",
+          "uncertainty": "The visible mask reveal is clear; audio details are unavailable."
+        },
+        {
+          "start_seconds": 5,
+          "end_seconds": 14,
+          "visible_action": "At night near a waterfront, one man extends a hand for a handshake, pulls the other man's hand downward instead, and both bend over during the prank.",
+          "heard_audio": "No transcript is available; spoken audio is unknown.",
+          "uncertainty": "The visible interaction is clear; its staging and the participants' identities are not established."
+        },
+        {
+          "start_seconds": 14,
+          "end_seconds": 19,
+          "visible_action": "A boy wearing a life vest stands at the edge of a swimming pool and positions himself as if preparing to jump.",
+          "heard_audio": "No transcript is available; spoken audio is unknown.",
+          "uncertainty": "The clip ends before the jump or its outcome is shown."
+        },
+        {
+          "start_seconds": 19,
+          "end_seconds": 25,
+          "visible_action": "On a sunny paved street, a man holding a small child's hand walks forward. The child lets go and runs ahead while the man follows and bends slightly in pursuit.",
+          "heard_audio": "No transcript is available; spoken audio is unknown.",
+          "uncertainty": "The visible chase is clear; the eventual outcome is not shown."
+        }
+      ],
+      "audio_overview": "No transcript is available for this video, so spoken audio is unknown. No music, laughter, effects, or silence are inferred.",
+      "editing_observations": [
+        "The video is divided into four short segments joined by hard cuts at approximately 5, 14, and 19 seconds.",
+        "Each segment presents a separate visual gag or setup.",
+        "On-screen challenge text appears across multiple segments, with additional prompt text in the pool sequence."
+      ],
+      "review_angles": [
+        "Chronological visual-action review",
+        "Short-form compilation editing",
+        "No reliable speech evidence"
+      ],
+      "uncertainties": [
+        "No transcript is available, so audio content cannot be characterized.",
+        "No identity is inferred from faces or appearance.",
+        "Consent, staging, injury, and outcomes are not established."
+      ]
+    },
+    {
+      "vidbest_id": 305,
+      "item_id": "ksi_01a15be1-0bc9-72a0-b98c-47e23490d6b9",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 21.6,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 21,
+          "visible_action": "A man in a plaid shirt and cap sits outdoors against a textured wall, keeps his arms crossed, and repeatedly opens his mouth and tilts his head while facing the camera.",
+          "heard_audio": "Two brief speech segments are detected near the end; they are difficult to interpret reliably, with repeated words resembling [source speech not reproduced] and [source speech not reproduced]",
+          "uncertainty": "The visual review does not establish the reason for his reaction or the meaning of the speech."
+        }
+      ],
+      "audio_overview": "Audio is not treated as fully accessible. Only the limited, partially intelligible speech near the end is reported; no music, laughter, effects, or silence are inferred.",
+      "editing_observations": [
+        "One continuous static medium close-up runs for nearly the entire video.",
+        "No visible camera cut occurs within the shot."
+      ],
+      "review_angles": [
+        "Single-subject reaction close-up.",
+        "Stable framing with minimal visual change."
+      ],
+      "uncertainties": [
+        "The source does not provide enough reliable audio to determine the complete dialogue or context."
+      ]
+    },
+    {
+      "vidbest_id": 306,
+      "item_id": "ksi_01a15be1-0eea-72e2-8cd4-1d450c91daee",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 46.378005,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 9,
+          "visible_action": "Three men sit on a wooden bench; one leans toward the seated man in a tank top, who clutches his lower back and falls sideways across the bench.",
+          "heard_audio": "No reliable speech paraphrase is available for this segment.",
+          "uncertainty": "The purpose of the action and whether it is staged cannot be determined visually."
+        },
+        {
+          "start_seconds": 9,
+          "end_seconds": 16,
+          "visible_action": "A man with a mustache walks through an indoor area decorated with yellow and white balloons, looking around as the camera follows him past a glass partition.",
+          "heard_audio": "A spoken line is detected and resembles a lyric about walking through a shadow and looking at a light; the wording is not fully reliable.",
+          "uncertainty": "The source does not establish the setting or the man's role."
+        },
+        {
+          "start_seconds": 16,
+          "end_seconds": 27,
+          "visible_action": "A white lion walks across grass and opens its mouth while the camera pans to follow it.",
+          "heard_audio": "No reliable speech paraphrase is available for this segment.",
+          "uncertainty": "The visible mouth movement is not assigned a specific cause."
+        },
+        {
+          "start_seconds": 27,
+          "end_seconds": 36,
+          "visible_action": "A first-person camera shows white socks and yellow sandals on pavement at night, tilts upward, then holds on a house, bare tree, and bird perched at the top.",
+          "heard_audio": "A brief utterance resembling [source speech not reproduced] is detected; no further reliable speech is available.",
+          "uncertainty": "The reason for the camera movement and the on-screen wording are not independently explained."
+        },
+        {
+          "start_seconds": 36,
+          "end_seconds": 42,
+          "visible_action": "A crowded nighttime gathering is shown with people moving together; several hold phones, and a person in a maroon hoodie is visible near the center.",
+          "heard_audio": "No reliable speech paraphrase is available for this segment.",
+          "uncertainty": "The event and participants' identities are not established."
+        },
+        {
+          "start_seconds": 42,
+          "end_seconds": 46.378005,
+          "visible_action": "A man sings into a microphone on a stage; the video then cuts to two men seated at a table, visibly reacting to one another.",
+          "heard_audio": "No reliable speech paraphrase is available for this segment.",
+          "uncertainty": "The final shot change does not establish what the seated men are responding to."
+        }
+      ],
+      "audio_overview": "Audio is not treated as fully accessible. Only a partially intelligible spoken line around 9.28–13.68 seconds and a brief utterance resembling [source speech not reproduced] around 22.48–24.08 seconds are reported; no music, laughter, effects, or silence are inferred.",
+      "editing_observations": [
+        "The video is a rapid multi-segment compilation with visible cuts around 9, 16, 27, 36, and 42 seconds.",
+        "Camera styles vary from static and panning shots to handheld and point-of-view footage.",
+        "On-screen captions and emoji graphics recur across several segments."
+      ],
+      "review_angles": [
+        "Chronological compilation of unrelated short visual moments.",
+        "Mix of reaction footage, animal footage, point-of-view imagery, a crowd scene, and stage footage."
+      ],
+      "uncertainties": [
+        "The source does not establish identities, intent, staging, consent, injury, or outcomes.",
+        "Sparse audio prevents reliable interpretation of most dialogue and context."
+      ]
+    },
+    {
+      "vidbest_id": 310,
+      "item_id": "ksi_01a15be1-09a1-75e1-ad80-328ee0b0d816",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 35.165011,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 7,
+          "visible_action": "Split screen shows three seated viewers above an animated boss confronting a smaller stick figure; the smaller figure makes a cheeky gesture and the boss reacts.",
+          "heard_audio": "No reliable speech transcription available.",
+          "uncertainty": "Audio content is unknown; reactions are described visually only."
+        },
+        {
+          "start_seconds": 7,
+          "end_seconds": 14,
+          "visible_action": "The animation switches to a crying female stick figure facing the boss while the viewers remain in the upper panel.",
+          "heard_audio": "No reliable speech transcription available.",
+          "uncertainty": "The apparent crying and viewer reactions are visual depictions; audio is unknown."
+        },
+        {
+          "start_seconds": 14,
+          "end_seconds": 17,
+          "visible_action": "The animated figure appears bandaged in a blue hospital bed with an IV; the upper panel briefly zooms toward one viewer before returning to the split layout.",
+          "heard_audio": "No reliable speech transcription available.",
+          "uncertainty": "The medical imagery is an animated depiction; no real-world outcome is inferred."
+        },
+        {
+          "start_seconds": 17,
+          "end_seconds": 32,
+          "visible_action": "An animated fly moves against a window; a window figure approaches, opens it, and the fly leaves after making a hand gesture.",
+          "heard_audio": "No reliable speech transcription available.",
+          "uncertainty": "The fly’s gesture is visible animation; audio is unknown."
+        },
+        {
+          "start_seconds": 32,
+          "end_seconds": 35,
+          "visible_action": "The animation panel disappears and the viewer panel expands to a close-up of one person gesturing.",
+          "heard_audio": "No reliable speech transcription available.",
+          "uncertainty": "The person’s reaction is described without inferring identity or audio."
+        }
+      ],
+      "audio_overview": "No transcript is available, so speech and other audio content cannot be reliably characterized.",
+      "editing_observations": [
+        "Persistent split-screen reaction layout for most of the video.",
+        "Animated scenes change several times within the lower panel.",
+        "Brief zoom toward an upper-panel viewer around 14–17 seconds.",
+        "The final section removes the animation and expands the reaction footage."
+      ],
+      "review_angles": [
+        "Reaction-video structure",
+        "Animated visual gag progression",
+        "Split-screen composition"
+      ],
+      "uncertainties": [
+        "Audio content is unknown because no transcript is available.",
+        "No identity, staging, consent, injury, or real-world outcome is inferred."
+      ]
+    },
+    {
+      "vidbest_id": 311,
+      "item_id": "ksi_01a15be1-49be-74a2-8845-445eb875e27e",
+      "visual_access": true,
+      "audio_access": false,
+      "duration_seconds": 27.678005,
+      "scenes": [
+        {
+          "start_seconds": 0,
+          "end_seconds": 4,
+          "visible_action": "A shirtless man attempts to lift a weighted barbell on a bed; the bar slips and he falls backward off the bed.",
+          "heard_audio": "No reliable speech transcription available.",
+          "uncertainty": "The visible fall is reported without inferring injury or outcome."
+        },
+        {
+          "start_seconds": 4,
+          "end_seconds": 9,
+          "visible_action": "Two bearded men appear in a medium close-up, holding hands and visibly reacting together.",
+          "heard_audio": "No reliable speech transcription available.",
+          "uncertainty": "Their reaction is described visually; no laughter audio is inferred."
+        },
+        {
+          "start_seconds": 9,
+          "end_seconds": 20,
+          "visible_action": "A man picks a mango, dips it into a blue plate of powder, bites it, loses balance, and tumbles backward into bushes.",
+          "heard_audio": "Brief utterances are transcribed as [source speech not reproduced] and [source speech not reproduced]",
+          "uncertainty": "The transcript contains only two very short utterances; other audio is unknown."
+        },
+        {
+          "start_seconds": 20,
+          "end_seconds": 24,
+          "visible_action": "A man claps indoors; another man’s head rises into view below a window, and the first man turns toward him.",
+          "heard_audio": "No reliable speech transcription available.",
+          "uncertainty": "The reaction is described from visible movement only."
+        },
+        {
+          "start_seconds": 24,
+          "end_seconds": 27,
+          "visible_action": "A young boy sits outdoors on a concrete step and visibly laughs while looking off-camera.",
+          "heard_audio": "No reliable speech transcription available.",
+          "uncertainty": "No laughter audio is inferred from the visual reaction."
+        }
+      ],
+      "audio_overview": "Audio access is limited: only two very short transcript snippets are available, [source speech not reproduced] and [source speech not reproduced] No music, laughter, effects, or silence are inferred.",
+      "editing_observations": [
+        "The video is a rapid compilation of five unrelated setups.",
+        "Cuts occur at approximately 4, 9, 20, and 24 seconds.",
+        "Most shots are static; the mango sequence has slight handheld movement.",
+        "The final shot holds on the seated boy’s reaction."
+      ],
+      "review_angles": [
+        "Short-form mishap compilation",
+        "Reaction cutaways",
+        "Visual surprise and physical-comedy timing"
+      ],
+      "uncertainties": [
+        "Only two brief speech snippets are reliably available.",
+        "No identity, staging, consent, injury, or final outcome is inferred."
+      ]
+    }
+  ],
+  "sourceRetrievalHolds": [
+    307,
+    317
+  ],
+  "responseLimit": {
+    "code": "plan_limit_exceeded",
+    "dailyLimit": 15,
+    "retryAfter": "2026-10-22T00:32:49Z",
+    "deferredIds": [
+      312,
+      313,
+      316,
+      318,
+      319,
+      322,
+      323,
+      325,
+      326
+    ],
+    "noFurtherCalls": true
+  },
+  "notes": "Analysis ingestion was into the existing owner-authorized TikTok review collection only. No Vid.Best D1/R2/media/source fields were changed by analysis. Sparse ASR is not continuous audio verification; visible mouths, captions and absent ASR do not prove audible events or silence.",
+  "transcriptPublication": "Exact transcripts and lyrics are omitted. The record retains exact source/item identities, timestamps, visual observations and paraphrased audio evidence. Public reviews use original critical prose.",
+  "analysisSessionIds": [
+    "sess_01a15be0-0363-79e1-a1c7-971a5c066bc9",
+    "sess_01a15be0-0553-7a71-9792-f0e91f544267",
+    "sess_01a15be1-5b40-7c42-b694-c87db5824441",
+    "sess_01a15be1-5b07-76e2-adfa-d81a943a4722",
+    "sess_01a15be1-5b53-7591-8888-d298b6910361",
+    "sess_01a15be4-aa2c-7680-8d1a-c9db5d4fdd32",
+    "sess_01a15be4-aaa1-7f30-986a-fb455c6aec71",
+    "sess_01a15be7-394a-74c3-819d-795a23d28382",
+    "sess_01a15be7-3a25-78d1-abd2-9526d29299a7",
+    "sess_01a15be7-493b-78b1-baa3-7acb309d6849",
+    "sess_01a15be7-3a02-7c72-b481-835ce9519d63",
+    "sess_01a15beb-7a24-7ea0-a84e-5ceaeca34a79",
+    "sess_01a15beb-7c22-7533-bbcb-227c115ee9a6",
+    "sess_01a15beb-77f4-7600-a7b4-0f30507274c4",
+    "sess_01a15beb-7a74-70d3-9393-c2720d1e5448"
+  ]
+}
