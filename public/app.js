@@ -252,9 +252,11 @@ function renderCarousel(errorMessage = "") {
     card.dataset.index = String(index);
     if (video.thumbnail_url) {
       const image = document.createElement("img");
-      image.src = video.thumbnail_url;
       image.alt = "";
       image.loading = index === 0 ? "eager" : "lazy";
+      image.decoding = "async";
+      image.fetchPriority = index === 0 ? "high" : "low";
+      image.src = video.thumbnail_url;
       image.addEventListener("error", () => image.replaceWith(featuredFallback()));
       card.append(image);
     } else {
@@ -359,9 +361,10 @@ async function loadVideos({ reset }) {
     if (requestId !== state.requestId) return;
     const incoming = result.videos;
     state.total = Number(result.pagination.total);
+    const previousCount = state.videos.length;
     state.videos.push(...incoming);
     state.offset += incoming.length;
-    renderVideoGrid();
+    renderVideoGrid({ appendFrom: reset ? 0 : previousCount });
     syncUrl();
   } catch (error) {
     if (requestId !== state.requestId) return;
@@ -376,9 +379,11 @@ async function loadVideos({ reset }) {
   }
 }
 
-function renderVideoGrid() {
-  replaceContent(elements.grid);
-  state.videos.forEach((video) => elements.grid.append(buildVideoCard(video)));
+function renderVideoGrid({ appendFrom = 0 } = {}) {
+  // Keep existing cards, media previews and lazy-load state when loading page 2+.
+  // Re-creating every previously loaded tile needlessly refetches thumbnails.
+  if (appendFrom === 0) replaceContent(elements.grid);
+  state.videos.slice(appendFrom).forEach((video) => elements.grid.append(buildVideoCard(video)));
   document.dispatchEvent(new CustomEvent("vidbest:grid-rendered"));
   const shown = state.videos.length;
   elements.resultSummary.textContent = state.total === 1 ? "1 curated video" : `${state.total.toLocaleString()} curated videos`;
@@ -425,6 +430,9 @@ function buildVideoCard(video) {
   time.textContent = formatDate(video.created_at);
 
   const image = card.querySelector(".tile-media img");
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.fetchPriority = "low";
   const fallback = card.querySelector(".media-fallback");
   const listingImage = video.review_preview_url || video.thumbnail_url;
   if (listingImage && card.dataset.videoProvider !== "tiktok") {

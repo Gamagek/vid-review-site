@@ -1,3 +1,4 @@
+import { cachedPublicResponse } from "./public-edge-cache.js";
 import { signedLegacyV5Page } from "./legacy-v5-signer.js";
 import edgeWorker from "./edge.js";
 import { facebookPosterUrl } from "./facebook-posters.js";
@@ -785,7 +786,8 @@ export default {
   async fetch(request, env, ctx) {
     let response;
     try {
-      response = await seoWorker.fetch(request, env, ctx);
+      response = await cachedPublicResponse(request, env, ctx, () => seoWorker.fetch(request, env, ctx));
+      if (!response) response = await seoWorker.fetch(request, env, ctx);
     } catch (error) {
       const path = new URL(request.url).pathname;
       if (!["GET", "HEAD"].includes(request.method) || !/^\/(?:videos|category\/[^/]+|(?:image-)?sitemap\.xml|sitemaps\/[^/]+\.xml)$/.test(path)) throw error;
