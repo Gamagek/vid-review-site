@@ -2721,7 +2721,7 @@ test("editorial SEO schema links a real indexable category and preserves protect
   assert.equal(article["@id"], "https://example.com/watch/editorial-review-42#review");
   assert.equal(article.headline, "An original editorial review");
   assert.equal(article.datePublished, publishDate);
-  assert.equal(article.author.name, "Vid.Best");
+  assert.equal(article.author.name, context.env.APP_NAME);
   assert.deepEqual(article.about, { "@id": "https://example.com/watch/editorial-review-42#video" });
   assert.equal(breadcrumb.itemListElement[1].item, "https://example.com/category/funny-comedy");
   assert.equal(article.dateModified, undefined);
