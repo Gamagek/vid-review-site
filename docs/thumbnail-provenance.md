@@ -621,3 +621,8 @@ Prompt (built-in generation mode): Use case illustration-story; wide 16:9 Vid.Be
 
 
 Source availability exclusion (13 October 2026): Dilscoop source YouTube Shorts YVT1oUI2nTE reports Video unavailable, removed following a copyright removal request by Copyright Integrity International. Both same-video hq2.jpg and hqdefault.jpg are verified 404 in Actions. No substitute cover/source was published and the original review/date fields remain untouched. Do not rehost this removed source or substitute a different video's poster. Garden record 144's illustration, absolute watch image metadata, stale poster redirect and unchanged protected-field fingerprint were verified after deployment; see the latest SEO checkpoint and artifact 11782656400.
+
+
+## 21 October2026: batch11 source previews retained; separate art prepared
+
+Ten original conceptual illustrations for135/131/132/119/130/134/36/98/115/86 are prepared in PR255, not yet published. Source JPEG URLs remain unmodified, decode480×360 and passedHTTP200/MIME/byte checks before D1 quota exhaustion. They remain image1; the new1600×900WebP art is separate image2. Exact guard identities, preview observations/limits, original prompts and checked WebP/PNG hashes are in docs/review-images/batch11-source-verification-20261021.json and docs/review-illustration-prompts.json. No actual-frame, actor-likeness, fresh-audio or original-authorship claim is made. All100prior assets and source/owner posters are preserved. D1 code7500 temporarily blocks final pre-release/live checks; finish PR255 before any next batch.

@@ -604,6 +604,15 @@ test('source-associated review covers drive social images while preserving video
     const html = await (await request(context,'https://vid.best/watch/'+art.slug,{headers:{'User-Agent':'VidBest-SEO-Audit/1.0'}})).text();
     assert.ok(html.includes('src="https://vid.best'+art.path+'"'));
     assert.ok(html.includes(art.caption));
+    if (art.sourceImage) {
+      const sidebar = html.match(/<aside class="watch-review-images"[\s\S]*?<\/aside>/)?.[0];
+      assert.ok(sidebar, 'audited dual-image pages retain a separate source/artwork column');
+      assert.ok(sidebar.indexOf('data-review-image="source"') < sidebar.indexOf('data-review-image="artwork"'));
+      assert.match(sidebar, /<img src="https:\/\/vid\.best\/review-covers\/owner-source\.jpg"/,
+        'the current owner poster wins even after the artwork audit');
+      assert.ok(sidebar.includes('src="https://vid.best' + art.path + '"'));
+      assert.equal((sidebar.match(/<img /g) || []).length, 2);
+    }
     assert.match(html, /<div class="watch-review-body">\s*<article class="watch-copy glass-panel">/);
     assert.ok(html.indexOf('<!-- review-body -->') < html.indexOf('id="vidbest-related-reviews"'));
     assert.match(html, /Owner listing remains unchanged/);

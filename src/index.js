@@ -3065,6 +3065,10 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   const tags = Array.isArray(video.seo_tags) ? video.seo_tags.slice(0, 20) : [];
   const illustration = reviewIllustration(video);
   const reviewImage = illustration ? `${baseUrl}${illustration.path}` : thumbnail;
+  // Audited dual-image entries keep the current owner/source preview first.
+  // Artwork remains a separate illustration; no poster or player field is rewritten.
+  const sourceReviewImage = illustration?.sourceImage && thumbnail && thumbnail !== reviewImage
+    ? thumbnail : "";
   // A Vid.Best review's creation date is not the original third-party video's
   // publication date. Google requires the *video* date when it is known.
   const uploadDate = video.source_published_at || (video.provider === "r2" ? video.created_at : "");
@@ -3183,7 +3187,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <meta name="twitter:image" content="${escapeHtml(reviewImage)}">
   ${illustration ? `<meta name="twitter:image:alt" content="${escapeHtml(illustration.alt)}">` : ""}
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/styles.css?v=20261018-review-art1">
+  <link rel="stylesheet" href="/styles.css?v=20261021-dual-review-images1">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
   ${video.provider === "tiktok" ? '<script src="/tiktok-oembed-cache.js?v=20261018-replay" defer></script><script src="/tiktok-preview-service.js?v=20261018-replay" defer></script>' : ""}
   ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>' : ""}
@@ -3242,12 +3246,20 @@ function renderWatchHtml(video, request, env, scriptNonce) {
       </nav>` : ""}
       <a class="source-link" href="${escapeHtml(video.source_page_url || video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open original source ↗</a>
     </article>
-    ${reviewImage ? `<figure class="watch-review-art glass-panel" aria-label="Review image">
+    ${sourceReviewImage ? `<aside class="watch-review-images" aria-label="Source preview and conceptual review artwork">
+      <figure class="watch-review-art glass-panel" data-review-image="source" aria-label="Source preview image">
+        <a href="${escapeHtml(sourceReviewImage)}" target="_blank" rel="noopener noreferrer" aria-label="View source preview image">
+          <img src="${escapeHtml(sourceReviewImage)}" alt="${escapeHtml(`${video.title} — publisher preview image`)}" width="${illustration.sourceImage.url === sourceReviewImage ? illustration.sourceImage.width : 640}" height="${illustration.sourceImage.url === sourceReviewImage ? illustration.sourceImage.height : 360}" loading="lazy" decoding="async">
+        </a>
+        <figcaption>Source/publisher preview image.</figcaption>
+      </figure>` : ""}
+    ${reviewImage ? `<figure class="watch-review-art glass-panel"${sourceReviewImage ? ' data-review-image="artwork"' : ""} aria-label="Review image">
       <a href="${escapeHtml(reviewImage)}" target="_blank" rel="noopener noreferrer" aria-label="View review preview image">
         <img src="${escapeHtml(reviewImage)}" alt="${escapeHtml(illustration?.alt || `${video.title} — review preview image`)}" width="${illustration?.width || 640}" height="${illustration?.height || 360}" loading="lazy" decoding="async">
       </a>
       <figcaption>${escapeHtml(illustration?.caption || "Preview artwork for this review. The original video remains with its publisher.")}</figcaption>
     </figure>` : ""}
+    ${sourceReviewImage ? "</aside>" : ""}
     </div><!-- review-body -->
     <section class="comments-panel glass-panel">
       <h2>Community comments</h2>

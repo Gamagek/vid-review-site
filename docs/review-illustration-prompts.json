@@ -3400,6 +3400,336 @@
       "sourceEvidence": "Current owner D1 title/slug/source/publication/date identity verified at2026-10-20T06:55:41.181Z. Public TikTok page HTTP200/exact videoID7216300787679448325/account@warface2991/caption verified at2026-10-20T07:06:06.643Z; excerpt/hash in docs/review-images/batch10-source-verification-20261020.json. No source footage/audio viewed or original authorship inferred. Invented scene: A pair of entirely original colorful canvas dance shoes on a glossy midnight dance floor, caught at different jaunty angles, with flowing magenta and turquoise ribbons suggesting rhythmic motion. A softly lit blank vintage radio silhouette in the distance, beautiful spotlit reflections, energetic panoramic composition. Symbolize the verified dance/funny/joke caption only; do not depict a monkey, performer, artist likeness or any official song art, or imply inspected audio.",
       "previewFallbackEvidence": "Owner thumbnail is empty in read-only D1. Existing exact title/slug/source/published and empty-field digest plus live R2 source-poster priority guard are required; any owner poster, saved source bytes or unknown storage state wins. No owner media field or VideoObject source thumbnail is rewritten.",
       "verificationLimits": "Original symbolic conceptual artwork only, not a source frame, observed event, actual creator poster/likeness, source audio, location or outcome claim. No visible AI-production lettering. Source/owner posters, VideoObject evidence, review/SEO fields/structure/dates, players, holds and all D1/R2 remain owner-controlled and unchanged."
+    },
+    {
+      "id": 135,
+      "slug": "titli-chennai-express-full-video-song-shahrukh-khan-deepika-padukone-music-video-analysis-why-titli-",
+      "prompt": "Use case: stylized-concept. Create ONE original, premium cinematic anime-style editorial illustration for the Vid.Best review of the film song Titli (Chennai Express), not an actual source frame or official poster. Landscape precisely 16:9, high definition, ideally 1920x1080. A single beautifully detailed pale golden butterfly hovers above a small white jasmine blossom on a rain-kissed green branch in the foreground. Behind it, a luminous imagined South Asian garden opens into soft turquoise hills, glowing early-morning mist and warm saffron sunlight. A delicate trail of tiny light motes suggests the fluttering, weightless feeling of discovering love. Elegant hand-painted anime background, exquisite botanical detail, cinematic depth, gentle wind, restrained jewel tones, emotionally tender mood, composition asymmetrical with butterfly at the left third and deep open garden to the right. Theme evidence is the exact song/title 'Titli' and its butterfly/romance interpretation; the garden and butterfly are invented metaphors, not a claim about filmed locations, actual events or costumes. No people, no celebrity likeness, no film characters, no copied poster composition, no logos, no play icon. Entirely text-free: no lettering, captions, AI-generated, AI, generated-by or production labels anywhere.",
+      "asset": "public/review-illustrations/titli-butterfly-romance-anime-v1.webp",
+      "bytes": 285416,
+      "sha256": "f5bd76f5a78b9cc83f238a198d605636f2a158c2eaba51f2e0f2a009811b9973",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-21T17:50:55.890500+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "27b4ee7d2373222ae6d5ca460fe8569e4ef1bf3a034f69437286eff9eef340d6",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 86,
+        "method": 6,
+        "scope": "Technical size/format conversion only; the original generated PNG is retained."
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch11-source-verification-20261021.json",
+        "inventoryAt": "2026-10-21T17:41:22.163Z",
+        "sourceThumbnailCheckedAt": "2026-10-21T17:52:43.741Z",
+        "sceneInterpretation": "golden butterfly above jasmine in an imagined sunlit garden, interpreting the Titli romance theme",
+        "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
+      },
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+    },
+    {
+      "id": 131,
+      "slug": "wiz-khalifa-see-you-again-ft-charlie-puth-official-video-furious-7-soundtrack",
+      "prompt": "Use case: stylized-concept. Create ONE original cinematic anime-style conceptual editorial illustration for a review of 'See You Again', the Wiz Khalifa and Charlie Puth soundtrack music video. High-definition landscape 16:9, ideally 1920x1080. Invent a beautifully painted coastal road at blue hour: a grand piano stands in the near foreground on a quiet scenic overlook, its ivory keys catching warm amber light; beyond it, a road gently separates into two paths along a vast coastline toward a peach-colored sunrise. A small blank ribbon tied to the piano moves in the sea breeze, suggesting remembrance and farewell without tragedy imagery. Sophisticated anime environmental painting, bold sweeping diagonal road, pale blue sea, tactile piano wood, delicate glowing dust and clouds; contemplative rather than sad or promotional clickbait. This is a symbolic interpretation of the verified music-review theme of reunion, friendship and farewell, not a reconstruction of any shot, actual place or person. No performers, faces, silhouettes of people, recognizable actors, vehicle brands, racing cars or movie imagery. Entirely text-free; no logos, song lyrics, titles, AI-generated, AI or other production labels anywhere.",
+      "asset": "public/review-illustrations/see-you-again-farewell-roads-anime-v1.webp",
+      "bytes": 256960,
+      "sha256": "607c5cf75d882f173506c18da5ebc7f44819158b04f5a2736993ad59ab311892",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-21T17:54:10.387527+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "f714e3cbdc9d2ce3eb2d8170846a5fc73872850e1ea8672e249dacb417656839",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 82,
+        "method": 6,
+        "scope": "Technical size/format conversion only; the original generated PNG is retained."
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch11-source-verification-20261021.json",
+        "inventoryAt": "2026-10-21T17:41:22.163Z",
+        "sourceThumbnailCheckedAt": "2026-10-21T17:52:43.741Z",
+        "sceneInterpretation": "piano overlooking two coastal roads at sunrise, interpreting See You Again and its farewell theme",
+        "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
+      },
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+    },
+    {
+      "id": 132,
+      "slug": "guli-mata-saad-lamjarred-shreya-ghoshal-jennifer-winget-anshul-garg",
+      "prompt": "Use case: stylized-concept. Create ONE original cinematic anime environmental illustration for the 'Guli Mata' romantic music-video review. Landscape HD exactly 16:9, ideally 1920x1080. An imagined moonlit courtyard seen from a low angle through an intricate, original turquoise horseshoe arch. Two small brass lanterns stand on opposite sides of a shallow reflecting pool, their warm lights meeting at a single floating rose in the middle. Rich indigo night, subtle crimson flowers, hand-painted patterned tiles, atmospheric starlight, beautiful ornamental detail, a sense of longing and romance across a distance. Dramatic foreground framing and strong central reflection, not a generic garden vista. This invented symbolic scene interprets the verified review's romantic/fairytale mood and song identity; it is not a real location or an observed source scene. Do not reproduce the source poster, its couple, costumes, celebrity likenesses, film characters, or actual production design. No humans, no faces, no official logos, badges or play icons. Entirely text-free: no titles, lyrics, AI-generated, AI, generated-by or production wording anywhere.",
+      "asset": "public/review-illustrations/guli-mata-moonlit-courtyard-anime-v1.webp",
+      "bytes": 258292,
+      "sha256": "44ef33d0c8423ed3d9a78a37479b30220f20f350e403cbead9cfb380902ba0c1",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-21T17:57:18.408669+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "a596ca04a31b523644623df779899c615d9f6d0284767119d96954bf5d705216",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 82,
+        "method": 6,
+        "scope": "Technical size/format conversion only; the original generated PNG is retained."
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch11-source-verification-20261021.json",
+        "inventoryAt": "2026-10-21T17:41:22.163Z",
+        "sourceThumbnailCheckedAt": "2026-10-21T17:52:43.741Z",
+        "sceneInterpretation": "rose floating between lanterns in an invented moonlit courtyard, interpreting Guli Mata romance",
+        "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
+      },
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+    },
+    {
+      "id": 119,
+      "slug": "official-best-travelling-songs-of-bollywood-road-trip-songs-t-series",
+      "prompt": "Use case: stylized-concept. Create ONE vibrant original cinematic anime illustration for a review of the Bollywood travelling-song compilation 'Best Travelling Songs of Bollywood / Road Trip Songs'. High-definition landscape precisely 16:9, ideally 1920x1080. Wide view from the empty back seat of an invented vintage open-top car, with a small worn teal suitcase, a folded blank paper map and unbranded headphones on the cream seat in the foreground. Through the windshield, a winding mountain road climbs toward bright snow-dusted peaks under a clear ultramarine sky; roadside marigold flowers and warm afternoon light. No driver or passengers are visible. Beautiful hand-painted anime landscape, painterly clouds, crisp reflective chrome, dynamic joyful perspective and summer-travel anticipation. The source publisher's preview establishes a road-trip/music compilation; this is an invented symbolic travel scene, not a reproduced movie frame, actual route or travel claim. Avoid recognizable actors, film characters, copied vehicle design, real logos, readable map labels, music notes, badges and official posters. Absolutely no text or production labels, including AI-generated or AI.",
+      "asset": "public/review-illustrations/bollywood-road-trip-music-anime-v1.webp",
+      "bytes": 280064,
+      "sha256": "c924273c1a42d5c4895ea03b052d9ce20703000b25bf5f5d3b4ced5a00b9bfcd",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-21T17:56:50.261025+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "e845096c0c1485cfb0f70fe2f8536220d24b8ca6c03df0850178eaf356a98dc9",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 78,
+        "method": 6,
+        "scope": "Technical size/format conversion only; the original generated PNG is retained."
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch11-source-verification-20261021.json",
+        "inventoryAt": "2026-10-21T17:41:22.163Z",
+        "sourceThumbnailCheckedAt": "2026-10-21T17:52:43.741Z",
+        "sceneInterpretation": "empty convertible with suitcase and headphones on an invented mountain journey, interpreting the Bollywood travelling-song compilation",
+        "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
+      },
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+    },
+    {
+      "id": 130,
+      "slug": "katy-perry-roar-how-katy-perry-conquered-the-jungle-in-roar",
+      "prompt": "Use case: stylized-concept. Create ONE original premium anime background illustration for a review of the pop music video 'Roar'. Landscape HD precisely 16:9, ideally 1920x1080. A majestic original tiger stands calmly on a mossy fallen tree above a luminous emerald jungle stream, facing into a broad beam of morning light. Thick tropical leaves and bright hibiscus frame the edges; misty waterfalls and bold violet-blue shadows give cinematic depth. The tiger is dignified and peaceful, with superb painterly fur and confident posture, expressing the review's jungle/self-confidence metaphor. Strong low camera angle, dynamic tree diagonal, lush richly colored hand-painted anime environmental art. This is a newly invented symbolic scene grounded in the jungle motif visible in the exact source preview and the review topic, not a filmed event or source frame. No human characters, celebrities, copied costumes or poster layouts, plane crash, danger, injuries, rescue or outcome claims. No logos, play icons, lettering, lyrics, titles, AI-generated, AI or any production labels anywhere.",
+      "asset": "public/review-illustrations/roar-jungle-confidence-anime-v1.webp",
+      "bytes": 279168,
+      "sha256": "fccaf1d9b146f814fafad6a72e5ed77e10be9eaeaa26915b1caf5d18b6165adb",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-21T17:59:31.646611+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "db1c3a5e2abb213c0184ee6c8c18e1f18064b770b5d459b8414270c1829dbe85",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 74,
+        "method": 6,
+        "scope": "Technical size/format conversion only; the original generated PNG is retained."
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch11-source-verification-20261021.json",
+        "inventoryAt": "2026-10-21T17:41:22.163Z",
+        "sourceThumbnailCheckedAt": "2026-10-21T17:52:43.741Z",
+        "sceneInterpretation": "peaceful tiger on a mossy log above an imagined jungle stream, interpreting the Roar jungle and confidence theme",
+        "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
+      },
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+    },
+    {
+      "id": 134,
+      "slug": "rose-bruno-mars-apt-official-music-video",
+      "prompt": "Use case: stylized-concept. Create ONE original stylish cinematic anime editorial illustration for the ROSÉ and Bruno Mars 'APT.' music-video review. HD landscape exactly 16:9, ideally 1920x1080. An EMPTY pink rehearsal room seen from a dramatic wide low corner angle. A pearl-white unbranded drum kit sits on a slightly raised checkerboard platform, one cream electric guitar leans safely on a black stand at the opposite side, a loose black instrument cable draws a lively curve across the glossy floor. Punchy hot-pink walls, inky black shadows, soft peach bounced light, sparkling metallic cymbals, polished hand-painted anime finish. A strong asymmetric composition and beautiful geometry convey playful music-session energy. The exact source preview verifies the pink room and drum-kit motif; invent a new room design/composition rather than copying its performers or shot. No humans, celebrity likenesses, copied faces, characters, logos, stickers, readable instrument brands, play icons or promotional badges. Entirely text-free: no words, song lyrics, AI-generated, AI or production labels.",
+      "asset": "public/review-illustrations/apt-pink-rehearsal-room-anime-v1.webp",
+      "bytes": 157420,
+      "sha256": "536125c93540d59c3cae11c2135d6b5658d43704aa9b0fac22b09627e48050fc",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-21T17:59:02.539055+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "adf456a4796917cc74dae5406db64bc1128db1825a32a798c7a33a3de7bb4000",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 86,
+        "method": 6,
+        "scope": "Technical size/format conversion only; the original generated PNG is retained."
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch11-source-verification-20261021.json",
+        "inventoryAt": "2026-10-21T17:41:22.163Z",
+        "sourceThumbnailCheckedAt": "2026-10-21T17:52:43.741Z",
+        "sceneInterpretation": "empty pink rehearsal room with drum kit and guitar, interpreting the APT music-session motif",
+        "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
+      },
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+    },
+    {
+      "id": 36,
+      "slug": "lady-gaga-bruno-mars-die-with-a-smile-official-music-video",
+      "prompt": "Use case: stylized-concept. Create ONE original sophisticated cinematic anime editorial illustration for the 'Die With A Smile' duet music-video review. Precisely 16:9 landscape HD, ideally 1920x1080. Two unbranded vintage silver microphones stand facing slightly toward one another on an EMPTY small retro television studio stage. A warm honey-colored upright piano sits at the left edge and heavy deep-teal velvet curtains form a semicircle behind. Amber footlights, a soft dusty rose spotlight, rich turquoise and copper palette, fine film-like grain, elegant hand-painted anime lighting. A single looping microphone cable visually connects the two stands. Intimate eye-level composition emphasizing the paired microphones and shared space rather than a vast landscape. The verified source preview shows a duet performance setting; this is a newly invented symbolic stage for companionship, not a source shot or production reconstruction. No performers, faces, celebrity likenesses, costumes, exact source set design, names, brands or copied posters. No letters, lyrics, logos, play icons, AI-generated, AI or any production labels anywhere.",
+      "asset": "public/review-illustrations/die-with-a-smile-duet-stage-anime-v1.webp",
+      "bytes": 171274,
+      "sha256": "605f5d307b810ee9fdbae6a4276c86c8edfdcf578bb1d4cf3e1d78558833f43c",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-21T18:01:14.785077+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "ce9c4a475979c3d5ac18d40b4b45fdec9fb869288d47746751f1020f76b11b9f",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 86,
+        "method": 6,
+        "scope": "Technical size/format conversion only; the original generated PNG is retained."
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch11-source-verification-20261021.json",
+        "inventoryAt": "2026-10-21T17:41:22.163Z",
+        "sourceThumbnailCheckedAt": "2026-10-21T17:52:43.741Z",
+        "sceneInterpretation": "two microphones on an imagined empty retro stage, interpreting the Die With A Smile duet theme",
+        "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
+      },
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+    },
+    {
+      "id": 98,
+      "slug": "3-why-this-kolaveri-di-official-video-dhanush-anirudh-ravichander-shruti-haasan",
+      "prompt": "Use case: stylized-concept. Create ONE beautiful original anime editorial illustration for the recording-session music-video review 'Why This Kolaveri Di'. High-definition landscape precisely 16:9, ideally 1920x1080. Close three-quarter view inside an EMPTY cozy recording booth: a large unbranded condenser microphone with circular black pop filter at the right foreground; well-worn headphones rest on a simple wooden stool beside a plain blank lyric-paper sheet and pencil. Beyond the studio glass, an amber-lit mixing console and soft bokeh meters glow. Warm burnt-orange and walnut tones with electric cyan reflections, detailed audio cables, lovely hand-painted anime texture, strong shallow-focus composition and informal creative-session mood. The exact source preview shows headphones and studio microphone; this is a separate invented studio still life, not the actual recording room, artist performance or a source frame. No people, celebrity likenesses, recognizable studio logos, lyrics, readable meter words, names, promotional badges or play icons. Entirely text-free, including no AI-generated, AI, generated-by or other production wording.",
+      "asset": "public/review-illustrations/kolaveri-di-recording-booth-anime-v1.webp",
+      "bytes": 177118,
+      "sha256": "2e71ec45ab6219dbe419b46c120e935b17bcab47b34991f35a1c17e7b53a4d17",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-21T18:01:38.548693+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "4aa11644b7ec429b9f30e3e203a762d79918f79b14b25ce722aa5e1ebf013ff4",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 86,
+        "method": 6,
+        "scope": "Technical size/format conversion only; the original generated PNG is retained."
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch11-source-verification-20261021.json",
+        "inventoryAt": "2026-10-21T17:41:22.163Z",
+        "sourceThumbnailCheckedAt": "2026-10-21T17:52:43.741Z",
+        "sceneInterpretation": "microphone, pop filter and headphones in an invented recording booth, interpreting the Kolaveri Di studio-session motif",
+        "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
+      },
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+    },
+    {
+      "id": 115,
+      "slug": "tujh-mein-rab-dikhta-hai-song-rab-ne-bana-di-jodi-shah-rukh-khan-anushka-sharma-roop-kumar",
+      "prompt": "Use case: stylized-concept. Create ONE tender original cinematic anime illustration for the romantic song review 'Tujh Mein Rab Dikhta Hai'. High-definition exactly 16:9 landscape, ideally 1920x1080. In an imagined rain-washed Indian courtyard at early dusk, two entirely original anonymous young adult anime characters are seen only from behind, sharing a simple deep-red umbrella while standing quietly side by side. They wear understated everyday clothing, a pale blue shirt and a plain coral shawl, neither matching the source actors or costumes. Small warm marigold garlands and soft paper lanterns glow along the distant arcade; a delicate reflection of their umbrella appears in the wet stone paving. Gentle cinematic lighting, soft violet sky, exquisite hand-painted anime backgrounds, intimate emotional scale. Express the verified song-review theme of caring companionship and romance; this is an invented metaphor, not an actual shot, event, place or the film's characters. Do not recreate actor likenesses, film costumes, recognizable choreography, religious deities or official poster design. No faces visible, no logos, play icons, song lyrics, readable words, AI-generated, AI or any production labels.",
+      "asset": "public/review-illustrations/tujh-mein-rab-romantic-companionship-anime-v1.webp",
+      "bytes": 260690,
+      "sha256": "b987f291c7540d74cb24ed9f908085d3c94ce0ccf9c94fe0ed4d6028be5f1a1a",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-21T18:03:27.003039+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "c90bf887ad16fb3b355dc32b11804422f0cd2300633d309a7a9be893c85eb067",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 82,
+        "method": 6,
+        "scope": "Technical size/format conversion only; the original generated PNG is retained."
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch11-source-verification-20261021.json",
+        "inventoryAt": "2026-10-21T17:41:22.163Z",
+        "sourceThumbnailCheckedAt": "2026-10-21T17:52:43.741Z",
+        "sceneInterpretation": "two original anonymous characters seen from behind sharing an umbrella, interpreting the Tujh Mein Rab Dikhta Hai romance theme",
+        "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
+      },
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
+    },
+    {
+      "id": 86,
+      "slug": "luis-fonsi-despacito-ft-daddy-yankee",
+      "prompt": "Use case: stylized-concept. Create ONE richly colored original cinematic anime illustration for a review of 'Despacito', the Luis Fonsi / Daddy Yankee music video. HD landscape precisely 16:9, ideally 1920x1080. A sun-warmed invented old-town music courtyard: a beautifully detailed unbranded nylon-string guitar rests against a turquoise wooden doorway in the left foreground, a small pair of hand percussion drums nearby, and a bold coral wall curves toward a lively but EMPTY cobbled lane. Overhead strings of tiny warm bulbs catch golden late-afternoon light; banana leaves cast rhythmic shadows and a few colorful cloth ribbons suggest motion. Distinctive close foreground still life with deep street perspective, saturated coral/turquoise/yellow palette, refined hand-painted anime finish, joyful social-music atmosphere. The exact source preview establishes the music-performance/social setting; this invented scene evokes that music-review mood without claiming a filmed location, actual footage or fresh listening analysis. No performers, dancers, faces, celebrity likenesses, replicated outfits, specific real landmarks, copied source poster, brands or official logos. Entirely text-free, no lyrics, titles, play icon, AI-generated, AI or production labels anywhere.",
+      "asset": "public/review-illustrations/despacito-courtyard-music-anime-v1.webp",
+      "bytes": 294426,
+      "sha256": "e19fe5fb1da3c2c21d50930c7f200b2975fead76500b77fb1296c99fbd2976c0",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-21T18:04:00.370523+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "e2d50bc6c3f9c3646ea088a8de6a14dd383fe8f1e5de936815452319c4b305e2",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 78,
+        "method": 6,
+        "scope": "Technical size/format conversion only; the original generated PNG is retained."
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch11-source-verification-20261021.json",
+        "inventoryAt": "2026-10-21T17:41:22.163Z",
+        "sourceThumbnailCheckedAt": "2026-10-21T17:52:43.741Z",
+        "sceneInterpretation": "guitar and percussion in an invented colorful courtyard, interpreting the Despacito social-music mood",
+        "limits": "Exact published D1 identity and decoded source preview/theme only. Artwork is an invented conceptual illustration, not observed footage, an actual location, a celebrity portrait or a reproduction of source production design. No fresh continuous audio/footage inspection."
+      },
+      "verificationLimits": "Preserve source/owner preview URLs, VideoObject thumbnail, original dates/title/review/SEO/source/player/rights fields and all D1/R2 data. No visible AI-production wording. Publication requires exact-head CI, dry-run, deployed asset hashes and matching HTML/sitemaps."
     }
   ],
   "ownerDesignPreference": {

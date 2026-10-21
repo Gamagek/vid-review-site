@@ -1,7 +1,17 @@
+import illustrations from "./review-illustrations.json" with { type: "json" };
+
 // Public response cache: Cloudflare edge first, durable R2 snapshot second, D1 last.
 // Never cache member sessions, mutations, error responses, or private headers.
 // The browser receives no-store even when the edge holds a fresh copy.
 const CACHE_VERSION = "v1";
+// A new artwork release must not inherit a fresh XML snapshot missing its images.
+// This non-security fingerprint only versions XML keys; API/browser policy is unchanged.
+const IMAGE_CATALOG_REVISION = illustrations.reduce((hash, item) => {
+  for (const char of `${item.id}:${item.path}:${item.sha256}`) {
+    hash = Math.imul(hash ^ char.charCodeAt(0), 16777619) >>> 0;
+  }
+  return hash;
+}, 2166136261).toString(16);
 const EDGE_SECONDS = 300;
 const MAX_SNAPSHOT_SECONDS = 24 * 60 * 60;
 const MAX_BODY_BYTES = 1_500_000;
@@ -50,11 +60,16 @@ function policyFor(request) {
   if ([...url.searchParams.keys()].some((name) => !allowed.includes(name))) return null;
   if ([...url.searchParams.keys()].some((name) => url.searchParams.getAll(name).length !== 1)) return null;
   if (url.search.length > 300) return null;
-  const canonical = new URL("https://vid.best/__public_cache/" + CACHE_VERSION + path);
+  const revision = policyRevision(kind);
+  const canonical = new URL("https://vid.best/__public_cache/" + revision + path);
   const params = new URLSearchParams(url.searchParams);
   params.sort();
   canonical.search = params.toString();
   return { canonical: canonical.toString(), kind, snapshot };
+}
+
+function policyRevision(kind) {
+  return kind === "xml" ? `${CACHE_VERSION}-images-${IMAGE_CATALOG_REVISION}` : CACHE_VERSION;
 }
 
 function validBody(kind, body) {

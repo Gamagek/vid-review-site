@@ -1,0 +1,15 @@
+{
+  "recordedAt": "2026-10-21T18:12:07.879858+00:00",
+  "provider": "Cloudflare D1",
+  "accountId": "de9e41200f6bdfab80553c8eb08f9b16",
+  "databaseId": "d1a91eb2-1c41-44b8-aff1-24166f2c91f4",
+  "httpStatus": 400,
+  "code": 7500,
+  "message": "Your account has exceeded D1's free tier daily row read limit. Upgrade to a paid plan or wait until tomorrow (midnight UTC) to continue.",
+  "action": "No further D1 queries, no schema writes, no paid-plan change. Complete local/CI preparation; defer merge/deploy and exact live verification until fresh target/data checks can pass after the stated reset. Keep existing hourly task active and continue this same ten-image batch; no duplicate generation.",
+  "counts": {
+    "newGenerated": 10,
+    "newPublished": 0,
+    "liveVerified": 0
+  }
+}

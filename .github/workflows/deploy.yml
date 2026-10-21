@@ -86,3 +86,16 @@ jobs:
       - name: Deploy Worker
         if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
         run: npm run deploy
+
+      - name: Verify the published review illustration batch
+        if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' && contains(github.event.head_commit.message, '[review-art-publish]')
+        run: node scripts/verify-review-illustrations.mjs --batch=latest
+
+      - name: Save exact live image and page verification evidence
+        if: always() && contains(github.event.head_commit.message, '[review-art-publish]')
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: review-illustration-live-verification
+          path: review-illustration-verification.json
+          if-no-files-found: error
+          retention-days: 14
