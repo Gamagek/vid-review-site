@@ -1,0 +1,28 @@
+{
+  "state": "in_progress",
+  "recordIds": [
+    135,
+    131,
+    132,
+    119,
+    130,
+    134,
+    36,
+    98,
+    115,
+    86
+  ],
+  "base": "4d689eecb2a6de52844a0fcc58b7045c0c17ec3a",
+  "ownerResumeDate": "2026-10-21",
+  "maxNewPages": 10,
+  "generated": 0,
+  "published": 0,
+  "liveVerified": 0,
+  "scope": "Reserve ten unillustrated published music-review pages for source verification and distinct conceptual anime artworks. Preserve all D1 fields, original source images and holds; source verification must pass before publication. No page or image is published by this reservation.",
+  "preservationBaseline": {
+    "checkedAt": "2026-10-21T17:41:22.163Z",
+    "saved": 501,
+    "published": 501,
+    "allNonCounterVideoFieldsSha256": "1555f0985be9a3cf2e06ee4b60207078d7d9bc4fc618a8e9d836f5aeda7518f5"
+  }
+}
