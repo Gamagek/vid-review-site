@@ -2,6 +2,7 @@
 -- recorded for these exact source URLs. Do not touch created_at, updated_at,
 -- source metadata, visibility, engagement counts, or canonical slugs.
 -- The WHERE clause prevents updates if a slug has been repointed to another source.
+-- All statements are idempotent and deliberately omit RETURNING; replay is safe.
 
 UPDATE videos
 SET description = 'A barber handover leads into a whipped-cream mess, improvised sunglasses and a few household-tool cutaways. The strongest moments are visual and immediate; the quick changes make this feel like a gag reel rather than one continuous story.',
