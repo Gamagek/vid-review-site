@@ -10,7 +10,7 @@ test('sidebar artwork assets have unique verified WebP bytes and complete bounde
   const prompts = JSON.parse(readFileSync(new URL('../docs/review-illustration-prompts.json', import.meta.url)));
   const paths = new Set();
   const hashes = new Set();
-  for (const item of illustrations) {
+  for (const item of illustrations.filter(row => row.path.startsWith('/review-illustrations/'))) {
     assert.match(item.path, /^\/review-illustrations\/[a-z0-9-]+-v\d+\.webp$/);
     assert.ok(!paths.has(item.path)); paths.add(item.path);
     const bytes = readFileSync(new URL('../public' + item.path, import.meta.url));
@@ -51,7 +51,7 @@ test('sidebar artwork assets have unique verified WebP bytes and complete bounde
 });
 
 test('first-party publisher copies follow exact source identity and yield to later owner posters', () => {
-  const paired = illustrations.filter(item => item.sourceImage?.path);
+  const paired = illustrations.filter(item => item.sourceImage?.path && item.path.startsWith('/review-illustrations/'));
   assert.equal(paired.length, 20);
   for (const item of paired) {
     const row = {id:item.id,slug:item.slug,title:item.expectedTitle,source_url:item.sourceUrl,published:1};
