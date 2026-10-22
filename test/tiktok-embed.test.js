@@ -222,7 +222,7 @@ test("repeated Play calls on the same open cached player keep one iframe and one
   let dialog = null, frames = 0, nextTimer = 0, fetches = 0;
   function element(tag) {
     const events = new Map();
-    return { tagName: tag.toUpperCase(), children: [], contentWindow: {},
+    return { tagName: tag.toUpperCase(), dataset: {}, children: [], contentWindow: {},
       setAttribute(name, value) { this[name] = value; },
       addEventListener(name, fn) { events.set(name, fn); },
       append(...nodes) { this.children.push(...nodes); },
