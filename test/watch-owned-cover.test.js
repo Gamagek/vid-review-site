@@ -241,7 +241,8 @@ test("refresh failure, detached cards and missing preview service do not remove 
 test("cards without an owned-cover marker use their server-rendered image without a background refresh", async () => {
   for (const owned of [null, "https://external.example/review-covers/fixture.webp", `${cover}?not-approved=1`, "/media/uploads/fixture.webp"]) {
     const h = browserHarness({ owned });
+    const initiallyRenderedImage = h.image.src;
     h.resolve({ thumbnail_url: providerPoster }); await settle();
-    assert.notEqual(h.image.src, providerPoster);
+    assert.equal(h.image.src, initiallyRenderedImage);
   }
 });
