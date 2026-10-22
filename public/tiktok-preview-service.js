@@ -315,7 +315,8 @@
     const dialog = ensureDialog();
     // A second click on the same open player must not replace its iframe,
     // repeat the metadata lookup or restart TikTok's official embed script.
-    if (dialog.open && activeSource === share.url && activeFrame) return true;
+    // Also deduplicate rapid clicks while the first iframe is queued for the next animation frame.
+    if (dialog.open && activeSource === share.url) return true;
     ++activePreview;
     cleanupEmbed(dialog);
     activeSource = share.url;
