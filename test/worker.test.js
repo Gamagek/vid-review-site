@@ -2974,7 +2974,7 @@ test("server-rendered editorial reviews expose escaped, semantic topic headings 
     "https://www.youtube.com/watch?v=TBSjGjhFvnI",
     "https://www.youtube.com/embed/TBSjGjhFvnI",
     "A friendship and crime-drama review.",
-    "🤝 Friendship & Trust\\n\\nA con-man partnership faces a family secret.\\n\\n🎬 A Distinct 1976 Classic\\n\\nNo invented scene claims. <script>alert('x')</script>",
+    "🤝 Friendship & Trust\n\nA con-man partnership faces a family secret.\n\n🎬 A Distinct 1976 Classic\n\nNo invented scene claims. <script>alert('x')</script>",
     publishedAt, publishedAt,
   );
   const before = context.sqlite.prepare(
@@ -2985,12 +2985,12 @@ test("server-rendered editorial reviews expose escaped, semantic topic headings 
   });
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /<h3>🤝 Friendship &amp; Trust<\\/h3>/);
-  assert.match(html, /<h3>🎬 A Distinct 1976 Classic<\\/h3>/);
-  assert.match(html, /<p>A con-man partnership faces a family secret\\.<\\/p>/);
-  assert.doesNotMatch(html, /<script>alert\\('x'\\)<\\/script>/);
+  assert.match(html, /<h3>🤝 Friendship &amp; Trust<\/h3>/);
+  assert.match(html, /<h3>🎬 A Distinct 1976 Classic<\/h3>/);
+  assert.match(html, /<p>A con-man partnership faces a family secret\.<\/p>/);
+  assert.doesNotMatch(html, /<script>alert\('x'\)<\/script>/);
   assert.match(html, /&lt;script&gt;alert/);
-  assert.match(html, /2026-10-20T18:30:31\\.299Z/);
+  assert.match(html, /2026-10-20T18:30:31\.299Z/);
   const after = context.sqlite.prepare(
     "SELECT created_at,updated_at,review_text FROM videos WHERE id=513"
   ).get();
