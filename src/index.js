@@ -3069,7 +3069,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   // Artwork remains a separate illustration; no poster or player field is rewritten.
   const sourceReviewPreview = reviewSourcePreview(video, thumbnail, baseUrl);
   const sourceReviewImage = sourceReviewPreview?.url !== reviewImage ? sourceReviewPreview?.url : "";
-  const dualImageSchema = Number(video.id) > 10 && video.media_type !== "raw" && Boolean(sourceReviewImage && illustration);
+  const dualImageSchema = [512, 513].includes(Number(video.id)) && video.media_type !== "raw" && Boolean(sourceReviewImage && illustration);
   // A Vid.Best review's creation date is not the original third-party video's
   // publication date. Google requires the *video* date when it is known.
   const uploadDate = video.source_published_at || (video.provider === "r2" ? video.created_at : "");
@@ -3127,13 +3127,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
         publisher: { "@id": `${baseUrl}#organization` },
         ...(sourceAttribution ? { isBasedOn: sourceAttribution } : {}),
         ...(reviewImage ? { primaryImageOfPage: reviewImage } : {}),
-        ...(illustration ? { image: dualImageSchema ? [
-          { "@type": "ImageObject", contentUrl: sourceReviewImage,
-            caption: "Source/publisher video preview, separate from conceptual review artwork.",
-            width: sourceReviewPreview.width, height: sourceReviewPreview.height },
-          { "@type": "ImageObject", contentUrl: reviewImage,
-            caption: illustration.caption, width: illustration.width, height: illustration.height }
-        ] : { "@type": "ImageObject", contentUrl: reviewImage,
+        ...(illustration ? { image: { "@type": "ImageObject", contentUrl: reviewImage,
           caption: illustration.caption, width: illustration.width, height: illustration.height } } : {}),
         mainEntity: { "@id": `${canonical}#video` },
         isPartOf: { "@id": `${baseUrl}#website` },
@@ -3158,7 +3152,13 @@ function renderWatchHtml(video, request, env, scriptNonce) {
         },
         publisher: { "@id": `${baseUrl}#organization` },
         ...(sourceAttribution ? { isBasedOn: sourceAttribution } : {}),
-        ...(reviewImage ? { image: dualImageSchema ? [sourceReviewImage, reviewImage] : [reviewImage] } : {}),
+        ...(reviewImage ? { image: dualImageSchema ? [
+          { "@type": "ImageObject", contentUrl: sourceReviewImage,
+            caption: "Source/publisher preview image, not original Vid.Best artwork.",
+            width: sourceReviewPreview.width, height: sourceReviewPreview.height },
+          { "@type": "ImageObject", contentUrl: reviewImage,
+            caption: illustration.caption, width: illustration.width, height: illustration.height }
+        ] : [reviewImage] } : {}),
       }] : []),
       {
         "@type": "BreadcrumbList",
