@@ -1,0 +1,110 @@
+{
+  "success": true,
+  "checkedAt": "2026-10-22T05:57:00.862Z",
+  "saved": 507,
+  "published": 507,
+  "fields": [
+    "cache_attempts",
+    "cache_error",
+    "cache_next_attempt_at",
+    "cache_source_url",
+    "cache_status",
+    "cached_at",
+    "created_at",
+    "description",
+    "embed_url",
+    "featured",
+    "id",
+    "media_type",
+    "primary_category",
+    "published",
+    "r2_key",
+    "redistribution_certified",
+    "redistribution_certified_at",
+    "review_text",
+    "seo_description",
+    "seo_tags",
+    "seo_title",
+    "slug",
+    "source_page_url",
+    "source_url",
+    "subcategory",
+    "thumbnail_url",
+    "title",
+    "trending",
+    "updated_at"
+  ],
+  "nonCounterSha256": "71e5c2bb3c3c4e858c59e690b9c5f00752e01e5ade12426671d03224fb978c82",
+  "rowsRead": 507,
+  "rowsWritten": 0,
+  "targetChecks": [
+    {
+      "id": 65,
+      "identityMatches": true,
+      "createdAt": "2026-09-30T17:29:14.072Z",
+      "updatedAt": "2026-09-30T17:36:09.130Z"
+    },
+    {
+      "id": 67,
+      "identityMatches": true,
+      "createdAt": "2026-09-30T18:20:08.598Z",
+      "updatedAt": "2026-09-30T18:20:08.598Z"
+    },
+    {
+      "id": 87,
+      "identityMatches": true,
+      "createdAt": "2026-10-03T18:29:25.584Z",
+      "updatedAt": "2026-10-03T18:40:53.630Z"
+    },
+    {
+      "id": 99,
+      "identityMatches": true,
+      "createdAt": "2026-10-05T18:26:41.611Z",
+      "updatedAt": "2026-10-05T19:11:38.482Z"
+    },
+    {
+      "id": 102,
+      "identityMatches": true,
+      "createdAt": "2026-10-05T18:29:41.988Z",
+      "updatedAt": "2026-10-05T19:29:26.524Z"
+    },
+    {
+      "id": 103,
+      "identityMatches": true,
+      "createdAt": "2026-10-05T18:30:16.560Z",
+      "updatedAt": "2026-10-05T19:36:02.456Z"
+    },
+    {
+      "id": 116,
+      "identityMatches": true,
+      "createdAt": "2026-10-09T18:22:29.237Z",
+      "updatedAt": "2026-10-09T19:36:56.406Z"
+    },
+    {
+      "id": 117,
+      "identityMatches": true,
+      "createdAt": "2026-10-09T18:25:22.067Z",
+      "updatedAt": "2026-10-09T19:28:41.121Z"
+    },
+    {
+      "id": 137,
+      "identityMatches": true,
+      "createdAt": "2026-10-11T13:51:57.342Z",
+      "updatedAt": "2026-10-11T13:51:57.342Z"
+    },
+    {
+      "id": 138,
+      "identityMatches": true,
+      "createdAt": "2026-10-11T18:31:18.266Z",
+      "updatedAt": "2026-10-11T18:39:36.842Z"
+    }
+  ],
+  "manifestAssets": 120,
+  "activeIdentityMatches": 119,
+  "preexistingIdentityHoldIds": [
+    308
+  ],
+  "preflight": "docs/review-images/batch12-release-preflight-20261022.json",
+  "allNonCounterVideoFieldsUnchanged": true,
+  "limit": "All507video rows hashed excluding mutable counters; exact ten identities/posters/dates match. No D1/R2writes. Active119is an identity-match count, not119newlive HTTPchecks."
+}
