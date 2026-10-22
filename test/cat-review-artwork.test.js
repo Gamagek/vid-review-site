@@ -9,7 +9,7 @@ test("cat review artwork is a source-guarded first-party image, not represented 
   assert.ok(item);
   assert.equal(item.slug, "cat-hard-hat-mirror-trick-and-fake-iphone-prank");
   assert.equal(item.sourceUrl, "https://www.youtube.com/shorts/l79eveAPMwk");
-  assert.equal(item.path, "/review-illustrations/cat-hard-hat-iphone-sponge-concept-v1.svg");
+  assert.equal(item.path, "/review-artwork/cat-hard-hat-iphone-sponge-concept-v1.svg");
   assert.match(item.caption, /not a video frame/i);
   const bytes = readFileSync(new URL("../public" + item.path, import.meta.url), "utf8");
   assert.match(bytes, /^<svg[^>]*xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
