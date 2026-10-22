@@ -1,0 +1,312 @@
+{
+  "schemaVersion": 1,
+  "kind": "review-source-capture-plan",
+  "batch": 12,
+  "recordIds": [
+    65,
+    67,
+    87,
+    99,
+    102,
+    103,
+    116,
+    117,
+    137,
+    138
+  ],
+  "checkedAt": "2026-10-22T05:36:36.549Z",
+  "inventory": {
+    "saved": 507,
+    "published": 507,
+    "nonCounterSha256": "71e5c2bb3c3c4e858c59e690b9c5f00752e01e5ade12426671d03224fb978c82",
+    "rowsWritten": 0
+  },
+  "images": [
+    {
+      "id": 65,
+      "slug": "knight-rider-theme-2020-cover-remake-by-enzo-margaglio",
+      "expectedTitle": "Knight Rider Theme 2020 ​🚘 (Cover/Remake by Enzo Margaglio)",
+      "sourceUrl": "https://youtu.be/ZhG18g4XNO8?si=p0cxQqgS-ll1Gc1t",
+      "published": 1,
+      "sourceImage": {
+        "url": "https://i.ytimg.com/vi/ZhG18g4XNO8/hqdefault.jpg",
+        "width": 480,
+        "height": 360
+      }
+    },
+    {
+      "id": 67,
+      "slug": "j-geco-chicken-song-the-ultimate-techno-dance-anthem",
+      "expectedTitle": "J.Geco - Chicken Song 😃🐔 The Ultimate Techno Dance Anthem",
+      "sourceUrl": "https://youtu.be/msSc7Mv0QHY?si=C5VuO3-4mU7ry-Hm",
+      "published": 1,
+      "sourceImage": {
+        "url": "https://i.ytimg.com/vi/msSc7Mv0QHY/hqdefault.jpg",
+        "width": 480,
+        "height": 360
+      }
+    },
+    {
+      "id": 87,
+      "slug": "shakira-waka-waka-the-ultimate-anthem-of-resilience-unity",
+      "expectedTitle": "Shakira - Waka Waka ⚽ The Ultimate Anthem of Resilience & Unity",
+      "sourceUrl": "https://youtu.be/pRpeEdMmmQ0?si=NgAXDgyUBqRWboHZ",
+      "published": 1,
+      "sourceImage": {
+        "url": "https://i.ytimg.com/vi/pRpeEdMmmQ0/hqdefault.jpg",
+        "width": 480,
+        "height": 360
+      }
+    },
+    {
+      "id": 99,
+      "slug": "maari-2-rowdy-baby-video-song-dhanush-sai-pallavi-yuvan-shankar-raja-balaji-mohan",
+      "expectedTitle": "🕺💃 Maari 2 - Rowdy Baby (Video Song) | Dhanush, Sai Pallavi | Yuvan Shankar Raja | Balaji Mohan",
+      "sourceUrl": "https://youtu.be/x6Q7c9RyMzk?si=t-6s8VMVWqrOJtUF",
+      "published": 1,
+      "sourceImage": {
+        "url": "https://i.ytimg.com/vi/x6Q7c9RyMzk/hqdefault.jpg",
+        "width": 480,
+        "height": 360
+      }
+    },
+    {
+      "id": 102,
+      "slug": "arash-feat-helena-one-day-official-video",
+      "expectedTitle": "🥺 Arash & Helena's 'One Day' - The Ultimate Emotional Journey",
+      "sourceUrl": "https://youtu.be/rjBsQ9SygnE?si=Ci3G96zxu58OQ53q",
+      "published": 1,
+      "sourceImage": {
+        "url": "https://i.ytimg.com/vi/rjBsQ9SygnE/hqdefault.jpg",
+        "width": 480,
+        "height": 360
+      }
+    },
+    {
+      "id": 103,
+      "slug": "psy-gangnam-style-m-v",
+      "expectedTitle": "🤩🌟😆 PSY - GANGNAM STYLE(강남스타일) M/V | Why PSY's 'Gangnam Style' Became the Ultimate Viral Hit",
+      "sourceUrl": "https://youtu.be/9bZkp7q19f0?si=IOzlJaDdRVUMkJGx",
+      "published": 1,
+      "sourceImage": {
+        "url": "https://i.ytimg.com/vi/9bZkp7q19f0/hqdefault.jpg",
+        "width": 480,
+        "height": 360
+      }
+    },
+    {
+      "id": 116,
+      "slug": "kala-chashma-baar-baar-dekho-sidharth-m-katrina-kaif-badshah-neha-kakkar-prem-hardeep",
+      "expectedTitle": "😎 𝐊𝐚𝐥𝐚 𝐂𝐡𝐚𝐬𝐡𝐦𝐚 | Baar Baar Dekho | Sidharth M & Katrina Kaif | Badshah, Neha Kakkar, Prem & Hardeep 😃",
+      "sourceUrl": "https://youtu.be/k4yXQkG2s1E?si=30jvRtDDzSUJaFpn",
+      "published": 1,
+      "sourceImage": {
+        "url": "https://i.ytimg.com/vi/k4yXQkG2s1E/hqdefault.jpg",
+        "width": 480,
+        "height": 360
+      }
+    },
+    {
+      "id": 117,
+      "slug": "full-song-khairiyat-bonus-track-chhichhore-sushant-shraddha-pritam-amitabh-b-arijit-singh",
+      "expectedTitle": "🧡 Full Song: KHAIRIYAT (BONUS TRACK) | CHHICHHORE | Sushant, Shraddha | Pritam, Amitabh B|Arijit Singh",
+      "sourceUrl": "https://youtu.be/hoNb6HuNmU0?si=dBxfjq_tNWhOYTFw",
+      "published": 1,
+      "sourceImage": {
+        "url": "https://i.ytimg.com/vi/hoNb6HuNmU0/hqdefault.jpg",
+        "width": 480,
+        "height": 360
+      }
+    },
+    {
+      "id": 137,
+      "slug": "the-balrog-of-morgoth-the-lord-of-the-rings-the-fellowship-of-the-ring-scene-analysis-why-the-balrog",
+      "expectedTitle": "⭐ The Balrog of Morgoth | The Lord of the Rings: The Fellowship of the Ring | Scene Analysis! 🌋✨ Why the Balrog is Cinema's Most Terrifying Monster",
+      "sourceUrl": "https://youtu.be/t6gvqwhUozM?si=-x-PDk7BxU7vnJKx",
+      "published": 1,
+      "sourceImage": {
+        "url": "https://i.ytimg.com/vi/t6gvqwhUozM/hqdefault.jpg",
+        "width": 480,
+        "height": 360
+      }
+    },
+    {
+      "id": 138,
+      "slug": "dandanakka-romeo-juliet-jayam-ravi",
+      "expectedTitle": "🌟😃 Dandanakka – A Spirited Tribute to T. Rajendar | Romeo Juliet",
+      "sourceUrl": "https://www.youtube.com/watch?v=1zRe8UPF1tM",
+      "published": 1,
+      "sourceImage": {
+        "url": "https://i.ytimg.com/vi/1zRe8UPF1tM/hqdefault.jpg",
+        "width": 480,
+        "height": 360
+      }
+    }
+  ],
+  "targetEvidence": [
+    {
+      "id": 65,
+      "slug": "knight-rider-theme-2020-cover-remake-by-enzo-margaglio",
+      "title": "Knight Rider Theme 2020 ​🚘 (Cover/Remake by Enzo Margaglio)",
+      "source_url": "https://youtu.be/ZhG18g4XNO8?si=p0cxQqgS-ll1Gc1t",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/ZhG18g4XNO8/hqdefault.jpg",
+      "media_type": "youtube",
+      "published": 1,
+      "created_at": "2026-09-30T17:29:14.072Z",
+      "updated_at": "2026-09-30T17:36:09.130Z",
+      "reviewLength": 13663,
+      "reviewExcerpt": "The Iconic Synth-Wave Resurrection 🚘🎶\n\n​🚘 1. The Pulse of Cinematic Nostalgia\nThis magnificent 2020 remake of the legendary Knight Rider theme is a sheer triumph of electronic music production! The moment that iconic, futuristic synthesizer melody begins to play, it instantly teleports the listener straight back to the 1980s. It is a fascinating psychological experience—a single, repeating musical"
+    },
+    {
+      "id": 67,
+      "slug": "j-geco-chicken-song-the-ultimate-techno-dance-anthem",
+      "title": "J.Geco - Chicken Song 😃🐔 The Ultimate Techno Dance Anthem",
+      "source_url": "https://youtu.be/msSc7Mv0QHY?si=C5VuO3-4mU7ry-Hm",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/msSc7Mv0QHY/hqdefault.jpg",
+      "media_type": "youtube",
+      "published": 1,
+      "created_at": "2026-09-30T18:20:08.598Z",
+      "updated_at": "2026-09-30T18:20:08.598Z",
+      "reviewLength": 2079,
+      "reviewExcerpt": "The Greatest Avian Club Banger of All Time 🐔\n\n​🎧 1. The Pinnacle of Farmyard EDM\nThis video is not just a meme; it is a legendary piece of internet history! J.Geco’s \"Chicken Song\" is an absolute masterpiece of absurdity. The concept is so incredibly simple yet so ridiculously effective: taking the frantic, uncoordinated clucking of a chicken and meticulously remixing it into a high-energy, heavy-"
+    },
+    {
+      "id": 87,
+      "slug": "shakira-waka-waka-the-ultimate-anthem-of-resilience-unity",
+      "title": "Shakira - Waka Waka ⚽ The Ultimate Anthem of Resilience & Unity",
+      "source_url": "https://youtu.be/pRpeEdMmmQ0?si=NgAXDgyUBqRWboHZ",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/pRpeEdMmmQ0/hqdefault.jpg",
+      "media_type": "youtube",
+      "published": 1,
+      "created_at": "2026-10-03T18:29:25.584Z",
+      "updated_at": "2026-10-03T18:40:53.630Z",
+      "reviewLength": 13064,
+      "reviewExcerpt": "The Anthem of Resilience and Global Unity ⚽\n\n​🏆 1. The Power of an Undying Sports Anthem\nShakira’s \"Waka Waka (This Time for Africa)\" is far more than just a promotional tournament track—it is a cultural milestone that has captured billions of views over the years. What sets this song apart is its infectious energy, driven by traditional African rhythms fused with modern pop production. It instant"
+    },
+    {
+      "id": 99,
+      "slug": "maari-2-rowdy-baby-video-song-dhanush-sai-pallavi-yuvan-shankar-raja-balaji-mohan",
+      "title": "🕺💃 Maari 2 - Rowdy Baby (Video Song) | Dhanush, Sai Pallavi | Yuvan Shankar Raja | Balaji Mohan",
+      "source_url": "https://youtu.be/x6Q7c9RyMzk?si=t-6s8VMVWqrOJtUF",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/x6Q7c9RyMzk/hqdefault.jpg",
+      "media_type": "youtube",
+      "published": 1,
+      "created_at": "2026-10-05T18:26:41.611Z",
+      "updated_at": "2026-10-05T19:11:38.482Z",
+      "reviewLength": 12950,
+      "reviewExcerpt": "The Symphony of Mischief & Unmatched Rhythm 🕺💃\n\n​👥 1. The Magnetism of the Lead Duo\nAnchoring this vibrant musical sequence with Dhanush and Sai Pallavi serves as a brilliant cinematic hook. Dhanush brings his signature effortless swagger, but it is Sai Pallavi's unparalleled, fluid energy that completely steals the screen. When audiences observe their natural chemistry and joyful, uninhibited exp"
+    },
+    {
+      "id": 102,
+      "slug": "arash-feat-helena-one-day-official-video",
+      "title": "🥺 Arash & Helena's 'One Day' - The Ultimate Emotional Journey",
+      "source_url": "https://youtu.be/rjBsQ9SygnE?si=Ci3G96zxu58OQ53q",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/rjBsQ9SygnE/hqdefault.jpg",
+      "media_type": "youtube",
+      "published": 1,
+      "created_at": "2026-10-05T18:29:41.988Z",
+      "updated_at": "2026-10-05T19:29:26.524Z",
+      "reviewLength": 13177,
+      "reviewExcerpt": "The Symphony of Longing & Surreal Visuals 🏔️✨\n\n​🌌 1. The Magnetism of Epic Storytelling\nAnchoring this emotional music video with vast, breathtaking landscapes and surreal imagery serves as a brilliant cinematic hook. When audiences see the video moving through towering mountains, reflective lakes and cosmic backdrops, it transforms a standard heartbreak song into a visually epic journey. The expa"
+    },
+    {
+      "id": 103,
+      "slug": "psy-gangnam-style-m-v",
+      "title": "🤩🌟😆 PSY - GANGNAM STYLE(강남스타일) M/V | Why PSY's 'Gangnam Style' Became the Ultimate Viral Hit",
+      "source_url": "https://youtu.be/9bZkp7q19f0?si=IOzlJaDdRVUMkJGx",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/9bZkp7q19f0/hqdefault.jpg",
+      "media_type": "youtube",
+      "published": 1,
+      "created_at": "2026-10-05T18:30:16.560Z",
+      "updated_at": "2026-10-05T19:36:02.456Z",
+      "reviewLength": 13358,
+      "reviewExcerpt": "The Symphony of Viral Absurdity & Iconic Choreography 🐎🕺\n\n​😎 1. The Magnetism of Unapologetic Swagger\nAnchoring this massive cultural phenomenon with PSY’s confident, larger-than-life persona serves as a brilliant cinematic hook. When audiences observe him dancing with utter conviction in completely absurd locations—from a parking garage and a carousel to a random elevator and a sauna—it transform"
+    },
+    {
+      "id": 116,
+      "slug": "kala-chashma-baar-baar-dekho-sidharth-m-katrina-kaif-badshah-neha-kakkar-prem-hardeep",
+      "title": "😎 𝐊𝐚𝐥𝐚 𝐂𝐡𝐚𝐬𝐡𝐦𝐚 | Baar Baar Dekho | Sidharth M & Katrina Kaif | Badshah, Neha Kakkar, Prem & Hardeep 😃",
+      "source_url": "https://youtu.be/k4yXQkG2s1E?si=30jvRtDDzSUJaFpn",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/k4yXQkG2s1E/hqdefault.jpg",
+      "media_type": "youtube",
+      "published": 1,
+      "created_at": "2026-10-09T18:22:29.237Z",
+      "updated_at": "2026-10-09T19:36:56.406Z",
+      "reviewLength": 13019,
+      "reviewExcerpt": "​🎬 Cinematic Dance Breakdown: The Rebellious Swag and Viral Beat of 'Kala Chashma' 🕶️🔥\n\n​🕶️ 1. The Reinvention of Wedding Aesthetics\nThe visual brilliance of this music video lies in its complete subversion of traditional Indian wedding attire. By pairing grand, heavily embroidered lehengas and sherwanis with sleek, modern black sunglasses (\"Kala Chashma\"), the director injects a massive dose of u"
+    },
+    {
+      "id": 117,
+      "slug": "full-song-khairiyat-bonus-track-chhichhore-sushant-shraddha-pritam-amitabh-b-arijit-singh",
+      "title": "🧡 Full Song: KHAIRIYAT (BONUS TRACK) | CHHICHHORE | Sushant, Shraddha | Pritam, Amitabh B|Arijit Singh",
+      "source_url": "https://youtu.be/hoNb6HuNmU0?si=dBxfjq_tNWhOYTFw",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/hoNb6HuNmU0/hqdefault.jpg",
+      "media_type": "youtube",
+      "published": 1,
+      "created_at": "2026-10-09T18:25:22.067Z",
+      "updated_at": "2026-10-09T19:28:41.121Z",
+      "reviewLength": 12957,
+      "reviewExcerpt": "Soul-Stirring Ballad Spotlight: The Emotional Weight of 'Khairiyat'\n\n​🎞️ 1. The Power of Nostalgic Visual Storytelling\nThe music video masterfully captures the fleeting, golden era of college life. By framing the romance against the everyday backdrop of campus libraries, sports fields, and crowded canteens, it creates an immediate sense of relatable nostalgia. Sushant Singh Rajput and Shraddha Kap"
+    },
+    {
+      "id": 137,
+      "slug": "the-balrog-of-morgoth-the-lord-of-the-rings-the-fellowship-of-the-ring-scene-analysis-why-the-balrog",
+      "title": "⭐ The Balrog of Morgoth | The Lord of the Rings: The Fellowship of the Ring | Scene Analysis! 🌋✨ Why the Balrog is Cinema's Most Terrifying Monster",
+      "source_url": "https://youtu.be/t6gvqwhUozM?si=-x-PDk7BxU7vnJKx",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/t6gvqwhUozM/hqdefault.jpg",
+      "media_type": "youtube",
+      "published": 1,
+      "created_at": "2026-10-11T13:51:57.342Z",
+      "updated_at": "2026-10-11T13:51:57.342Z",
+      "reviewLength": 14101,
+      "reviewExcerpt": "🌋✨ Cinematic Deep Dive: The Supernatural Terror of the Balrog 🗡️🧙‍♂️\n\n​🌑 1. The Mastery of Supernatural Dread\nIn this deep-dive analysis of the legendary Mines of Moria sequence from The Lord of the Rings: The Fellowship of the Ring, exploring its supernatural lore, masterful sound design, and emotional devastation, the true genius immediately starts with the build-up. Before the Balrog is even fu"
+    },
+    {
+      "id": 138,
+      "slug": "dandanakka-romeo-juliet-jayam-ravi",
+      "title": "🌟😃 Dandanakka – A Spirited Tribute to T. Rajendar | Romeo Juliet",
+      "source_url": "https://www.youtube.com/watch?v=1zRe8UPF1tM",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/1zRe8UPF1tM/hqdefault.jpg",
+      "media_type": "youtube",
+      "published": 1,
+      "created_at": "2026-10-11T18:31:18.266Z",
+      "updated_at": "2026-10-11T18:39:36.842Z",
+      "reviewLength": 13344,
+      "reviewExcerpt": "✨ 1. A Celebration Built Around Recognition\n\nThere is something wonderfully unrestrained about Dandanakka. From its driving rhythm to its larger-than-life celebration of Tamil cinema, the song is designed to bring people together rather than impress them with elaborate musical complexity. Featured in the film Romeo Juliet, it turns an affectionate tribute to actor and filmmaker T. Rajendar into a "
+    }
+  ],
+  "holds": {
+    "ids": [
+      2,
+      3,
+      8,
+      30,
+      46,
+      73,
+      81,
+      108,
+      183,
+      308,
+      327,
+      328
+    ],
+    "draftPR": 254,
+    "head": "ddaea65681c31651c1cfca92fee6feaea0c047bc",
+    "policy": "All raw/source-removal/demo/Saiyaara/Summer/owner media holds remain; no source/R2/D1 writes."
+  },
+  "sourceEvidenceLimit": "Reserve only. Verify every publisher preview HTTP/MIME/bytes/hash and inspect its actual pixels before generation. Saved review excerpts establish documented themes, not newly observed footage/audio.",
+  "externalLimits": {
+    "Supadata": "Metadata HTTP429 limit-exceeded: monthly plan usage exhausted. One attempt only; no retries, alternate account, credits purchase or auto recharge.",
+    "vidIQ": "Earlier source verification recorded insufficient credits; not retried."
+  }
+}

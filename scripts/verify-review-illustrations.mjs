@@ -120,6 +120,9 @@ try {
         assert.ok(sidebar, 'Both images must be server rendered');
         assert.ok(sidebar.indexOf('data-review-image="source"') < sidebar.indexOf('data-review-image="artwork"'));
         assert.equal((sidebar.match(/<img /g) || []).length, 2);
+        if (item.embeddedWatermark === 'vid.best') {
+          assert.ok(!sidebar.includes('watch-review-watermark'), 'Do not duplicate the watermark embedded in the image');
+        }
         assert.ok(sidebar.includes('src="' + sourceImageUrl.replaceAll('&', '&amp;') + '"'));
         assert.ok(sidebar.includes('src="' + image + '"'));
         if (video) assert.ok(video.thumbnailUrl.includes(item.sourceImage.url), 'Original source thumbnail preserved');
@@ -142,6 +145,7 @@ try {
         dualImageSourceFirst: dualImage, sourceImage: sourceImageUrl || null,
         sourceCopyVerified, sourceCopySha256: sourceCopyVerified ? item.sourceImage.sha256 : null,
         artworkDisplayWatermark: item.displayWatermark || null,
+        artworkEmbeddedWatermark: item.embeddedWatermark || null,
         videoSchemaPresent: Boolean(video),
         videoThumbnailUnchanged: video ? true : null,
         preexistingSourceDateUnavailable: !video && sourceMetadataUnavailable.has(item.id),

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "inventoryAt": "2026-10-22T04:41:53.570Z",
+  "inventoryAt": "2026-10-22T05:36:36.549Z",
   "publishedLibraryCount": 507,
   "batchLimit": 10,
-  "phase": "batch11_published_verified_pending_queue_reconciliation",
+  "phase": "batch12_prepared_pending_ci",
   "policy": "Preserve all source/owner posters and all D1 fields. Match current published ID, slug, source and title before enabling art. Do not edit protected review topics/media or drafts. Reconcile newly published records on each run; no regeneration merely for freshness. The owner’s 18 October request authorizes separate sidebar artwork identified by truthful conceptual-not-source-frame captions for all published platforms/topics, including comedy, but never edits existing protected review text, SEO titles, source posters or players. Source-removal/demo/Saiyaara/Summer holds remain. The19October owner steering additionally authorizes identity-matched generated art in OpenGraph/Twitter/WebPage metadata and guarded fallback for genuinely broken listing previews; preserve working source posters/VideoObject evidence and all D1/R2 media fields.",
   "baseline": {
     "saved": 214,
@@ -538,8 +538,9 @@
       "slug": "knight-rider-theme-2020-cover-remake-by-enzo-margaglio",
       "category": "Music",
       "sourceSha256": "e32aa8fe4270da6189a23bd1d96acc14181e0d4fa393547ccd5e38a6174d0ccf",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 12
     },
     {
       "id": 66,
@@ -555,8 +556,9 @@
       "slug": "j-geco-chicken-song-the-ultimate-techno-dance-anthem",
       "category": "Funny & Comedy",
       "sourceSha256": "9d87792386aa5166a50afc9cac5ba0bdeffc018b33875cbf6bdd56aa47cbc1a3",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 12
     },
     {
       "id": 68,
@@ -720,8 +722,9 @@
       "slug": "shakira-waka-waka-the-ultimate-anthem-of-resilience-unity",
       "category": "Music",
       "sourceSha256": "c636d914c2b5c5d82e7857ea3c1a83289d1b21f3570789aabc42d35d2ec103ca",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 12
     },
     {
       "id": 88,
@@ -820,8 +823,9 @@
       "slug": "maari-2-rowdy-baby-video-song-dhanush-sai-pallavi-yuvan-shankar-raja-balaji-mohan",
       "category": "Music",
       "sourceSha256": "dd850dbeed62ba61b6c76a651eae02dc57f2ea5e6132993e550b15632902302f",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 12
     },
     {
       "id": 100,
@@ -844,16 +848,18 @@
       "slug": "arash-feat-helena-one-day-official-video",
       "category": "Music",
       "sourceSha256": "07a176def8f02f408b351d2ef68e3a9fb5bc884d7aee2c728787d46846f233ba",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 12
     },
     {
       "id": 103,
       "slug": "psy-gangnam-style-m-v",
       "category": "Music",
       "sourceSha256": "2a4035f2c05098db17be1b72aa0a9ece5179304b50ccc9a8c897294a0aa62369",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 12
     },
     {
       "id": 104,
@@ -963,16 +969,18 @@
       "slug": "kala-chashma-baar-baar-dekho-sidharth-m-katrina-kaif-badshah-neha-kakkar-prem-hardeep",
       "category": "Music",
       "sourceSha256": "c9e2f32e9e3333a3619a387a511ac4dd0c69501af65ea85591f42dd00f7c1027",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 12
     },
     {
       "id": 117,
       "slug": "full-song-khairiyat-bonus-track-chhichhore-sushant-shraddha-pritam-amitabh-b-arijit-singh",
       "category": "Music",
       "sourceSha256": "35288f5ddeccab4de5a124c3a52399ec017988567a90a665d270d79c1c791c27",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 12
     },
     {
       "id": 118,
@@ -1153,16 +1161,18 @@
       "slug": "the-balrog-of-morgoth-the-lord-of-the-rings-the-fellowship-of-the-ring-scene-analysis-why-the-balrog",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "c4b4c72593ddcb2d0b35edbe07b9f8cc78bb7dbc96727801fb03386344251ce0",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 12
     },
     {
       "id": 138,
       "slug": "dandanakka-romeo-juliet-jayam-ravi",
       "category": "Music",
       "sourceSha256": "ebf587d9d3ba6495fcb6897a2137020fcea3ac5045d8409010577420dd6763d6",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 12
     },
     {
       "id": 139,
@@ -3595,9 +3605,657 @@
       "provider": "youtube",
       "sourceSha256": "28aa7065fa3b877d3a8e5eadf080b2848807dab95eec909f511bdefb74bac40b",
       "status": "pending_theme_verification"
+    },
+    {
+      "id": 449,
+      "slug": "crying-face-snack-surprise-watermelon-check-and-clothespin-pranks",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "60b959478db9b48aadea7a6efc5ca46a467955371376642f3aada83fd0943254",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 450,
+      "slug": "kitchen-singing-chair-tumble-face-mask-surprise-and-pink-phone-case",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "bd7f5512bf3f66e6240cf4c66e52114e6faeb8e9cd0bd9010570985e877ba308",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 451,
+      "slug": "kitchen-wok-surprise-furniture-jump-cake-feeding-and-restaurant-pranks",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "83061621d040e4e06389f570f11d2c024f449cc1bdf541ea701c8f28735f785e",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 452,
+      "slug": "dancing-husky-face-filters-tablet-sketch-and-stacked-package-climb",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "c18384898e8de8777695a278fe03af72f640e0a4503c57fb721cdd7012f7abc3",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 453,
+      "slug": "food-tray-surprise-gym-fall-animal-mask-scare-and-sleep-posture-hack",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "796f3a269afec7362d233742be6a92e62fa304c63ac1b61e99586ede2f3ed595",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 454,
+      "slug": "mystery-bowl-children-s-money-meme-gym-spin-and-toy-motorcycle",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "3293d104eb3f222db95c46c1fc84f4e38259e9ff47b8679a9a31c0e59d158976",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 455,
+      "slug": "kitchen-statue-prank-food-stall-chase-noodle-trick-and-flour-sack-surprise",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "4d51e51fd85705603065c63aafcfafe2840d162ee8b137af0741007512ff1462",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 456,
+      "slug": "water-toy-surprise-baby-bottle-watermelon-and-family-reactions",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "fcd2f2863c21c25f980392e4734c37fc86b32acdcf0006cb45fbba058a0d9a8f",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 457,
+      "slug": "barbershop-surprise-kitchen-singing-dancing-and-forehead-startle",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "22853b8ecadc014a0b5d1c32aa3cbc499a488a01843e1708fe7ede9fa5f1d5f6",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 458,
+      "slug": "scooter-pond-fall-football-stool-prank-gym-tire-and-pogo-stick",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "6981711f89fbb6f9b69b587607d988aac5b70f32e14dadb7fb6d584e04ff7992",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 459,
+      "slug": "pool-and-ditch-falls-laundry-dance-shadow-illusion-and-speedcubing",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "d758a1ae09b9a1db7904b8647176ed7fc88c2642432f41269f1d1ff3c2d3b588",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 460,
+      "slug": "kitchen-singing-golden-horse-statues-egg-mistake-and-blue-pants-rooster",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "07eccde3d809342c08e4859b818afe1d30455c12a745995df499a3fa874ff3bb",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 461,
+      "slug": "kitchen-mystery-mud-pit-fall-field-splash-and-banana-peel",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "687c52c9fca18a82d3499b0de7f2eb37389317644a0a9d054b10ef6bd27b7669",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 462,
+      "slug": "metal-gate-speaker-startle-chair-fall-and-broken-eggs",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "220408670f6bc72c85db9b4e0b06778d8c731af05df4ab04c008104161866fa9",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 463,
+      "slug": "bottle-trick-cyclist-fall-high-kicks-and-snowy-car-surprise",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "62597b569b3175ab3fb6d219158be2bd5611e400f9f3035283e6b22d578021e5",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 464,
+      "slug": "citrus-squeeze-surprise-piglet-ballet-lift-and-apple-face-filter",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "d8bba7a6b3e2325c5696fcd841f7b807dbe4161264c1a136d5f6ca678f24338b",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 465,
+      "slug": "seafood-slap-lettuce-chef-balloon-prank-barking-dogs-and-beluga-plane",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "b7d1b1da29e84321edcd5e5c38b495d36a60a420950e32b53189d520f3fe71a7",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 466,
+      "slug": "samsung-vs-iphone-funeral-prank-pasta-meme-and-inflatable-slide",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "035d1034d9ad3eb7ef7789c93bef6b00b15b109d6826f723919a3fd0a86e4c3d",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 467,
+      "slug": "baby-cry-reactions-cheese-meme-soccer-tv-and-skincare-double-prank",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "4f18d5910ed6c025902d6850d9f0b0b58b954f7e5fc803d8ddc00d70a20b5c53",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 468,
+      "slug": "coffee-spill-pool-slide-heart-makeup-and-textbook-brain-transfer-prank",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "9a9170428a115f7c74f0507c0c5621a0b76874c5932e481336a260c1cb2c823d",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 469,
+      "slug": "night-motorcycle-chase-funny-donkey-shoebox-balance-and-fake-arm-illusion",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "8200dd39738909b3916f4406c47b3694fb7bb571c84b4999c5accf62936890db",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 470,
+      "slug": "gym-workout-gags-muscular-dog-meme-and-home-haircut-fail",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "65fa404639bf17b9203769db3cd8d4dd278d9a819f52dc597ee5726059b3591f",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 471,
+      "slug": "monkey-selfie-surprise-blowtorch-bottle-cup-stacking-and-milk-spill",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "d7e0661e2cc833c7bf655b81b79991ee880b18e19a200f7a488a72666ddd9f8d",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 472,
+      "slug": "charger-cable-prank-slippery-floor-fall-dancing-husky-and-gym-clone",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "f408a003ab0ada6cf9d3524d468dc68830f731720aa56ffbdc93a2e064dd18ce",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 473,
+      "slug": "soccer-ball-gags-cgi-wall-smash-and-balloon-startled-cat-reaction",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "11915202207bf681e79b3a9ae921339c3944cb32f1d2fd8b14b81630c76a8a66",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 474,
+      "slug": "film-review-1lfk1lssi_c",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "e2ff83ee959765ce5be76fccf8fcab83f6f4eb1acf12326e345ced1becd0bc0c",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 475,
+      "slug": "film-review-uleqb_l-n08",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "80c9683511c7ab5e1180abf4c3c202e24c2be3f5bd482d1118c1fe01b21f3cf0",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 476,
+      "slug": "film-review-vkuii430d_0",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "4a9d7797d495a388d374cac0399728f8df94f3f1a5ea2d5f64df6f0c6366d02f",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 477,
+      "slug": "film-review-b6h-kqlqqec",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "bd704a720a779771c69eab41a4127d87e1493c740c8319e9af1fd1be30474b40",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 478,
+      "slug": "film-review-5gvmxnd-zb0",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "603337002a01698d0790ab171256acdba09ad9d43305cf93f519c8601f6df0e6",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 479,
+      "slug": "film-review-zzhfvt5vzhi",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "cb08ce8e60585db19684cc4a62b59bd480fb7ff44c03a8a08093f07e90d3f15d",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 480,
+      "slug": "film-review-rfa3ruwflyi",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "7335a2dc3501bc3c0fc534b4d0fca291c7fb63136d1ec78fbef35f9367394315",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 481,
+      "slug": "film-review-lknhvdpky7g",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "3b831ab5b352dc4734289cf57d62b91d443fb4c8ec18cf9cf3a7b438b3073238",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 482,
+      "slug": "film-review-krcpn6rrnx8",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "0f9f8b95341329905f7ecdd2e60dfe74062661918f7c8309b31368b1dcccfa2e",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 483,
+      "slug": "film-review-i3o-uefzfko",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "606945a28494e6b35dfa474a3d4aaf5655a19f19b0190de59df29a94c750ec42",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 484,
+      "slug": "film-review-bgpzy56q1no",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "7c5391ae8b24cf8b3c828495978c4833abd2e705bf2d92989084f4df8b15f5da",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 485,
+      "slug": "film-review-zr52mgyhm_q",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "86d352736c83534a9787c5042c5e9b0afd18484cee2f476262614bc770c5cf97",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 486,
+      "slug": "film-review-ta7hozfrkjq",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "c7c8246f9b0687fce132dd135068eca3e87c376da20e4fd00db09ccff241d24e",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 487,
+      "slug": "film-review-k04erjfqo-c",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "c1f5ef30d92b2448c246ba9b0c07be2b4cc82b3bd4967e8c5c436ae6a63258db",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 488,
+      "slug": "film-review-dss4nps3hag",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "3b1940cd44e200b9c3e10c57b164fbe25b3851c8ba3c29419f73910e7c68b0ab",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 489,
+      "slug": "film-review-vs7aqxyrddm",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "097a522530a53d80b2d956578679b4c801846b7a9160432e1c4ee6ebf149410f",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 490,
+      "slug": "film-review-9ohsfiqej9o",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "667718ca44a7eb67f19103e432549cc639698d57495356feb778c1c3c598fdc9",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 491,
+      "slug": "film-review-agwszfum_yq",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "2294c3c1b14cb4a29da25e6e59c2dcf7bfd81bdcd72827b8f6753f0eca492623",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 492,
+      "slug": "film-review-lxxkiukdk4w",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "ad2070e03e7e9e890a0c7bd6266611b3ced8ea0c6e7789c50138e3ca8a6acabc",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 493,
+      "slug": "film-review--biymxomyyo",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "8ffc6347c4dc7faeb9ec89e0f0dd06f2d6b1dbc380953df0e1df026d96925796",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 494,
+      "slug": "film-review-e3lm0btgzfi",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "350549631a175a164e49ecf790cd81926fa0f7d5c6a35f6e717c6694facb449b",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 495,
+      "slug": "film-review-uogcxfudiqo",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "c0f3140b55a4388688b2594ff5a51d142f7cc89902f7dda2e6c85df6479678b5",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 496,
+      "slug": "film-review-lg2i2oqnoy0",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "cde12aa3657d314b5f49e8aa06109193f15830a9de2e3977a1d6f3e6c7278c0d",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 497,
+      "slug": "film-review-ieeche5mv-y",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "0f054155c95e30932206feb87faa05a76bec9a725431dc0cdf406a445bc6f0c1",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 498,
+      "slug": "film-review-1a23tlgqdmw",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "82ec302de2e18e047fb63ba0a758dc6ef2776fec874a171146cb823d4d734e82",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 499,
+      "slug": "film-review-hbev2n65qd8",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "bbdb771e6a3244c259fd3acdc2ca5ee0161ed016933d188b9031c29326cbc47f",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 500,
+      "slug": "film-review-redva3_ork0",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "4c3e26a6bbda15c64ea236d5d770a8980269e78b074d7d9a352d9e782733f180",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 501,
+      "slug": "film-review-mhfdg9rsdlg",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "ab390ee15ce7283811f5a2931f7821854f2cefd24731947fac043960cd76fbcf",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 502,
+      "slug": "film-review-vcolk9qybfw",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "392e722033c3a6777473f7914af5b96b64a3c8836bd3e252998f6112f1d46dde",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 503,
+      "slug": "film-review-otec_zqedpg",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "7bb5be2f7bcaabbf485606e96b873f019eadbd795b593d1b71b1dfbaf472616e",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 504,
+      "slug": "film-review-snpy-c-vxyy",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "b64ed51aa557a31351f2000ecb04322c7d5f56a3826d7206af31ef4f4ce9d726",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 505,
+      "slug": "film-review-1aipeqgurls",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "a16b41e87339d9a071b22d82cd38ce73a6ed39067f07961ccd3c00cc271547df",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 506,
+      "slug": "film-review-js4hjnv4zu4",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "809aeeebbb84e5ec9828df8cedcb7cc1f2e6066061550dd85b7056c1a34d4e27",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 507,
+      "slug": "film-review-v9qpkyed3f4",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "7f1edafde00d4825041403eb0d1efd74f181a79fe03c7275af163f67082be220",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 508,
+      "slug": "film-review-j8w7dzngshg",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "79c884b7cff4a36cc18b92c5aab222f8a2cfb97869b8b275866cbe4690a1ffbc",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 509,
+      "slug": "film-review-ehkke8hsy1i",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "d76eb4b76c9b234168ffa5961afdc8cc96ab034817bf061022717181e9b825a8",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 510,
+      "slug": "son-of-satyamurthy-hindi-film-review",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "85000dd74c7ea0d2ca87c7443b63fa2a38bcb09c4d9bf4480f71c09df5d628a1",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 511,
+      "slug": "jurassic-attack-2013-english-film-review",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "132c9e5b3d5b6f311fd81cd2a7be7d91852c599a96317cd502d9e08a5cd386a8",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 512,
+      "slug": "phir-hera-pheri-2006-film-review",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "9691857fd3409d0853b1f3f8927525f864fcf9fac861e78d65c5847db07154a2",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 513,
+      "slug": "hera-pheri-1976-film-review",
+      "category": "Entertainment, Movies & Games",
+      "provider": "youtube",
+      "sourceSha256": "d1fc6bf1f70261eb48ccd36b98c4a142199bc22d6ac24040b523fc8e71a90ed6",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 514,
+      "slug": "skincare-scare-cat-chaos-bowl-prank-funny-short",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "976ae07c1c75276de9afbd931ccc1e268057ed9b2dcc9a82847f36ee1e81f720",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 515,
+      "slug": "bedroom-foot-tap-watermelon-gag-and-cream-toss",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "47a37d17c2f158fbfb68d9edd20707515460f2b67c5b08a95405659978372c42",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 516,
+      "slug": "fake-iphone-sponge-haircut-mix-up-and-kitchen-pranks",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "ebd2a8cf847c4ab3d5b2c77eb127bfa19d04f7fb457d46832606ee13b06c477e",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 517,
+      "slug": "haircut-tea-biscuits-and-horror-movie-popcorn-chaos",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "64cc45043aade95a3ec8f22ceefc4775a0f55a1d9956065fb1558e73ece9e2f4",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 518,
+      "slug": "gate-kick-cereal-splash-dog-sprint-and-toddler-reactions",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "28750d2c4fe715e0972abf9da939502918c0589cfb84d45beed9e4045d991d8b",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 519,
+      "slug": "egg-splash-flour-balloon-trash-bag-and-sofa-pranks",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "7e72d0445bb1b870e2674c06fca2c5c355992e5a62e042adb79f2b6c5526795a",
+      "published": 1,
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 520,
+      "slug": "park-cup-bed-challenge-cherry-prank-and-doorway-cream-smash",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "f16bdf807c245c8124499905b53c4edc0110ac782b6e1030de4545ac42d36be1",
+      "published": 1,
+      "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Reconcile72 unqueued current published identities; preserveID308owner-change hold and PR254six-draft/media holds. Select up to10new missing dual-image eligible reviews with verified theme/source evidence and original intact publisher image. Future new anime artwork must include bottom-right vid.best watermark in the image itself. Do not regenerate batch11.",
+  "nextTask": "Finish existing PR260/batch12. Ten real unique artworks and ten unchanged first-party source previews are prepared; do not regenerate or start batch13. Run existing tests and Worker dry-run; require current-head CI; fresh identity/preservation preflight; merge/deploy and verify all10artworks plus10source copies and exact watch/split image-sitemap associations. Only then record publication and move to next up-to10eligible missing dual-image pages.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -8516,212 +9174,79 @@
     "postReleasePreservation": "docs/review-images/batch11-post-release-preservation-20261022.json"
   },
   "lastImageProductionBatch": {
-    "state": "published_verified",
+    "state": "prepared_pending_ci",
     "recordIds": [
-      135,
-      131,
-      132,
-      119,
-      130,
-      134,
-      36,
-      98,
-      115,
-      86
+      65,
+      67,
+      87,
+      99,
+      102,
+      103,
+      116,
+      117,
+      137,
+      138
     ],
-    "branch": "seo/review-illustrations-batch11-20261021",
-    "pr": 255,
-    "base": "4d689eecb2a6de52844a0fcc58b7045c0c17ec3a",
+    "branch": "seo/review-illustrations-batch12-20261022",
+    "base": "ad762444d202947a87b34966e29a57695e957607",
     "newGenerated": 10,
-    "newPublished": 10,
-    "liveVerified": 10,
-    "baseline": {
-      "checkedAt": "2026-10-21T17:41:22.163Z",
-      "saved": 501,
-      "published": 501,
-      "nonCounterSha256": "1555f0985be9a3cf2e06ee4b60207078d7d9bc4fc618a8e9d836f5aeda7518f5"
+    "newPublished": 0,
+    "liveVerified": 0,
+    "sourceCapturePlan": "docs/review-images/batch12-source-capture-plan-20261022.json",
+    "baseline": "docs/review-images/batch12-preservation-baseline-20261022.json",
+    "pr": 260,
+    "newSourceCopiesPrepared": 10,
+    "sourceCopies": "docs/review-images/batch12-source-copies-20261022.json",
+    "assetChecks": "docs/review-images/batch12-asset-checks-20261022.json",
+    "briefs": "docs/review-images/batch12-artwork-briefs-20261022.json",
+    "expectedPublishDates": {
+      "65": "2026-09-30T17:29:14.072Z",
+      "67": "2026-09-30T18:20:08.598Z",
+      "87": "2026-10-03T18:29:25.584Z",
+      "99": "2026-10-05T18:26:41.611Z",
+      "102": "2026-10-05T18:29:41.988Z",
+      "103": "2026-10-05T18:30:16.560Z",
+      "116": "2026-10-09T18:22:29.237Z",
+      "117": "2026-10-09T18:25:22.067Z",
+      "137": "2026-10-11T13:51:57.342Z",
+      "138": "2026-10-11T18:31:18.266Z"
     },
-    "sourceVerification": "docs/review-images/batch11-source-verification-20261021.json",
-    "briefs": "docs/review-images/batch11-artwork-briefs-20261021.json",
-    "assetChecks": "docs/review-images/batch11-asset-checks-20261021.json",
-    "blocker": "",
-    "releaseGates": [
-      "Full regression tests",
-      "Worker dry-run",
-      "Required exact-head CI",
-      "Fresh D1 target identity/preservation check from fresh read-only inventory",
-      "Merge/deployment",
-      "All10live asset/HTML/split-sitemap associations"
+    "sourceMetadataUnavailableIds": [
+      65,
+      67,
+      87,
+      99,
+      102,
+      103,
+      116,
+      117,
+      137,
+      138
     ],
+    "sourceMetadataCheckedAt": "2026-10-22T05:50:17.463Z",
+    "sourceMetadataLimit": "Fresh indexed query returned no source upload-date metadata for these ten. Preserve current omission of VideoObject; never invent a source date.",
     "validation": {
+      "sourceCaptureCI": 39729309682,
+      "nodeTestsDuringCapture": 468,
+      "pythonTestsDuringCapture": 4,
+      "sourceCaptureDryRun": true,
+      "assetBytesHashesDimensions": "10new artworks and10unchanged source copies checked",
+      "exactHeadCI": "pending prepared-asset commit",
       "nodeTests": 468,
       "workerDryRun": true,
-      "assetHashesAndPreservation": true,
-      "exactHeadCI": "passed39723584902 atc6ef7ebb0e75e6ce1a974066f1c97ddeca202215",
-      "pythonSuite": "4passed",
-      "pythonTests": 4,
-      "liveHTTPHashHTMLMaps": "10artworks+10source copies passed"
+      "prior110ArtworksAndProvenance": "unchanged",
+      "existingOwnerHolds": "preserved",
+      "sourceFirstHTMLAndMaps": "local regression pass"
     },
-    "reconciledMain": "fe12eaa1049b948ee049f60d3ef2f61be079c2aa",
-    "upstreamReconciliation": "docs/review-images/batch11-upstream-reconciliation-20261022.json",
-    "newSourceCopiesPrepared": 10,
-    "sourceCopies": "docs/review-images/batch11-source-copies-20261022.json",
-    "ownerImagePreference": "docs/review-images/source-pairs-and-branding-20261022.md",
-    "expectedPublishDates": {
-      "135": "2026-10-11T13:29:15.091Z",
-      "131": "2026-10-10T18:22:02.889Z",
-      "132": "2026-10-10T18:27:22.255Z",
-      "119": "2026-10-09T18:28:10.831Z",
-      "130": "2026-10-10T18:14:20.768Z",
-      "134": "2026-10-10T18:29:21.086Z",
-      "36": "2026-09-25T20:35:28.639Z",
-      "98": "2026-10-05T18:26:15.919Z",
-      "115": "2026-10-08T18:54:19.596Z",
-      "86": "2026-10-03T16:54:10.360Z"
-    },
-    "sourcePairingCheckpoint": "docs/review-images/batch11-source-pairing-checkpoint-20261022.json",
-    "editorialUpstreamReconciliation": "docs/review-images/batch11-editorial-upstream-reconciliation-20261022.json",
-    "resolvedQuotaBlocker": {
-      "resolvedAt": "2026-10-22T00:31:21.647Z",
-      "previous": "Cloudflare D1 HTTP400/code7500 free-tier daily row-read quota reached during queue reconciliation. No further D1 queries until the stated midnightUTC reset. Final pre-release identity/preservation and live watch checks remain required. This is transient; do not disable the existing task or regenerate this batch."
-    },
+    "watermark": "vid.best embedded in each new artwork image file, no HTMLoverlay",
+    "holds": "All existing owner/draft/Saiyaara/Summer/source30/removal/raw holds remain, including308andPR254six drafts.",
+    "releasePreflight": "docs/review-images/batch12-release-preflight-20261022.json",
     "preReleasePreservation": {
-      "checkedAt": "2026-10-22T04:37:22.541Z",
+      "checkedAt": "2026-10-22T05:52:09.922Z",
       "saved": 507,
       "published": 507,
-      "nonCounterSha256": "71e5c2bb3c3c4e858c59e690b9c5f00752e01e5ade12426671d03224fb978c82",
-      "fields": [
-        "cache_attempts",
-        "cache_error",
-        "cache_next_attempt_at",
-        "cache_source_url",
-        "cache_status",
-        "cached_at",
-        "created_at",
-        "description",
-        "embed_url",
-        "featured",
-        "id",
-        "media_type",
-        "primary_category",
-        "published",
-        "r2_key",
-        "redistribution_certified",
-        "redistribution_certified_at",
-        "review_text",
-        "seo_description",
-        "seo_tags",
-        "seo_title",
-        "slug",
-        "source_page_url",
-        "source_url",
-        "subcategory",
-        "thumbnail_url",
-        "title",
-        "trending",
-        "updated_at"
-      ],
-      "evidence": "docs/review-images/batch11-release-preflight-20261022.json"
-    },
-    "releasePreflight": "docs/review-images/batch11-release-preflight-20261022.json",
-    "sourceMetadataUnavailableIds": [
-      135,
-      131,
-      132,
-      119,
-      130,
-      134,
-      36,
-      98,
-      115,
-      86
-    ],
-    "newSourceCopiesPublished": 10,
-    "release": {
-      "batch": 11,
-      "completedAt": "2026-10-22T04:41:53.570Z",
-      "recordIds": [
-        135,
-        131,
-        132,
-        119,
-        130,
-        134,
-        36,
-        98,
-        115,
-        86
-      ],
-      "pullRequest": 255,
-      "head": "c6ef7ebb0e75e6ce1a974066f1c97ddeca202215",
-      "commit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4",
-      "ci": {
-        "run": 39723584902,
-        "job": 119642363655,
-        "nodeTests": 468,
-        "pythonTests": 4,
-        "workerDryRun": true
-      },
-      "deployment": {
-        "run": 39723707668,
-        "job": 119642741445,
-        "worker": "vid-review-site",
-        "deploymentId": "f9250c10-1ced-4076-b327-2c3e78965c90",
-        "version": "f026257a-4978-437c-9c57-75195b63fd3d",
-        "percentage": 100,
-        "createdAt": "2026-10-22T04:41:10.881556Z",
-        "codeOnly": true,
-        "databaseMigrationSteps": "skipped"
-      },
-      "artifact": {
-        "id": 12401849520,
-        "name": "review-illustration-live-verification",
-        "size_in_bytes": 2668,
-        "url": "https://api.github.com/repos/Gamagek/vid-review-site/actions/artifacts/12401849520",
-        "archive_download_url": "https://api.github.com/repos/Gamagek/vid-review-site/actions/artifacts/12401849520/zip",
-        "expired": false,
-        "created_at": "2026-10-22T04:41:36Z",
-        "expires_at": "2026-11-05T04:41:36Z",
-        "updated_at": "2026-10-22T04:41:36Z",
-        "digest": "sha256:47dd9b05ecf564ce78bcf7f2a837794753089c91def4ce46e407f03eab6fd086",
-        "workflow_run": {
-          "id": 39723707668,
-          "repository_id": 1324282150,
-          "head_repository_id": 1324282150,
-          "head_branch": "main",
-          "head_sha": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
-        }
-      },
-      "counts": {
-        "generatedThisRun": 0,
-        "previouslyGeneratedCommitted": 10,
-        "newSourceCopiesThisRun": 0,
-        "sourceCopiesPreviouslyCommitted": 10,
-        "newArtworkMerged": 10,
-        "newArtworkDeployed": 10,
-        "newArtworkPublished": 10,
-        "newArtworkLiveVerified": 10,
-        "sourceCopiesPublishedAndVerified": 10,
-        "manifestTotal": 110,
-        "activeIdentityMatchedArtworks": 109,
-        "preexistingIdentityHeldArtworks": 1,
-        "currentSaved": 507,
-        "currentPublished": 507
-      },
-      "liveEvidence": "docs/review-images/batch11-live-verification-20261022.json",
-      "preservationEvidence": "docs/review-images/batch11-post-release-preservation-20261022.json",
-      "limitations": [
-        "These ten prepared artworks use a page watermark overlay, not baked-in file lettering; future new generation must embed vid.best.",
-        "No source upload dates are available for the ten; the existing sanitizer intentionally omits VideoObject and no dates are invented.",
-        "109of110 manifest entries match current published identity; preexistingID308 is disabled after an independent owner title edit.",
-        "The435-entry queue needs72 additional published identities reconciled. No next batch has been generated/reserved.",
-        "No Google indexed-count evidence, guaranteed indexing, AdSense approval, source video/audio inspection or provider playback claim."
-      ],
-      "nextTask": "Reconcile72 unqueued current published identities; preserveID308owner-change hold and PR254six-draft/media holds. Select up to10new missing dual-image eligible reviews with verified theme/source evidence and original intact publisher image. Future new anime artwork must include bottom-right vid.best watermark in the image itself. Do not regenerate batch11."
-    },
-    "liveVerification": "docs/review-images/batch11-live-verification-20261022.json",
-    "liveVerificationAt": "2026-10-22T04:41:13.296Z",
-    "postReleasePreservation": "docs/review-images/batch11-post-release-preservation-20261022.json"
+      "nonCounterSha256": "71e5c2bb3c3c4e858c59e690b9c5f00752e01e5ade12426671d03224fb978c82"
+    }
   },
   "ownerReconciliation20261021": {
     "authoritativeInventoryAt": "2026-10-21T17:41:22.163Z",
@@ -8840,10 +9365,85 @@
     "meaning": "Identity match count, not110live HTTP checks; this release independently live-verified its10newartworks and10source copies."
   },
   "queueReconciliationPending": {
-    "inventoryAt": "2026-10-22T04:41:53.570Z",
+    "inventoryAt": "2026-10-22T05:36:36.549Z",
     "published": 507,
-    "queuedIdentities": 435,
-    "missingIdentities": 72,
-    "nextAction": "Fresh bounded reconciliation before next batch; no partial truncated identities committed."
+    "queuedIdentities": 507,
+    "missingIdentities": 0,
+    "completedEvidence": "docs/review-images/batch12-queue-reconciliation-20261022.json"
+  },
+  "batch12": {
+    "state": "prepared_pending_ci",
+    "recordIds": [
+      65,
+      67,
+      87,
+      99,
+      102,
+      103,
+      116,
+      117,
+      137,
+      138
+    ],
+    "branch": "seo/review-illustrations-batch12-20261022",
+    "base": "ad762444d202947a87b34966e29a57695e957607",
+    "newGenerated": 10,
+    "newPublished": 0,
+    "liveVerified": 0,
+    "sourceCapturePlan": "docs/review-images/batch12-source-capture-plan-20261022.json",
+    "baseline": "docs/review-images/batch12-preservation-baseline-20261022.json",
+    "pr": 260,
+    "newSourceCopiesPrepared": 10,
+    "sourceCopies": "docs/review-images/batch12-source-copies-20261022.json",
+    "assetChecks": "docs/review-images/batch12-asset-checks-20261022.json",
+    "briefs": "docs/review-images/batch12-artwork-briefs-20261022.json",
+    "expectedPublishDates": {
+      "65": "2026-09-30T17:29:14.072Z",
+      "67": "2026-09-30T18:20:08.598Z",
+      "87": "2026-10-03T18:29:25.584Z",
+      "99": "2026-10-05T18:26:41.611Z",
+      "102": "2026-10-05T18:29:41.988Z",
+      "103": "2026-10-05T18:30:16.560Z",
+      "116": "2026-10-09T18:22:29.237Z",
+      "117": "2026-10-09T18:25:22.067Z",
+      "137": "2026-10-11T13:51:57.342Z",
+      "138": "2026-10-11T18:31:18.266Z"
+    },
+    "sourceMetadataUnavailableIds": [
+      65,
+      67,
+      87,
+      99,
+      102,
+      103,
+      116,
+      117,
+      137,
+      138
+    ],
+    "sourceMetadataCheckedAt": "2026-10-22T05:50:17.463Z",
+    "sourceMetadataLimit": "Fresh indexed query returned no source upload-date metadata for these ten. Preserve current omission of VideoObject; never invent a source date.",
+    "validation": {
+      "sourceCaptureCI": 39729309682,
+      "nodeTestsDuringCapture": 468,
+      "pythonTestsDuringCapture": 4,
+      "sourceCaptureDryRun": true,
+      "assetBytesHashesDimensions": "10new artworks and10unchanged source copies checked",
+      "exactHeadCI": "pending prepared-asset commit",
+      "nodeTests": 468,
+      "workerDryRun": true,
+      "prior110ArtworksAndProvenance": "unchanged",
+      "existingOwnerHolds": "preserved",
+      "sourceFirstHTMLAndMaps": "local regression pass"
+    },
+    "watermark": "vid.best embedded in each new artwork image file, no HTMLoverlay",
+    "holds": "All existing owner/draft/Saiyaara/Summer/source30/removal/raw holds remain, including308andPR254six drafts.",
+    "releasePreflight": "docs/review-images/batch12-release-preflight-20261022.json",
+    "preReleasePreservation": {
+      "checkedAt": "2026-10-22T05:52:09.922Z",
+      "saved": 507,
+      "published": 507,
+      "nonCounterSha256": "71e5c2bb3c3c4e858c59e690b9c5f00752e01e5ade12426671d03224fb978c82"
+    }
   }
 }
