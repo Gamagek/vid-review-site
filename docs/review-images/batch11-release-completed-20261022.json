@@ -1,0 +1,82 @@
+{
+  "batch": 11,
+  "completedAt": "2026-10-22T04:41:53.570Z",
+  "recordIds": [
+    135,
+    131,
+    132,
+    119,
+    130,
+    134,
+    36,
+    98,
+    115,
+    86
+  ],
+  "pullRequest": 255,
+  "head": "c6ef7ebb0e75e6ce1a974066f1c97ddeca202215",
+  "commit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4",
+  "ci": {
+    "run": 39723584902,
+    "job": 119642363655,
+    "nodeTests": 468,
+    "pythonTests": 4,
+    "workerDryRun": true
+  },
+  "deployment": {
+    "run": 39723707668,
+    "job": 119642741445,
+    "worker": "vid-review-site",
+    "deploymentId": "f9250c10-1ced-4076-b327-2c3e78965c90",
+    "version": "f026257a-4978-437c-9c57-75195b63fd3d",
+    "percentage": 100,
+    "createdAt": "2026-10-22T04:41:10.881556Z",
+    "codeOnly": true,
+    "databaseMigrationSteps": "skipped"
+  },
+  "artifact": {
+    "id": 12401849520,
+    "name": "review-illustration-live-verification",
+    "size_in_bytes": 2668,
+    "url": "https://api.github.com/repos/Gamagek/vid-review-site/actions/artifacts/12401849520",
+    "archive_download_url": "https://api.github.com/repos/Gamagek/vid-review-site/actions/artifacts/12401849520/zip",
+    "expired": false,
+    "created_at": "2026-10-22T04:41:36Z",
+    "expires_at": "2026-11-05T04:41:36Z",
+    "updated_at": "2026-10-22T04:41:36Z",
+    "digest": "sha256:47dd9b05ecf564ce78bcf7f2a837794753089c91def4ce46e407f03eab6fd086",
+    "workflow_run": {
+      "id": 39723707668,
+      "repository_id": 1324282150,
+      "head_repository_id": 1324282150,
+      "head_branch": "main",
+      "head_sha": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
+    }
+  },
+  "counts": {
+    "generatedThisRun": 0,
+    "previouslyGeneratedCommitted": 10,
+    "newSourceCopiesThisRun": 0,
+    "sourceCopiesPreviouslyCommitted": 10,
+    "newArtworkMerged": 10,
+    "newArtworkDeployed": 10,
+    "newArtworkPublished": 10,
+    "newArtworkLiveVerified": 10,
+    "sourceCopiesPublishedAndVerified": 10,
+    "manifestTotal": 110,
+    "activeIdentityMatchedArtworks": 109,
+    "preexistingIdentityHeldArtworks": 1,
+    "currentSaved": 507,
+    "currentPublished": 507
+  },
+  "liveEvidence": "docs/review-images/batch11-live-verification-20261022.json",
+  "preservationEvidence": "docs/review-images/batch11-post-release-preservation-20261022.json",
+  "limitations": [
+    "These ten prepared artworks use a page watermark overlay, not baked-in file lettering; future new generation must embed vid.best.",
+    "No source upload dates are available for the ten; the existing sanitizer intentionally omits VideoObject and no dates are invented.",
+    "109of110 manifest entries match current published identity; preexistingID308 is disabled after an independent owner title edit.",
+    "The435-entry queue needs72 additional published identities reconciled. No next batch has been generated/reserved.",
+    "No Google indexed-count evidence, guaranteed indexing, AdSense approval, source video/audio inspection or provider playback claim."
+  ],
+  "nextTask": "Reconcile72 unqueued current published identities; preserveID308owner-change hold and PR254six-draft/media holds. Select up to10new missing dual-image eligible reviews with verified theme/source evidence and original intact publisher image. Future new anime artwork must include bottom-right vid.best watermark in the image itself. Do not regenerate batch11."
+}
