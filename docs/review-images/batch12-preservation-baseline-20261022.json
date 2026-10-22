@@ -1,0 +1,127 @@
+{
+  "success": true,
+  "checkedAt": "2026-10-22T05:36:36.549Z",
+  "saved": 507,
+  "published": 507,
+  "providers": {
+    "youtube": 431,
+    "raw": 2,
+    "tiktok": 54,
+    "facebook": 20
+  },
+  "fields": [
+    "cache_attempts",
+    "cache_error",
+    "cache_next_attempt_at",
+    "cache_source_url",
+    "cache_status",
+    "cached_at",
+    "created_at",
+    "description",
+    "embed_url",
+    "featured",
+    "id",
+    "media_type",
+    "primary_category",
+    "published",
+    "r2_key",
+    "redistribution_certified",
+    "redistribution_certified_at",
+    "review_text",
+    "seo_description",
+    "seo_tags",
+    "seo_title",
+    "slug",
+    "source_page_url",
+    "source_url",
+    "subcategory",
+    "thumbnail_url",
+    "title",
+    "trending",
+    "updated_at"
+  ],
+  "nonCounterSha256": "71e5c2bb3c3c4e858c59e690b9c5f00752e01e5ade12426671d03224fb978c82",
+  "buckets": [
+    {
+      "first": 1,
+      "last": 53,
+      "rows": 50,
+      "sha256": "13fb6718c24966dd5f3148217a42798f186b8847732d64886b16ab0069ca3ae5"
+    },
+    {
+      "first": 54,
+      "last": 103,
+      "rows": 50,
+      "sha256": "238b66123487e0aa341186a9cde0d94a99f03c17403c9cc7d34e6c7921761515"
+    },
+    {
+      "first": 104,
+      "last": 159,
+      "rows": 50,
+      "sha256": "cccefb1e6be078ff0e543f320bc8f1117c17f03ca3b0a0303a0aefb2323212a0"
+    },
+    {
+      "first": 160,
+      "last": 213,
+      "rows": 50,
+      "sha256": "b57e2c4ca652c333d2df5cb30d474c942011c51a4adf180429235b68479cb682"
+    },
+    {
+      "first": 214,
+      "last": 263,
+      "rows": 50,
+      "sha256": "7925282bcf82f3a8dc789fe8b7584676a948e18c7e32e08c794d816f9dc7c76d"
+    },
+    {
+      "first": 264,
+      "last": 313,
+      "rows": 50,
+      "sha256": "b50ad771a147c58314b51539c0834d0ba3bf81dc22fc36642120387ec3c528dc"
+    },
+    {
+      "first": 314,
+      "last": 363,
+      "rows": 50,
+      "sha256": "cdc32130374900d6872e80279bfd3c5cd507a8bd6fb7bcc975c37392b7fa967c"
+    },
+    {
+      "first": 364,
+      "last": 413,
+      "rows": 50,
+      "sha256": "9cbef7cb6f473cd2cce2b042eb39f94dfa46ff9a94dabb5bdfbb5e14c7cc0148"
+    },
+    {
+      "first": 414,
+      "last": 463,
+      "rows": 50,
+      "sha256": "0e19916cbf7201a903bde63eb897ff9de1e81596174ea88e7e72e23195532c06"
+    },
+    {
+      "first": 464,
+      "last": 513,
+      "rows": 50,
+      "sha256": "1ce8c5601fc5e3485ec4ea3b49ce6db6ef87b51f1caa15b90b82e4deea7626ac"
+    },
+    {
+      "first": 514,
+      "last": 520,
+      "rows": 7,
+      "sha256": "0a93f1de1b30ee8e7878e496b826514192f236a2da715e910c972334088d65ea"
+    }
+  ],
+  "rowsRead": 507,
+  "rowsWritten": 0,
+  "targetIdentityIds": [
+    65,
+    67,
+    87,
+    99,
+    102,
+    103,
+    116,
+    117,
+    137,
+    138
+  ],
+  "newQueueIdentities": 72
+}

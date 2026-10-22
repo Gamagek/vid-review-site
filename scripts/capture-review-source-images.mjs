@@ -4,9 +4,17 @@ import crypto from 'node:crypto';
 
 // Owner-authorized, unchanged publisher previews for the already reserved batch.
 // No video requests, D1 writes, thumbnail replacements, proxy route or retries.
-const manifest = JSON.parse(fs.readFileSync(new URL('../src/review-illustrations.json', import.meta.url)));
+const planArg = process.argv.find(value => value.startsWith('--plan='));
+const planPath = planArg?.slice(7);
+if (planPath) assert.match(planPath, /^docs\/review-images\/batch\d+-source-capture-plan-\d{8}\.json$/);
+const plan = planPath ? JSON.parse(fs.readFileSync(new URL('../' + planPath, import.meta.url))) : null;
+if (plan) {
+  assert.equal(plan.kind, 'review-source-capture-plan');
+  assert.ok(plan.images.every(item => item.published === 1 && item.slug && item.expectedTitle));
+}
+const manifest = plan?.images || JSON.parse(fs.readFileSync(new URL('../src/review-illustrations.json', import.meta.url)));
 const queue = JSON.parse(fs.readFileSync(new URL('../docs/review-image-queue.json', import.meta.url)));
-const ids = queue.lastImageProductionBatch?.recordIds;
+const ids = plan?.recordIds || queue.lastImageProductionBatch?.recordIds;
 assert.ok(ids?.length > 0 && ids.length <= 10 && new Set(ids).size === ids.length);
 const output = new URL('../public/review-source-images/', import.meta.url);
 fs.mkdirSync(output, {recursive: true});
