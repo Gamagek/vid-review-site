@@ -31,9 +31,6 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Capture the reserved batch12 publisher previews once
-        if: github.event_name == 'pull_request' && github.head_ref == 'seo/review-illustrations-batch12-20261022' && hashFiles('docs/review-images/batch12-source-copies-20261022.json') == ''
-        run: node scripts/capture-review-source-images.mjs --plan=docs/review-images/batch12-source-capture-plan-20261022.json --emit-transfer
       - name: Validate production Docker Compose without starting services
         run: docker compose -f ops/portainer/vidbest-v56.yaml config --quiet
         env:

@@ -703,7 +703,8 @@ test('unchanged first-party source copies pair with artwork in HTML and every ma
     const sidebar=html.match(/<aside class="watch-review-images"[\s\S]*?<\/aside>/)?.[0];
     assert.ok(sidebar.indexOf('src="'+original+'"') < sidebar.indexOf('src="'+artwork+'"'));
     assert.equal((sidebar.match(/<img /g)||[]).length,2);
-    assert.equal((sidebar.match(/watch-review-watermark/g)||[]).length,1,'Brand artwork only');
+    assert.equal((sidebar.match(/watch-review-watermark/g)||[]).length,art.displayWatermark==='vid.best'?1:0,
+      'Legacy artwork uses one overlay; embedded watermark files need no duplicate overlay');
     const sourceFigure=sidebar.match(/<figure[^>]*data-review-image="source"[\s\S]*?<\/figure>/)?.[0];
     assert.doesNotMatch(sourceFigure,/watch-review-watermark/);
     const graph=JSON.parse(html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)[1])['@graph'];

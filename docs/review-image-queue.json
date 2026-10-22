@@ -3,7 +3,7 @@
   "inventoryAt": "2026-10-22T05:36:36.549Z",
   "publishedLibraryCount": 507,
   "batchLimit": 10,
-  "phase": "batch12_source_verification",
+  "phase": "batch12_prepared_pending_ci",
   "policy": "Preserve all source/owner posters and all D1 fields. Match current published ID, slug, source and title before enabling art. Do not edit protected review topics/media or drafts. Reconcile newly published records on each run; no regeneration merely for freshness. The owner’s 18 October request authorizes separate sidebar artwork identified by truthful conceptual-not-source-frame captions for all published platforms/topics, including comedy, but never edits existing protected review text, SEO titles, source posters or players. Source-removal/demo/Saiyaara/Summer holds remain. The19October owner steering additionally authorizes identity-matched generated art in OpenGraph/Twitter/WebPage metadata and guarded fallback for genuinely broken listing previews; preserve working source posters/VideoObject evidence and all D1/R2 media fields.",
   "baseline": {
     "saved": 214,
@@ -538,7 +538,7 @@
       "slug": "knight-rider-theme-2020-cover-remake-by-enzo-margaglio",
       "category": "Music",
       "sourceSha256": "e32aa8fe4270da6189a23bd1d96acc14181e0d4fa393547ccd5e38a6174d0ccf",
-      "status": "reserved_source_verification",
+      "status": "prepared",
       "provider": "youtube",
       "batch": 12
     },
@@ -556,7 +556,7 @@
       "slug": "j-geco-chicken-song-the-ultimate-techno-dance-anthem",
       "category": "Funny & Comedy",
       "sourceSha256": "9d87792386aa5166a50afc9cac5ba0bdeffc018b33875cbf6bdd56aa47cbc1a3",
-      "status": "reserved_source_verification",
+      "status": "prepared",
       "provider": "youtube",
       "batch": 12
     },
@@ -722,7 +722,7 @@
       "slug": "shakira-waka-waka-the-ultimate-anthem-of-resilience-unity",
       "category": "Music",
       "sourceSha256": "c636d914c2b5c5d82e7857ea3c1a83289d1b21f3570789aabc42d35d2ec103ca",
-      "status": "reserved_source_verification",
+      "status": "prepared",
       "provider": "youtube",
       "batch": 12
     },
@@ -823,7 +823,7 @@
       "slug": "maari-2-rowdy-baby-video-song-dhanush-sai-pallavi-yuvan-shankar-raja-balaji-mohan",
       "category": "Music",
       "sourceSha256": "dd850dbeed62ba61b6c76a651eae02dc57f2ea5e6132993e550b15632902302f",
-      "status": "reserved_source_verification",
+      "status": "prepared",
       "provider": "youtube",
       "batch": 12
     },
@@ -848,7 +848,7 @@
       "slug": "arash-feat-helena-one-day-official-video",
       "category": "Music",
       "sourceSha256": "07a176def8f02f408b351d2ef68e3a9fb5bc884d7aee2c728787d46846f233ba",
-      "status": "reserved_source_verification",
+      "status": "prepared",
       "provider": "youtube",
       "batch": 12
     },
@@ -857,7 +857,7 @@
       "slug": "psy-gangnam-style-m-v",
       "category": "Music",
       "sourceSha256": "2a4035f2c05098db17be1b72aa0a9ece5179304b50ccc9a8c897294a0aa62369",
-      "status": "reserved_source_verification",
+      "status": "prepared",
       "provider": "youtube",
       "batch": 12
     },
@@ -969,7 +969,7 @@
       "slug": "kala-chashma-baar-baar-dekho-sidharth-m-katrina-kaif-badshah-neha-kakkar-prem-hardeep",
       "category": "Music",
       "sourceSha256": "c9e2f32e9e3333a3619a387a511ac4dd0c69501af65ea85591f42dd00f7c1027",
-      "status": "reserved_source_verification",
+      "status": "prepared",
       "provider": "youtube",
       "batch": 12
     },
@@ -978,7 +978,7 @@
       "slug": "full-song-khairiyat-bonus-track-chhichhore-sushant-shraddha-pritam-amitabh-b-arijit-singh",
       "category": "Music",
       "sourceSha256": "35288f5ddeccab4de5a124c3a52399ec017988567a90a665d270d79c1c791c27",
-      "status": "reserved_source_verification",
+      "status": "prepared",
       "provider": "youtube",
       "batch": 12
     },
@@ -1161,7 +1161,7 @@
       "slug": "the-balrog-of-morgoth-the-lord-of-the-rings-the-fellowship-of-the-ring-scene-analysis-why-the-balrog",
       "category": "Entertainment, Movies & Games",
       "sourceSha256": "c4b4c72593ddcb2d0b35edbe07b9f8cc78bb7dbc96727801fb03386344251ce0",
-      "status": "reserved_source_verification",
+      "status": "prepared",
       "provider": "youtube",
       "batch": 12
     },
@@ -1170,7 +1170,7 @@
       "slug": "dandanakka-romeo-juliet-jayam-ravi",
       "category": "Music",
       "sourceSha256": "ebf587d9d3ba6495fcb6897a2137020fcea3ac5045d8409010577420dd6763d6",
-      "status": "reserved_source_verification",
+      "status": "prepared",
       "provider": "youtube",
       "batch": 12
     },
@@ -4255,7 +4255,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Finish reserved batch12 IDs65,67,87,99,102,103,116,117,137,138: verify/copy unchanged exact source previews, inspect pixels, generate at most one distinctive16:9 anime/conceptual artwork per eligible review with embedded vid.best watermark, test and pass exact-head CI, merge/deploy and verify all asset/watch/split-sitemap links. Do not repeat completed batch11 or regenerate existing art. All owner/draft/media holds remain.",
+  "nextTask": "Finish existing PR260/batch12. Ten real unique artworks and ten unchanged first-party source previews are prepared; do not regenerate or start batch13. Run existing tests and Worker dry-run; require current-head CI; fresh identity/preservation preflight; merge/deploy and verify all10artworks plus10source copies and exact watch/split image-sitemap associations. Only then record publication and move to next up-to10eligible missing dual-image pages.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -9174,212 +9174,79 @@
     "postReleasePreservation": "docs/review-images/batch11-post-release-preservation-20261022.json"
   },
   "lastImageProductionBatch": {
-    "state": "published_verified",
+    "state": "prepared_pending_ci",
     "recordIds": [
-      135,
-      131,
-      132,
-      119,
-      130,
-      134,
-      36,
-      98,
-      115,
-      86
+      65,
+      67,
+      87,
+      99,
+      102,
+      103,
+      116,
+      117,
+      137,
+      138
     ],
-    "branch": "seo/review-illustrations-batch11-20261021",
-    "pr": 255,
-    "base": "4d689eecb2a6de52844a0fcc58b7045c0c17ec3a",
+    "branch": "seo/review-illustrations-batch12-20261022",
+    "base": "ad762444d202947a87b34966e29a57695e957607",
     "newGenerated": 10,
-    "newPublished": 10,
-    "liveVerified": 10,
-    "baseline": {
-      "checkedAt": "2026-10-21T17:41:22.163Z",
-      "saved": 501,
-      "published": 501,
-      "nonCounterSha256": "1555f0985be9a3cf2e06ee4b60207078d7d9bc4fc618a8e9d836f5aeda7518f5"
+    "newPublished": 0,
+    "liveVerified": 0,
+    "sourceCapturePlan": "docs/review-images/batch12-source-capture-plan-20261022.json",
+    "baseline": "docs/review-images/batch12-preservation-baseline-20261022.json",
+    "pr": 260,
+    "newSourceCopiesPrepared": 10,
+    "sourceCopies": "docs/review-images/batch12-source-copies-20261022.json",
+    "assetChecks": "docs/review-images/batch12-asset-checks-20261022.json",
+    "briefs": "docs/review-images/batch12-artwork-briefs-20261022.json",
+    "expectedPublishDates": {
+      "65": "2026-09-30T17:29:14.072Z",
+      "67": "2026-09-30T18:20:08.598Z",
+      "87": "2026-10-03T18:29:25.584Z",
+      "99": "2026-10-05T18:26:41.611Z",
+      "102": "2026-10-05T18:29:41.988Z",
+      "103": "2026-10-05T18:30:16.560Z",
+      "116": "2026-10-09T18:22:29.237Z",
+      "117": "2026-10-09T18:25:22.067Z",
+      "137": "2026-10-11T13:51:57.342Z",
+      "138": "2026-10-11T18:31:18.266Z"
     },
-    "sourceVerification": "docs/review-images/batch11-source-verification-20261021.json",
-    "briefs": "docs/review-images/batch11-artwork-briefs-20261021.json",
-    "assetChecks": "docs/review-images/batch11-asset-checks-20261021.json",
-    "blocker": "",
-    "releaseGates": [
-      "Full regression tests",
-      "Worker dry-run",
-      "Required exact-head CI",
-      "Fresh D1 target identity/preservation check from fresh read-only inventory",
-      "Merge/deployment",
-      "All10live asset/HTML/split-sitemap associations"
+    "sourceMetadataUnavailableIds": [
+      65,
+      67,
+      87,
+      99,
+      102,
+      103,
+      116,
+      117,
+      137,
+      138
     ],
+    "sourceMetadataCheckedAt": "2026-10-22T05:50:17.463Z",
+    "sourceMetadataLimit": "Fresh indexed query returned no source upload-date metadata for these ten. Preserve current omission of VideoObject; never invent a source date.",
     "validation": {
+      "sourceCaptureCI": 39729309682,
+      "nodeTestsDuringCapture": 468,
+      "pythonTestsDuringCapture": 4,
+      "sourceCaptureDryRun": true,
+      "assetBytesHashesDimensions": "10new artworks and10unchanged source copies checked",
+      "exactHeadCI": "pending prepared-asset commit",
       "nodeTests": 468,
       "workerDryRun": true,
-      "assetHashesAndPreservation": true,
-      "exactHeadCI": "passed39723584902 atc6ef7ebb0e75e6ce1a974066f1c97ddeca202215",
-      "pythonSuite": "4passed",
-      "pythonTests": 4,
-      "liveHTTPHashHTMLMaps": "10artworks+10source copies passed"
+      "prior110ArtworksAndProvenance": "unchanged",
+      "existingOwnerHolds": "preserved",
+      "sourceFirstHTMLAndMaps": "local regression pass"
     },
-    "reconciledMain": "fe12eaa1049b948ee049f60d3ef2f61be079c2aa",
-    "upstreamReconciliation": "docs/review-images/batch11-upstream-reconciliation-20261022.json",
-    "newSourceCopiesPrepared": 10,
-    "sourceCopies": "docs/review-images/batch11-source-copies-20261022.json",
-    "ownerImagePreference": "docs/review-images/source-pairs-and-branding-20261022.md",
-    "expectedPublishDates": {
-      "135": "2026-10-11T13:29:15.091Z",
-      "131": "2026-10-10T18:22:02.889Z",
-      "132": "2026-10-10T18:27:22.255Z",
-      "119": "2026-10-09T18:28:10.831Z",
-      "130": "2026-10-10T18:14:20.768Z",
-      "134": "2026-10-10T18:29:21.086Z",
-      "36": "2026-09-25T20:35:28.639Z",
-      "98": "2026-10-05T18:26:15.919Z",
-      "115": "2026-10-08T18:54:19.596Z",
-      "86": "2026-10-03T16:54:10.360Z"
-    },
-    "sourcePairingCheckpoint": "docs/review-images/batch11-source-pairing-checkpoint-20261022.json",
-    "editorialUpstreamReconciliation": "docs/review-images/batch11-editorial-upstream-reconciliation-20261022.json",
-    "resolvedQuotaBlocker": {
-      "resolvedAt": "2026-10-22T00:31:21.647Z",
-      "previous": "Cloudflare D1 HTTP400/code7500 free-tier daily row-read quota reached during queue reconciliation. No further D1 queries until the stated midnightUTC reset. Final pre-release identity/preservation and live watch checks remain required. This is transient; do not disable the existing task or regenerate this batch."
-    },
+    "watermark": "vid.best embedded in each new artwork image file, no HTMLoverlay",
+    "holds": "All existing owner/draft/Saiyaara/Summer/source30/removal/raw holds remain, including308andPR254six drafts.",
+    "releasePreflight": "docs/review-images/batch12-release-preflight-20261022.json",
     "preReleasePreservation": {
-      "checkedAt": "2026-10-22T04:37:22.541Z",
+      "checkedAt": "2026-10-22T05:52:09.922Z",
       "saved": 507,
       "published": 507,
-      "nonCounterSha256": "71e5c2bb3c3c4e858c59e690b9c5f00752e01e5ade12426671d03224fb978c82",
-      "fields": [
-        "cache_attempts",
-        "cache_error",
-        "cache_next_attempt_at",
-        "cache_source_url",
-        "cache_status",
-        "cached_at",
-        "created_at",
-        "description",
-        "embed_url",
-        "featured",
-        "id",
-        "media_type",
-        "primary_category",
-        "published",
-        "r2_key",
-        "redistribution_certified",
-        "redistribution_certified_at",
-        "review_text",
-        "seo_description",
-        "seo_tags",
-        "seo_title",
-        "slug",
-        "source_page_url",
-        "source_url",
-        "subcategory",
-        "thumbnail_url",
-        "title",
-        "trending",
-        "updated_at"
-      ],
-      "evidence": "docs/review-images/batch11-release-preflight-20261022.json"
-    },
-    "releasePreflight": "docs/review-images/batch11-release-preflight-20261022.json",
-    "sourceMetadataUnavailableIds": [
-      135,
-      131,
-      132,
-      119,
-      130,
-      134,
-      36,
-      98,
-      115,
-      86
-    ],
-    "newSourceCopiesPublished": 10,
-    "release": {
-      "batch": 11,
-      "completedAt": "2026-10-22T04:41:53.570Z",
-      "recordIds": [
-        135,
-        131,
-        132,
-        119,
-        130,
-        134,
-        36,
-        98,
-        115,
-        86
-      ],
-      "pullRequest": 255,
-      "head": "c6ef7ebb0e75e6ce1a974066f1c97ddeca202215",
-      "commit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4",
-      "ci": {
-        "run": 39723584902,
-        "job": 119642363655,
-        "nodeTests": 468,
-        "pythonTests": 4,
-        "workerDryRun": true
-      },
-      "deployment": {
-        "run": 39723707668,
-        "job": 119642741445,
-        "worker": "vid-review-site",
-        "deploymentId": "f9250c10-1ced-4076-b327-2c3e78965c90",
-        "version": "f026257a-4978-437c-9c57-75195b63fd3d",
-        "percentage": 100,
-        "createdAt": "2026-10-22T04:41:10.881556Z",
-        "codeOnly": true,
-        "databaseMigrationSteps": "skipped"
-      },
-      "artifact": {
-        "id": 12401849520,
-        "name": "review-illustration-live-verification",
-        "size_in_bytes": 2668,
-        "url": "https://api.github.com/repos/Gamagek/vid-review-site/actions/artifacts/12401849520",
-        "archive_download_url": "https://api.github.com/repos/Gamagek/vid-review-site/actions/artifacts/12401849520/zip",
-        "expired": false,
-        "created_at": "2026-10-22T04:41:36Z",
-        "expires_at": "2026-11-05T04:41:36Z",
-        "updated_at": "2026-10-22T04:41:36Z",
-        "digest": "sha256:47dd9b05ecf564ce78bcf7f2a837794753089c91def4ce46e407f03eab6fd086",
-        "workflow_run": {
-          "id": 39723707668,
-          "repository_id": 1324282150,
-          "head_repository_id": 1324282150,
-          "head_branch": "main",
-          "head_sha": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
-        }
-      },
-      "counts": {
-        "generatedThisRun": 0,
-        "previouslyGeneratedCommitted": 10,
-        "newSourceCopiesThisRun": 0,
-        "sourceCopiesPreviouslyCommitted": 10,
-        "newArtworkMerged": 10,
-        "newArtworkDeployed": 10,
-        "newArtworkPublished": 10,
-        "newArtworkLiveVerified": 10,
-        "sourceCopiesPublishedAndVerified": 10,
-        "manifestTotal": 110,
-        "activeIdentityMatchedArtworks": 109,
-        "preexistingIdentityHeldArtworks": 1,
-        "currentSaved": 507,
-        "currentPublished": 507
-      },
-      "liveEvidence": "docs/review-images/batch11-live-verification-20261022.json",
-      "preservationEvidence": "docs/review-images/batch11-post-release-preservation-20261022.json",
-      "limitations": [
-        "These ten prepared artworks use a page watermark overlay, not baked-in file lettering; future new generation must embed vid.best.",
-        "No source upload dates are available for the ten; the existing sanitizer intentionally omits VideoObject and no dates are invented.",
-        "109of110 manifest entries match current published identity; preexistingID308 is disabled after an independent owner title edit.",
-        "The435-entry queue needs72 additional published identities reconciled. No next batch has been generated/reserved.",
-        "No Google indexed-count evidence, guaranteed indexing, AdSense approval, source video/audio inspection or provider playback claim."
-      ],
-      "nextTask": "Reconcile72 unqueued current published identities; preserveID308owner-change hold and PR254six-draft/media holds. Select up to10new missing dual-image eligible reviews with verified theme/source evidence and original intact publisher image. Future new anime artwork must include bottom-right vid.best watermark in the image itself. Do not regenerate batch11."
-    },
-    "liveVerification": "docs/review-images/batch11-live-verification-20261022.json",
-    "liveVerificationAt": "2026-10-22T04:41:13.296Z",
-    "postReleasePreservation": "docs/review-images/batch11-post-release-preservation-20261022.json"
+      "nonCounterSha256": "71e5c2bb3c3c4e858c59e690b9c5f00752e01e5ade12426671d03224fb978c82"
+    }
   },
   "ownerReconciliation20261021": {
     "authoritativeInventoryAt": "2026-10-21T17:41:22.163Z",
@@ -9505,7 +9372,7 @@
     "completedEvidence": "docs/review-images/batch12-queue-reconciliation-20261022.json"
   },
   "batch12": {
-    "state": "reserved_source_verification",
+    "state": "prepared_pending_ci",
     "recordIds": [
       65,
       67,
@@ -9520,10 +9387,63 @@
     ],
     "branch": "seo/review-illustrations-batch12-20261022",
     "base": "ad762444d202947a87b34966e29a57695e957607",
-    "newGenerated": 0,
+    "newGenerated": 10,
     "newPublished": 0,
     "liveVerified": 0,
     "sourceCapturePlan": "docs/review-images/batch12-source-capture-plan-20261022.json",
-    "baseline": "docs/review-images/batch12-preservation-baseline-20261022.json"
+    "baseline": "docs/review-images/batch12-preservation-baseline-20261022.json",
+    "pr": 260,
+    "newSourceCopiesPrepared": 10,
+    "sourceCopies": "docs/review-images/batch12-source-copies-20261022.json",
+    "assetChecks": "docs/review-images/batch12-asset-checks-20261022.json",
+    "briefs": "docs/review-images/batch12-artwork-briefs-20261022.json",
+    "expectedPublishDates": {
+      "65": "2026-09-30T17:29:14.072Z",
+      "67": "2026-09-30T18:20:08.598Z",
+      "87": "2026-10-03T18:29:25.584Z",
+      "99": "2026-10-05T18:26:41.611Z",
+      "102": "2026-10-05T18:29:41.988Z",
+      "103": "2026-10-05T18:30:16.560Z",
+      "116": "2026-10-09T18:22:29.237Z",
+      "117": "2026-10-09T18:25:22.067Z",
+      "137": "2026-10-11T13:51:57.342Z",
+      "138": "2026-10-11T18:31:18.266Z"
+    },
+    "sourceMetadataUnavailableIds": [
+      65,
+      67,
+      87,
+      99,
+      102,
+      103,
+      116,
+      117,
+      137,
+      138
+    ],
+    "sourceMetadataCheckedAt": "2026-10-22T05:50:17.463Z",
+    "sourceMetadataLimit": "Fresh indexed query returned no source upload-date metadata for these ten. Preserve current omission of VideoObject; never invent a source date.",
+    "validation": {
+      "sourceCaptureCI": 39729309682,
+      "nodeTestsDuringCapture": 468,
+      "pythonTestsDuringCapture": 4,
+      "sourceCaptureDryRun": true,
+      "assetBytesHashesDimensions": "10new artworks and10unchanged source copies checked",
+      "exactHeadCI": "pending prepared-asset commit",
+      "nodeTests": 468,
+      "workerDryRun": true,
+      "prior110ArtworksAndProvenance": "unchanged",
+      "existingOwnerHolds": "preserved",
+      "sourceFirstHTMLAndMaps": "local regression pass"
+    },
+    "watermark": "vid.best embedded in each new artwork image file, no HTMLoverlay",
+    "holds": "All existing owner/draft/Saiyaara/Summer/source30/removal/raw holds remain, including308andPR254six drafts.",
+    "releasePreflight": "docs/review-images/batch12-release-preflight-20261022.json",
+    "preReleasePreservation": {
+      "checkedAt": "2026-10-22T05:52:09.922Z",
+      "saved": 507,
+      "published": 507,
+      "nonCounterSha256": "71e5c2bb3c3c4e858c59e690b9c5f00752e01e5ade12426671d03224fb978c82"
+    }
   }
 }

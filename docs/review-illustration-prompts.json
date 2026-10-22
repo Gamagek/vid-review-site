@@ -3880,6 +3880,556 @@
         "evidence": "docs/review-images/batch11-source-copies-20261022.json",
         "note": "Unmodified original publisher preview bytes, not generated artwork or a newly captured video frame."
       }
+    },
+    {
+      "id": 65,
+      "slug": "knight-rider-theme-2020-cover-remake-by-enzo-margaglio",
+      "prompt": "Use case: stylized-concept.\nAsset type: original editorial review illustration for one exact Vid.Best video review, a separate image2 beside its unchanged publisher preview.\nCreate a beautiful high-definition16:9 landscape, ideally1600x900, filling the whole canvas without borders or letterboxing. Distinctive cinematic anime/stylized painted art with careful depth, expressive light and attractive detail; original composition, not a generic card.\nScene: A low rear three-quarter view of an invented midnight-blue1980s-style wedge coupe driving along a rain-polished mountain road at blue hour, a slim red tail-light streak and distant neon-magenta city reflected on wet asphalt. The enormous indigo sky and rolling hills evoke pulsing synthesizer nostalgia. The car is a generic original design without badges, no people, no recognizable KITT replica; cinematic hand-painted anime background art.\nGrounding: interpret only the documented theme '1980s synth-cover nostalgia, dark sportscar and red light'. This is conceptual review art, NOT a captured source video frame. Do not reproduce a publisher poster, film frame, creator logo, celebrity likeness or copyrighted frame composition.\nText(verbatim): \"vid.best\" in small crisp unobtrusive lowercase white lettering with a subtle dark edge at the bottom-right, integrated INSIDE the image pixels, with a comfortable margin. Spell v i d . b e s t exactly. This must be the only text anywhere in the image.\nNo AI, AI-generated, generated-by or production/disclosure lettering, no title text, no official badge, no play icon, no imitation watermark or other logo. No fabricated footage/audio/event/location/health/rescue claim.",
+      "asset": "public/review-illustrations/knight-rider-synthwave-night-drive-anime-v1.webp",
+      "bytes": 295918,
+      "sha256": "a71ef4983aed9d2fde5ec6bff0d256fc76cd9a7dd63ae5ec7f278c1e180625ac",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-22T05:43:03.628256+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "a672e8bc64ecfb6337fdb4885af0e8643cbcc54867e7703b396fc0c859e1bbf0",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 90,
+        "method": 6,
+        "scope": "Technical size/format conversion only; original generated PNG retained."
+      },
+      "embeddedWatermark": {
+        "text": "vid.best",
+        "placement": "bottom-right",
+        "method": "Built into original image pixels by imagegen; no page overlay"
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch12-source-capture-plan-20261022.json",
+        "previewChecks": "docs/review-images/batch12-source-copies-20261022.json",
+        "inventoryAt": "2026-10-22T05:36:36.549Z",
+        "sourceThumbnailCheckedAt": "2026-10-22T05:40:13.273Z",
+        "sceneInterpretation": "1980s synth-cover nostalgia, dark sportscar and red light",
+        "visualSourceNotes": "Publisher preview shows a dark blue/black sports car viewed from the front, red scanner-like light, and Enzo Margaglio2020remake lettering. Original new composition uses a different generic car and viewpoint; no actor or branded vehicle replica.",
+        "limits": "Exact published identity, visually decoded publisher preview and documented review theme only; no fresh continuous footage/audio inspection or claim of a real frame/location/celebrity likeness."
+      },
+      "sourcePreviewCopy": {
+        "id": 65,
+        "url": "https://i.ytimg.com/vi/ZhG18g4XNO8/hqdefault.jpg",
+        "path": "/review-source-images/65-b2a2698d6dd33f21.jpg",
+        "bytes": 12895,
+        "sha256": "b2a2698d6dd33f21059aa814299c72b42ec8ab9d69b95ec7928e93740611bf56",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-22T05:40:13.273Z",
+        "evidence": "docs/review-images/batch12-source-copies-20261022.json",
+        "note": "Unmodified publisher JPEG bytes, not newly captured footage or generated art."
+      },
+      "verificationLimits": "Preserve owner/source media, VideoObject eligibility/thumbnail, dates, text, all D1/R2 and holds. Publication gated on current-head CI/dry-run and actual deployment/live HTTP/hash/HTML/sitemap associations."
+    },
+    {
+      "id": 67,
+      "slug": "j-geco-chicken-song-the-ultimate-techno-dance-anthem",
+      "prompt": "Use case: stylized-concept.\nAsset type: original editorial review illustration for one exact Vid.Best video review, a separate image2 beside its unchanged publisher preview.\nCreate a beautiful high-definition16:9 landscape, ideally1600x900, filling the whole canvas without borders or letterboxing. Distinctive cinematic anime/stylized painted art with careful depth, expressive light and attractive detail; original composition, not a generic card.\nScene: A playful white chicken with a red comb joyfully mid-hop on a tiny circular dance floor in a rustic barn transformed by violet and turquoise disco light, straw catching sparkling light beams and a large warm moon through a high barn window. Low floor-level wide-angle view, detailed feathers, dynamic wing gesture and buoyant music-like arcs of light. Original whimsical anime film still-style illustration of an invented scene; no DJ person, no copied poster composition.\nGrounding: interpret only the documented theme 'playful chicken-themed electronic remix'. This is conceptual review art, NOT a captured source video frame. Do not reproduce a publisher poster, film frame, creator logo, celebrity likeness or copyrighted frame composition.\nText(verbatim): \"vid.best\" in small crisp unobtrusive lowercase white lettering with a subtle dark edge at the bottom-right, integrated INSIDE the image pixels, with a comfortable margin. Spell v i d . b e s t exactly. This must be the only text anywhere in the image.\nNo AI, AI-generated, generated-by or production/disclosure lettering, no title text, no official badge, no play icon, no imitation watermark or other logo. No fabricated footage/audio/event/location/health/rescue claim.",
+      "asset": "public/review-illustrations/chicken-song-neon-farmyard-disco-anime-v1.webp",
+      "bytes": 295244,
+      "sha256": "9b9a8001c2faebfefa2d769228a52979d44d05accd470c7a1ae166f086ad78ea",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-22T05:43:45.689275+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "e4fa13a5fd29419291cce36a0fc2dc94e61cd1d228125a8409f956ff9a294153",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 90,
+        "method": 6,
+        "scope": "Technical size/format conversion only; original generated PNG retained."
+      },
+      "embeddedWatermark": {
+        "text": "vid.best",
+        "placement": "bottom-right",
+        "method": "Built into original image pixels by imagegen; no page overlay"
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch12-source-capture-plan-20261022.json",
+        "previewChecks": "docs/review-images/batch12-source-copies-20261022.json",
+        "inventoryAt": "2026-10-22T05:36:36.549Z",
+        "sourceThumbnailCheckedAt": "2026-10-22T05:40:13.338Z",
+        "sceneInterpretation": "playful chicken-themed electronic remix",
+        "visualSourceNotes": "Publisher preview has a white chicken, Chicken Song/Geco Remix lettering and circular multicolor lights. New composition interprets a techno/farmyard joke without copying that poster.",
+        "limits": "Exact published identity, visually decoded publisher preview and documented review theme only; no fresh continuous footage/audio inspection or claim of a real frame/location/celebrity likeness."
+      },
+      "sourcePreviewCopy": {
+        "id": 67,
+        "url": "https://i.ytimg.com/vi/msSc7Mv0QHY/hqdefault.jpg",
+        "path": "/review-source-images/67-a61a2326218dcda8.jpg",
+        "bytes": 55294,
+        "sha256": "a61a2326218dcda833f9b87b65411c259f9a2a42f720c6404268945fcb797e42",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-22T05:40:13.338Z",
+        "evidence": "docs/review-images/batch12-source-copies-20261022.json",
+        "note": "Unmodified publisher JPEG bytes, not newly captured footage or generated art."
+      },
+      "verificationLimits": "Preserve owner/source media, VideoObject eligibility/thumbnail, dates, text, all D1/R2 and holds. Publication gated on current-head CI/dry-run and actual deployment/live HTTP/hash/HTML/sitemap associations."
+    },
+    {
+      "id": 87,
+      "slug": "shakira-waka-waka-the-ultimate-anthem-of-resilience-unity",
+      "prompt": "Use case: stylized-concept.\nAsset type: original editorial review illustration for one exact Vid.Best video review, a separate image2 beside its unchanged publisher preview.\nCreate a beautiful high-definition16:9 landscape, ideally1600x900, filling the whole canvas without borders or letterboxing. Distinctive cinematic anime/stylized painted art with careful depth, expressive light and attractive detail; original composition, not a generic card.\nScene: An open community football field at warm sunset, a football sharply detailed in foreground on green grass; beyond it a semicircle of diverse anonymous adult friends seen mostly from behind with hands raised together, joyful flowing movement and colorful unbranded pennants around the field. A huge gold sky and glowing dust give the moment uplifting anime sports-film energy. No famous players or singers, no recognizable faces, no FIFA emblems, no national-team kits, no trophy or claim of a particular match.\nGrounding: interpret only the documented theme 'football anthem, shared celebration and unity'. This is conceptual review art, NOT a captured source video frame. Do not reproduce a publisher poster, film frame, creator logo, celebrity likeness or copyrighted frame composition.\nText(verbatim): \"vid.best\" in small crisp unobtrusive lowercase white lettering with a subtle dark edge at the bottom-right, integrated INSIDE the image pixels, with a comfortable margin. Spell v i d . b e s t exactly. This must be the only text anywhere in the image.\nNo AI, AI-generated, generated-by or production/disclosure lettering, no title text, no official badge, no play icon, no imitation watermark or other logo. No fabricated footage/audio/event/location/health/rescue claim.",
+      "asset": "public/review-illustrations/waka-waka-football-unity-anime-v1.webp",
+      "bytes": 286356,
+      "sha256": "4b9c99e7eed1af5b2fa4428e3659c39df517c860164061de80d98af15e6c2187",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-22T05:44:41.110616+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "38b3c72bd3ce3beb7334d3f9c428d16ea034af9cc61d1bdc88f5a22f52bbd69e",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 88,
+        "method": 6,
+        "scope": "Technical size/format conversion only; original generated PNG retained."
+      },
+      "embeddedWatermark": {
+        "text": "vid.best",
+        "placement": "bottom-right",
+        "method": "Built into original image pixels by imagegen; no page overlay"
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch12-source-capture-plan-20261022.json",
+        "previewChecks": "docs/review-images/batch12-source-copies-20261022.json",
+        "inventoryAt": "2026-10-22T05:36:36.549Z",
+        "sourceThumbnailCheckedAt": "2026-10-22T05:40:13.348Z",
+        "sceneInterpretation": "football anthem, shared celebration and unity",
+        "visualSourceNotes": "Preview shows the singer with colorful flowers/dancers; publisher page title confirms official2010football song. New concept is a football celebration rather than a copied performer likeness.",
+        "limits": "Exact published identity, visually decoded publisher preview and documented review theme only; no fresh continuous footage/audio inspection or claim of a real frame/location/celebrity likeness."
+      },
+      "sourcePreviewCopy": {
+        "id": 87,
+        "url": "https://i.ytimg.com/vi/pRpeEdMmmQ0/hqdefault.jpg",
+        "path": "/review-source-images/87-8351fcad2aec165c.jpg",
+        "bytes": 21068,
+        "sha256": "8351fcad2aec165cdd4c8defe4f80e5c493312ff56016f548dfd9a776e039465",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-22T05:40:13.348Z",
+        "evidence": "docs/review-images/batch12-source-copies-20261022.json",
+        "note": "Unmodified publisher JPEG bytes, not newly captured footage or generated art."
+      },
+      "verificationLimits": "Preserve owner/source media, VideoObject eligibility/thumbnail, dates, text, all D1/R2 and holds. Publication gated on current-head CI/dry-run and actual deployment/live HTTP/hash/HTML/sitemap associations."
+    },
+    {
+      "id": 99,
+      "slug": "maari-2-rowdy-baby-video-song-dhanush-sai-pallavi-yuvan-shankar-raja-balaji-mohan",
+      "prompt": "Use case: stylized-concept.\nAsset type: original editorial review illustration for one exact Vid.Best video review, a separate image2 beside its unchanged publisher preview.\nCreate a beautiful high-definition16:9 landscape, ideally1600x900, filling the whole canvas without borders or letterboxing. Distinctive cinematic anime/stylized painted art with careful depth, expressive light and attractive detail; original composition, not a generic card.\nScene: An invented sunny South Indian courtyard filled with bold teal and peach architectural shapes; two entirely fictional adult anime dancers seen in energetic full-body profile at opposite corners of a sweeping diagonal, one in loose cobalt streetwear and one in flowing coral dance clothes. Their feet kick up small arcs of golden dust, long afternoon shadows emphasize the rhythmic exchange. Wide crane-like composition, mischievous joyful movement, expressive original character designs; no resemblance to Dhanush or Sai Pallavi, no film-frame or poster imitation.\nGrounding: interpret only the documented theme 'joyful duet, playful dance energy'. This is conceptual review art, NOT a captured source video frame. Do not reproduce a publisher poster, film frame, creator logo, celebrity likeness or copyrighted frame composition.\nText(verbatim): \"vid.best\" in small crisp unobtrusive lowercase white lettering with a subtle dark edge at the bottom-right, integrated INSIDE the image pixels, with a comfortable margin. Spell v i d . b e s t exactly. This must be the only text anywhere in the image.\nNo AI, AI-generated, generated-by or production/disclosure lettering, no title text, no official badge, no play icon, no imitation watermark or other logo. No fabricated footage/audio/event/location/health/rescue claim.",
+      "asset": "public/review-illustrations/rowdy-baby-playful-dance-courtyard-anime-v1.webp",
+      "bytes": 299600,
+      "sha256": "234517b442274d6c2a044b1333b67f8d820a38dd8788f448fd70c8091a0fc00a",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-22T05:45:19.923554+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "00c2023fd67b6e1b887d92b448d58df5204dbd58ce10ae31fe43a5dca9716641",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 84,
+        "method": 6,
+        "scope": "Technical size/format conversion only; original generated PNG retained."
+      },
+      "embeddedWatermark": {
+        "text": "vid.best",
+        "placement": "bottom-right",
+        "method": "Built into original image pixels by imagegen; no page overlay"
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch12-source-capture-plan-20261022.json",
+        "previewChecks": "docs/review-images/batch12-source-copies-20261022.json",
+        "inventoryAt": "2026-10-22T05:36:36.549Z",
+        "sourceThumbnailCheckedAt": "2026-10-22T05:40:13.372Z",
+        "sceneInterpretation": "joyful duet, playful dance energy",
+        "visualSourceNotes": "Publisher preview identifies Rowdy Baby and its paired performers. New dancers and invented courtyard avoid recreating their faces, clothes or poster pose.",
+        "limits": "Exact published identity, visually decoded publisher preview and documented review theme only; no fresh continuous footage/audio inspection or claim of a real frame/location/celebrity likeness."
+      },
+      "sourcePreviewCopy": {
+        "id": 99,
+        "url": "https://i.ytimg.com/vi/x6Q7c9RyMzk/hqdefault.jpg",
+        "path": "/review-source-images/99-ce98dd0e5abd9111.jpg",
+        "bytes": 33932,
+        "sha256": "ce98dd0e5abd9111227cd23f9fcd4d0d2d6e9d09172af11eb5f8dd7b5142262a",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-22T05:40:13.372Z",
+        "evidence": "docs/review-images/batch12-source-copies-20261022.json",
+        "note": "Unmodified publisher JPEG bytes, not newly captured footage or generated art."
+      },
+      "verificationLimits": "Preserve owner/source media, VideoObject eligibility/thumbnail, dates, text, all D1/R2 and holds. Publication gated on current-head CI/dry-run and actual deployment/live HTTP/hash/HTML/sitemap associations."
+    },
+    {
+      "id": 102,
+      "slug": "arash-feat-helena-one-day-official-video",
+      "prompt": "Use case: stylized-concept.\nAsset type: original editorial review illustration for one exact Vid.Best video review, a separate image2 beside its unchanged publisher preview.\nCreate a beautiful high-definition16:9 landscape, ideally1600x900, filling the whole canvas without borders or letterboxing. Distinctive cinematic anime/stylized painted art with careful depth, expressive light and attractive detail; original composition, not a generic card.\nScene: A very small anonymous adult figure seen from behind on the edge of an invented still midnight lake, an ivory scarf lifting and unfurling into a broad luminous ribbon across a violet star-filled sky. The water reflects stars and soft pale fabric, with faraway dark mountain silhouettes and a quiet rose-colored horizon. Elegant surreal anime watercolor painting about distance, hope and longing; no celebrity face, no recognizable costume or pose copied from the video, no factual place or outcome implied.\nGrounding: interpret only the documented theme 'longing and surreal ethereal imagery'. This is conceptual review art, NOT a captured source video frame. Do not reproduce a publisher poster, film frame, creator logo, celebrity likeness or copyrighted frame composition.\nText(verbatim): \"vid.best\" in small crisp unobtrusive lowercase white lettering with a subtle dark edge at the bottom-right, integrated INSIDE the image pixels, with a comfortable margin. Spell v i d . b e s t exactly. This must be the only text anywhere in the image.\nNo AI, AI-generated, generated-by or production/disclosure lettering, no title text, no official badge, no play icon, no imitation watermark or other logo. No fabricated footage/audio/event/location/health/rescue claim.",
+      "asset": "public/review-illustrations/one-day-starlit-longing-anime-v1.webp",
+      "bytes": 299526,
+      "sha256": "4c5c1b319d9014eff340b348cbb70b0555a367ac74f7803fae3cfd846f15d2de",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-22T05:46:04.224626+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "5460f74625ab1258b96a56a08267eea2add0f0eaf5e8612e61e15d7075aa6ce5",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 88,
+        "method": 6,
+        "scope": "Technical size/format conversion only; original generated PNG retained."
+      },
+      "embeddedWatermark": {
+        "text": "vid.best",
+        "placement": "bottom-right",
+        "method": "Built into original image pixels by imagegen; no page overlay"
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch12-source-capture-plan-20261022.json",
+        "previewChecks": "docs/review-images/batch12-source-copies-20261022.json",
+        "inventoryAt": "2026-10-22T05:36:36.549Z",
+        "sourceThumbnailCheckedAt": "2026-10-22T05:40:13.391Z",
+        "sceneInterpretation": "longing and surreal ethereal imagery",
+        "visualSourceNotes": "Exact preview shows a woman in a flowing pale dress surrounded by dark starry imagery. New anonymous distant silhouette with floating cloth uses that verified mood, not a copied face or unsupported real location.",
+        "limits": "Exact published identity, visually decoded publisher preview and documented review theme only; no fresh continuous footage/audio inspection or claim of a real frame/location/celebrity likeness."
+      },
+      "sourcePreviewCopy": {
+        "id": 102,
+        "url": "https://i.ytimg.com/vi/rjBsQ9SygnE/hqdefault.jpg",
+        "path": "/review-source-images/102-1925f6c8e5c4ceaa.jpg",
+        "bytes": 10033,
+        "sha256": "1925f6c8e5c4ceaa42cb10ef8d55939c323cac55691c70cd735a8fb8c8d2a368",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-22T05:40:13.391Z",
+        "evidence": "docs/review-images/batch12-source-copies-20261022.json",
+        "note": "Unmodified publisher JPEG bytes, not newly captured footage or generated art."
+      },
+      "verificationLimits": "Preserve owner/source media, VideoObject eligibility/thumbnail, dates, text, all D1/R2 and holds. Publication gated on current-head CI/dry-run and actual deployment/live HTTP/hash/HTML/sitemap associations."
+    },
+    {
+      "id": 103,
+      "slug": "psy-gangnam-style-m-v",
+      "prompt": "Use case: stylized-concept.\nAsset type: original editorial review illustration for one exact Vid.Best video review, a separate image2 beside its unchanged publisher preview.\nCreate a beautiful high-definition16:9 landscape, ideally1600x900, filling the whole canvas without borders or letterboxing. Distinctive cinematic anime/stylized painted art with careful depth, expressive light and attractive detail; original composition, not a generic card.\nScene: A humorous outdoor riding-school courtyard at clear bright blue midday; an entirely invented adult dancer seen from behind doing a playful horse-riding dance step, in a mustard bomber jacket and dark trousers, with two curious horses peeking over a pale wooden fence on the far side. Exaggerated springy shadows and clean graphic anime shapes create comic musical confidence. Wide off-center camera with a huge sky, wind-blown leaves and vivid warm/cool contrast. No PSY likeness, no black-suit caricature, no copied stable interior or title lettering.\nGrounding: interpret only the documented theme 'horse-step dance and comic confidence'. This is conceptual review art, NOT a captured source video frame. Do not reproduce a publisher poster, film frame, creator logo, celebrity likeness or copyrighted frame composition.\nText(verbatim): \"vid.best\" in small crisp unobtrusive lowercase white lettering with a subtle dark edge at the bottom-right, integrated INSIDE the image pixels, with a comfortable margin. Spell v i d . b e s t exactly. This must be the only text anywhere in the image.\nNo AI, AI-generated, generated-by or production/disclosure lettering, no title text, no official badge, no play icon, no imitation watermark or other logo. No fabricated footage/audio/event/location/health/rescue claim.",
+      "asset": "public/review-illustrations/gangnam-style-playful-horse-step-anime-v1.webp",
+      "bytes": 293812,
+      "sha256": "b0a79bd33e59e10a602bce69537cfc9f7b03b99f9a8934dfc0b8fa54e2cb4d7d",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-22T05:46:40.413506+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "6f12d9f6e4a12d9862b1fea528432dfb0ccb7fb9df25ebf01e92f5768ce15708",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 88,
+        "method": 6,
+        "scope": "Technical size/format conversion only; original generated PNG retained."
+      },
+      "embeddedWatermark": {
+        "text": "vid.best",
+        "placement": "bottom-right",
+        "method": "Built into original image pixels by imagegen; no page overlay"
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch12-source-capture-plan-20261022.json",
+        "previewChecks": "docs/review-images/batch12-source-copies-20261022.json",
+        "inventoryAt": "2026-10-22T05:36:36.549Z",
+        "sourceThumbnailCheckedAt": "2026-10-22T05:40:13.409Z",
+        "sceneInterpretation": "horse-step dance and comic confidence",
+        "visualSourceNotes": "Preview is a cartoon stable with horses and a caricatured dancer. New outdoor setting and original back-view dancer do not reproduce the caricature, logos or poster composition.",
+        "limits": "Exact published identity, visually decoded publisher preview and documented review theme only; no fresh continuous footage/audio inspection or claim of a real frame/location/celebrity likeness."
+      },
+      "sourcePreviewCopy": {
+        "id": 103,
+        "url": "https://i.ytimg.com/vi/9bZkp7q19f0/hqdefault.jpg",
+        "path": "/review-source-images/103-8494f0e35f49bc86.jpg",
+        "bytes": 53433,
+        "sha256": "8494f0e35f49bc869e63e630e813587ca5f3fa969d302c81820cbfd2ecd275f1",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-22T05:40:13.409Z",
+        "evidence": "docs/review-images/batch12-source-copies-20261022.json",
+        "note": "Unmodified publisher JPEG bytes, not newly captured footage or generated art."
+      },
+      "verificationLimits": "Preserve owner/source media, VideoObject eligibility/thumbnail, dates, text, all D1/R2 and holds. Publication gated on current-head CI/dry-run and actual deployment/live HTTP/hash/HTML/sitemap associations."
+    },
+    {
+      "id": 116,
+      "slug": "kala-chashma-baar-baar-dekho-sidharth-m-katrina-kaif-badshah-neha-kakkar-prem-hardeep",
+      "prompt": "Use case: stylized-concept.\nAsset type: original editorial review illustration for one exact Vid.Best video review, a separate image2 beside its unchanged publisher preview.\nCreate a beautiful high-definition16:9 landscape, ideally1600x900, filling the whole canvas without borders or letterboxing. Distinctive cinematic anime/stylized painted art with careful depth, expressive light and attractive detail; original composition, not a generic card.\nScene: An overhead cinematic anime view into an invented marigold-decorated wedding courtyard at golden evening, a curved line of anonymous adult celebrants stepping in rhythm among scattered orange petals. In the near foreground on a carved balcony ledge sits a pair of glossy black sunglasses reflecting warm fairy lights; below, richly colored burgundy, emerald and cream garments swirl in motion. Distinctive festive composition, intricate textiles and lovely soft bokeh; no celebrity faces, no copied film costumes or poses, no product logos or real wedding claim.\nGrounding: interpret only the documented theme 'black sunglasses and festive wedding dance'. This is conceptual review art, NOT a captured source video frame. Do not reproduce a publisher poster, film frame, creator logo, celebrity likeness or copyrighted frame composition.\nText(verbatim): \"vid.best\" in small crisp unobtrusive lowercase white lettering with a subtle dark edge at the bottom-right, integrated INSIDE the image pixels, with a comfortable margin. Spell v i d . b e s t exactly. This must be the only text anywhere in the image.\nNo AI, AI-generated, generated-by or production/disclosure lettering, no title text, no official badge, no play icon, no imitation watermark or other logo. No fabricated footage/audio/event/location/health/rescue claim.",
+      "asset": "public/review-illustrations/kala-chashma-marigold-wedding-rhythm-anime-v1.webp",
+      "bytes": 283204,
+      "sha256": "d5f0326f6c29e1257e1e0d0d435c064fe64e98a043a1baf31eb41657d262dfa4",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-22T05:47:47.103129+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "92270180fca6306c2780a96fecd4480dcee9405379632e064947c6b3e50eab9d",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 84,
+        "method": 6,
+        "scope": "Technical size/format conversion only; original generated PNG retained."
+      },
+      "embeddedWatermark": {
+        "text": "vid.best",
+        "placement": "bottom-right",
+        "method": "Built into original image pixels by imagegen; no page overlay"
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch12-source-capture-plan-20261022.json",
+        "previewChecks": "docs/review-images/batch12-source-copies-20261022.json",
+        "inventoryAt": "2026-10-22T05:36:36.549Z",
+        "sourceThumbnailCheckedAt": "2026-10-22T05:40:13.431Z",
+        "sceneInterpretation": "black sunglasses and festive wedding dance",
+        "visualSourceNotes": "Source preview shows sunglasses, gold/red festive outfits and Kala Chashma title. New overhead wedding courtyard uses original figures and a sunglasses motif without copying actors, poses or poster.",
+        "limits": "Exact published identity, visually decoded publisher preview and documented review theme only; no fresh continuous footage/audio inspection or claim of a real frame/location/celebrity likeness."
+      },
+      "sourcePreviewCopy": {
+        "id": 116,
+        "url": "https://i.ytimg.com/vi/k4yXQkG2s1E/hqdefault.jpg",
+        "path": "/review-source-images/116-7dce6a42152016a5.jpg",
+        "bytes": 34280,
+        "sha256": "7dce6a42152016a536477d81f96db66ff1c87424365156b510f5ade6fff9ef6d",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-22T05:40:13.431Z",
+        "evidence": "docs/review-images/batch12-source-copies-20261022.json",
+        "note": "Unmodified publisher JPEG bytes, not newly captured footage or generated art."
+      },
+      "verificationLimits": "Preserve owner/source media, VideoObject eligibility/thumbnail, dates, text, all D1/R2 and holds. Publication gated on current-head CI/dry-run and actual deployment/live HTTP/hash/HTML/sitemap associations."
+    },
+    {
+      "id": 117,
+      "slug": "full-song-khairiyat-bonus-track-chhichhore-sushant-shraddha-pritam-amitabh-b-arijit-singh",
+      "prompt": "Use case: stylized-concept.\nAsset type: original editorial review illustration for one exact Vid.Best video review, a separate image2 beside its unchanged publisher preview.\nCreate a beautiful high-definition16:9 landscape, ideally1600x900, filling the whole canvas without borders or letterboxing. Distinctive cinematic anime/stylized painted art with careful depth, expressive light and attractive detail; original composition, not a generic card.\nScene: A quiet invented university quadrangle after monsoon rain, seen through an arched library window at late afternoon. On the window ledge an open blank notebook and two steaming tea cups; in the distance two small anonymous adult students walk side by side beneath a shared plain teal umbrella across a reflective stone path. Lush trees, ochre walls and soft rain light create gentle wistful anime nostalgia and companionship. No readable writing, no recognizable actors, no exact film location, no invented health or relationship outcome.\nGrounding: interpret only the documented theme 'college nostalgia, affection and memory'. This is conceptual review art, NOT a captured source video frame. Do not reproduce a publisher poster, film frame, creator logo, celebrity likeness or copyrighted frame composition.\nText(verbatim): \"vid.best\" in small crisp unobtrusive lowercase white lettering with a subtle dark edge at the bottom-right, integrated INSIDE the image pixels, with a comfortable margin. Spell v i d . b e s t exactly. This must be the only text anywhere in the image.\nNo AI, AI-generated, generated-by or production/disclosure lettering, no title text, no official badge, no play icon, no imitation watermark or other logo. No fabricated footage/audio/event/location/health/rescue claim.",
+      "asset": "public/review-illustrations/khairiyat-campus-memory-anime-v1.webp",
+      "bytes": 274408,
+      "sha256": "00a93ae005489f5ee927332dc0baf801185f5a6af4af26a3ef279db3c0f23b42",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-22T05:48:19.687921+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "8630a2e7d77705db77492509c9fe8c8f166b5bffd62b0cda38a6937c5e4712ce",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 82,
+        "method": 6,
+        "scope": "Technical size/format conversion only; original generated PNG retained."
+      },
+      "embeddedWatermark": {
+        "text": "vid.best",
+        "placement": "bottom-right",
+        "method": "Built into original image pixels by imagegen; no page overlay"
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch12-source-capture-plan-20261022.json",
+        "previewChecks": "docs/review-images/batch12-source-copies-20261022.json",
+        "inventoryAt": "2026-10-22T05:36:36.549Z",
+        "sourceThumbnailCheckedAt": "2026-10-22T05:40:13.446Z",
+        "sceneInterpretation": "college nostalgia, affection and memory",
+        "visualSourceNotes": "Source preview identifies Khairiyat with a romantic pair; saved review explicitly discusses college nostalgia. New invented campus/back-view figures are conceptual, not a claimed observed frame.",
+        "limits": "Exact published identity, visually decoded publisher preview and documented review theme only; no fresh continuous footage/audio inspection or claim of a real frame/location/celebrity likeness."
+      },
+      "sourcePreviewCopy": {
+        "id": 117,
+        "url": "https://i.ytimg.com/vi/hoNb6HuNmU0/hqdefault.jpg",
+        "path": "/review-source-images/117-c698965070e2bcce.jpg",
+        "bytes": 37070,
+        "sha256": "c698965070e2bcce59c0a4962ee71145a5462e9bc481d80248eef5b9ab2b17b6",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-22T05:40:13.446Z",
+        "evidence": "docs/review-images/batch12-source-copies-20261022.json",
+        "note": "Unmodified publisher JPEG bytes, not newly captured footage or generated art."
+      },
+      "verificationLimits": "Preserve owner/source media, VideoObject eligibility/thumbnail, dates, text, all D1/R2 and holds. Publication gated on current-head CI/dry-run and actual deployment/live HTTP/hash/HTML/sitemap associations."
+    },
+    {
+      "id": 137,
+      "slug": "the-balrog-of-morgoth-the-lord-of-the-rings-the-fellowship-of-the-ring-scene-analysis-why-the-balrog",
+      "prompt": "Use case: stylized-concept.\nAsset type: original editorial review illustration for one exact Vid.Best video review, a separate image2 beside its unchanged publisher preview.\nCreate a beautiful high-definition16:9 landscape, ideally1600x900, filling the whole canvas without borders or letterboxing. Distinctive cinematic anime/stylized painted art with careful depth, expressive light and attractive detail; original composition, not a generic card.\nScene: A monumental original underground cavern with jagged basalt columns and a deep chasm; a thin broken stone path curves across the lower foreground, where one tiny anonymous cloaked traveler stands with an ordinary lantern. Far beyond, an immense wall of ember-red fire and roiling smoke casts an ambiguous looming shadow against the vault, suggesting overwhelming supernatural dread without a defined monster face, horns or copyrighted creature design. Sweeping high-angle hand-painted anime fantasy environment, molten orange light against deep charcoal and ash blue, extreme scale and rich atmospheric detail. No Gandalf likeness or exact Moria bridge/frame recreation.\nGrounding: interpret only the documented theme 'supernatural dread through fire, shadow and scale'. This is conceptual review art, NOT a captured source video frame. Do not reproduce a publisher poster, film frame, creator logo, celebrity likeness or copyrighted frame composition.\nText(verbatim): \"vid.best\" in small crisp unobtrusive lowercase white lettering with a subtle dark edge at the bottom-right, integrated INSIDE the image pixels, with a comfortable margin. Spell v i d . b e s t exactly. This must be the only text anywhere in the image.\nNo AI, AI-generated, generated-by or production/disclosure lettering, no title text, no official badge, no play icon, no imitation watermark or other logo. No fabricated footage/audio/event/location/health/rescue claim.",
+      "asset": "public/review-illustrations/balrog-fire-and-shadow-chasm-anime-v1.webp",
+      "bytes": 292974,
+      "sha256": "32e5ae42d994e426afeca33a4a5fffa6f6afc5e60d1aaa189f03e422cc498fdc",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-22T05:48:58.700878+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "eb80b0a8e0b0b12762f5f831a602bfa8c73feaa496b2a25a77e8622a6986eb9e",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 90,
+        "method": 6,
+        "scope": "Technical size/format conversion only; original generated PNG retained."
+      },
+      "embeddedWatermark": {
+        "text": "vid.best",
+        "placement": "bottom-right",
+        "method": "Built into original image pixels by imagegen; no page overlay"
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch12-source-capture-plan-20261022.json",
+        "previewChecks": "docs/review-images/batch12-source-copies-20261022.json",
+        "inventoryAt": "2026-10-22T05:36:36.549Z",
+        "sourceThumbnailCheckedAt": "2026-10-22T05:40:13.470Z",
+        "sceneInterpretation": "supernatural dread through fire, shadow and scale",
+        "visualSourceNotes": "Preview is a fiery horned monster face. New environmental concept avoids that character's detailed design, source framing, logos and actor likeness.",
+        "limits": "Exact published identity, visually decoded publisher preview and documented review theme only; no fresh continuous footage/audio inspection or claim of a real frame/location/celebrity likeness."
+      },
+      "sourcePreviewCopy": {
+        "id": 137,
+        "url": "https://i.ytimg.com/vi/t6gvqwhUozM/hqdefault.jpg",
+        "path": "/review-source-images/137-08f624cd95cab5f3.jpg",
+        "bytes": 10240,
+        "sha256": "08f624cd95cab5f399d69702e1bc36fde919133180cb1e5a6f2156705960f4fc",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-22T05:40:13.470Z",
+        "evidence": "docs/review-images/batch12-source-copies-20261022.json",
+        "note": "Unmodified publisher JPEG bytes, not newly captured footage or generated art."
+      },
+      "verificationLimits": "Preserve owner/source media, VideoObject eligibility/thumbnail, dates, text, all D1/R2 and holds. Publication gated on current-head CI/dry-run and actual deployment/live HTTP/hash/HTML/sitemap associations."
+    },
+    {
+      "id": 138,
+      "slug": "dandanakka-romeo-juliet-jayam-ravi",
+      "prompt": "Use case: stylized-concept.\nAsset type: original editorial review illustration for one exact Vid.Best video review, a separate image2 beside its unchanged publisher preview.\nCreate a beautiful high-definition16:9 landscape, ideally1600x900, filling the whole canvas without borders or letterboxing. Distinctive cinematic anime/stylized painted art with careful depth, expressive light and attractive detail; original composition, not a generic card.\nScene: A vibrant invented Tamil street celebration at dusk, viewed at a dramatic low diagonal past a large hand-played double-headed drum in the foreground. Anonymous adult dancers seen mostly from behind move along a lane with strings of simple lights and vivid cloth streamers; one fictional drummer's hands give a sharp sense of rhythm. Warm vermilion walls, cobalt evening shadows and amber lantern glow; exuberant stylized anime cinematic illustration, detailed drum wood and fabric movement. No film stars, recognizable faces, celebrity tribute portrait, copied movie pose, branded signs or factual event claim.\nGrounding: interpret only the documented theme 'Tamil cinema tribute and energetic communal rhythm'. This is conceptual review art, NOT a captured source video frame. Do not reproduce a publisher poster, film frame, creator logo, celebrity likeness or copyrighted frame composition.\nText(verbatim): \"vid.best\" in small crisp unobtrusive lowercase white lettering with a subtle dark edge at the bottom-right, integrated INSIDE the image pixels, with a comfortable margin. Spell v i d . b e s t exactly. This must be the only text anywhere in the image.\nNo AI, AI-generated, generated-by or production/disclosure lettering, no title text, no official badge, no play icon, no imitation watermark or other logo. No fabricated footage/audio/event/location/health/rescue claim.",
+      "asset": "public/review-illustrations/dandanakka-tamil-street-percussion-anime-v1.webp",
+      "bytes": 295176,
+      "sha256": "189862829fc6e97c1a5573be5336180d32a7b5e919ae1937b2baef4a6eefae07",
+      "width": 1600,
+      "height": 900,
+      "generatedOn": "2026-10-22T05:49:35.045818+00:00",
+      "generationMode": "built-in image_gen.imagegen; one call per distinct asset",
+      "generatedFileSha256": "fa665eb810dafdf1329a754cc97b010f30e8f521fe2a8a7aa9e4228a43345b3f",
+      "generatedDimensions": [
+        1672,
+        941
+      ],
+      "optimization": {
+        "format": "WebP",
+        "width": 1600,
+        "height": 900,
+        "quality": 88,
+        "method": 6,
+        "scope": "Technical size/format conversion only; original generated PNG retained."
+      },
+      "embeddedWatermark": {
+        "text": "vid.best",
+        "placement": "bottom-right",
+        "method": "Built into original image pixels by imagegen; no page overlay"
+      },
+      "sourceEvidence": {
+        "file": "docs/review-images/batch12-source-capture-plan-20261022.json",
+        "previewChecks": "docs/review-images/batch12-source-copies-20261022.json",
+        "inventoryAt": "2026-10-22T05:36:36.549Z",
+        "sourceThumbnailCheckedAt": "2026-10-22T05:40:13.511Z",
+        "sceneInterpretation": "Tamil cinema tribute and energetic communal rhythm",
+        "visualSourceNotes": "Preview identifies Dandanakka and its sunglasses-wearing film pair. New invented street-percussion celebration interprets the documented Tamil cinema/rhythm theme without faces, costumes or poster copying.",
+        "limits": "Exact published identity, visually decoded publisher preview and documented review theme only; no fresh continuous footage/audio inspection or claim of a real frame/location/celebrity likeness."
+      },
+      "sourcePreviewCopy": {
+        "id": 138,
+        "url": "https://i.ytimg.com/vi/1zRe8UPF1tM/hqdefault.jpg",
+        "path": "/review-source-images/138-32f738727ade856f.jpg",
+        "bytes": 39013,
+        "sha256": "32f738727ade856f5a7b36a89002ea0197a24ad64acc13bef59af2bc4f472842",
+        "width": 480,
+        "height": 360,
+        "mime": "image/jpeg",
+        "httpStatus": 200,
+        "modified": false,
+        "checkedAt": "2026-10-22T05:40:13.511Z",
+        "evidence": "docs/review-images/batch12-source-copies-20261022.json",
+        "note": "Unmodified publisher JPEG bytes, not newly captured footage or generated art."
+      },
+      "verificationLimits": "Preserve owner/source media, VideoObject eligibility/thumbnail, dates, text, all D1/R2 and holds. Publication gated on current-head CI/dry-run and actual deployment/live HTTP/hash/HTML/sitemap associations."
     }
   ],
   "ownerDesignPreference": {

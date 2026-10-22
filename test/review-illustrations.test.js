@@ -52,7 +52,7 @@ test('sidebar artwork assets have unique verified WebP bytes and complete bounde
 
 test('first-party publisher copies follow exact source identity and yield to later owner posters', () => {
   const paired = illustrations.filter(item => item.sourceImage?.path);
-  assert.equal(paired.length, 10);
+  assert.equal(paired.length, 20);
   for (const item of paired) {
     const row = {id:item.id,slug:item.slug,title:item.expectedTitle,source_url:item.sourceUrl,published:1};
     const before = structuredClone(row);
