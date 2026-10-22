@@ -229,7 +229,8 @@ test("failed local cover releases its label/contain style and uses a finite exis
 });
 
 test("refresh failure, detached cards and missing preview service do not remove the server cover", async () => {
-  const h = browserHarness(); h.reject(new Error("temporary metadata failure")); await settle();
+  const h = browserHarness(); await settle();
+  assert.equal(h.serviceCalls.length, 0, "the page never starts a background provider lookup");
   assert.equal(h.image.src, cover); assert.equal(h.kicker.textContent, illustrationLabel);
   const detached = browserHarness(); detached.card.isConnected = false;
   detached.resolve({ title: "Late title", thumbnail_url: providerPoster }); await settle();
