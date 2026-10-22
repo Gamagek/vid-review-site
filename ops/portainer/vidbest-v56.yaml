@@ -17,6 +17,7 @@ services:
       APP_VERSION: "56-R2-ADMIN-APPROVED-RAPIDAPI-CACHE"
       MIRROR_ENABLED: "${MIRROR_ENABLED:-0}"
       MIRROR_HMAC_KEY: "${MIRROR_HMAC_KEY:-}"
+      MIRROR_DIR: "/app/state/vidbest-disk-mirror"
       PORT: "8080"
       R2_ENDPOINT: "https://de9e41200f6bdfab80553c8eb08f9b16.r2.cloudflarestorage.com"
       R2_BUCKET_NAME: "vid-assets"
@@ -52,7 +53,7 @@ services:
       const path = require("node:path");
       
       const PREFIX = "/__mirror/v1/";
-      const DISK = "/app/state/vidbest-disk-mirror";
+      const DISK = process.env.MIRROR_DIR || "/app/state/vidbest-disk-mirror";
       const ACTIVE = process.env.MIRROR_ENABLED === "1";
       const KEY = process.env.MIRROR_HMAC_KEY || "";
       const MAX_REQUEST = 1450000;
