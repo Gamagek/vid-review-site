@@ -67,7 +67,7 @@ function policyFor(request) {
   const params = new URLSearchParams(url.searchParams);
   params.sort();
   canonical.search = params.toString();
-  return { canonical: canonical.toString(), kind, snapshot };
+  return { canonical: canonical.toString(), kind, snapshot, route: path + (params.toString() ? "?" + params.toString() : "") };
 }
 
 function policyRevision(kind) {
@@ -138,6 +138,111 @@ function edgeCache() {
   catch { return null; }
 }
 
+
+// Optional Oracle snapshot replication/failover: OFF until separate Portainer,
+// Worker-secret and end-to-end canary checks explicitly enable the flag.
+// Never mirror session, member, mutations, watch HTML, arbitrary search or admin APIs.
+const MIRROR_FIELDS = ["id","slug","title","description","primary_category","subcategory","thumbnail_url","media_type","provider","source_url","embed_url","views","reaction_count","created_at","review_text","seo_title","seo_description","seo_tags","reactions","preview_poster_url","review_artwork_url","review_artwork_alt","review_preview_url","featured","trending","published","has_captions","redistribution_certified"];
+const MIRROR_MAX_AGE = 48 * 60 * 60;
+const MIRROR_PATH = "/__mirror/v1/snapshots";
+const MIRROR_ORIGIN = "https://video.megasale.win";
+const MIRROR_MIME_JSON = "application/json; charset=utf-8";
+const MIRROR_MIME_XML = "application/xml; charset=utf-8";
+
+function mirrorEnabled(env, policy) {
+  return env?.MIRROR_PUBLIC_SNAPSHOTS === "1" &&
+    typeof env?.MIRROR_HMAC_KEY === "string" && env.MIRROR_HMAC_KEY.length >= 32 &&
+    policy?.snapshot === true && (policy.kind === "json" || policy.kind === "xml") &&
+    typeof policy.route === "string" &&
+    (policy.kind === "xml" || /^\/api\/videos(?:\?|$)/.test(policy.route));
+}
+function projectedMirrorDocument(policy, body, sourceHeaders) {
+  if (new TextEncoder().encode(body).byteLength > 1_200_000) return null;
+  const headers = {};
+  for (const name of ["X-Robots-Tag","Content-Security-Policy","Referrer-Policy","X-Frame-Options"]) {
+    const value = sourceHeaders?.get?.(name);
+    if (value && value.length <= 2000) headers[name] = value;
+  }
+  if (policy.kind === "xml") {
+    if (!/^\s*<\?xml/.test(body) || /<!DOCTYPE|<!ENTITY/i.test(body)) return null;
+    return { route: policy.route, kind: "sitemap_xml", mime: MIRROR_MIME_XML, body, headers };
+  }
+  if (policy.kind !== "json" || !policy.route.startsWith("/api/videos")) return null;
+  try {
+    const parsed = JSON.parse(body);
+    if (!Array.isArray(parsed.videos) || parsed.videos.length > 48 || !parsed.pagination) return null;
+    const pages = parsed.pagination;
+    if (Object.keys(pages).some(k => !["limit","offset","total"].includes(k)) ||
+        Object.values(pages).some(n => !Number.isSafeInteger(n) || n < 0)) return null;
+    const videos = [];
+    for (const src of parsed.videos) {
+      if (!src || typeof src !== "object" || !Number.isSafeInteger(src.id) || src.id < 1 ||
+          typeof src.slug !== "string" || !/^[a-z0-9][a-z0-9-]{0,199}$/.test(src.slug) ||
+          src.published === false) return null;
+      const v = {};
+      for (const key of MIRROR_FIELDS) {
+        if (src[key] !== undefined) v[key] = src[key];
+      }
+      // Explicitly discard unexpected top-level database/actor fields.
+      if (Object.entries(v).some(([k,val]) => /url$/i.test(k) && val && typeof val === "string" &&
+          /(?:token|secret|access_token|auth|api_key|password|signature)=/i.test(val))) return null;
+      videos.push(v);
+    }
+    const safeBody = JSON.stringify({videos,pagination:{
+      limit:pages.limit,offset:pages.offset,total:pages.total,
+    }});
+    if (new TextEncoder().encode(safeBody).byteLength > 1_200_000) return null;
+    return { route: policy.route, kind: "public_videos_json", mime: MIRROR_MIME_JSON, body: safeBody, headers };
+  } catch { return null; }
+}
+function hexMirror(bytes) {
+  return [...new Uint8Array(bytes)].map(n => n.toString(16).padStart(2,"0")).join("");
+}
+async function mirrorCall(env, method, target, jsonBody) {
+  const stamp = String(Math.floor(Date.now() / 1000));
+  const body = jsonBody === undefined ? "" : JSON.stringify(jsonBody);
+  if (new TextEncoder().encode(body).byteLength > 1_450_000) return null;
+  const encoder = new TextEncoder();
+  const digest = hexMirror(await crypto.subtle.digest("SHA-256",encoder.encode(body)));
+  const key = await crypto.subtle.importKey("raw",encoder.encode(env.MIRROR_HMAC_KEY),
+    {name:"HMAC",hash:"SHA-256"},false,["sign"]);
+  const signature = hexMirror(await crypto.subtle.sign("HMAC",key,
+    encoder.encode(stamp+"\n"+method+"\n"+target+"\n"+digest)));
+  try {
+    const upstream = await fetch(MIRROR_ORIGIN+target,{
+      method,cache:"no-store",redirect:"error",signal:AbortSignal.timeout(1500),
+      headers:{"X-Mirror-Timestamp":stamp,"X-Mirror-Signature":signature,
+        ...(jsonBody === undefined ? {} : {"Content-Type":"application/json"})},
+      ...(jsonBody === undefined ? {} : {body}),
+    });
+    if (!upstream.ok) return null;
+    return await upstream.json();
+  } catch { return null; }
+}
+async function readOracleSnapshot(env, policy) {
+  if (!mirrorEnabled(env,policy)) return null;
+  const target = MIRROR_PATH + "?route=" + encodeURIComponent(policy.route);
+  const obj = await mirrorCall(env,"GET",target);
+  if (!obj || obj.route !== policy.route || !Number.isFinite(obj.age) ||
+      obj.age < 0 || obj.age > MIRROR_MAX_AGE || typeof obj.body !== "string" ||
+      !validBody(policy.kind,obj.body) ||
+      (policy.kind === "json" && (obj.kind !== "public_videos_json" || obj.mime !== MIRROR_MIME_JSON)) ||
+      (policy.kind === "xml" && (obj.kind !== "sitemap_xml" || obj.mime !== MIRROR_MIME_XML))) return null;
+  const headers = new Headers({"Content-Type":obj.mime,"Cache-Control":"no-store",
+    "X-Content-Type-Options":"nosniff"});
+  for (const name of ["X-Robots-Tag","Content-Security-Policy","Referrer-Policy","X-Frame-Options"]) {
+    const value=obj.headers?.[name];
+    if (typeof value === "string" && value.length <= 2000) headers.set(name,value);
+  }
+  return new Response(obj.body,{status:200,headers});
+}
+async function writeOracleSnapshot(env, policy, body, headers) {
+  if (!mirrorEnabled(env,policy)) return;
+  const doc=projectedMirrorDocument(policy,body,headers);
+  if (!doc) return;
+  await mirrorCall(env,"PUT",MIRROR_PATH,doc);
+}
+
 async function persist(env, ctx, policy, cacheKey, response, body, type, robots, writeSnapshot = true) {
   const tasks = [];
   const cache = edgeCache();
@@ -159,6 +264,9 @@ async function persist(env, ctx, policy, cacheKey, response, body, type, robots,
       }), { httpMetadata: { contentType: "application/json" } });
     })());
   }
+  // Replicate eligible, previously validated public snapshots only. This also
+  // lets a cold edge R2 read warm the disk mirror without any new D1 query.
+  if (mirrorEnabled(env,policy)) tasks.push(writeOracleSnapshot(env,policy,body,response.headers));
   if (!tasks.length) return;
   const work = Promise.allSettled(tasks).then((settled) => {
     if (settled.some((task) => task.status === "rejected")) console.warn("A public cache write was deferred");
@@ -197,12 +305,18 @@ async function resolveMiss(request, env, ctx, handler, policy) {
   try { response = await handler(); }
   catch (error) {
     if (saved) return browserResponse(fromSnapshot(saved), "R2-STALE");
+    const mirror = await readOracleSnapshot(env,policy);
+    if (mirror) return browserResponse(mirror,"ORACLE-STALE");
     throw error;
   }
   // A no-store/private origin response must NEVER enter edge or R2, including JSON.
   if (!response.ok || response.headers.has("Set-Cookie") ||
     /(?:^|,)\s*(?:private|no-store)\b/i.test(response.headers.get("Cache-Control") || "")) {
     if (response.status >= 500 && saved) return browserResponse(fromSnapshot(saved), "R2-STALE");
+    if (response.status >= 500) {
+      const mirror=await readOracleSnapshot(env,policy);
+      if (mirror) return browserResponse(mirror,"ORACLE-STALE");
+    }
     return response;
   }
   // Require an explicit origin public directive before caching JSON responses.

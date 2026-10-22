@@ -15,6 +15,9 @@ services:
     working_dir: /app
     environment:
       APP_VERSION: "56-R2-ADMIN-APPROVED-RAPIDAPI-CACHE"
+      MIRROR_ENABLED: "${MIRROR_ENABLED:-0}"
+      MIRROR_HMAC_KEY: "${MIRROR_HMAC_KEY:-}"
+      MIRROR_DIR: "/app/state/vidbest-disk-mirror"
       PORT: "8080"
       R2_ENDPOINT: "https://de9e41200f6bdfab80553c8eb08f9b16.r2.cloudflarestorage.com"
       R2_BUCKET_NAME: "vid-assets"
@@ -39,10 +42,189 @@ services:
     - /bin/sh
     - -ec
     - |
+      cat > /app/vidbest-mirror.js <<'VIDBEST_MIRROR_JS'
+      "use strict";
+      // Standalone disk mirror INSIDE the existing app. No additional stack, image or process.
+      // Intentionally restricted to public snapshots: interactions stay OFF until D1
+      // idempotency + reconciliation is proven. Opt-in MIRROR_ENABLED=1 only after staging.
+      const fs = require("node:fs");
+      const fsp = require("node:fs/promises");
+      const crypto = require("node:crypto");
+      const path = require("node:path");
+      
+      const PREFIX = "/__mirror/v1/";
+      const DISK = process.env.MIRROR_DIR || "/app/state/vidbest-disk-mirror";
+      const ACTIVE = process.env.MIRROR_ENABLED === "1";
+      const KEY = process.env.MIRROR_HMAC_KEY || "";
+      const MAX_REQUEST = 1450000;
+      const MAX_SNAPSHOT = 1200000;
+      const MAX_FILES = 2500;
+      const MAX_DISK = 80 * 1024 * 1024;
+      const TTL_MS = 48 * 60 * 60 * 1000;
+      const VIDEO_KEYS = new Set(["id","slug","title","description","primary_category","subcategory","thumbnail_url","media_type","provider","source_url","embed_url","views","reaction_count","created_at","review_text","seo_title","seo_description","seo_tags","reactions","preview_poster_url","review_artwork_url","review_artwork_alt","review_preview_url","featured","trending","published","has_captions","redistribution_certified"]);
+      let running = 0;
+      
+      function reply(res, status, value) {
+        const text = JSON.stringify(value);
+        res.writeHead(status, {"Content-Type":"application/json; charset=utf-8","Content-Length":String(Buffer.byteLength(text)),"Cache-Control":"no-store","X-Content-Type-Options":"nosniff","X-Robots-Tag":"noindex, nofollow"});
+        res.end(text);
+      }
+      function hex(value) { return crypto.createHash("sha256").update(value).digest("hex"); }
+      function hmac(timestamp, method, target, body) {
+        return crypto.createHmac("sha256",KEY).update(timestamp+"\n"+method+"\n"+target+"\n"+hex(body)).digest("hex");
+      }
+      function auth(req, body) {
+        const time = req.headers["x-mirror-timestamp"];
+        const given = req.headers["x-mirror-signature"];
+        if (KEY.length < 32 || typeof time !== "string" || !/^\d{10,12}$/.test(time) || typeof given !== "string" || !/^[0-9a-f]{64}$/.test(given)) return false;
+        if (Math.abs(Math.floor(Date.now()/1000)-Number(time)) > 90) return false;
+        const expected = Buffer.from(hmac(time,req.method,req.url,body),"hex");
+        return crypto.timingSafeEqual(expected,Buffer.from(given,"hex"));
+      }
+      function safeRoute(route) {
+        if (typeof route !== "string" || route.length > 400) return false;
+        if (/^\/watch\/[a-z0-9][a-z0-9-]{0,199}$/.test(route)) return true;
+        if (/^\/(?:sitemap\.xml|image-(?:editorial-|source-)?sitemap\.xml|sitemaps\/[a-z0-9-]+\.xml)$/.test(route)) return true;
+        if (!route.startsWith("/api/videos")) return false;
+        try {
+          const u = new URL(route,"https://vid.best");
+          if (u.pathname !== "/api/videos" || !/^\/api\/videos(?:\?|$)/.test(route)) return false;
+          const allowed=new Set(["category","subcategory","featured","trending","sort","limit","offset"]);
+          for (const key of u.searchParams.keys()) if (!allowed.has(key) || u.searchParams.getAll(key).length !== 1) return false;
+          const offset = Number(u.searchParams.get("offset") || 0);
+          return Number.isSafeInteger(offset) && offset >= 0 && offset <= 48;
+        } catch { return false; }
+      }
+      function cleanFields(obj, keys) {
+        return obj && typeof obj === "object" && !Array.isArray(obj) && Object.keys(obj).every(k=>keys.has(k));
+      }
+      function safeVideo(video) {
+        if (!cleanFields(video,VIDEO_KEYS) || !Number.isSafeInteger(video.id) || video.id < 1 || typeof video.slug !== "string" || !/^[a-z0-9][a-z0-9-]{0,199}$/.test(video.slug)) return false;
+        for (const [key,value] of Object.entries(video)) {
+          if (typeof value === "string" && value.length > 60000) return false;
+          if (/url$/i.test(key) && value) {
+            if (typeof value !== "string" || value.length > 2048) return false;
+            let u;
+            try { u = new URL(value, "https://vid.best"); } catch { return false; }
+            if (u.protocol !== "https:" || u.username || u.password || u.port || /(?:token|secret|access_token|auth|api_key|password|signature)=/i.test(u.search)) return false;
+          }
+          if (key === "reactions" && (!cleanFields(value,new Set(["like","love","useful"])) || Object.values(value).some(n=>!Number.isSafeInteger(n)||n<0))) return false;
+          if (key === "seo_tags" && !(typeof value === "string" && value.length < 1500) && !(Array.isArray(value) && value.length <= 30 && value.every(v=>typeof v==="string" && v.length<80))) return false;
+        }
+        return true;
+      }
+      function validDoc(doc) {
+        if (!cleanFields(doc,new Set(["route","kind","mime","body","headers"])) || Object.keys(doc).length<4 || !safeRoute(doc.route) || typeof doc.body!=="string" || Buffer.byteLength(doc.body)>MAX_SNAPSHOT) return false;
+        if (doc.headers && (!cleanFields(doc.headers,new Set(["X-Robots-Tag","Content-Security-Policy","Referrer-Policy","X-Frame-Options"])) || Object.values(doc.headers).some(v=>typeof v!=="string" || v.length>2000))) return false;
+        if (doc.route.startsWith("/api/videos")) {
+          if (doc.kind!=="public_videos_json" || doc.mime!=="application/json; charset=utf-8") return false;
+          try {
+            const data=JSON.parse(doc.body);
+            return cleanFields(data,new Set(["videos","pagination"])) && Array.isArray(data.videos) && data.videos.length<=48 &&
+              data.videos.every(safeVideo) && (!data.pagination || (cleanFields(data.pagination,new Set(["limit","offset","total"])) && Object.values(data.pagination).every(v=>Number.isSafeInteger(v)&&v>=0)));
+          } catch { return false; }
+        }
+        if (doc.route.startsWith("/watch/")) {
+          if (doc.kind!=="review_json" || doc.mime!=="application/json; charset=utf-8") return false;
+          try {
+            const data=JSON.parse(doc.body);
+            return safeVideo(data) && data.slug===doc.route.slice(7) && typeof data.review_text==="string";
+          } catch { return false; }
+        }
+        return doc.kind==="sitemap_xml" && doc.mime==="application/xml; charset=utf-8" && /^\s*<\?xml/.test(doc.body) && !/<!DOCTYPE|<!ENTITY/i.test(doc.body);
+      }
+      function target(route) { return path.join(DISK,"snapshots",hex(route)+".json"); }
+      async function atomicSave(file, data) {
+        await fsp.mkdir(path.dirname(file),{recursive:true,mode:0o700});
+        const temp=file+"."+crypto.randomBytes(8).toString("hex")+".tmp";
+        try {
+          const handle=await fsp.open(temp,"wx",0o600);
+          try { await handle.writeFile(data); await handle.sync(); } finally { await handle.close(); }
+          await fsp.rename(temp,file);
+        } finally { await fsp.rm(temp,{force:true}).catch(()=>{}); }
+      }
+      async function save(doc) {
+        if (!validDoc(doc)) return false;
+        const dir=path.join(DISK,"snapshots");
+        await fsp.mkdir(dir,{recursive:true,mode:0o700});
+        const dest=target(doc.route);
+        const buffer=Buffer.from(JSON.stringify({...doc,created_at:Date.now()}));
+        const names=(await fsp.readdir(dir)).filter(n=>/^[a-f0-9]{64}\.json$/.test(n));
+        const existing=[];
+        let total=0;
+        for (const name of names) {
+          const file=path.join(dir,name), stat=await fsp.stat(file);
+          if (file===dest) continue;
+          existing.push({file,size:stat.size,modified:stat.mtimeMs});
+          total+=stat.size;
+        }
+        existing.sort((a,b)=>a.modified-b.modified);
+        while ((existing.length+1>MAX_FILES || total+buffer.length>MAX_DISK) && existing.length) {
+          const item=existing.shift();
+          await fsp.rm(item.file,{force:true});
+          total-=item.size;
+        }
+        if (buffer.length+total>MAX_DISK) return false;
+        await atomicSave(dest,buffer);
+        return true;
+      }
+      async function load(route) {
+        if (!safeRoute(route)) return null;
+        let data;
+        try {data=await fsp.readFile(target(route));}
+        catch (error) {if(error.code==="ENOENT")return null;throw error;}
+        if(data.length>MAX_REQUEST) return null;
+        const doc=JSON.parse(data);
+        if (!Number.isFinite(doc.created_at) || doc.created_at>Date.now()+90000 || Date.now()-doc.created_at>TTL_MS) return null;
+        const {route:stored,kind,mime,body,headers}=doc;
+        if(stored!==route || !validDoc({route:stored,kind,mime,body,headers})) return null;
+        return {route,kind,mime,body,headers:headers||{},age:Math.max(0,Math.floor((Date.now()-doc.created_at)/1000))};
+      }
+      async function readBody(req) {
+        const len=req.headers["content-length"];
+        if (len!==undefined && (!/^\d+$/.test(String(len)) || Number(len)>MAX_REQUEST)) throw Error("request too large");
+        const chunks=[];let length=0;
+        for await (const part of req) {
+          length+=part.length;
+          if(length>MAX_REQUEST) throw Error("request too large");
+          chunks.push(part);
+        }
+        if (len!==undefined && Number(len)!==length) throw Error("length mismatch");
+        return Buffer.concat(chunks,length);
+      }
+      async function handle(req,res) {
+        const targetUrl=req.url||"/";
+        if(!targetUrl.startsWith(PREFIX)) return false;
+        if (!ACTIVE || KEY.length<32) {reply(res,404,{error:"not found"});return true;}
+        if (++running>2) {running--;reply(res,503,{error:"busy"});return true;}
+        try {
+          const body=await readBody(req);
+          if (!auth(req,body)) {reply(res,401,{error:"unauthorized"});return true;}
+          const parsed=new URL(targetUrl,"https://video.megasale.win");
+          if(parsed.pathname===PREFIX+"snapshots" && req.method==="PUT") {
+            const doc=JSON.parse(body.toString("utf8"));
+            const ok=await save(doc);
+            reply(res,ok?200:400,{saved:ok});return true;
+          }
+          if(parsed.pathname===PREFIX+"snapshots" && req.method==="GET") {
+            const route=parsed.searchParams.get("route")||"";
+            const found=await load(route);
+            reply(res,found?200:404,found||{error:"snapshot missing"});return true;
+          }
+          // Event endpoints are deliberately unavailable until a durable D1 event
+          // idempotency ledger and replay tests are verified end-to-end.
+          reply(res,404,{error:"not found"});return true;
+        } catch(error) {
+          reply(res,503,{error:"mirror unavailable"});return true;
+        } finally {running--;}
+      }
+      module.exports={handle,safeRoute,validDoc,save,load};
+      VIDBEST_MIRROR_JS
       cat > /app/server.js <<'VIDBEST_GATEWAY_JS'
       const http = require("http");
       const crypto = require("crypto");
       const fs = require("fs");
+      const vidbestMirror = require("./vidbest-mirror.js");
       const { spawn } = require("child_process");
       const { Readable, Transform } = require("stream");
       const { pipeline } = require("stream/promises");
@@ -661,6 +843,7 @@ services:
       async function handle(req, res) {
         try {
           const url = new URL(req.url || "/", "http://" + (req.headers.host || "localhost"));
+          if (await vidbestMirror.handle(req, res)) return;
 
           // Public web UI, but provider calls require the user-supplied secret tester token.
           if (url.pathname === "/tester" || url.pathname === "/tester/") {
