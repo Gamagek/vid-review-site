@@ -43,6 +43,30 @@ function publicVideos() {
   });
 }
 
+test("artwork XML releases ignore the previous catalog snapshot while public API cache keys stay stable", async () => {
+  const previous = globalThis.caches;
+  const cache = createCache();
+  globalThis.caches = { default: cache };
+  try {
+    await cache.put(new Request("https://vid.best/__public_cache/v1/sitemaps/images-editorial-1.xml"),
+      new Response('<?xml version="1.0"?><urlset>Old artwork catalog</urlset>', { headers: { "Content-Type": "application/xml" } }));
+    await cache.put(new Request("https://vid.best/__public_cache/v1/api/videos"), publicVideos());
+    let xmlQueries = 0;
+    const ctx = createContext();
+    const response = await cachedPublicResponse(new Request("https://vid.best/sitemaps/images-editorial-1.xml"), {}, ctx, () => {
+      xmlQueries += 1;
+      return new Response('<?xml version="1.0"?><urlset>Current artwork catalog</urlset>', { headers: { "Content-Type": "application/xml" } });
+    });
+    assert.match(await response.text(), /Current artwork catalog/);
+    assert.equal(xmlQueries, 1);
+    await ctx.flush();
+    const api = await cachedPublicResponse(new Request("https://vid.best/api/videos"), {}, ctx, () => {
+      throw new Error("The existing public API cache must survive artwork publication");
+    });
+    assert.equal(api.headers.get("X-VidBest-Edge-Cache"), "HIT");
+  } finally { globalThis.caches = previous; }
+});
+
 test("public video listings use edge HIT without a second D1 call, but browser storage stays disabled", async () => {
   const previous = globalThis.caches;
   globalThis.caches = { default: createCache() };

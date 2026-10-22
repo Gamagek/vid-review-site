@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-21T22:47:36.873540+00:00",
+  "pr": 255,
+  "preparedArtworksFromEarlierRun": 10,
+  "newGenerated": 0,
+  "unchangedSourceCopiesPrepared": 10,
+  "merged": 0,
+  "deployed": 0,
+  "liveVerified": 0,
+  "preservation": {
+    "previous100ManifestAndProvenance": true,
+    "all110ArtworkHashesAndOriginalPrompts": true,
+    "all435QueueEntriesAndHolds": true,
+    "d1Writes": 0,
+    "r2Writes": 0,
+    "d1QueriesThisUpdate": 0
+  },
+  "validation": {
+    "localNodeTests": 467,
+    "localNodePass": 467,
+    "workerDryRun": true,
+    "finalExactHeadCI": "pending"
+  },
+  "browserFixture": "docs/review-images/batch11-layout-checks-20261022.json",
+  "sourceCopies": "docs/review-images/batch11-source-copies-20261022.json",
+  "limits": {
+    "d1": "Known HTTP400/code7500 daily row-read quota. No retry before2026-10-22T00:00:00Z. Fresh release identity and preservation checks remain required.",
+    "inventory": "Last readable snapshot501saved/501published at2026-10-21T17:41:22.163Z; current count unknown.",
+    "branding": "The pending10existing WebP bytes are unchanged; vid.best is a watch-page display overlay. Future newly generated files must embed the watermark.",
+    "sceneEvidence": "Publisher previews verified; no fresh continuous source-video/audio inspection or best-frame recreation claim.",
+    "browser": "Mobile fixture requestHTTP422/code6002timeout. No desktop request attempted afterward; no visual mobile or live publication success is claimed."
+  }
+}

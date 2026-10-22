@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "inventoryAt": "2026-10-20T06:55:41.181Z",
-  "publishedLibraryCount": 388,
+  "inventoryAt": "2026-10-22T04:37:22.541Z",
+  "publishedLibraryCount": 507,
   "batchLimit": 10,
-  "phase": "additive_sidebar_illustrations",
+  "phase": "batch11_preflight_verified_pending_release_ci",
   "policy": "Preserve all source/owner posters and all D1 fields. Match current published ID, slug, source and title before enabling art. Do not edit protected review topics/media or drafts. Reconcile newly published records on each run; no regeneration merely for freshness. The owner’s 18 October request authorizes separate sidebar artwork identified by truthful conceptual-not-source-frame captions for all published platforms/topics, including comedy, but never edits existing protected review text, SEO titles, source posters or players. Source-removal/demo/Saiyaara/Summer holds remain. The19October owner steering additionally authorizes identity-matched generated art in OpenGraph/Twitter/WebPage metadata and guarded fallback for genuinely broken listing previews; preserve working source posters/VideoObject evidence and all D1/R2 media fields.",
   "baseline": {
     "saved": 214,
@@ -291,8 +291,9 @@
       "slug": "lady-gaga-bruno-mars-die-with-a-smile-official-music-video",
       "category": "Music",
       "sourceSha256": "4794a42203c1d970f6f257f4f16b883cb31f1c643d2e05881a4083ac4d20b6ba",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 11
     },
     {
       "id": 37,
@@ -706,8 +707,9 @@
       "slug": "luis-fonsi-despacito-ft-daddy-yankee",
       "category": "Music",
       "sourceSha256": "844d66181a13d7e95bb88ae34b75853f2b7178597661dc8f8b1050965ed9dd89",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 11
     },
     {
       "id": 87,
@@ -803,8 +805,9 @@
       "slug": "3-why-this-kolaveri-di-official-video-dhanush-anirudh-ravichander-shruti-haasan",
       "category": "Music",
       "sourceSha256": "66c09546dfec3d3b0b55d14c6b8c37ca11ac3c9a8554394bd3f5f0fbf0f622bc",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 11
     },
     {
       "id": 99,
@@ -943,8 +946,9 @@
       "slug": "tujh-mein-rab-dikhta-hai-song-rab-ne-bana-di-jodi-shah-rukh-khan-anushka-sharma-roop-kumar",
       "category": "Music",
       "sourceSha256": "f0a74df9835f9ad36317d63c7ec3af4e30085ff45919eb525543f777e8827981",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 11
     },
     {
       "id": 116,
@@ -975,8 +979,9 @@
       "slug": "official-best-travelling-songs-of-bollywood-road-trip-songs-t-series",
       "category": "Music",
       "sourceSha256": "70f8a7cd7420d163473c0fa4994164fb476f513a01fee3c5ed51694479ab6be9",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 11
     },
     {
       "id": 120,
@@ -1067,24 +1072,27 @@
       "slug": "katy-perry-roar-how-katy-perry-conquered-the-jungle-in-roar",
       "category": "Music",
       "sourceSha256": "d9cd86022e70482d98a10ed587d82518fb4544b4ddf6217d731de03023cbc246",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 11
     },
     {
       "id": 131,
       "slug": "wiz-khalifa-see-you-again-ft-charlie-puth-official-video-furious-7-soundtrack",
       "category": "Music",
       "sourceSha256": "61df52dee5c59f34c0c8a710ad05a3c1574b539b1731dc0070d599d80833d1a4",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 11
     },
     {
       "id": 132,
       "slug": "guli-mata-saad-lamjarred-shreya-ghoshal-jennifer-winget-anshul-garg",
       "category": "Music",
       "sourceSha256": "c6682471f55e4af84426d44fc91d58ce8c6855c2f52f667d8ca2eff32608997b",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 11
     },
     {
       "id": 133,
@@ -1099,16 +1107,18 @@
       "slug": "rose-bruno-mars-apt-official-music-video",
       "category": "Music",
       "sourceSha256": "a9e7efa592a3c913cb7c16fb5cde408c1dfba2b2cecf184044db53497d5eb0dc",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 11
     },
     {
       "id": 135,
       "slug": "titli-chennai-express-full-video-song-shahrukh-khan-deepika-padukone-music-video-analysis-why-titli-",
       "category": "Music",
       "sourceSha256": "329b41a15bc81678eb3ea888c6a8211b120869593a887343ea110ab4af729e1f",
-      "status": "pending_theme_verification",
-      "provider": "youtube"
+      "status": "prepared",
+      "provider": "youtube",
+      "batch": 11
     },
     {
       "id": 136,
@@ -3186,9 +3196,385 @@
       "provider": "youtube",
       "sourceSha256": "27ebc4cbb1ed091d3625d8f39165b894aa15a07934721a833b1d5b2fd586b304",
       "status": "pending_theme_verification"
+    },
+    {
+      "id": 402,
+      "slug": "giraffe-surprise-lemon-squeeze-fails-and-cake-plate-prank",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "8f438b75c7b3ce474db98c9206a2e2b22b35363406e2f6f868929b0457bd7db2",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 403,
+      "slug": "kitchen-food-prank-gate-jump-yellow-dress-dance-and-flour-surprise",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "764ad3a542f6242b3049d59d2174859cd2921fb4186a7e43b583d35f9a007662",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 404,
+      "slug": "endless-extension-cord-illusion-parking-lot-scare-and-hallway-creature-prank",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "b4b7d37f6b987151b58fcf34363eea3ddfa32682a46161f86c2968e705754301",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 405,
+      "slug": "vacuum-selfie-stick-prank-bottle-surprise-pool-splash-and-lawn-tumble",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "2b1ed4514d44195fd1a2c10026a06cf892a53368d1359156bb804329c4aa0121",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 406,
+      "slug": "princess-surprise-funny-rice-tutorial-and-gym-photobomb",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "54668101fc20438e1d4b4e3e253e912f95d8682515018c3cac0c3a3081785f54",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 407,
+      "slug": "outdoor-stunt-fail-hallway-jump-scare-and-messy-kitchen-pranks",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "6332aa079a3b04e9b73924de64084bbadd4a1cf4f19eb79b384bd9a878ad8394",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 408,
+      "slug": "fake-emergency-prank-grass-eating-comedy-and-classroom-mischief",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "e17928aaed43ebb0ba2009f6187ba3f3f5ddd19f49c5123d4931b0783953818f",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 409,
+      "slug": "pot-slip-barbershop-camera-prank-and-funny-haircut-trend",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "3515ec3766ab74abe286db144d5aa4398ec93eadfc68d23ff08fcb4341a886e3",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 410,
+      "slug": "kitchen-pizza-fails-surprise-car-reveal-and-funny-cat-moments",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "5484844957273aac3206123e48770a948a417e6618631cc8f6b95a4a399a9383",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 411,
+      "slug": "salon-haircut-prank-platform-heels-and-1760-vs-2026-alarm-comedy",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "c7adc767800990c23b2c1e6570b545793fb41acd37be4c78eb03fcee6182fc64",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 412,
+      "slug": "turkey-water-surprise-salon-prank-and-funny-kitchen-cat-meow",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "42d21c0c36ca5f5d432ce0e04b2e09f290a9a4a7b2d193d94658b5a4eb37f159",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 413,
+      "slug": "outdoor-surprise-prank-kitchen-mishap-and-fast-cut-comedy-reactions",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "f450e9345818598ed845f0a01906654b8f0af630acd3e532c4b83c5e5e0da12b",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 414,
+      "slug": "rice-coughing-sketch-door-peek-prank-and-workshop-measuring-mishap",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "5e484b80ba6b1a528449928ca551cdff2da7c5f776ec071e43fbc1dc2f80d185",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 415,
+      "slug": "funny-dog-reaction-refrigerator-surprise-prank-and-soda-bottle-struggle",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "b381df250fcf9a79bcf7c147ea650d44c99c4f255a2140a058a2bb862e394f6e",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 416,
+      "slug": "household-mishap-jump-scare-and-fast-cut-food-prank-reactions",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "4e2e2e2518eb99d685dd33d8963207883bca0feb408255cfb4b0683fd3a5145b",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 417,
+      "slug": "makeup-copycat-prank-funny-body-pose-seal-and-street-surprise",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "3406ec39c00e42ef202703bc5961c9ccf14a69618ffca0b8b48962f1c2d0f016",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 418,
+      "slug": "covered-car-reveal-trunk-jump-scare-and-purple-motorcycle-comedy",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "71cbf0b677647827cefddc52ced077826e7aac9048c4520f1d9c7e9fdf7723c3",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 419,
+      "slug": "pool-dive-funny-face-filters-animated-eyes-and-construction-vest-comedy",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "dd8de5ced3579e7f7f27cd2d1e086aa8754b561b60dc1a47b4b011f8d776c767",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 420,
+      "slug": "baby-bottle-feeding-ice-cream-joke-and-men-vs-women-whiteboard-comedy",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "18770f471de17de2a53e56da7d3eab2ab6054f7f0ae7b617870e400163ee06f4",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 421,
+      "slug": "belly-face-reveal-doorway-drink-spill-and-sleeping-water-prank",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "f32d3762cab1d1267cde2f66e9da9e5505bd96e83353571caaae3ac8f78a2dc1",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 422,
+      "slug": "household-surprise-kitchen-mishap-and-fast-cut-prank-reactions",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "654867fbc01e709caf7d197b1f92b47b8ae0089d960e8e3aeba9da4595c7dac0",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 423,
+      "slug": "magnifying-glass-surprise-dancing-clips-barking-dogs-and-classroom-sprint",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "0c2c6c15a85fe9fd9c6d60e8eaabfb765b0bb3eb7af004079a52316b8f54cf2e",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 424,
+      "slug": "makeup-copycat-giant-orange-phone-dancing-dog-and-mustache-filter",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "2c50210e15b9553800091771ff1a62c8b2d325ade68327831b91b22e0c9897c8",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 425,
+      "slug": "doorway-scare-anteater-haircut-meme-snowball-fall-and-office-slip",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "9a28c006733395c1743d48a1ffa66d62a5a197c7cb6be17dd2c47a5915d618cd",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 426,
+      "slug": "park-collar-pull-tumble-cream-face-mishaps-and-superhero-face-swap",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "3676423480b1787c79cae01cb425b52f45c78ddebae5e9d7f2dee9d3735cda17",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 427,
+      "slug": "mango-string-prank-family-comedy-snack-gag-and-workshop-surprise",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "b46940f5cb20025e093fc0b3fb3ead343c10a11c818e9715184b018831db4e9e",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 428,
+      "slug": "household-startle-kitchen-mishap-and-funny-animal-reaction-compilation",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "5d06d8512f76dccd4597ca214bb7405549a5086f3331f63ab731d16640d6c456",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 429,
+      "slug": "kitchen-dance-basketball-fall-garden-tumble-and-bedroom-surprise",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "edcd6c004d1955c1287bfbd1b558e716fd8c9fa134002490e697526d29687567",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 430,
+      "slug": "household-startle-indoor-mishap-funny-face-filter-and-prank-reactions",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "85350877c9606f6df83c22fd36fb18ae3e786257390187499c3e8858ab8e8c20",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 431,
+      "slug": "gym-flexing-kitchen-mishap-acrobatic-dance-and-funny-animal-reactions",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "802bea3bfb2d7153b288d017148a2f967f83ab0fc2bab5f0e1076d02c1bd9bfd",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 432,
+      "slug": "door-kick-fall-cheerleading-dance-hair-illusion-and-fork-typing-comedy",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "d9891569c893043949ae0bac67d2a8219eab5a378feee419e299666322436488",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 433,
+      "slug": "crosswalk-dance-tiger-face-mask-oven-surprise-and-car-mirror-prank",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "4e6866c44f59c919fc5f6f3b50546e3e757c52ec51ca741c5ae82bc2d58579c0",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 434,
+      "slug": "street-stool-prank-pot-lid-surprise-bedroom-fall-and-dining-comedy",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "6e1df5bfedaec783803d20f3ae9d7fa43f333d5db1ff4ca296bea558dd1a7625",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 435,
+      "slug": "spicy-food-reaction-flour-blast-face-filter-and-cream-splash-pranks",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "ef4e79b778ac20aa59e2c54fed4abdb2f49cdd8a2aa0818eaaaa0b9bb69d6547",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 436,
+      "slug": "pillow-fight-classroom-desk-prank-drill-spoon-and-sofa-surprise",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "d5cfab1251fad55d4e5b6054af0ba8ca8c08c860858a008366e108a09f56fea9",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 437,
+      "slug": "melting-soda-bottle-funny-dog-teeth-car-prank-and-ice-cream-surprise",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "ea3c11b635607a04c60aa88b4ba4aa7e592500680055f932341408b5b113e245",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 438,
+      "slug": "bedroom-tumble-hallway-dash-funny-dogs-and-penguin-filter-dance",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "95d065435d6e8bee1b9485fde3a8d9f2fc870a9f73b6b909de2c05ad1c59025e",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 439,
+      "slug": "sunglasses-grandma-card-game-surprise-grocery-prank-and-car-mirror-comedy",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "7f905c202aec381515fc1e0c3832c085303a92bcf87b0b8ebb7d14e5efa30e70",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 440,
+      "slug": "aging-face-filter-snowy-dog-phone-scare-and-bicycle-wheelbarrow-crash",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "d6810ee530b42bbf97f1d84018269da2e424d3fc46587bb10624c2519c5a4363",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 441,
+      "slug": "kitchen-reactions-street-table-prank-garden-stool-fall-and-bamboo-raft-splash",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "2643a0097cf66659c448f024eefb8a7d0af85d59f4ea4323511b2a32c14d2bda",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 442,
+      "slug": "car-washer-fluid-prank-funny-teeth-ice-cream-bite-and-dancing-husky",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "98fbe760a985ad16e57861f65a098e65d9efb2f92802ec6346aeaa6b7a87d48f",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 443,
+      "slug": "splash-prank-pizza-gag-water-balloon-surprise-and-giant-cookie-bite",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "9eff4182de30e54eba3f1b0c7d12ee9fc26d30b1da0e0889d53ef89289a28f16",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 444,
+      "slug": "kitchen-food-prank-falling-chandelier-bakery-surprise-and-water-jug-challenge",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "efada519ea22567053a0a55e596a9388cd09541bb05e0d5eae47f4d6141cdba0",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 445,
+      "slug": "animal-face-filter-street-running-window-prank-and-flying-shoes",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "bf6c0cb8c8c232d277fe2a7cbc04d57a6f0c4d9176919e87032165e7570791a1",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 446,
+      "slug": "eyeliner-transformation-video-call-surprise-javelin-throw-and-ironing-prank",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "8bd29c334ad655552dde516cc77f5f43e419c1af3f8bf390c6b175608fd168d0",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 447,
+      "slug": "barbershop-water-splash-meteor-meme-kickboxing-and-water-spit-prank",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "ff682f69bb6654f04acea2531cf6909a29eefa4422a74da7d15f61b558d25ff5",
+      "status": "pending_theme_verification"
+    },
+    {
+      "id": 448,
+      "slug": "handheld-gaming-surprise-water-splash-pranks-and-funny-phone-call",
+      "category": "Funny & Comedy",
+      "provider": "youtube",
+      "sourceSha256": "28aa7065fa3b877d3a8e5eadf080b2848807dab95eec909f511bdefb74bac40b",
+      "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Owner20October image-creation pause remains active: no image generation/editing or production batch until an explicit resume request. Preserve388queue entries/100artworks and all holds. Non-image PR240 saved-SEO-title renderer correction is now deployed and seven live metadata/preservation samples pass; do not repeat it. Continue authorized non-image work on the newly observed library-sitemap error1 using safe read-only diagnostics, or a source-verifiable unprotected editorial item when exact Google error details are unavailable. Verified Tagembed/Iframely mappings remain missing; never switch to artwork during the pause.",
+  "nextTask": "Finish PR255 / batch11 IDs135,131,132,119,130,134,36,98,115,86: fresh507/507 inventory and exact source/date/poster guards match. Complete current-head CI and Worker dry-run, merge/deploy this same prepared batch, then verify all10artworks and10unchanged source copies with exact watch HTML and split/combined sitemap associations. No regeneration. After release, reconcile72current inventory identities missing from the dated435-entry queue; retain all holds and select up to10eligible missing dual-image pages with baked-in vid.best branding for future new artworks.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -3341,11 +3727,10 @@
   },
   "reconciledAt": "2026-10-20T06:55:41.181Z",
   "providerCounts": {
-    "youtube": 312,
-    "other": 1,
+    "youtube": 431,
+    "raw": 2,
     "tiktok": 54,
-    "facebook": 20,
-    "instagram": 1
+    "facebook": 20
   },
   "verificationCommand": "node scripts/verify-review-illustrations.mjs --ids=4,144,145,149,150,151,152,159,160,161",
   "batch2": {
@@ -6315,7 +6700,7 @@
       }
     }
   },
-  "savedLibraryCount": 388,
+  "savedLibraryCount": 507,
   "priorityMissingImages": [
     {
       "id": 292,
@@ -7885,9 +8270,282 @@
     }
   },
   "imageCreationPause": {
-    "active": true,
+    "active": false,
     "instructionDate": "2026-10-20",
     "resumeRequires": "Explicit owner instruction",
-    "scope": "No image generation/editing or new image-production batches while paused. Preserve existing100artworks, all388queue entries, source/owner posters, manifest/provenance and image associations. Existing-image read-only verification for authorized non-image work remains allowed."
+    "scope": "Owner explicitly resumed production on21October2026: up to10distinct eligible published pages per run. Preserve prior work and holds; no visible AI-production lettering.",
+    "resumeInstructionDate": "2026-10-21"
+  },
+  "ownerImageCreationHistory": [
+    {
+      "active": true,
+      "instructionDate": "2026-10-20",
+      "resumeRequires": "Explicit owner instruction",
+      "scope": "No image generation/editing or new image-production batches while paused. Preserve existing100artworks, all388queue entries, source/owner posters, manifest/provenance and image associations. Existing-image read-only verification for authorized non-image work remains allowed."
+    }
+  ],
+  "batch11": {
+    "state": "preflight_verified_pending_release_ci",
+    "recordIds": [
+      135,
+      131,
+      132,
+      119,
+      130,
+      134,
+      36,
+      98,
+      115,
+      86
+    ],
+    "branch": "seo/review-illustrations-batch11-20261021",
+    "pr": 255,
+    "base": "4d689eecb2a6de52844a0fcc58b7045c0c17ec3a",
+    "newGenerated": 10,
+    "newPublished": 0,
+    "liveVerified": 0,
+    "baseline": {
+      "checkedAt": "2026-10-21T17:41:22.163Z",
+      "saved": 501,
+      "published": 501,
+      "nonCounterSha256": "1555f0985be9a3cf2e06ee4b60207078d7d9bc4fc618a8e9d836f5aeda7518f5"
+    },
+    "sourceVerification": "docs/review-images/batch11-source-verification-20261021.json",
+    "briefs": "docs/review-images/batch11-artwork-briefs-20261021.json",
+    "assetChecks": "docs/review-images/batch11-asset-checks-20261021.json",
+    "blocker": "",
+    "releaseGates": [
+      "Full regression tests",
+      "Worker dry-run",
+      "Required exact-head CI",
+      "Fresh D1 target identity/preservation check from fresh read-only inventory",
+      "Merge/deployment",
+      "All10live asset/HTML/split-sitemap associations"
+    ],
+    "validation": {
+      "nodeTests": 468,
+      "workerDryRun": true,
+      "assetHashesAndPreservation": true,
+      "exactHeadCI": "pending for fresh preflight/schema-preservation verifier head",
+      "pythonSuite": "required CI pending"
+    },
+    "reconciledMain": "fe12eaa1049b948ee049f60d3ef2f61be079c2aa",
+    "upstreamReconciliation": "docs/review-images/batch11-upstream-reconciliation-20261022.json",
+    "newSourceCopiesPrepared": 10,
+    "sourceCopies": "docs/review-images/batch11-source-copies-20261022.json",
+    "ownerImagePreference": "docs/review-images/source-pairs-and-branding-20261022.md",
+    "expectedPublishDates": {
+      "135": "2026-10-11T13:29:15.091Z",
+      "131": "2026-10-10T18:22:02.889Z",
+      "132": "2026-10-10T18:27:22.255Z",
+      "119": "2026-10-09T18:28:10.831Z",
+      "130": "2026-10-10T18:14:20.768Z",
+      "134": "2026-10-10T18:29:21.086Z",
+      "36": "2026-09-25T20:35:28.639Z",
+      "98": "2026-10-05T18:26:15.919Z",
+      "115": "2026-10-08T18:54:19.596Z",
+      "86": "2026-10-03T16:54:10.360Z"
+    },
+    "sourcePairingCheckpoint": "docs/review-images/batch11-source-pairing-checkpoint-20261022.json",
+    "editorialUpstreamReconciliation": "docs/review-images/batch11-editorial-upstream-reconciliation-20261022.json",
+    "resolvedQuotaBlocker": {
+      "resolvedAt": "2026-10-22T00:31:21.647Z",
+      "previous": "Cloudflare D1 HTTP400/code7500 free-tier daily row-read quota reached during queue reconciliation. No further D1 queries until the stated midnightUTC reset. Final pre-release identity/preservation and live watch checks remain required. This is transient; do not disable the existing task or regenerate this batch."
+    },
+    "preReleasePreservation": {
+      "checkedAt": "2026-10-22T04:37:22.541Z",
+      "saved": 507,
+      "published": 507,
+      "nonCounterSha256": "71e5c2bb3c3c4e858c59e690b9c5f00752e01e5ade12426671d03224fb978c82",
+      "fields": [
+        "cache_attempts",
+        "cache_error",
+        "cache_next_attempt_at",
+        "cache_source_url",
+        "cache_status",
+        "cached_at",
+        "created_at",
+        "description",
+        "embed_url",
+        "featured",
+        "id",
+        "media_type",
+        "primary_category",
+        "published",
+        "r2_key",
+        "redistribution_certified",
+        "redistribution_certified_at",
+        "review_text",
+        "seo_description",
+        "seo_tags",
+        "seo_title",
+        "slug",
+        "source_page_url",
+        "source_url",
+        "subcategory",
+        "thumbnail_url",
+        "title",
+        "trending",
+        "updated_at"
+      ],
+      "evidence": "docs/review-images/batch11-release-preflight-20261022.json"
+    },
+    "releasePreflight": "docs/review-images/batch11-release-preflight-20261022.json",
+    "sourceMetadataUnavailableIds": [
+      135,
+      131,
+      132,
+      119,
+      130,
+      134,
+      36,
+      98,
+      115,
+      86
+    ]
+  },
+  "lastImageProductionBatch": {
+    "state": "preflight_verified_pending_release_ci",
+    "recordIds": [
+      135,
+      131,
+      132,
+      119,
+      130,
+      134,
+      36,
+      98,
+      115,
+      86
+    ],
+    "branch": "seo/review-illustrations-batch11-20261021",
+    "pr": 255,
+    "base": "4d689eecb2a6de52844a0fcc58b7045c0c17ec3a",
+    "newGenerated": 10,
+    "newPublished": 0,
+    "liveVerified": 0,
+    "baseline": {
+      "checkedAt": "2026-10-21T17:41:22.163Z",
+      "saved": 501,
+      "published": 501,
+      "nonCounterSha256": "1555f0985be9a3cf2e06ee4b60207078d7d9bc4fc618a8e9d836f5aeda7518f5"
+    },
+    "sourceVerification": "docs/review-images/batch11-source-verification-20261021.json",
+    "briefs": "docs/review-images/batch11-artwork-briefs-20261021.json",
+    "assetChecks": "docs/review-images/batch11-asset-checks-20261021.json",
+    "blocker": "",
+    "releaseGates": [
+      "Full regression tests",
+      "Worker dry-run",
+      "Required exact-head CI",
+      "Fresh D1 target identity/preservation check from fresh read-only inventory",
+      "Merge/deployment",
+      "All10live asset/HTML/split-sitemap associations"
+    ],
+    "validation": {
+      "nodeTests": 468,
+      "workerDryRun": true,
+      "assetHashesAndPreservation": true,
+      "exactHeadCI": "pending for fresh preflight/schema-preservation verifier head",
+      "pythonSuite": "required CI pending"
+    },
+    "reconciledMain": "fe12eaa1049b948ee049f60d3ef2f61be079c2aa",
+    "upstreamReconciliation": "docs/review-images/batch11-upstream-reconciliation-20261022.json",
+    "newSourceCopiesPrepared": 10,
+    "sourceCopies": "docs/review-images/batch11-source-copies-20261022.json",
+    "ownerImagePreference": "docs/review-images/source-pairs-and-branding-20261022.md",
+    "expectedPublishDates": {
+      "135": "2026-10-11T13:29:15.091Z",
+      "131": "2026-10-10T18:22:02.889Z",
+      "132": "2026-10-10T18:27:22.255Z",
+      "119": "2026-10-09T18:28:10.831Z",
+      "130": "2026-10-10T18:14:20.768Z",
+      "134": "2026-10-10T18:29:21.086Z",
+      "36": "2026-09-25T20:35:28.639Z",
+      "98": "2026-10-05T18:26:15.919Z",
+      "115": "2026-10-08T18:54:19.596Z",
+      "86": "2026-10-03T16:54:10.360Z"
+    },
+    "sourcePairingCheckpoint": "docs/review-images/batch11-source-pairing-checkpoint-20261022.json",
+    "editorialUpstreamReconciliation": "docs/review-images/batch11-editorial-upstream-reconciliation-20261022.json",
+    "resolvedQuotaBlocker": {
+      "resolvedAt": "2026-10-22T00:31:21.647Z",
+      "previous": "Cloudflare D1 HTTP400/code7500 free-tier daily row-read quota reached during queue reconciliation. No further D1 queries until the stated midnightUTC reset. Final pre-release identity/preservation and live watch checks remain required. This is transient; do not disable the existing task or regenerate this batch."
+    },
+    "preReleasePreservation": {
+      "checkedAt": "2026-10-22T04:37:22.541Z",
+      "saved": 507,
+      "published": 507,
+      "nonCounterSha256": "71e5c2bb3c3c4e858c59e690b9c5f00752e01e5ade12426671d03224fb978c82",
+      "fields": [
+        "cache_attempts",
+        "cache_error",
+        "cache_next_attempt_at",
+        "cache_source_url",
+        "cache_status",
+        "cached_at",
+        "created_at",
+        "description",
+        "embed_url",
+        "featured",
+        "id",
+        "media_type",
+        "primary_category",
+        "published",
+        "r2_key",
+        "redistribution_certified",
+        "redistribution_certified_at",
+        "review_text",
+        "seo_description",
+        "seo_tags",
+        "seo_title",
+        "slug",
+        "source_page_url",
+        "source_url",
+        "subcategory",
+        "thumbnail_url",
+        "title",
+        "trending",
+        "updated_at"
+      ],
+      "evidence": "docs/review-images/batch11-release-preflight-20261022.json"
+    },
+    "releasePreflight": "docs/review-images/batch11-release-preflight-20261022.json",
+    "sourceMetadataUnavailableIds": [
+      135,
+      131,
+      132,
+      119,
+      130,
+      134,
+      36,
+      98,
+      115,
+      86
+    ]
+  },
+  "ownerReconciliation20261021": {
+    "authoritativeInventoryAt": "2026-10-21T17:41:22.163Z",
+    "saved": 501,
+    "published": 501,
+    "queueEntries": 435,
+    "newQueueIdentitiesAdded": 47,
+    "remainingNewInventoryRowsNotYetQueued": 66,
+    "status": "partial_due_to_D1_daily_read_quota",
+    "limits": "Fresh501/501 inventory was read before quota exhaustion. Later60published identity rows yielded47previously unqueued entries. Queue now435entries;66inventory items remain unreconciled and require fresh reads after the quota reset. Counts are a dated snapshot, not a current live-query claim.",
+    "newPublishedRowsRead": 60
+  },
+  "latestOwnerImagePreference": {
+    "recordedAt": "2026-10-22",
+    "sourceImage": "Keep the original/captured publisher image unchanged as image1; use an identity-guarded, byte-identical first-party copy when verified bytes are available. Retain the original D1/source VideoObject thumbnail URL.",
+    "artwork": "Image2: a distinctive cinematic anime/stylized interpretation of a genuinely verified scene or key idea. Only claim scene fidelity when inspection evidence exists; never pass conceptual artwork off as a source frame.",
+    "branding": {
+      "text": "vid.best",
+      "placement": "bottom-right",
+      "newGenerationPrompts": "Include the exact small vid.best watermark inside every future newly generated asset. No AI-generated wording.",
+      "existingPreparedBatch11": "Existing ten artwork bytes remain unchanged; a visible HTML/CSS watermark is placed over artwork in the watch-page display. This is not a baked-in watermark in those ten image files."
+    },
+    "discovery": "Both actual images in server-rendered watch HTML, source-first sidebar, split source/editorial and legacy combined maps; flat sitemap root; stable hash-named first-party copies. No indexing guarantee.",
+    "details": "docs/review-images/source-pairs-and-branding-20261022.md"
   }
 }

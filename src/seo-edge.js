@@ -2,7 +2,7 @@ import { cachedPublicResponse } from "./public-edge-cache.js";
 import { signedLegacyV5Page } from "./legacy-v5-signer.js";
 import edgeWorker from "./edge.js";
 import { facebookPosterUrl } from "./facebook-posters.js";
-import { reviewIllustration } from "./review-illustrations.js";
+import { reviewIllustration, reviewSourcePreview } from "./review-illustrations.js";
 import { stableTikTokImage } from "./tiktok-image.js";
 import { dailyWeeklyBestResponse, dailyWeeklyBestSitemap } from "./daily-weekly-best.js";
 
@@ -439,7 +439,8 @@ async function imageSitemapIndex(env) {
 }
 
 function crawlableImageUrl(row) {
-  const candidate = publicThumbnail(row);
+  const thumbnail = publicThumbnail(row);
+  const candidate = reviewSourcePreview(row, thumbnail, CANONICAL_ORIGIN)?.url || thumbnail;
   try {
     const url = new URL(candidate);
     // Never advertise data URLs, credentialed addresses, or non-HTTPS source pages as images.

@@ -1,0 +1,61 @@
+{
+  "recordedAt": "2026-10-21T23:34:44.591541+00:00",
+  "pr": 255,
+  "previousImageHead": "cb87fb7080d17ff850b5abc97ea06d22a0053f1c",
+  "reconciledMain": "fe12eaa1049b948ee049f60d3ef2f61be079c2aa",
+  "upstreamChanges": [
+    "f462156: preserve the already merged guarded five-review refresh and its publication-date regression test",
+    "fe12eaa: preserve data-only migration detection that avoids broad D1 schema reads"
+  ],
+  "mergeConflicts": false,
+  "newGenerated": 0,
+  "newSourceCopies": 0,
+  "existingPreparedArtworks": 10,
+  "existingCommittedSourceCopies": 10,
+  "mergedToMain": false,
+  "deployed": false,
+  "liveVerified": 0,
+  "validation": {
+    "localNodeTests": 468,
+    "localNodePass": 468,
+    "workerDryRun": true,
+    "all110ArtworkManifestsAndProvenanceUnchanged": true,
+    "all10SourceCopiesUnchanged": true,
+    "assetReleaseDiffContainsMigrationOrSchemaFiles": false,
+    "exactHeadCI": "pending for this merge commit"
+  },
+  "upstreamOwnerData": {
+    "migration": "migrations/0050_five_comedy_review_refresh.sql",
+    "gitBlob": "a9f4d04a7ab72c9955280925187210e2cc6b424b",
+    "sha256": "ed7ce4a0b5e0bf18ee7c8e0f71c78f78c804f53c78ae9d84aa22733542714e0a",
+    "fields": [
+      "description",
+      "review_text",
+      "seo_title",
+      "seo_description",
+      "seo_tags"
+    ],
+    "sourceURLs": [
+      "https://www.youtube.com/shorts/PCLXcrXkszI",
+      "https://www.youtube.com/shorts/I6fejmn7RJU",
+      "https://www.youtube.com/shorts/5f0Nr5Aaz_U",
+      "https://www.youtube.com/shorts/nSJquJ0OPVc",
+      "https://www.youtube.com/shorts/7P7ZTnnEEc4"
+    ],
+    "note": "Inherited exact upstream file, not authored or executed by this image task. Preserve current owner content. Do not assume the old whole-library hash still describes current owner state. Take a fresh pre-release preservation snapshot after quota reset and compare that with the post-release state."
+  },
+  "independentProduction": {
+    "deployment": "41305c22-e38d-4907-b0cd-5a6d4df7c6bc",
+    "version": "56e36ef4-63d5-40f3-afa2-a55bbe8145af",
+    "createdOn": "2026-10-21T23:18:07.745455Z",
+    "scope": "Independent upstream deployment, not this image batch. Its database-update outcome has not been re-read during quota exhaustion."
+  },
+  "releaseBlocker": {
+    "code": 7500,
+    "type": "D1 daily row-read quota",
+    "nextD1QueryNotBeforeUTC": "2026-10-22T00:00:00Z",
+    "queriesThisReconciliation": 0,
+    "writesThisReconciliation": 0
+  },
+  "nextTask": "Finish the same PR255 after fresh current inventory/target/owner preservation checks, passing exact-head CI and actual deployment plus all10WebP/all10JPEG watch/sitemap verification. No regeneration, new batch or automation. Preserve PR254 six-video draft hold and all media/owner holds."
+}
