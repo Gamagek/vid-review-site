@@ -3219,9 +3219,9 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css?v=20261022-source-pairs-watermark1">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
-  ${video.provider === "tiktok" ? '<script src="/tiktok-oembed-cache.js?v=20261018-replay" defer></script><script src="/tiktok-preview-service.js?v=20261018-replay" defer></script>' : ""}
+  ${video.provider === "tiktok" ? '<script src="/tiktok-oembed-cache.js?v=20261018-replay" defer></script><script src="/tiktok-preview-service.js?v=20261022-official-first" defer></script>' : ""}
   ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>' : ""}
-  <script src="/watch.js?v=20261019-art-preview" defer></script>
+  <script src="/watch.js?v=20261022-official-first" defer></script>
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261008-gateway1">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-cache2" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
@@ -3417,7 +3417,7 @@ function renderMedia(video, playbackOrigin, viewer = false) {
     const previewDescription = cleanText(
       preview.description,
       260,
-      "Preview details are cached by Vid.Best. Choose Play to check video availability.",
+      "Select Play to watch this post. Some videos may be unavailable in embeds.",
     );
     // Keep the selected, reviewed cover separate from provider-cached metadata.
     const ownedCover = ownedTikTokWatchCover(video, playbackOrigin);
