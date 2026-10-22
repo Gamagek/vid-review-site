@@ -2957,3 +2957,42 @@ test("root and type-specific image indexes omit an empty final editorial image p
   assert.equal(nonexistent.status, 404);
   assert.match(await nonexistent.text(), /No images/);
 });
+
+
+test("server-rendered editorial reviews expose escaped, semantic topic headings without changing stored dates", async () => {
+  const context = createTestContext();
+  const publishedAt = "2026-10-20T18:30:31.299Z";
+  context.sqlite.prepare(
+    `INSERT INTO videos
+      (id, slug, title, source_url, embed_url, media_type, primary_category, subcategory,
+       description, review_text, published, created_at, updated_at)
+     VALUES (513, ?, ?, ?, ?, 'youtube', 'Entertainment, Movies & Games', 'Film Reviews',
+             ?, ?, 1, ?, ?)`
+  ).run(
+    "hera-pheri-1976-film-review",
+    "Hera Pheri (1976) - Friendship on Trial",
+    "https://www.youtube.com/watch?v=TBSjGjhFvnI",
+    "https://www.youtube.com/embed/TBSjGjhFvnI",
+    "A friendship and crime-drama review.",
+    "🤝 Friendship & Trust\n\nA con-man partnership faces a family secret.\n\n🎬 A Distinct 1976 Classic\n\nNo invented scene claims. <script>alert('x')</script>",
+    publishedAt, publishedAt,
+  );
+  const before = context.sqlite.prepare(
+    "SELECT created_at,updated_at,review_text FROM videos WHERE id=513"
+  ).get();
+  const response = await send(context, "/watch/hera-pheri-1976-film-review", {
+    headers: { "User-Agent": "Googlebot" },
+  });
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /<h3>🤝 Friendship &amp; Trust<\/h3>/);
+  assert.match(html, /<h3>🎬 A Distinct 1976 Classic<\/h3>/);
+  assert.match(html, /<p>A con-man partnership faces a family secret\.<\/p>/);
+  assert.doesNotMatch(html, /<script>alert\('x'\)<\/script>/);
+  assert.match(html, /&lt;script&gt;alert/);
+  assert.match(html, /2026-10-20T18:30:31\.299Z/);
+  const after = context.sqlite.prepare(
+    "SELECT created_at,updated_at,review_text FROM videos WHERE id=513"
+  ).get();
+  assert.deepEqual(after, before);
+});
