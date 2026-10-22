@@ -93,7 +93,7 @@ test("rejects mismatched metadata and unsafe TikTok URLs", async () => {
   }
 });
 
-test("TikTok browser service uses the signed Cloudflare/Portainer watch route", () => {
+test("TikTok browser service uses official player first, with an opt-in gateway fallback", () => {
   const h = harness();
   const link = h.api.gatewayWatchUrl(share + "?utm_source=demo");
   assert.equal(new URL(link).origin, "https://tiktok-oembed-gateway.gkasunc.workers.dev");
@@ -102,10 +102,12 @@ test("TikTok browser service uses the signed Cloudflare/Portainer watch route", 
   assert.equal(h.api.gatewayWatchUrl("https://evil.test/" + share), null);
   assert.match(code, /gatewayWatchUrl/);
   assert.match(code, /createElement\(["']iframe["']\)/);
-  assert.doesNotMatch(code, /\/player\/v1\//);
+  assert.match(code, /\/player\/v1\//);
   assert.doesNotMatch(code, /https:\/\/www\.tiktok\.com\/embed\.js/);
   assert.match(code, /requestAnimationFrame/);
   assert.match(code, /cleanupEmbed/);
+  assert.match(code, /observeOfficialPlayer/);
+  assert.match(code, /data-tiktok-dialog-alternate/);
   assert.match(code, /author_name/);
 });
 
@@ -141,6 +143,7 @@ test("a slow gateway stays interactive without the false 15-minute lock, and cle
     ["[data-tiktok-dialog-title]", element("strong")],
     ["[data-tiktok-dialog-author]", element("span")],
     ["[data-tiktok-dialog-description]", element("p")],
+    ["[data-tiktok-dialog-alternate]", element("button")],
     [".tiktok-preview-dialog-close", element("button")],
     ["[data-tiktok-dialog-cancel]", element("button")],
   ]);
@@ -186,23 +189,24 @@ test("a slow gateway stays interactive without the false 15-minute lock, and cle
   assert.equal(createdFrames, 0, "no player before dialog opens and is painted");
   rafs.shift()();
   assert.equal(createdFrames, 1);
-  assert.match(host.children[0].src, /^https:\/\/tiktok-oembed-gateway\.gkasunc\.workers\.dev\/watch\?/);
+  assert.match(host.children[0].src, /^https:\/\/www\.tiktok\.com\/player\/v1\/6718335390845095173\?/);
   assert.equal(timers.size, 1, "only one readiness timer");
   const timeout = [...timers.values()][0].fn;
   timers.clear();
   timeout();
   assert.equal(host.children[0].tagName, "IFRAME", "slow loading must not destroy the player");
-  assert.match(status.textContent, /longer to load/i);
+  assert.match(status.textContent, /has not confirmed readiness/i);
   assert.equal(timers.size, 0);
   const frame = host.children[0];
-  const event = { source: frame.contentWindow, origin: "https://tiktok-oembed-gateway.gkasunc.workers.dev", data: { channel: "vidbest-gateway", video_id: "6718335390845095173", state: "error", message: "Source could not be prepared." } };
+  const event = { source: frame.contentWindow, origin: "https://www.tiktok.com", data: { "x-tiktok-player": true, type: "onPlayerReady" } };
   winListeners.get("message")({ ...event, origin: "https://evil.test" });
-  assert.match(status.textContent, /longer to load/i);
+  assert.match(status.textContent, /has not confirmed readiness/i);
   winListeners.get("message")({ ...event, source: {} });
-  assert.match(status.textContent, /longer to load/i);
+  assert.match(status.textContent, /has not confirmed readiness/i);
   winListeners.get("message")(event);
-  assert.equal(status.textContent, "Source could not be prepared.");
-  assert.equal(host.children[0], frame, "gateway keeps its own retry controls");
+  assert.equal(status.textContent, "Ready to play on TikTok's player.");
+  assert.equal(host.children[0], frame, "the official embed stays mounted after readiness");
+  assert.equal(selectors.get("[data-tiktok-dialog-alternate]").hidden, false);
   dialog.close();
   assert.equal(winListeners.has("message"), false);
   assert.equal(host.children.length, 0, "closing the popup removes player and placeholder");
