@@ -3236,7 +3236,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
         <button class="button text-button" type="button" data-interest="less">Show fewer like this</button>
         <p id="interest-status" class="form-status" role="status"></p>
       </div>
-      ${video.review_text ? `<section class="review-copy"><h2>Review & discovery notes</h2>${paragraphs(video.review_text, REVIEW_TEXT_MAX_LENGTH)}</section>` : ""}
+      ${video.review_text ? `<section class="review-copy"><h2>Review & discovery notes</h2>${Number(video.id) > 10 && video.media_type !== "raw" ? editorialReviewParagraphs(video.review_text, REVIEW_TEXT_MAX_LENGTH) : paragraphs(video.review_text, REVIEW_TEXT_MAX_LENGTH)}</section>` : ""}
       ${video.transcript ? `<details class="transcript-panel"><summary>Read transcript</summary><div>${paragraphs(video.transcript)}</div></details>` : ""}
       <p class="review-source-note">Vid.Best provides commentary on external media, not a claim of original video authorship. <a href="/editorial">How our reviews work</a>.</p>
       ${video.relatedEditorialReviews?.length ? `<nav class="related-reviews" aria-label="Related video reviews">
@@ -4096,6 +4096,19 @@ function preparePlaybackEmbed(value, playbackOrigin) {
   } catch {
     return value;
   }
+}
+
+function editorialReviewParagraphs(text, maximum = 7000) {
+  // Preserve user text verbatim and HTML-escape every segment. Explicit short
+  // emoji/numbered topic lines become semantic review headings for crawlers;
+  // regular paragraphs and transcripts keep their original rendering.
+  return cleanLongText(text, maximum).split(/\n{2,}/).map((segment) => {
+    const line = segment.trim();
+    const heading = line.length <= 110 && !line.includes("\n") &&
+      /^(?:[1-9]\d?[.)]\s+|[\p{Extended_Pictographic}\uFE0F\u200D]+\s+)/u.test(line) &&
+      !/[.!?]$/.test(line);
+    return heading ? `<h3>${escapeHtml(line)}</h3>` : `<p>${escapeHtml(segment)}</p>`;
+  }).join("");
 }
 
 function paragraphs(text, maximum = 7000) {
