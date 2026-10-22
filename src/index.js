@@ -681,7 +681,9 @@ async function fetchTikTokPreviewOnce(env, share, options = {}) {
       if (durable && Date.parse(durable.fetched_at) + 7 * 86400000 > Date.now()) {
         return tikTokPreviewFromRow(durable, "d1-stale");
       }
-      throw new AppError(503, "A TikTok metadata refresh was already attempted today.", null, { "Retry-After": "3600" });
+      const dailyError = new AppError(503, "A TikTok metadata refresh was already attempted today.", null, { "Retry-After": "3600" });
+      dailyError.cooldown = true; // A per-video lease must never place every creator on global cooldown.
+      throw dailyError;
     }
     const gatewayUrl = buildTikTokOEmbedGatewayUrl(env, canonicalShare);
     const response = await fetch(gatewayUrl, {
