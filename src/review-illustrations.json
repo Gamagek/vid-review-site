@@ -1860,5 +1860,51 @@
       "mime": "image/jpeg"
     },
     "embeddedWatermark": "vid.best"
+  },
+  {
+    "id": 512,
+    "slug": "phir-hera-pheri-2006-film-review",
+    "sourceUrl": "https://www.youtube.com/watch?v=Us6pVG4NK8Q",
+    "expectedTitle": "Phir Hera Pheri (2006) — Raju's Double-Money Trap and Babu Bhaiya's Chaos",
+    "path": "/media/uploads/review-illustrations/phir-hera-pheri-2006-money-chaos-v1.jpg",
+    "width": 1024,
+    "height": 1024,
+    "alt": "Colourful original anime-style editorial illustration of three friends caught in a chaotic money scheme in an imagined Indian street, conveying the Phir Hera Pheri comedy of easy riches",
+    "caption": "An imagined editorial illustration of the trio's money troubles, not a still from Phir Hera Pheri (2006).",
+    "bytes": 803841,
+    "sha256": "6e52e28e08533f33377c2e68ac86dd0f164ca9702c7fb8bde47b09299c4bb502",
+    "sourceImage": {
+      "url": "https://vid.best/media/uploads/review-source-images/512-7b35c9b8d370c392.jpg",
+      "width": 640,
+      "height": 480,
+      "path": "/media/uploads/review-source-images/512-7b35c9b8d370c392.jpg",
+      "bytes": 66861,
+      "sha256": "7b35c9b8d370c392e84c6af7730cc77a26f33a0f310a620e0ae234f99382ee55",
+      "mime": "image/jpeg"
+    },
+    "displayWatermark": "vid.best"
+  },
+  {
+    "id": 513,
+    "slug": "hera-pheri-1976-film-review",
+    "sourceUrl": "https://www.youtube.com/watch?v=TBSjGjhFvnI",
+    "expectedTitle": "Hera Pheri (1976) — Vijay and Ajay's Friendship on Trial",
+    "path": "/media/uploads/review-illustrations/hera-pheri-1976-friendship-concept-v1.jpg",
+    "width": 1024,
+    "height": 1024,
+    "alt": "Original cinematic illustrated portrait of two 1970s Indian crime-story friends in a dramatic imagined street, reflecting trust and betrayal in Hera Pheri (1976)",
+    "caption": "Conceptual editorial artwork interpreting Vijay and Ajay's friendship, not a frame from the original 1976 film.",
+    "bytes": 672624,
+    "sha256": "bb0244bef548eebe65b96b4d04ccf849048a64018a54df95fa1ab0ddab89c3b1",
+    "sourceImage": {
+      "url": "https://vid.best/media/uploads/review-source-images/513-09350c9e0817e7ae.jpg",
+      "width": 640,
+      "height": 480,
+      "path": "/media/uploads/review-source-images/513-09350c9e0817e7ae.jpg",
+      "bytes": 70651,
+      "sha256": "09350c9e0817e7ae60a2e30ff933a31918a16a66f8a7f0061e5491a4d2579a8c",
+      "mime": "image/jpeg"
+    },
+    "displayWatermark": "vid.best"
   }
 ]
