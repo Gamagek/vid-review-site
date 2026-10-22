@@ -105,7 +105,7 @@ services:
           if (/url$/i.test(key) && value) {
             if (typeof value !== "string" || value.length > 2048) return false;
             let u;
-            try { u = new URL(value); } catch { return false; }
+            try { u = new URL(value, "https://vid.best"); } catch { return false; }
             if (u.protocol !== "https:" || u.username || u.password || u.port || /(?:token|secret|access_token|auth|api_key|password|signature)=/i.test(u.search)) return false;
           }
           if (key === "reactions" && (!cleanFields(value,new Set(["like","love","useful"])) || Object.values(value).some(n=>!Number.isSafeInteger(n)||n<0))) return false;
