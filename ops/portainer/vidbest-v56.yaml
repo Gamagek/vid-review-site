@@ -61,7 +61,7 @@ services:
       const MAX_FILES = 2500;
       const MAX_DISK = 80 * 1024 * 1024;
       const TTL_MS = 48 * 60 * 60 * 1000;
-      const VIDEO_KEYS = new Set(["id","slug","title","description","primary_category","subcategory","thumbnail_url","media_type","source_url","embed_url","views","reaction_count","created_at","review_text","seo_title","seo_description","seo_tags","reactions","preview_poster_url","review_artwork_url"]);
+      const VIDEO_KEYS = new Set(["id","slug","title","description","primary_category","subcategory","thumbnail_url","media_type","provider","source_url","embed_url","views","reaction_count","created_at","review_text","seo_title","seo_description","seo_tags","reactions","preview_poster_url","review_artwork_url","review_artwork_alt","review_preview_url","featured","trending","published","has_captions","redistribution_certified"]);
       let running = 0;
       
       function reply(res, status, value) {
@@ -114,7 +114,8 @@ services:
         return true;
       }
       function validDoc(doc) {
-        if (!cleanFields(doc,new Set(["route","kind","mime","body"])) || Object.keys(doc).length!==4 || !safeRoute(doc.route) || typeof doc.body!=="string" || Buffer.byteLength(doc.body)>MAX_SNAPSHOT) return false;
+        if (!cleanFields(doc,new Set(["route","kind","mime","body","headers"])) || Object.keys(doc).length<4 || !safeRoute(doc.route) || typeof doc.body!=="string" || Buffer.byteLength(doc.body)>MAX_SNAPSHOT) return false;
+        if (doc.headers && (!cleanFields(doc.headers,new Set(["X-Robots-Tag","Content-Security-Policy","Referrer-Policy","X-Frame-Options"])) || Object.values(doc.headers).some(v=>typeof v!=="string" || v.length>2000))) return false;
         if (doc.route.startsWith("/api/videos")) {
           if (doc.kind!=="public_videos_json" || doc.mime!=="application/json; charset=utf-8") return false;
           try {
@@ -175,9 +176,9 @@ services:
         if(data.length>MAX_REQUEST) return null;
         const doc=JSON.parse(data);
         if (!Number.isFinite(doc.created_at) || doc.created_at>Date.now()+90000 || Date.now()-doc.created_at>TTL_MS) return null;
-        const {route:stored,kind,mime,body}=doc;
-        if(stored!==route || !validDoc({route:stored,kind,mime,body})) return null;
-        return {route,kind,mime,body,age:Math.max(0,Math.floor((Date.now()-doc.created_at)/1000))};
+        const {route:stored,kind,mime,body,headers}=doc;
+        if(stored!==route || !validDoc({route:stored,kind,mime,body,headers})) return null;
+        return {route,kind,mime,body,headers:headers||{},age:Math.max(0,Math.floor((Date.now()-doc.created_at)/1000))};
       }
       async function readBody(req) {
         const len=req.headers["content-length"];
