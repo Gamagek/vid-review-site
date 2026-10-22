@@ -1970,7 +1970,7 @@ test("renders the current Vid.Best TikTok gateway architecture as metadata-only 
 
   const previewService = readFileSync(new URL("../public/tiktok-preview-service.js", import.meta.url), "utf8");
   assert.doesNotMatch(previewService, /www\.tiktok\.com\/embed\.js/);
-  assert.doesNotMatch(previewService, /\/player\/v1\//);
+  assert.match(previewService, /\/player\/v1\//);
   assert.match(previewService, /gatewayWatchUrl/);
   assert.match(previewService, /tiktok-oembed-gateway\.gkasunc\.workers\.dev\/watch/);
   assert.match(previewService, /createElement\(["']iframe["']\)/);
