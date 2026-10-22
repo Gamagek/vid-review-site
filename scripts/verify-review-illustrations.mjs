@@ -5,6 +5,9 @@ import crypto from 'node:crypto';
 const ORIGIN = 'https://vid.best';
 const allArt = JSON.parse(fs.readFileSync(new URL('../src/review-illustrations.json', import.meta.url)));
 const productionQueue = JSON.parse(fs.readFileSync(new URL('../docs/review-image-queue.json', import.meta.url)));
+// Existing source-date safeguards omit VideoObject when its upload date is unknown.
+// Permit only the exact IDs documented by the fresh read-only release preflight.
+const sourceMetadataUnavailable = new Set(productionQueue.lastImageProductionBatch?.sourceMetadataUnavailableIds || []);
 const idsArg = process.argv.find(value => value.startsWith('--ids='));
 const latest = process.argv.includes('--batch=latest');
 assert.ok(!(idsArg && latest), 'Choose explicit IDs or the latest production batch');
@@ -119,7 +122,8 @@ try {
         assert.equal((sidebar.match(/<img /g) || []).length, 2);
         assert.ok(sidebar.includes('src="' + sourceImageUrl.replaceAll('&', '&amp;') + '"'));
         assert.ok(sidebar.includes('src="' + image + '"'));
-        assert.ok(video.thumbnailUrl.includes(item.sourceImage.url), 'Original source thumbnail preserved');
+        if (video) assert.ok(video.thumbnailUrl.includes(item.sourceImage.url), 'Original source thumbnail preserved');
+        else assert.ok(sourceMetadataUnavailable.has(item.id), 'Missing VideoObject must match the fresh preflight');
         assert.ok(hasImage(combined, canonical, sourceImageUrl));
         assert.ok(hasImage(source, canonical, sourceImageUrl));
         assert.ok(hasImage(videos, canonical, sourceImageUrl));
@@ -138,7 +142,10 @@ try {
         dualImageSourceFirst: dualImage, sourceImage: sourceImageUrl || null,
         sourceCopyVerified, sourceCopySha256: sourceCopyVerified ? item.sourceImage.sha256 : null,
         artworkDisplayWatermark: item.displayWatermark || null,
-        videoThumbnailUnchanged: true, datePublished: page.datePublished, dateModified: page.dateModified});
+        videoSchemaPresent: Boolean(video),
+        videoThumbnailUnchanged: video ? true : null,
+        preexistingSourceDateUnavailable: !video && sourceMetadataUnavailable.has(item.id),
+        datePublished: page.datePublished, dateModified: page.dateModified});
     } catch (error) {
       result.failures.push({id: item.id, error: String(error)});
     }
@@ -148,6 +155,8 @@ try {
 }
 result.allPassed = result.failures.length === 0 && result.results.length === art.length;
 fs.writeFileSync('review-illustration-verification.json', JSON.stringify(result, null, 2) + '\n');
+// Public asset evidence in CI logs remains accessible even when artifact downloads are unavailable.
+console.log('VIDBEST_LIVE_IMAGE_EVIDENCE ' + JSON.stringify(result));
 console.log(JSON.stringify({checkedAt: result.checkedAt, requested: art.length, liveVerified: result.results.length,
   allPassed: result.allPassed, failures: result.failures, inspectionCalls: 0, sitemapSubmissions: 0}));
 if (!result.allPassed) process.exitCode = 1;

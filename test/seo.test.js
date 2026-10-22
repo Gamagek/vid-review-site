@@ -730,6 +730,13 @@ test('unchanged first-party source copies pair with artwork in HTML and every ma
   const xml=await(await request(context,'https://vid.best/sitemaps/images-source-1.xml')).text();
   assert.ok(xml.includes('<image:loc>'+replacement+'</image:loc>'));
   assert.ok(!xml.includes('<image:loc>https://vid.best'+art.sourceImage.path+'</image:loc>'));
+  context.sqlite.prepare('DELETE FROM video_source_metadata WHERE video_id=?').run(art.id);
+  const withoutSourceDate=await(await request(context,'https://vid.best/watch/'+art.slug,
+    {headers:{'User-Agent':'VidBest-SEO-Audit/1.0'}})).text();
+  const graph=JSON.parse(withoutSourceDate.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)[1])['@graph'];
+  assert.equal(graph.find(node=>node['@type']==='VideoObject'),undefined,'Unknown source upload dates stay unknown');
+  assert.equal(graph.find(node=>node['@type']==='WebPage').image.contentUrl,'https://vid.best'+art.path);
+  assert.ok(withoutSourceDate.includes('src="'+replacement+'"'),'Both review imagery and current owner preview survive schema omission');
 });
 
 test('public Facebook preview artwork is bounded to the audited placeholder and preserves later owner covers', async (t) => {

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "inventoryAt": "2026-10-21T17:41:22.163Z",
-  "publishedLibraryCount": 501,
+  "inventoryAt": "2026-10-22T04:37:22.541Z",
+  "publishedLibraryCount": 507,
   "batchLimit": 10,
-  "phase": "batch11_prepared_release_blocked_by_d1_daily_read_quota",
+  "phase": "batch11_preflight_verified_pending_release_ci",
   "policy": "Preserve all source/owner posters and all D1 fields. Match current published ID, slug, source and title before enabling art. Do not edit protected review topics/media or drafts. Reconcile newly published records on each run; no regeneration merely for freshness. The owner’s 18 October request authorizes separate sidebar artwork identified by truthful conceptual-not-source-frame captions for all published platforms/topics, including comedy, but never edits existing protected review text, SEO titles, source posters or players. Source-removal/demo/Saiyaara/Summer holds remain. The19October owner steering additionally authorizes identity-matched generated art in OpenGraph/Twitter/WebPage metadata and guarded fallback for genuinely broken listing previews; preserve working source posters/VideoObject evidence and all D1/R2 media fields.",
   "baseline": {
     "saved": 214,
@@ -3574,7 +3574,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Finish existing PR255 / batch11 IDs135,131,132,119,130,134,36,98,115,86 before selecting or generating another batch. Ten actual artworks are prepared, not published. Preserve the upstream publication-order fix5b03134; complete CI for its reconciliation, wait until at least2026-10-22T00:00:00Z for the stated D1 daily-read quota reset, re-check current protected data/target identities, then merge/deploy and verify all10image hashes plus source-first/artwork-second HTML and both split image maps. Preserve all100prior artworks and all holds. Reconcile the66remaining new queue entries after readable inventory returns. Do not regenerate these10.",
+  "nextTask": "Finish PR255 / batch11 IDs135,131,132,119,130,134,36,98,115,86: fresh507/507 inventory and exact source/date/poster guards match. Complete current-head CI and Worker dry-run, merge/deploy this same prepared batch, then verify all10artworks and10unchanged source copies with exact watch HTML and split/combined sitemap associations. No regeneration. After release, reconcile72current inventory identities missing from the dated435-entry queue; retain all holds and select up to10eligible missing dual-image pages with baked-in vid.best branding for future new artworks.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -3727,7 +3727,7 @@
   },
   "reconciledAt": "2026-10-20T06:55:41.181Z",
   "providerCounts": {
-    "youtube": 425,
+    "youtube": 431,
     "raw": 2,
     "tiktok": 54,
     "facebook": 20
@@ -6700,7 +6700,7 @@
       }
     }
   },
-  "savedLibraryCount": 501,
+  "savedLibraryCount": 507,
   "priorityMissingImages": [
     {
       "id": 292,
@@ -8285,7 +8285,7 @@
     }
   ],
   "batch11": {
-    "state": "prepared_release_blocked",
+    "state": "preflight_verified_pending_release_ci",
     "recordIds": [
       135,
       131,
@@ -8313,12 +8313,12 @@
     "sourceVerification": "docs/review-images/batch11-source-verification-20261021.json",
     "briefs": "docs/review-images/batch11-artwork-briefs-20261021.json",
     "assetChecks": "docs/review-images/batch11-asset-checks-20261021.json",
-    "blocker": "Cloudflare D1 HTTP400/code7500 free-tier daily row-read quota reached during queue reconciliation. No further D1 queries until the stated midnightUTC reset. Final pre-release identity/preservation and live watch checks remain required. This is transient; do not disable the existing task or regenerate this batch.",
+    "blocker": "",
     "releaseGates": [
       "Full regression tests",
       "Worker dry-run",
       "Required exact-head CI",
-      "Fresh D1 target identity/preservation check once quota resets",
+      "Fresh D1 target identity/preservation check from fresh read-only inventory",
       "Merge/deployment",
       "All10live asset/HTML/split-sitemap associations"
     ],
@@ -8326,7 +8326,7 @@
       "nodeTests": 468,
       "workerDryRun": true,
       "assetHashesAndPreservation": true,
-      "exactHeadCI": "pending for editorial upstream merge head",
+      "exactHeadCI": "pending for fresh preflight/schema-preservation verifier head",
       "pythonSuite": "required CI pending"
     },
     "reconciledMain": "fe12eaa1049b948ee049f60d3ef2f61be079c2aa",
@@ -8347,10 +8347,65 @@
       "86": "2026-10-03T16:54:10.360Z"
     },
     "sourcePairingCheckpoint": "docs/review-images/batch11-source-pairing-checkpoint-20261022.json",
-    "editorialUpstreamReconciliation": "docs/review-images/batch11-editorial-upstream-reconciliation-20261022.json"
+    "editorialUpstreamReconciliation": "docs/review-images/batch11-editorial-upstream-reconciliation-20261022.json",
+    "resolvedQuotaBlocker": {
+      "resolvedAt": "2026-10-22T00:31:21.647Z",
+      "previous": "Cloudflare D1 HTTP400/code7500 free-tier daily row-read quota reached during queue reconciliation. No further D1 queries until the stated midnightUTC reset. Final pre-release identity/preservation and live watch checks remain required. This is transient; do not disable the existing task or regenerate this batch."
+    },
+    "preReleasePreservation": {
+      "checkedAt": "2026-10-22T04:37:22.541Z",
+      "saved": 507,
+      "published": 507,
+      "nonCounterSha256": "71e5c2bb3c3c4e858c59e690b9c5f00752e01e5ade12426671d03224fb978c82",
+      "fields": [
+        "cache_attempts",
+        "cache_error",
+        "cache_next_attempt_at",
+        "cache_source_url",
+        "cache_status",
+        "cached_at",
+        "created_at",
+        "description",
+        "embed_url",
+        "featured",
+        "id",
+        "media_type",
+        "primary_category",
+        "published",
+        "r2_key",
+        "redistribution_certified",
+        "redistribution_certified_at",
+        "review_text",
+        "seo_description",
+        "seo_tags",
+        "seo_title",
+        "slug",
+        "source_page_url",
+        "source_url",
+        "subcategory",
+        "thumbnail_url",
+        "title",
+        "trending",
+        "updated_at"
+      ],
+      "evidence": "docs/review-images/batch11-release-preflight-20261022.json"
+    },
+    "releasePreflight": "docs/review-images/batch11-release-preflight-20261022.json",
+    "sourceMetadataUnavailableIds": [
+      135,
+      131,
+      132,
+      119,
+      130,
+      134,
+      36,
+      98,
+      115,
+      86
+    ]
   },
   "lastImageProductionBatch": {
-    "state": "prepared_release_blocked",
+    "state": "preflight_verified_pending_release_ci",
     "recordIds": [
       135,
       131,
@@ -8378,12 +8433,12 @@
     "sourceVerification": "docs/review-images/batch11-source-verification-20261021.json",
     "briefs": "docs/review-images/batch11-artwork-briefs-20261021.json",
     "assetChecks": "docs/review-images/batch11-asset-checks-20261021.json",
-    "blocker": "Cloudflare D1 HTTP400/code7500 free-tier daily row-read quota reached during queue reconciliation. No further D1 queries until the stated midnightUTC reset. Final pre-release identity/preservation and live watch checks remain required. This is transient; do not disable the existing task or regenerate this batch.",
+    "blocker": "",
     "releaseGates": [
       "Full regression tests",
       "Worker dry-run",
       "Required exact-head CI",
-      "Fresh D1 target identity/preservation check once quota resets",
+      "Fresh D1 target identity/preservation check from fresh read-only inventory",
       "Merge/deployment",
       "All10live asset/HTML/split-sitemap associations"
     ],
@@ -8391,7 +8446,7 @@
       "nodeTests": 468,
       "workerDryRun": true,
       "assetHashesAndPreservation": true,
-      "exactHeadCI": "pending for editorial upstream merge head",
+      "exactHeadCI": "pending for fresh preflight/schema-preservation verifier head",
       "pythonSuite": "required CI pending"
     },
     "reconciledMain": "fe12eaa1049b948ee049f60d3ef2f61be079c2aa",
@@ -8412,7 +8467,62 @@
       "86": "2026-10-03T16:54:10.360Z"
     },
     "sourcePairingCheckpoint": "docs/review-images/batch11-source-pairing-checkpoint-20261022.json",
-    "editorialUpstreamReconciliation": "docs/review-images/batch11-editorial-upstream-reconciliation-20261022.json"
+    "editorialUpstreamReconciliation": "docs/review-images/batch11-editorial-upstream-reconciliation-20261022.json",
+    "resolvedQuotaBlocker": {
+      "resolvedAt": "2026-10-22T00:31:21.647Z",
+      "previous": "Cloudflare D1 HTTP400/code7500 free-tier daily row-read quota reached during queue reconciliation. No further D1 queries until the stated midnightUTC reset. Final pre-release identity/preservation and live watch checks remain required. This is transient; do not disable the existing task or regenerate this batch."
+    },
+    "preReleasePreservation": {
+      "checkedAt": "2026-10-22T04:37:22.541Z",
+      "saved": 507,
+      "published": 507,
+      "nonCounterSha256": "71e5c2bb3c3c4e858c59e690b9c5f00752e01e5ade12426671d03224fb978c82",
+      "fields": [
+        "cache_attempts",
+        "cache_error",
+        "cache_next_attempt_at",
+        "cache_source_url",
+        "cache_status",
+        "cached_at",
+        "created_at",
+        "description",
+        "embed_url",
+        "featured",
+        "id",
+        "media_type",
+        "primary_category",
+        "published",
+        "r2_key",
+        "redistribution_certified",
+        "redistribution_certified_at",
+        "review_text",
+        "seo_description",
+        "seo_tags",
+        "seo_title",
+        "slug",
+        "source_page_url",
+        "source_url",
+        "subcategory",
+        "thumbnail_url",
+        "title",
+        "trending",
+        "updated_at"
+      ],
+      "evidence": "docs/review-images/batch11-release-preflight-20261022.json"
+    },
+    "releasePreflight": "docs/review-images/batch11-release-preflight-20261022.json",
+    "sourceMetadataUnavailableIds": [
+      135,
+      131,
+      132,
+      119,
+      130,
+      134,
+      36,
+      98,
+      115,
+      86
+    ]
   },
   "ownerReconciliation20261021": {
     "authoritativeInventoryAt": "2026-10-21T17:41:22.163Z",
