@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" role="img" aria-labelledby="art-title art-description">
+<title id="art-title">Two allies, one concealed enemy — conceptual illustration for Hera Pheri (1976)</title>
+<desc id="art-description">Original cinematic illustration of two fictional seventies-era friends, vintage architecture, a getaway car and a distant mysterious figure. Not a film still.</desc>
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#081c32"/><stop offset=".4" stop-color="#1c3950"/><stop offset=".76" stop-color="#b46749"/><stop offset="1" stop-color="#f4b56d"/></linearGradient>
+<linearGradient id="rose" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eaa06a"/><stop offset=".52" stop-color="#b95e3c"/><stop offset="1" stop-color="#5b2833"/></linearGradient>
+<linearGradient id="navy" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#51738a"/><stop offset=".6" stop-color="#273b60"/><stop offset="1" stop-color="#111e39"/></linearGradient>
+<linearGradient id="skinA" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fac58b"/><stop offset=".55" stop-color="#c97e57"/><stop offset="1" stop-color="#804831"/></linearGradient>
+<linearGradient id="skinB" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e9af78"/><stop offset=".5" stop-color="#ad6a4b"/><stop offset="1" stop-color="#543b42"/></linearGradient>
+<linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4b4545"/><stop offset="1" stop-color="#090d1e"/></linearGradient>
+<radialGradient id="glow"><stop stop-color="#ffdc9c" stop-opacity=".65"/><stop offset="1" stop-color="#e18360" stop-opacity="0"/></radialGradient>
+<pattern id="grit" width="21" height="21" patternUnits="userSpaceOnUse"><path d="M0 14h1m10-9h2m4 14h1" stroke="#ffcc99" stroke-width="1" opacity=".14"/></pattern>
+<filter id="soft"><feGaussianBlur stdDeviation="19"/></filter>
+<filter id="shine"><feGaussianBlur stdDeviation="4"/></filter>
+</defs>
+<rect width="1280" height="720" fill="url(#sky)"/>
+<circle cx="1030" cy="275" r="260" fill="url(#glow)"/>
+<g opacity=".40" fill="#152b3e"><path d="M0 387V204h68v-41h26v41h56v-56h30v56h37v183zM164 395V189h18v-26h70v26h18v206zM256 410V267h45v-66h26v66h54v143zM382 398V247h60v-65h34v65h34v151zM1034 399V184h45v-43h30v43h30v215zM1118 398V244h46v-71h26v71h90v154z"/></g>
+<g opacity=".50" fill="#213548" stroke="#ffc883" stroke-width="2"><path d="M592 387V246h42v-44h22v44h48v-44h22v44h42v141z"/><path d="M654 202v-30l44-38 44 38v30z"/><path d="M662 139h71l-34-59z"/><path d="M571 389V287h20v102zm217 0V287h20v102z"/></g>
+<g fill="#d9a77a" opacity=".38"><path d="M607 279h15v30h-15zm35 0h15v30h-15zm35 0h15v30h-15zm35 0h15v30h-15zm35 0h15v30h-15zm-104 45h18v29h-18zm48 0h18v29h-18zm48 0h18v29h-18z"/></g>
+<path d="M0 435Q610 398 1280 459V720H0Z" fill="url(#floor)"/>
+<path d="M0 540Q560 468 1280 584M0 611Q710 538 1280 657" fill="none" stroke="#db9169" stroke-width="7" opacity=".28"/>
+<ellipse cx="675" cy="649" rx="485" ry="37" fill="#00091d" opacity=".6" filter="url(#soft)"/>
+<g opacity=".76"><path d="M908 557q14-39 47-48h115q39 0 52 47l14 32H894Z" fill="#1d303c" stroke="#c88e70" stroke-width="4"/><path d="M960 519l19 40h94l-21-40z" fill="#62838d" stroke="#f3bb86" stroke-width="3"/><ellipse cx="951" cy="596" rx="30" ry="31" fill="#0c101d" stroke="#cf9c74" stroke-width="7"/><ellipse cx="1092" cy="596" rx="30" ry="31" fill="#0c101d" stroke="#cf9c74" stroke-width="7"/><path d="M907 566h24v11h-24zm198 0h24v11h-24z" fill="#ffe3ab" filter="url(#shine)"/></g>
+<!-- Rival observer: a generic symbolic figure, not a film actor -->
+<g transform="translate(1068 222)" opacity=".84"><path d="M55 122C0 135-10 207-25 312h191c-14-133-34-191-75-193Z" fill="#12212e"/><path d="M29 27q45-37 85 8l-5 73q-22 35-55 5L22 75Z" fill="#885f4d"/><path d="M13 47q6-65 67-64 49 5 44 73l-24-27-63 15-18 40Z" fill="#171722"/><path d="M30 64h69" stroke="#101a20" stroke-width="17" stroke-linecap="round"/><path d="M67 125l-4 114" stroke="#f4c7a2" stroke-width="6"/></g>
+<!-- Left protagonist: invented face and costume -->
+<g transform="translate(45 28)">
+<path d="M84 720Q79 491 157 409q70-45 171-27 73 20 149 110l62 228Z" fill="url(#rose)" stroke="#432c36" stroke-width="9"/>
+<path d="M151 429l97 128 88-139-13-65H191Z" fill="#f6d6b6"/>
+<path d="M207 428l44 90 36-91-5-73h-46Z" fill="#b36d4c"/>
+<path d="M141 432l95 116 38-76-4 163-94 85H91Z" fill="#7e3c30" opacity=".8"/>
+<path d="M340 419l-70 129 8 169h219Q427 509 340 419Z" fill="#5f3341" opacity=".82"/>
+<path d="M190 481l64 95-45 144h80l-18-160Z" fill="#f9efe1"/>
+<path d="M256 515l-22 37 31 119 17-111Z" fill="#333245"/>
+<path d="M164 217Q170 130 245 118q106-6 128 107l-11 102q-43 88-103 106-89-19-118-105Z" fill="url(#skinA)" stroke="#573e3d" stroke-width="8"/>
+<path d="M157 252q-25-29-28 10 0 48 37 58zm210 5q26-28 30 9 1 43-37 57z" fill="#af6b50"/>
+<path d="M161 250q11-44 12-57 35-44 115-36 47 2 88 51l-10-64q-33-77-105-81-111-1-124 89Z" fill="#151b27"/>
+<path d="M143 196q-18-71 43-109 89-57 165 1 40 30 33 88-49-46-97-48-72 5-144 68Z" fill="#1b1e27"/>
+<path d="M178 241l72-11m49 6 55 9" stroke="#3e2928" stroke-width="8" stroke-linecap="round"/>
+<path d="M191 265q21-13 49 0m73 3q17-12 34 0" fill="none" stroke="#251f28" stroke-width="7"/><circle cx="217" cy="269" r="5" fill="#101a28"/><circle cx="330" cy="271" r="5" fill="#101a28"/>
+<path d="M280 279l-17 44q20 11 33 0" fill="none" stroke="#9f6349" stroke-width="6"/><path d="M233 357q40 24 79-1" fill="none" stroke="#642f31" stroke-width="7" stroke-linecap="round"/>
+<path d="M161 412l88 132 70-131" fill="none" stroke="#dc935c" stroke-width="7" opacity=".5"/>
+<g transform="rotate(-14 152 560)"><path d="M66 483q-3-12 13-14l90 4q21 5 23 28l-7 148-127-2Z" fill="#d5ac8c"/><path d="M102 494l83 6-2 135-100-7Z" fill="#efe0bf" stroke="#654634" stroke-width="4"/><text x="116" y="532" fill="#77342e" font-size="35" font-family="Georgia,serif">A</text><path d="M145 542q-25 31-3 42 19-11 3-42Z" fill="#982b2f"/></g>
+</g>
+<!-- Right protagonist with contrasting navy tailoring -->
+<g transform="translate(570 35)">
+<path d="M9 720q-19-207 67-305 80-54 186-17 87 46 134 322Z" fill="url(#navy)" stroke="#17233c" stroke-width="9"/>
+<path d="M107 419l87 126 95-113-22-75H141Z" fill="#ead6bd"/>
+<path d="M158 404l52 94 41-94-11-55h-84Z" fill="#b47854"/>
+<path d="M110 452l93 112 15 156H52Z" fill="#263e68"/><path d="M271 435l-66 132-3 153h197q-32-195-128-285Z" fill="#2b3756"/>
+<path d="M175 502l37 69-21 149h87l-39-150 28-74Z" fill="#f4e4cf"/><path d="M218 544l-23 45 26 122 23-123Z" fill="#9c6457"/>
+<path d="M87 228q9-117 111-128 104 4 124 115l-8 94q-24 89-106 114-98-31-120-132Z" fill="url(#skinB)" stroke="#493941" stroke-width="8"/>
+<path d="M84 247q-24-24-25 9 1 40 30 50zm231 3q29-19 28 15 1 41-34 48Z" fill="#996043"/>
+<path d="M81 214Q50 124 121 77q46-26 89-25 91 5 129 112-24 0-46 43-10-46-75-66-76-17-137 73Z" fill="#151923"/>
+<path d="M79 216q-18-80 17-108 52-69 143-51 84 9 93 86-35-28-77-33-96-7-176 106Z" fill="#20202b"/>
+<path d="M103 237l74-11m42 4 58 11" stroke="#3b292b" stroke-width="8" stroke-linecap="round"/>
+<path d="M120 264q23-10 45 3m77-4q18-8 35 5" fill="none" stroke="#2e2229" stroke-width="7"/><circle cx="141" cy="268" r="5" fill="#111a25"/><circle cx="258" cy="268" r="5" fill="#111a25"/>
+<path d="M205 272l-19 50q19 11 33 0" fill="none" stroke="#9f6548" stroke-width="6"/><path d="M165 355q38 12 80-7" fill="none" stroke="#542f37" stroke-width="7" stroke-linecap="round"/>
+<path d="M97 429l106 135 79-137" fill="none" stroke="#a9b5c3" stroke-width="6" opacity=".48"/>
+</g>
+<rect width="1280" height="720" fill="url(#grit)" opacity=".72"/>
+<path d="M26 675h310m610 0h308" stroke="#ebbc91" stroke-width="2" opacity=".55"/>
+<text x="640" y="680" text-anchor="middle" fill="#ffe1b2" font-family="Georgia,serif" font-size="26" letter-spacing="4">vid.best</text>
+</svg>

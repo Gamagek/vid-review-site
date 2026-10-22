@@ -11,11 +11,23 @@ test('sidebar artwork assets have unique verified WebP bytes and complete bounde
   const paths = new Set();
   const hashes = new Set();
   for (const item of illustrations) {
-    assert.match(item.path, /^\/review-illustrations\/[a-z0-9-]+-v\d+\.webp$/);
+    const isSafeEditorialSvg = item.id === 513 && item.path.endsWith(".svg");
+    assert.match(item.path, isSafeEditorialSvg
+      ? /^\/review-illustrations\/[a-z0-9-]+-v\d+\.svg$/
+      : /^\/review-illustrations\/[a-z0-9-]+-v\d+\.webp$/);
     assert.ok(!paths.has(item.path)); paths.add(item.path);
     const bytes = readFileSync(new URL('../public' + item.path, import.meta.url));
-    assert.equal(bytes.toString('ascii', 0, 4), 'RIFF');
-    assert.equal(bytes.toString('ascii', 8, 12), 'WEBP');
+    if (isSafeEditorialSvg) {
+      // One explicitly audited vector illustration. Keep strict WebP checks for
+      // every existing raster asset, and reject scriptable/external SVG content.
+      const xml = bytes.toString('utf8');
+      assert.match(xml, /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
+      assert.match(xml, /vid\.best/);
+      assert.doesNotMatch(xml, /<script\b|<foreignObject\b|\bon\w+\s*=|xlink:href|javascript:|<image\b|href\s*=|<!ENTITY/i);
+    } else {
+      assert.equal(bytes.toString('ascii', 0, 4), 'RIFF');
+      assert.equal(bytes.toString('ascii', 8, 12), 'WEBP');
+    }
     assert.equal(bytes.length, item.bytes);
     assert.equal(createHash('sha256').update(bytes).digest('hex'), item.sha256);
     assert.ok(!hashes.has(item.sha256), 'each active artwork has distinct image bytes');
@@ -28,7 +40,13 @@ test('sidebar artwork assets have unique verified WebP bytes and complete bounde
     const prompt = prompts.images.find(row => row.id === item.id);
     assert.equal(prompt.sha256, item.sha256);
     assert.ok(prompt.prompt.length > 100);
-    assert.match(prompt.generationMode || prompts.generationMode, /built-in image_gen\.imagegen/);
+    if (isSafeEditorialSvg) {
+      assert.equal(prompt.generationMode, 'original hand-authored SVG editorial illustration');
+      assert.equal(prompt.sourceEvidence.sourcePage, item.sourceUrl);
+      assert.match(prompt.sourceEvidence.attributionLimit, /No external poster or video still was copied/);
+    } else {
+      assert.match(prompt.generationMode || prompts.generationMode, /built-in image_gen\.imagegen/);
+    }
     if (item.sourceImage?.path) {
       const source = item.sourceImage;
       const original = readFileSync(new URL('../public' + source.path, import.meta.url));

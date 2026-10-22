@@ -2996,3 +2996,50 @@ test("server-rendered editorial reviews expose escaped, semantic topic headings 
   ).get();
   assert.deepEqual(after, before);
 });
+
+
+test("Hera Pheri 1976 review artwork is indexable, source-matched and distinct from film footage", async () => {
+  const context = createTestContext();
+  const savedDate = "2026-10-20T18:30:31.299Z";
+  const title = "Hera Pheri (1976) — Vijay and Ajay's Friendship on Trial";
+  context.sqlite.prepare(
+    `INSERT INTO videos
+    (id, slug, title, source_url, embed_url, media_type, primary_category,
+     subcategory, description, review_text, published, created_at, updated_at)
+    VALUES (513, ?, ?, ?, ?, 'youtube', 'Entertainment, Movies & Games',
+            'Film Reviews', ?, ?, 1, ?, ?)`
+  ).run(
+    "hera-pheri-1976-film-review", title,
+    "https://www.youtube.com/watch?v=TBSjGjhFvnI",
+    "https://www.youtube.com/embed/TBSjGjhFvnI",
+    "The relationship between Vijay and Ajay is tested.",
+    "🤝 Trust and Deception\n\nA substantial original review of the friends and their conflict.",
+    savedDate, savedDate
+  );
+  const before = context.sqlite.prepare(
+    "SELECT created_at,updated_at,thumbnail_url,title,source_url FROM videos WHERE id=513"
+  ).get();
+  const page = await send(context, "/watch/hera-pheri-1976-film-review", {
+    headers: { "User-Agent": "Googlebot" },
+  });
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.match(html, /review-illustrations\/hera-pheri-1976-friendship-concept-v1\.svg/);
+  assert.match(html, /Conceptual review artwork; not a frame from the source video/);
+  assert.match(html, /not video footage/);
+  assert.match(html, /"@type":"ImageObject"/);
+  assert.match(html, /"width":1280,"height":720/);
+  // An original illustration must never masquerade as the provider video thumbnail.
+  assert.doesNotMatch(html, /"thumbnailUrl":\["https:\/\/example\.com\/review-illustrations/);
+  const xmlResponse = await seoEdge.fetch(
+    new Request("https://vid.best/sitemaps/images-editorial-1.xml"),
+    context.env, context.ctx
+  );
+  assert.equal(xmlResponse.status, 200);
+  const xml = await xmlResponse.text();
+  assert.match(xml, /<image:loc>https:\/\/vid\.best\/review-illustrations\/hera-pheri-1976-friendship-concept-v1\.svg<\/image:loc>/);
+  assert.match(xml, /<loc>https:\/\/vid\.best\/watch\/hera-pheri-1976-film-review<\/loc>/);
+  assert.deepEqual(context.sqlite.prepare(
+    "SELECT created_at,updated_at,thumbnail_url,title,source_url FROM videos WHERE id=513"
+  ).get(), before);
+});

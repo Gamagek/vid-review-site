@@ -4430,6 +4430,30 @@
         "note": "Unmodified publisher JPEG bytes, not newly captured footage or generated art."
       },
       "verificationLimits": "Preserve owner/source media, VideoObject eligibility/thumbnail, dates, text, all D1/R2 and holds. Publication gated on current-head CI/dry-run and actual deployment/live HTTP/hash/HTML/sitemap associations."
+    },
+    {
+      "id": 513,
+      "slug": "hera-pheri-1976-film-review",
+      "prompt": "Create an original hand-designed 16:9 vector editorial illustration for Vid.Best's existing Hera Pheri (1976) movie-review page. Depict two entirely fictional Indian men styled as 1970s crime-drama allies, back-to-back in tailored brown and blue suits, against an invented South Asian twilight city with historic architecture, a vintage car, playing cards, and a distant anonymous antagonist. Use layered amber and teal gradients, broad cinematic shading, hand-drawn details and rich silhouette depth. Interpret the verified themes of friendship, appearances and deceit, without copying a Shemaroo thumbnail, an official poster, any film frame, or recreating the two film actors' specific likenesses. Integrate only the small 'vid.best' watermark at bottom center. Do not include any deceptive claim that the image is actual footage.",
+      "asset": "public/review-illustrations/hera-pheri-1976-friendship-concept-v1.svg",
+      "bytes": 7864,
+      "sha256": "ee5ebb9c01d73db13a33f09785c66eac4c950966efc8bf09263e468c4dda4d55",
+      "width": 1280,
+      "height": 720,
+      "generationMode": "original hand-authored SVG editorial illustration",
+      "embeddedWatermark": {
+        "text": "vid.best",
+        "placement": "bottom-center",
+        "method": "vector paths/text embedded in original SVG; no separate overlay"
+      },
+      "sourceEvidence": {
+        "sourcePage": "https://www.youtube.com/watch?v=TBSjGjhFvnI",
+        "existingPage": "https://vid.best/watch/hera-pheri-1976-film-review",
+        "filmFacts": "Official Shemaroo synopsis of Vijay, Ajay and P.K., with film credits and music corroborated by third-party film listings",
+        "access": "Full source video not reviewed frame by frame. The artwork is a newly composed fictional, theme-based illustration.",
+        "attributionLimit": "No external poster or video still was copied, downloaded or claimed as a captured frame."
+      },
+      "verificationLimits": "Artwork applies only when live D1 id 513, slug, saved title, source URL and published status match; full byte SHA-256 verified. Owner image and publication metadata remain unchanged."
     }
   ],
   "ownerDesignPreference": {
