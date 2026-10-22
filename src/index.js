@@ -351,7 +351,7 @@ async function route(request, env, ctx) {
   }
   if (path === "/api/admin/juicer-cache/sync" && request.method === "POST") {
     await requireAdmin(request, env);
-    return juicerCacheSyncEndpoint(env);
+    return juicerCacheSyncEndpoint(request,env);
   }
 
   if (path === "/api/admin/videos" && request.method === "GET") {
