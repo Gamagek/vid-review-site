@@ -1860,5 +1860,18 @@
       "mime": "image/jpeg"
     },
     "embeddedWatermark": "vid.best"
+  },
+  {
+    "id": 513,
+    "slug": "hera-pheri-1976-film-review",
+    "sourceUrl": "https://www.youtube.com/watch?v=TBSjGjhFvnI",
+    "expectedTitle": "Hera Pheri (1976) — Vijay and Ajay's Friendship on Trial",
+    "path": "/review-illustrations/hera-pheri-1976-friendship-concept-v1.svg",
+    "width": 1280,
+    "height": 720,
+    "alt": "Original illustrated review artwork: two fictional 1970s-era allies stand against a twilight city as a concealed rival watches from afar, reflecting the trust and deception themes of Hera Pheri (1976); not a film frame",
+    "caption": "Original thematic illustration of friendship, identity and deception in 1970s Hindi crime cinema. Not a frame from Hera Pheri.",
+    "bytes": 7864,
+    "sha256": "ee5ebb9c01d73db13a33f09785c66eac4c950966efc8bf09263e468c4dda4d55"
   }
 ]
