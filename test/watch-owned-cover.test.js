@@ -72,7 +72,7 @@ test("watch first paint uses the selected illustration without changing owner te
   assert.match(html, /<h1>Owner review title<\/h1>/);
   assert.ok(html.includes("Owner review — final paragraph."));
   assert.doesNotMatch(html, /Last updated|<iframe|<video|"@type":"VideoObject"/);
-  assert.match(html, /\/watch\.js\?v=20261019-art-preview/);
+  assert.match(html, /\/watch\.js\?v=20261022-official-first/);
   assert.deepEqual(c.sqlite.prepare("SELECT * FROM videos ORDER BY id").all(), before);
   assert.deepEqual(c.sqlite.prepare("SELECT * FROM tiktok_oembed_cache").all(), metadata);
   const head = await render(c, "", { method: "HEAD" });
