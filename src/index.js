@@ -621,6 +621,22 @@ function unwrapTikTokOEmbedPayload(payload) {
   return null;
 }
 
+// Server-side daily lease: prevents simultaneous edge isolates from issuing
+// multiple outbound metadata lookups for the same public TikTok post.
+// Existing Saiyaara Tagembed and Proposal cached-oEmbed flows remain untouched.
+async function claimTikTokDailyMetadataLookup(env, videoId) {
+  if (!env.DB || videoId === "7603012203595320584" || videoId === "7669587518156705056") return true;
+  const now = Date.now();
+  const until = now + 24 * 60 * 60 * 1000;
+  const result = await env.DB.prepare(
+    `INSERT INTO app_settings (setting_key, setting_value)
+     VALUES (?, ?)
+     ON CONFLICT(setting_key) DO UPDATE SET setting_value = excluded.setting_value
+     WHERE CAST(app_settings.setting_value AS INTEGER) <= ?`,
+  ).bind("tiktok_oembed_daily_lease:" + videoId, String(until), now).run();
+  return Number(result?.meta?.changes || 0) === 1;
+}
+
 const tikTokMetadataRequests = new WeakMap();
 async function fetchTikTokPreview(env, share, options = {}) {
   const canonical = normalizeTikTokShareUrl(share);
@@ -659,6 +675,13 @@ async function fetchTikTokPreviewOnce(env, share, options = {}) {
       const error = new AppError(503, "TikTok preview is cooling down. Please try later.", null, { "Retry-After": String(remaining) });
       error.cooldown = true;
       throw error;
+    }
+    const claimed = await claimTikTokDailyMetadataLookup(env, videoId);
+    if (!claimed) {
+      if (durable && Date.parse(durable.fetched_at) + 7 * 86400000 > Date.now()) {
+        return tikTokPreviewFromRow(durable, "d1-stale");
+      }
+      throw new AppError(503, "A TikTok metadata refresh was already attempted today.", null, { "Retry-After": "3600" });
     }
     const gatewayUrl = buildTikTokOEmbedGatewayUrl(env, canonicalShare);
     const response = await fetch(gatewayUrl, {
