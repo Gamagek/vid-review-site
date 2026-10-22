@@ -97,7 +97,7 @@ const comparable = value => JSON.stringify({
   creator_name:value.creator_name,caption:value.caption,
   source_published_at:value.source_published_at,embed_url:value.embed_url
 });
-export async function syncJuicerFeedCache(env, {force=false,maxPages=MAX_PAGES}={}) {
+export async function syncJuicerFeedCache(env, {force=false,resume=false,maxPages=MAX_PAGES}={}) {
   if (!env.BUCKET?.get || !env.BUCKET?.put)
     return {ok:false,skipped:true,reason:"R2 BUCKET binding is unavailable"};
   const key = String(env.JUICER_API_KEY || "");
@@ -112,7 +112,7 @@ export async function syncJuicerFeedCache(env, {force=false,maxPages=MAX_PAGES}=
   if (!force && state.last_attempt_at && now - Date.parse(state.last_attempt_at) < 300_000) {
     return {ok:true,skipped:true,reason:"A feed refresh was attempted recently"};
   }
-  const currentPage = force ? 1 : Math.max(1,Number(state.next_page) || 1);
+  const currentPage = force && !resume ? 1 : Math.max(1,Number(state.next_page) || 1);
   let nextPage = currentPage;
   let processed=0,saved=0,unchanged=0,invalid=0;
   const cap=Math.max(1,Math.min(MAX_PAGES,Number(maxPages)||MAX_PAGES));
@@ -160,9 +160,16 @@ export async function juicerCacheStatus(env) {
     state: await getJuicerSyncState(env),
   });
 }
-export async function juicerCacheSyncEndpoint(env) {
+export async function juicerCacheSyncEndpoint(request,env) {
   try {
-    const result=await syncJuicerFeedCache(env,{force:true});
+    const length = Number(request.headers.get("content-length")||0);
+    if(length > 128) return safeResponse({ok:false,error:"Request body too large"},413);
+    let resume=false;
+    if(length>0) {
+      const body=await request.json();
+      resume=body?.resume === true;
+    }
+    const result=await syncJuicerFeedCache(env,{force:true,resume});
     return safeResponse(result,result.ok?200:503);
   } catch (error) {
     return safeResponse({ok:false,error:String(error.message).slice(0,150)},502);
