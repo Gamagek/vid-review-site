@@ -1,0 +1,130 @@
+{
+  "checkedAt": "2026-10-22T17:30:24.702Z",
+  "currentMain": "751c3ce1097d9344a6deb2dedd10b2344bd33988",
+  "currentDeployment": {
+    "id": "60abd6c4-a6c4-4638-97e4-1f085122722f",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "annotations": {
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "01ddead4-56f9-411f-8d2f-8ad934093e64",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-22T10:56:53.925137Z"
+  },
+  "currentInventory": {
+    "saved": 507,
+    "published": 501,
+    "drafts": [
+      {
+        "id": 515,
+        "slug": "bedroom-foot-tap-watermelon-gag-and-cream-toss",
+        "published": 0
+      },
+      {
+        "id": 516,
+        "slug": "fake-iphone-sponge-haircut-mix-up-and-kitchen-pranks",
+        "published": 0
+      },
+      {
+        "id": 517,
+        "slug": "haircut-tea-biscuits-and-horror-movie-popcorn-chaos",
+        "published": 0
+      },
+      {
+        "id": 518,
+        "slug": "gate-kick-cereal-splash-dog-sprint-and-toddler-reactions",
+        "published": 0
+      },
+      {
+        "id": 519,
+        "slug": "egg-splash-flour-balloon-trash-bag-and-sofa-pranks",
+        "published": 0
+      },
+      {
+        "id": 520,
+        "slug": "park-cup-bed-challenge-cherry-prank-and-doorway-cream-smash",
+        "published": 0
+      }
+    ],
+    "manifestEntries": 123,
+    "currentIdentityMatches": 122,
+    "guardMismatchIds": [
+      308
+    ],
+    "nonCounterSha256": "39fab53d098a231e401e6f9a3701fdd25a2ddc7f9be82d5af9b6726b52a6aebe",
+    "rowsRead": 507,
+    "rowsWritten": 0
+  },
+  "priorBatch12": {
+    "commit": "981ff37b09b0f13bf3badd68ad7e0858b3ff55ea",
+    "verifiedAt": "2026-10-22T05:56:09.425Z",
+    "deploymentVersion": "488f8204-22b1-4741-9f38-50e8ba70dd46",
+    "counts": {
+      "newGenerated": 10,
+      "newCommitted": 10,
+      "newMerged": 10,
+      "newDeployed": 10,
+      "newPublished": 10,
+      "newLiveVerified": 10,
+      "sourceCopiesCommitted": 10,
+      "sourceCopiesPublished": 10,
+      "sourceCopiesLiveVerified": 10,
+      "manifestTotal": 120,
+      "currentIdentityMatchedArtworks": 119,
+      "currentSaved": 507,
+      "currentPublished": 507,
+      "queueIdentities": 507,
+      "queueMissingIdentities": 0
+    },
+    "evidence": "docs/review-images/batch12-live-verification-20261022.json",
+    "meaning": "Earlier same-day publication/live proof, not new publication in this checkpoint run."
+  },
+  "concurrentOwnerChanges": {
+    "preserveManifestIds": [
+      512,
+      513,
+      401
+    ],
+    "draftHoldIds": [
+      515,
+      516,
+      517,
+      518,
+      519,
+      520
+    ],
+    "openPRs": [
+      262,
+      266,
+      267
+    ],
+    "policy": "Do not merge/rewrite these unrelated PRs or overwrite owner media, draft flags, reviews, source data, dates or the latest deployment."
+  },
+  "currentRun": {
+    "generated": 0,
+    "newAssetCommitted": 0,
+    "mergedArtworks": 0,
+    "deployedArtworks": 0,
+    "publishedArtworks": 0,
+    "liveVerifiedArtworks": 0
+  },
+  "blocker": {
+    "category": "transient_D1_daily_read_limit",
+    "error": "Error: Cloudflare API error: POST /accounts/de9e41200f6bdfab80553c8eb08f9b16/d1/database/d1a91eb2-1c41-44b8-aff1-24166f2c91f4/query returned HTTP 400: 7500: Your account has exceeded D1's free tier daily row read limit. Upgrade to a paid plan or wait until tomorrow (midnight UTC) to continue. See https://developers.cloudflare.com/d1/platform/limits/ for more details",
+    "candidateReadsStopped": true,
+    "paidPlanChanged": false,
+    "taskDisabled": false,
+    "followup": "After the provider daily reset, inspect current main/open PRs/deployment and fresh published identity evidence before selecting the next up-to10eligible missing image pairs. Never repeat batch12."
+  },
+  "probe": {
+    "sql": "SELECT 1 AS ready",
+    "rowsRead": 0,
+    "rowsWritten": 0,
+    "limit": "SQL availability alone did not establish remaining table-read budget. A later bounded table read confirmed7500, and no more D1 reads followed."
+  }
+}
