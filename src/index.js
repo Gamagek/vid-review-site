@@ -1543,7 +1543,7 @@ async function homeMiniFeed(request, env) {
       most_liked: mostLiked,
       saved,
     },
-  }, 200, { "Cache-Control": "private, no-store" });
+  }, 200, { "Cache-Control": member ? "private, no-store" : "public, max-age=0, s-maxage=300" });
 }
 
 async function latestNotifications(env) {
@@ -1802,10 +1802,12 @@ async function listVideos(request, env, includeUnpublished) {
   const videoRows = listResult.results || [];
   const videos = await hydrateVideos(env, videoRows);
 
+  // Only published directory JSON is public. The edge layer rewrites browser
+  // responses to no-store, while explicitly public origin data may be cached.
   return json({
     videos,
     pagination: { limit, offset, total: Number(countRow.results?.[0]?.total || 0) },
-  });
+  }, 200, { "Cache-Control": includeUnpublished ? "private, no-store" : "public, max-age=0, s-maxage=300" });
 }
 
 async function hydrateVideos(env, rows) {
