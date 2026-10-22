@@ -268,3 +268,73 @@ test("anonymous public mini-feed is cacheable but any cookie bypasses shared JSO
     }
   } finally { globalThis.caches = previous; }
 });
+
+
+// Verify the production Gateway adapter as extracted from existing Portainer YAML.
+test("staging gateway mirror: Compose retains existing services, volume, port and opt-in", async () => {
+  const [{ default: YAML }, { readFileSync }] = await Promise.all([import("yaml"), import("node:fs")]);
+  const config = YAML.parse(readFileSync(new URL("../ops/portainer/vidbest-v56.yaml",import.meta.url),"utf8"));
+  assert.deepEqual(Object.keys(config.services).sort(), ["app","cloudflared","rapidapi-tester"]);
+  assert.deepEqual(Object.keys(config.volumes).sort(), ["gateway-state","rapidapi-tester-state"]);
+  assert.ok(config.services.app.volumes.includes("gateway-state:/app/state"));
+  assert.ok(config.services.app.environment.MIRROR_ENABLED.includes("MIRROR_ENABLED:-0"));
+  assert.equal(config.services.app.environment.MIRROR_DIR, "/app/state/vidbest-disk-mirror");
+  assert.equal(config.services.cloudflared.command, "tunnel --no-autoupdate run");
+  assert.deepEqual(config.services.app.expose, ["8080"]);
+  assert.equal(config.services.app.ports, undefined);
+});
+
+async function loadStagingMirror(tempDir, enabled=true) {
+  const [{ default: YAML }, { readFileSync }, { Script, createContext }, { createRequire }] =
+    await Promise.all([import("yaml"),import("node:fs"),import("node:vm"),import("node:module")]);
+  const config = YAML.parse(readFileSync(new URL("../ops/portainer/vidbest-v56.yaml",import.meta.url),"utf8"));
+  const command=config.services.app.command[2];
+  const match=command.match(/cat > \/app\/vidbest-mirror\.js <<'VIDBEST_MIRROR_JS'\n([\s\S]*?)\nVIDBEST_MIRROR_JS\n/);
+  assert.ok(match, "Inline gateway module must be present and complete");
+  assert.match(command, /if \(await vidbestMirror\.handle\(req, res\)\) return;/);
+  const sandbox={require:createRequire(import.meta.url),module:{exports:{}},Buffer,URL,
+    process:{env:{MIRROR_ENABLED:enabled?"1":"0",MIRROR_HMAC_KEY:"a".repeat(48),MIRROR_DIR:tempDir}}};
+  new Script(match[1],{filename:"vidbest-mirror.js"}).runInContext(createContext(sandbox));
+  return sandbox.module.exports;
+}
+
+test("staging gateway mirror: native HTTP HMAC, persistence, privacy and disabled mode", async () => {
+  const [{ mkdtemp,rm }, { tmpdir }, { join }, { Readable }, crypto] = await Promise.all([
+    import("node:fs/promises"),import("node:os"),import("node:path"),
+    import("node:stream"),import("node:crypto")]);
+  const dir=await mkdtemp(join(tmpdir(),"vidbest-mirror-"));
+  const call=async (mirror, method, url, body, signed=true)=>{
+    const data=Buffer.from(body||"");
+    const timestamp=String(Math.floor(Date.now()/1000));
+    const signature=crypto.createHmac("sha256","a".repeat(48))
+      .update(timestamp+"\n"+method+"\n"+url+"\n"+crypto.createHash("sha256").update(data).digest("hex"))
+      .digest("hex");
+    const req=Readable.from([data]);req.method=method;req.url=url;
+    req.headers={"content-length":String(data.length)};
+    if(signed)Object.assign(req.headers,{"x-mirror-timestamp":timestamp,"x-mirror-signature":signature});
+    let status,payload;
+    const res={writeHead(code){status=code;},end(text){payload=JSON.parse(String(text));}};
+    assert.equal(await mirror.handle(req,res),true);
+    return {status,payload};
+  };
+  try {
+    const mirror=await loadStagingMirror(dir);
+    assert.equal(mirror.safeRoute("/api/admin/videos"),false);
+    assert.equal(mirror.safeRoute("/api/videos?limit=18&offset=0"),true);
+    const route="/api/videos?limit=18";
+    const doc={route,kind:"public_videos_json",mime:"application/json; charset=utf-8",
+      body:JSON.stringify({videos:[{id:12,slug:"verified-review",title:"Verified"}],
+        pagination:{limit:18,offset:0,total:1}})};
+    assert.equal(mirror.validDoc(doc),true);
+    assert.equal(mirror.validDoc({...doc,body:JSON.stringify({videos:[{id:12,slug:"verified-review",secretToken:"hidden"}]})}),false);
+    const ep="/__mirror/v1/snapshots";
+    assert.equal((await call(mirror,"PUT",ep,JSON.stringify(doc),false)).status,401);
+    assert.equal((await call(mirror,"PUT",ep,JSON.stringify(doc))).status,200);
+    const reopened=await loadStagingMirror(dir);
+    const result=await call(reopened,"GET",ep+"?route="+encodeURIComponent(route));
+    assert.equal(result.status,200);
+    assert.equal(result.payload.route,route);
+    assert.equal(JSON.parse(result.payload.body).videos[0].slug,"verified-review");
+    assert.equal((await call(await loadStagingMirror(dir,false),"GET",ep+"?route="+encodeURIComponent(route))).status,404);
+  } finally {await rm(dir,{recursive:true,force:true});}
+});
