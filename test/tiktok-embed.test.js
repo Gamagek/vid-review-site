@@ -108,7 +108,7 @@ test("TikTok browser service uses official player first, with an opt-in gateway 
   assert.match(code, /cleanupEmbed/);
   assert.match(code, /observeOfficialPlayer/);
   assert.match(code, /data-tiktok-dialog-alternate/);
-  assert.match(code, /author_name/);
+  assert.match(code, /getMetadata/);
 });
 
 
@@ -230,7 +230,7 @@ test("repeated Play calls on the same open cached player keep one iframe and one
       trigger(name) { events.get(name)?.(); },
     };
   }
-  for (const key of ["[data-tiktok-embed-host]", "[data-tiktok-dialog-status]", "[data-tiktok-dialog-title]", "[data-tiktok-dialog-author]", "[data-tiktok-dialog-description]", ".tiktok-preview-dialog-close", "[data-tiktok-dialog-cancel]"]) selectors.set(key, element("div"));
+  for (const key of ["[data-tiktok-embed-host]", "[data-tiktok-dialog-status]", "[data-tiktok-dialog-title]", "[data-tiktok-dialog-author]", "[data-tiktok-dialog-description]", "[data-tiktok-dialog-alternate]", ".tiktok-preview-dialog-close", "[data-tiktok-dialog-cancel]"]) selectors.set(key, element("div"));
   const document = { hidden: false,
     querySelector() { return dialog; }, addEventListener() {},
     body: { append(node) { dialog = node; } },
