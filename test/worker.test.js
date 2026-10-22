@@ -3025,8 +3025,8 @@ test("Hera Pheri 1976 review artwork is indexable, source-matched and distinct f
   assert.equal(page.status, 200);
   const html = await page.text();
   assert.match(html, /review-illustrations\/hera-pheri-1976-friendship-concept-v1\.svg/);
-  assert.match(html, /Original thematic illustration of friendship/);
-  assert.match(html, /This is not a frame|Not a frame from Hera Pheri/);
+  assert.match(html, /Conceptual review artwork; not a frame from the source video/);
+  assert.match(html, /not video footage/);
   assert.match(html, /"@type":"ImageObject"/);
   assert.match(html, /"width":1280,"height":720/);
   // An original illustration must never masquerade as the provider video thumbnail.
