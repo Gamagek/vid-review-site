@@ -1919,5 +1919,18 @@
     "caption": "Original conceptual review artwork inspired by the cat and fake-phone scenes; not a frame from the video.",
     "bytes": 3126,
     "displayWatermark": "vid.best"
+  },
+  {
+    "id": 521,
+    "slug": "lord-of-the-rings-game-movie-gollum-talion-minas-ithil",
+    "sourceUrl": "https://www.youtube.com/watch?v=RzfGUV5ckME",
+    "expectedTitle": "The Lord of the Rings Game Movie — Gollum, Talion and Minas Ithil",
+    "path": "/review-illustrations/lord-of-the-rings-gollum-talion-v1.webp",
+    "width": 1672,
+    "height": 941,
+    "alt": "Talion and Gollum before a burning Middle-earth fortress, with a gold Ring design and small vid.best watermark; conceptual review artwork, not video footage",
+    "caption": "Conceptual review artwork, not a frame from the source video. The 2025 lettering follows the upload’s title.",
+    "bytes": 257410,
+    "sha256": "44d8c8408b0fbb5d3d3ad55f28965e2db6152a3d5b98914c284fb99b2ce1396b"
   }
 ]

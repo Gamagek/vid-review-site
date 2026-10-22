@@ -4430,6 +4430,35 @@
         "note": "Unmodified publisher JPEG bytes, not newly captured footage or generated art."
       },
       "verificationLimits": "Preserve owner/source media, VideoObject eligibility/thumbnail, dates, text, all D1/R2 and holds. Publication gated on current-head CI/dry-run and actual deployment/live HTTP/hash/HTML/sitemap associations."
+    },
+    {
+      "id": 521,
+      "slug": "lord-of-the-rings-game-movie-gollum-talion-minas-ithil",
+      "sourceUrl": "https://www.youtube.com/watch?v=RzfGUV5ckME",
+      "expectedTitle": "The Lord of the Rings Game Movie — Gollum, Talion and Minas Ithil",
+      "path": "/review-illustrations/lord-of-the-rings-gollum-talion-v1.webp",
+      "width": 1672,
+      "height": 941,
+      "alt": "Talion and Gollum before a burning Middle-earth fortress, with a gold Ring design and small vid.best watermark; conceptual review artwork, not video footage",
+      "caption": "Conceptual review artwork, not a frame from the source video. The 2025 lettering follows the upload’s title.",
+      "bytes": 257410,
+      "sha256": "44d8c8408b0fbb5d3d3ad55f28965e2db6152a3d5b98914c284fb99b2ce1396b",
+      "asset": "public/review-illustrations/lord-of-the-rings-gollum-talion-v1.webp",
+      "prompt": "Use the latest approved cinematic illustration featuring Talion, Gollum and a small vid.best watermark at the bottom. Keep the watermark small and unobtrusive. Do not label illustrated artwork as a real captured frame. Optimize image size and format.",
+      "promptKind": "Owner publication instruction; the exact original generation prompt was not recovered.",
+      "generationMode": "Prior built-in image_gen.imagegen artwork approved by the owner; imported for this publication, no new generation.",
+      "referenceAsset": {
+        "library_file_id": "libfile_65bd8dca6a2c8191b233284793fb0b3e",
+        "name": "Fiery Fortress Fantasy Poster.png",
+        "sha256": "84cb28fa1e34e0a7a8cdeaf6122275c54521a0a071885fa1ed748fe677299895"
+      },
+      "optimization": {
+        "operation": "WebP encoding only",
+        "quality": 77,
+        "compositionChanged": false,
+        "watermarkPreserved": true
+      },
+      "sourceFrameStatus": "Pending; no copyrighted source frame was uploaded."
     }
   ],
   "ownerDesignPreference": {
