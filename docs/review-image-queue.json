@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "inventoryAt": "2026-10-22T04:37:22.541Z",
+  "inventoryAt": "2026-10-22T04:41:53.570Z",
   "publishedLibraryCount": 507,
   "batchLimit": 10,
-  "phase": "batch11_preflight_verified_pending_release_ci",
+  "phase": "batch11_published_verified_pending_queue_reconciliation",
   "policy": "Preserve all source/owner posters and all D1 fields. Match current published ID, slug, source and title before enabling art. Do not edit protected review topics/media or drafts. Reconcile newly published records on each run; no regeneration merely for freshness. The owner’s 18 October request authorizes separate sidebar artwork identified by truthful conceptual-not-source-frame captions for all published platforms/topics, including comedy, but never edits existing protected review text, SEO titles, source posters or players. Source-removal/demo/Saiyaara/Summer holds remain. The19October owner steering additionally authorizes identity-matched generated art in OpenGraph/Twitter/WebPage metadata and guarded fallback for genuinely broken listing previews; preserve working source posters/VideoObject evidence and all D1/R2 media fields.",
   "baseline": {
     "saved": 214,
@@ -291,9 +291,11 @@
       "slug": "lady-gaga-bruno-mars-die-with-a-smile-official-music-video",
       "category": "Music",
       "sourceSha256": "4794a42203c1d970f6f257f4f16b883cb31f1c643d2e05881a4083ac4d20b6ba",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
-      "batch": 11
+      "batch": 11,
+      "liveVerifiedAt": "2026-10-22T04:41:13.296Z",
+      "releaseCommit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
     },
     {
       "id": 37,
@@ -707,9 +709,11 @@
       "slug": "luis-fonsi-despacito-ft-daddy-yankee",
       "category": "Music",
       "sourceSha256": "844d66181a13d7e95bb88ae34b75853f2b7178597661dc8f8b1050965ed9dd89",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
-      "batch": 11
+      "batch": 11,
+      "liveVerifiedAt": "2026-10-22T04:41:13.296Z",
+      "releaseCommit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
     },
     {
       "id": 87,
@@ -805,9 +809,11 @@
       "slug": "3-why-this-kolaveri-di-official-video-dhanush-anirudh-ravichander-shruti-haasan",
       "category": "Music",
       "sourceSha256": "66c09546dfec3d3b0b55d14c6b8c37ca11ac3c9a8554394bd3f5f0fbf0f622bc",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
-      "batch": 11
+      "batch": 11,
+      "liveVerifiedAt": "2026-10-22T04:41:13.296Z",
+      "releaseCommit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
     },
     {
       "id": 99,
@@ -946,9 +952,11 @@
       "slug": "tujh-mein-rab-dikhta-hai-song-rab-ne-bana-di-jodi-shah-rukh-khan-anushka-sharma-roop-kumar",
       "category": "Music",
       "sourceSha256": "f0a74df9835f9ad36317d63c7ec3af4e30085ff45919eb525543f777e8827981",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
-      "batch": 11
+      "batch": 11,
+      "liveVerifiedAt": "2026-10-22T04:41:13.296Z",
+      "releaseCommit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
     },
     {
       "id": 116,
@@ -979,9 +987,11 @@
       "slug": "official-best-travelling-songs-of-bollywood-road-trip-songs-t-series",
       "category": "Music",
       "sourceSha256": "70f8a7cd7420d163473c0fa4994164fb476f513a01fee3c5ed51694479ab6be9",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
-      "batch": 11
+      "batch": 11,
+      "liveVerifiedAt": "2026-10-22T04:41:13.296Z",
+      "releaseCommit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
     },
     {
       "id": 120,
@@ -1072,27 +1082,33 @@
       "slug": "katy-perry-roar-how-katy-perry-conquered-the-jungle-in-roar",
       "category": "Music",
       "sourceSha256": "d9cd86022e70482d98a10ed587d82518fb4544b4ddf6217d731de03023cbc246",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
-      "batch": 11
+      "batch": 11,
+      "liveVerifiedAt": "2026-10-22T04:41:13.296Z",
+      "releaseCommit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
     },
     {
       "id": 131,
       "slug": "wiz-khalifa-see-you-again-ft-charlie-puth-official-video-furious-7-soundtrack",
       "category": "Music",
       "sourceSha256": "61df52dee5c59f34c0c8a710ad05a3c1574b539b1731dc0070d599d80833d1a4",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
-      "batch": 11
+      "batch": 11,
+      "liveVerifiedAt": "2026-10-22T04:41:13.296Z",
+      "releaseCommit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
     },
     {
       "id": 132,
       "slug": "guli-mata-saad-lamjarred-shreya-ghoshal-jennifer-winget-anshul-garg",
       "category": "Music",
       "sourceSha256": "c6682471f55e4af84426d44fc91d58ce8c6855c2f52f667d8ca2eff32608997b",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
-      "batch": 11
+      "batch": 11,
+      "liveVerifiedAt": "2026-10-22T04:41:13.296Z",
+      "releaseCommit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
     },
     {
       "id": 133,
@@ -1107,18 +1123,22 @@
       "slug": "rose-bruno-mars-apt-official-music-video",
       "category": "Music",
       "sourceSha256": "a9e7efa592a3c913cb7c16fb5cde408c1dfba2b2cecf184044db53497d5eb0dc",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
-      "batch": 11
+      "batch": 11,
+      "liveVerifiedAt": "2026-10-22T04:41:13.296Z",
+      "releaseCommit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
     },
     {
       "id": 135,
       "slug": "titli-chennai-express-full-video-song-shahrukh-khan-deepika-padukone-music-video-analysis-why-titli-",
       "category": "Music",
       "sourceSha256": "329b41a15bc81678eb3ea888c6a8211b120869593a887343ea110ab4af729e1f",
-      "status": "prepared",
+      "status": "published_verified",
       "provider": "youtube",
-      "batch": 11
+      "batch": 11,
+      "liveVerifiedAt": "2026-10-22T04:41:13.296Z",
+      "releaseCommit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
     },
     {
       "id": 136,
@@ -2440,8 +2460,11 @@
       "category": "Funny & Comedy",
       "provider": "tiktok",
       "sourceSha256": "386e0805de1b7c481ffa72d465bfaeda09848dc9ff4042b75e4c2f59a635fdba",
-      "status": "published_verified",
-      "batch": 9
+      "status": "hold_owner_identity_changed",
+      "batch": 9,
+      "previousStatus": "published_verified",
+      "holdReason": "Current owner title differs from artwork expectedTitle. Identity guard disables old artwork and preview fallback; preserve owner title/source/poster and original saved art. Revalidate theme before any future art work.",
+      "identityCheckedAt": "2026-10-22T04:41:53.570Z"
     },
     {
       "id": 309,
@@ -3574,7 +3597,7 @@
       "status": "pending_theme_verification"
     }
   ],
-  "nextTask": "Finish PR255 / batch11 IDs135,131,132,119,130,134,36,98,115,86: fresh507/507 inventory and exact source/date/poster guards match. Complete current-head CI and Worker dry-run, merge/deploy this same prepared batch, then verify all10artworks and10unchanged source copies with exact watch HTML and split/combined sitemap associations. No regeneration. After release, reconcile72current inventory identities missing from the dated435-entry queue; retain all holds and select up to10eligible missing dual-image pages with baked-in vid.best branding for future new artworks.",
+  "nextTask": "Reconcile72 unqueued current published identities; preserveID308owner-change hold and PR254six-draft/media holds. Select up to10new missing dual-image eligible reviews with verified theme/source evidence and original intact publisher image. Future new anime artwork must include bottom-right vid.best watermark in the image itself. Do not regenerate batch11.",
   "batch1": {
     "state": "published_verified",
     "recordIds": [
@@ -8285,7 +8308,7 @@
     }
   ],
   "batch11": {
-    "state": "preflight_verified_pending_release_ci",
+    "state": "published_verified",
     "recordIds": [
       135,
       131,
@@ -8302,8 +8325,8 @@
     "pr": 255,
     "base": "4d689eecb2a6de52844a0fcc58b7045c0c17ec3a",
     "newGenerated": 10,
-    "newPublished": 0,
-    "liveVerified": 0,
+    "newPublished": 10,
+    "liveVerified": 10,
     "baseline": {
       "checkedAt": "2026-10-21T17:41:22.163Z",
       "saved": 501,
@@ -8326,8 +8349,10 @@
       "nodeTests": 468,
       "workerDryRun": true,
       "assetHashesAndPreservation": true,
-      "exactHeadCI": "pending for fresh preflight/schema-preservation verifier head",
-      "pythonSuite": "required CI pending"
+      "exactHeadCI": "passed39723584902 atc6ef7ebb0e75e6ce1a974066f1c97ddeca202215",
+      "pythonSuite": "4passed",
+      "pythonTests": 4,
+      "liveHTTPHashHTMLMaps": "10artworks+10source copies passed"
     },
     "reconciledMain": "fe12eaa1049b948ee049f60d3ef2f61be079c2aa",
     "upstreamReconciliation": "docs/review-images/batch11-upstream-reconciliation-20261022.json",
@@ -8402,10 +8427,96 @@
       98,
       115,
       86
-    ]
+    ],
+    "newSourceCopiesPublished": 10,
+    "release": {
+      "batch": 11,
+      "completedAt": "2026-10-22T04:41:53.570Z",
+      "recordIds": [
+        135,
+        131,
+        132,
+        119,
+        130,
+        134,
+        36,
+        98,
+        115,
+        86
+      ],
+      "pullRequest": 255,
+      "head": "c6ef7ebb0e75e6ce1a974066f1c97ddeca202215",
+      "commit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4",
+      "ci": {
+        "run": 39723584902,
+        "job": 119642363655,
+        "nodeTests": 468,
+        "pythonTests": 4,
+        "workerDryRun": true
+      },
+      "deployment": {
+        "run": 39723707668,
+        "job": 119642741445,
+        "worker": "vid-review-site",
+        "deploymentId": "f9250c10-1ced-4076-b327-2c3e78965c90",
+        "version": "f026257a-4978-437c-9c57-75195b63fd3d",
+        "percentage": 100,
+        "createdAt": "2026-10-22T04:41:10.881556Z",
+        "codeOnly": true,
+        "databaseMigrationSteps": "skipped"
+      },
+      "artifact": {
+        "id": 12401849520,
+        "name": "review-illustration-live-verification",
+        "size_in_bytes": 2668,
+        "url": "https://api.github.com/repos/Gamagek/vid-review-site/actions/artifacts/12401849520",
+        "archive_download_url": "https://api.github.com/repos/Gamagek/vid-review-site/actions/artifacts/12401849520/zip",
+        "expired": false,
+        "created_at": "2026-10-22T04:41:36Z",
+        "expires_at": "2026-11-05T04:41:36Z",
+        "updated_at": "2026-10-22T04:41:36Z",
+        "digest": "sha256:47dd9b05ecf564ce78bcf7f2a837794753089c91def4ce46e407f03eab6fd086",
+        "workflow_run": {
+          "id": 39723707668,
+          "repository_id": 1324282150,
+          "head_repository_id": 1324282150,
+          "head_branch": "main",
+          "head_sha": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
+        }
+      },
+      "counts": {
+        "generatedThisRun": 0,
+        "previouslyGeneratedCommitted": 10,
+        "newSourceCopiesThisRun": 0,
+        "sourceCopiesPreviouslyCommitted": 10,
+        "newArtworkMerged": 10,
+        "newArtworkDeployed": 10,
+        "newArtworkPublished": 10,
+        "newArtworkLiveVerified": 10,
+        "sourceCopiesPublishedAndVerified": 10,
+        "manifestTotal": 110,
+        "activeIdentityMatchedArtworks": 109,
+        "preexistingIdentityHeldArtworks": 1,
+        "currentSaved": 507,
+        "currentPublished": 507
+      },
+      "liveEvidence": "docs/review-images/batch11-live-verification-20261022.json",
+      "preservationEvidence": "docs/review-images/batch11-post-release-preservation-20261022.json",
+      "limitations": [
+        "These ten prepared artworks use a page watermark overlay, not baked-in file lettering; future new generation must embed vid.best.",
+        "No source upload dates are available for the ten; the existing sanitizer intentionally omits VideoObject and no dates are invented.",
+        "109of110 manifest entries match current published identity; preexistingID308 is disabled after an independent owner title edit.",
+        "The435-entry queue needs72 additional published identities reconciled. No next batch has been generated/reserved.",
+        "No Google indexed-count evidence, guaranteed indexing, AdSense approval, source video/audio inspection or provider playback claim."
+      ],
+      "nextTask": "Reconcile72 unqueued current published identities; preserveID308owner-change hold and PR254six-draft/media holds. Select up to10new missing dual-image eligible reviews with verified theme/source evidence and original intact publisher image. Future new anime artwork must include bottom-right vid.best watermark in the image itself. Do not regenerate batch11."
+    },
+    "liveVerification": "docs/review-images/batch11-live-verification-20261022.json",
+    "liveVerificationAt": "2026-10-22T04:41:13.296Z",
+    "postReleasePreservation": "docs/review-images/batch11-post-release-preservation-20261022.json"
   },
   "lastImageProductionBatch": {
-    "state": "preflight_verified_pending_release_ci",
+    "state": "published_verified",
     "recordIds": [
       135,
       131,
@@ -8422,8 +8533,8 @@
     "pr": 255,
     "base": "4d689eecb2a6de52844a0fcc58b7045c0c17ec3a",
     "newGenerated": 10,
-    "newPublished": 0,
-    "liveVerified": 0,
+    "newPublished": 10,
+    "liveVerified": 10,
     "baseline": {
       "checkedAt": "2026-10-21T17:41:22.163Z",
       "saved": 501,
@@ -8446,8 +8557,10 @@
       "nodeTests": 468,
       "workerDryRun": true,
       "assetHashesAndPreservation": true,
-      "exactHeadCI": "pending for fresh preflight/schema-preservation verifier head",
-      "pythonSuite": "required CI pending"
+      "exactHeadCI": "passed39723584902 atc6ef7ebb0e75e6ce1a974066f1c97ddeca202215",
+      "pythonSuite": "4passed",
+      "pythonTests": 4,
+      "liveHTTPHashHTMLMaps": "10artworks+10source copies passed"
     },
     "reconciledMain": "fe12eaa1049b948ee049f60d3ef2f61be079c2aa",
     "upstreamReconciliation": "docs/review-images/batch11-upstream-reconciliation-20261022.json",
@@ -8522,7 +8635,93 @@
       98,
       115,
       86
-    ]
+    ],
+    "newSourceCopiesPublished": 10,
+    "release": {
+      "batch": 11,
+      "completedAt": "2026-10-22T04:41:53.570Z",
+      "recordIds": [
+        135,
+        131,
+        132,
+        119,
+        130,
+        134,
+        36,
+        98,
+        115,
+        86
+      ],
+      "pullRequest": 255,
+      "head": "c6ef7ebb0e75e6ce1a974066f1c97ddeca202215",
+      "commit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4",
+      "ci": {
+        "run": 39723584902,
+        "job": 119642363655,
+        "nodeTests": 468,
+        "pythonTests": 4,
+        "workerDryRun": true
+      },
+      "deployment": {
+        "run": 39723707668,
+        "job": 119642741445,
+        "worker": "vid-review-site",
+        "deploymentId": "f9250c10-1ced-4076-b327-2c3e78965c90",
+        "version": "f026257a-4978-437c-9c57-75195b63fd3d",
+        "percentage": 100,
+        "createdAt": "2026-10-22T04:41:10.881556Z",
+        "codeOnly": true,
+        "databaseMigrationSteps": "skipped"
+      },
+      "artifact": {
+        "id": 12401849520,
+        "name": "review-illustration-live-verification",
+        "size_in_bytes": 2668,
+        "url": "https://api.github.com/repos/Gamagek/vid-review-site/actions/artifacts/12401849520",
+        "archive_download_url": "https://api.github.com/repos/Gamagek/vid-review-site/actions/artifacts/12401849520/zip",
+        "expired": false,
+        "created_at": "2026-10-22T04:41:36Z",
+        "expires_at": "2026-11-05T04:41:36Z",
+        "updated_at": "2026-10-22T04:41:36Z",
+        "digest": "sha256:47dd9b05ecf564ce78bcf7f2a837794753089c91def4ce46e407f03eab6fd086",
+        "workflow_run": {
+          "id": 39723707668,
+          "repository_id": 1324282150,
+          "head_repository_id": 1324282150,
+          "head_branch": "main",
+          "head_sha": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
+        }
+      },
+      "counts": {
+        "generatedThisRun": 0,
+        "previouslyGeneratedCommitted": 10,
+        "newSourceCopiesThisRun": 0,
+        "sourceCopiesPreviouslyCommitted": 10,
+        "newArtworkMerged": 10,
+        "newArtworkDeployed": 10,
+        "newArtworkPublished": 10,
+        "newArtworkLiveVerified": 10,
+        "sourceCopiesPublishedAndVerified": 10,
+        "manifestTotal": 110,
+        "activeIdentityMatchedArtworks": 109,
+        "preexistingIdentityHeldArtworks": 1,
+        "currentSaved": 507,
+        "currentPublished": 507
+      },
+      "liveEvidence": "docs/review-images/batch11-live-verification-20261022.json",
+      "preservationEvidence": "docs/review-images/batch11-post-release-preservation-20261022.json",
+      "limitations": [
+        "These ten prepared artworks use a page watermark overlay, not baked-in file lettering; future new generation must embed vid.best.",
+        "No source upload dates are available for the ten; the existing sanitizer intentionally omits VideoObject and no dates are invented.",
+        "109of110 manifest entries match current published identity; preexistingID308 is disabled after an independent owner title edit.",
+        "The435-entry queue needs72 additional published identities reconciled. No next batch has been generated/reserved.",
+        "No Google indexed-count evidence, guaranteed indexing, AdSense approval, source video/audio inspection or provider playback claim."
+      ],
+      "nextTask": "Reconcile72 unqueued current published identities; preserveID308owner-change hold and PR254six-draft/media holds. Select up to10new missing dual-image eligible reviews with verified theme/source evidence and original intact publisher image. Future new anime artwork must include bottom-right vid.best watermark in the image itself. Do not regenerate batch11."
+    },
+    "liveVerification": "docs/review-images/batch11-live-verification-20261022.json",
+    "liveVerificationAt": "2026-10-22T04:41:13.296Z",
+    "postReleasePreservation": "docs/review-images/batch11-post-release-preservation-20261022.json"
   },
   "ownerReconciliation20261021": {
     "authoritativeInventoryAt": "2026-10-21T17:41:22.163Z",
@@ -8547,5 +8746,104 @@
     },
     "discovery": "Both actual images in server-rendered watch HTML, source-first sidebar, split source/editorial and legacy combined maps; flat sitemap root; stable hash-named first-party copies. No indexing guarantee.",
     "details": "docs/review-images/source-pairs-and-branding-20261022.md"
+  },
+  "lastCompletedImageBatch": {
+    "batch": 11,
+    "completedAt": "2026-10-22T04:41:53.570Z",
+    "recordIds": [
+      135,
+      131,
+      132,
+      119,
+      130,
+      134,
+      36,
+      98,
+      115,
+      86
+    ],
+    "pullRequest": 255,
+    "head": "c6ef7ebb0e75e6ce1a974066f1c97ddeca202215",
+    "commit": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4",
+    "ci": {
+      "run": 39723584902,
+      "job": 119642363655,
+      "nodeTests": 468,
+      "pythonTests": 4,
+      "workerDryRun": true
+    },
+    "deployment": {
+      "run": 39723707668,
+      "job": 119642741445,
+      "worker": "vid-review-site",
+      "deploymentId": "f9250c10-1ced-4076-b327-2c3e78965c90",
+      "version": "f026257a-4978-437c-9c57-75195b63fd3d",
+      "percentage": 100,
+      "createdAt": "2026-10-22T04:41:10.881556Z",
+      "codeOnly": true,
+      "databaseMigrationSteps": "skipped"
+    },
+    "artifact": {
+      "id": 12401849520,
+      "name": "review-illustration-live-verification",
+      "size_in_bytes": 2668,
+      "url": "https://api.github.com/repos/Gamagek/vid-review-site/actions/artifacts/12401849520",
+      "archive_download_url": "https://api.github.com/repos/Gamagek/vid-review-site/actions/artifacts/12401849520/zip",
+      "expired": false,
+      "created_at": "2026-10-22T04:41:36Z",
+      "expires_at": "2026-11-05T04:41:36Z",
+      "updated_at": "2026-10-22T04:41:36Z",
+      "digest": "sha256:47dd9b05ecf564ce78bcf7f2a837794753089c91def4ce46e407f03eab6fd086",
+      "workflow_run": {
+        "id": 39723707668,
+        "repository_id": 1324282150,
+        "head_repository_id": 1324282150,
+        "head_branch": "main",
+        "head_sha": "c443e9ae3eb6b8d8b8dd4764ef7d47cddb8c3bf4"
+      }
+    },
+    "counts": {
+      "generatedThisRun": 0,
+      "previouslyGeneratedCommitted": 10,
+      "newSourceCopiesThisRun": 0,
+      "sourceCopiesPreviouslyCommitted": 10,
+      "newArtworkMerged": 10,
+      "newArtworkDeployed": 10,
+      "newArtworkPublished": 10,
+      "newArtworkLiveVerified": 10,
+      "sourceCopiesPublishedAndVerified": 10,
+      "manifestTotal": 110,
+      "activeIdentityMatchedArtworks": 109,
+      "preexistingIdentityHeldArtworks": 1,
+      "currentSaved": 507,
+      "currentPublished": 507
+    },
+    "liveEvidence": "docs/review-images/batch11-live-verification-20261022.json",
+    "preservationEvidence": "docs/review-images/batch11-post-release-preservation-20261022.json",
+    "limitations": [
+      "These ten prepared artworks use a page watermark overlay, not baked-in file lettering; future new generation must embed vid.best.",
+      "No source upload dates are available for the ten; the existing sanitizer intentionally omits VideoObject and no dates are invented.",
+      "109of110 manifest entries match current published identity; preexistingID308 is disabled after an independent owner title edit.",
+      "The435-entry queue needs72 additional published identities reconciled. No next batch has been generated/reserved.",
+      "No Google indexed-count evidence, guaranteed indexing, AdSense approval, source video/audio inspection or provider playback claim."
+    ],
+    "nextTask": "Reconcile72 unqueued current published identities; preserveID308owner-change hold and PR254six-draft/media holds. Select up to10new missing dual-image eligible reviews with verified theme/source evidence and original intact publisher image. Future new anime artwork must include bottom-right vid.best watermark in the image itself. Do not regenerate batch11."
+  },
+  "currentArtworkCoverage": {
+    "checkedAt": "2026-10-22T04:41:53.570Z",
+    "manifestAssets": 110,
+    "currentPublishedIdentityMatches": 109,
+    "identityHoldIds": [
+      308
+    ],
+    "publishedReviews": 507,
+    "meaning": "Identity match count, not110live HTTP checks; this release independently live-verified its10newartworks and10source copies."
+  },
+  "queueReconciliationPending": {
+    "inventoryAt": "2026-10-22T04:41:53.570Z",
+    "published": 507,
+    "queuedIdentities": 435,
+    "missingIdentities": 72,
+    "nextAction": "Fresh bounded reconciliation before next batch; no partial truncated identities committed."
   }
 }

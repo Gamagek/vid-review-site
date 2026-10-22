@@ -1,0 +1,375 @@
+{
+  "activeIllustrations": 109,
+  "illustrationGuardMismatches": [
+    308
+  ],
+  "success": true,
+  "checkedAt": "2026-10-22T04:41:53.570Z",
+  "saved": 507,
+  "published": 507,
+  "providers": {
+    "youtube": 431,
+    "raw": 2,
+    "tiktok": 54,
+    "facebook": 20
+  },
+  "fields": [
+    "cache_attempts",
+    "cache_error",
+    "cache_next_attempt_at",
+    "cache_source_url",
+    "cache_status",
+    "cached_at",
+    "created_at",
+    "description",
+    "embed_url",
+    "featured",
+    "id",
+    "media_type",
+    "primary_category",
+    "published",
+    "r2_key",
+    "redistribution_certified",
+    "redistribution_certified_at",
+    "review_text",
+    "seo_description",
+    "seo_tags",
+    "seo_title",
+    "slug",
+    "source_page_url",
+    "source_url",
+    "subcategory",
+    "thumbnail_url",
+    "title",
+    "trending",
+    "updated_at"
+  ],
+  "nonCounterSha256": "71e5c2bb3c3c4e858c59e690b9c5f00752e01e5ade12426671d03224fb978c82",
+  "rowsRead": 507,
+  "rowsWritten": 0,
+  "targets": [
+    {
+      "id": 135,
+      "slug": "titli-chennai-express-full-video-song-shahrukh-khan-deepika-padukone-music-video-analysis-why-titli-",
+      "title": "🥰😍🤩 Titli Chennai Express Full Video Song | Shahrukh Khan, Deepika Padukone ❤ Music Video Analysis! 🦋 Why 'Titli' is a Bollywood Masterpiece 💛",
+      "source_url": "https://youtu.be/V8zXLMIjlcw?si=eev97UxUhO81u4uF",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/V8zXLMIjlcw/hqdefault.jpg",
+      "published": 1,
+      "created_at": "2026-10-11T13:29:15.091Z",
+      "updated_at": "2026-10-11T13:29:15.091Z",
+      "media_type": "youtube",
+      "reviewLength": 14688,
+      "rowSha256": "2e0da356297a520f0bd61298e59cf1ae09194baf8b19c0999b4f840325be7019"
+    },
+    {
+      "id": 131,
+      "slug": "wiz-khalifa-see-you-again-ft-charlie-puth-official-video-furious-7-soundtrack",
+      "title": "🌟 Wiz Khalifa - See You Again ft. Charlie Puth [Official Video] Furious 7 Soundtrack",
+      "source_url": "https://youtu.be/RgKAFK5djSk?si=7hD9SV4IBOTDDutG",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/RgKAFK5djSk/hqdefault.jpg",
+      "published": 1,
+      "created_at": "2026-10-10T18:22:02.889Z",
+      "updated_at": "2026-10-10T18:47:35.444Z",
+      "media_type": "youtube",
+      "reviewLength": 13940,
+      "rowSha256": "8c970cfafd70b4d65023dc3063b4fc2b7ef5f45287422af5428434cf535cf03f"
+    },
+    {
+      "id": 132,
+      "slug": "guli-mata-saad-lamjarred-shreya-ghoshal-jennifer-winget-anshul-garg",
+      "title": "👑✨ Guli Mata - Saad Lamjarred | Shreya Ghoshal | Jennifer Winget | Anshul Garg",
+      "source_url": "https://youtu.be/Gp1RNYBckBs?si=LIQQ1IsMN9kC_fom",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/Gp1RNYBckBs/hqdefault.jpg",
+      "published": 1,
+      "created_at": "2026-10-10T18:27:22.255Z",
+      "updated_at": "2026-10-10T18:27:22.255Z",
+      "media_type": "youtube",
+      "reviewLength": 13835,
+      "rowSha256": "9132b4e27ca44453dd0aa624efd6c78e236a64ebbbbfccf99ec84682bf4edd98"
+    },
+    {
+      "id": 119,
+      "slug": "official-best-travelling-songs-of-bollywood-road-trip-songs-t-series",
+      "title": "😃 OFFICIAL: Best Travelling Songs of Bollywood | Road Trip Songs | T-SERIES 😊",
+      "source_url": "https://youtu.be/T5eQ-Vo_3EQ?si=EJWyS5V--EAu-q-I",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/T5eQ-Vo_3EQ/hqdefault.jpg",
+      "published": 1,
+      "created_at": "2026-10-09T18:28:10.831Z",
+      "updated_at": "2026-10-09T19:15:22.979Z",
+      "media_type": "youtube",
+      "reviewLength": 13475,
+      "rowSha256": "094bce2fad1e1e84f06774cedd834b3201dbbbf644273aacd530933cd54011f7"
+    },
+    {
+      "id": 130,
+      "slug": "katy-perry-roar-how-katy-perry-conquered-the-jungle-in-roar",
+      "title": "Katy Perry - Roar | 🐅✨How Katy Perry Conquered the Jungle in 'Roar'",
+      "source_url": "https://youtu.be/CevxZvSJLk8?si=aYz8bAT9IwsfacrG",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/CevxZvSJLk8/hqdefault.jpg",
+      "published": 1,
+      "created_at": "2026-10-10T18:14:20.768Z",
+      "updated_at": "2026-10-10T18:49:37.339Z",
+      "media_type": "youtube",
+      "reviewLength": 13410,
+      "rowSha256": "446f1eb52a478f890ca1139212e2494565702e9136a0754006d7f23ec12efe3c"
+    },
+    {
+      "id": 134,
+      "slug": "rose-bruno-mars-apt-official-music-video",
+      "title": "🎸✨ ROSÉ & Bruno Mars - APT. (Official Music Video)",
+      "source_url": "https://youtu.be/ekr2nIex040?si=mSfl63pXSn9hpHG5",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/ekr2nIex040/hqdefault.jpg",
+      "published": 1,
+      "created_at": "2026-10-10T18:29:21.086Z",
+      "updated_at": "2026-10-10T18:53:06.195Z",
+      "media_type": "youtube",
+      "reviewLength": 13287,
+      "rowSha256": "3c2212734cae558376a7b9124788a685d5bab4a9a32d80db38b93025986db0ef"
+    },
+    {
+      "id": 36,
+      "slug": "lady-gaga-bruno-mars-die-with-a-smile-official-music-video",
+      "title": "Lady Gaga & Bruno Mars: \"Die With A Smile\" Official Music Video",
+      "source_url": "https://youtu.be/kPa7bsKwL-c?si=zFiQfs6aKx-rw56z",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/kPa7bsKwL-c/hqdefault.jpg",
+      "published": 1,
+      "created_at": "2026-09-25T20:35:28.639Z",
+      "updated_at": "2026-09-25T20:35:28.639Z",
+      "media_type": "youtube",
+      "reviewLength": 13272,
+      "rowSha256": "25ad7d151346342625b9f8c99160917123863721b55f046aba3e379dd63b6e93"
+    },
+    {
+      "id": 98,
+      "slug": "3-why-this-kolaveri-di-official-video-dhanush-anirudh-ravichander-shruti-haasan",
+      "title": "💗 Why This Kolaveri Di Official Video | Dhanush | Anirudh Ravichander | Shruti Haasan",
+      "source_url": "https://youtu.be/YR12Z8f1Dh8?si=KCqaONKWHtKAlwG7",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/YR12Z8f1Dh8/hqdefault.jpg",
+      "published": 1,
+      "created_at": "2026-10-05T18:26:15.919Z",
+      "updated_at": "2026-10-05T19:06:46.882Z",
+      "media_type": "youtube",
+      "reviewLength": 13173,
+      "rowSha256": "1ea80dd2fb17f245858e4d60feb75b64db7c13481ea52978330a15ea419e4a12"
+    },
+    {
+      "id": 115,
+      "slug": "tujh-mein-rab-dikhta-hai-song-rab-ne-bana-di-jodi-shah-rukh-khan-anushka-sharma-roop-kumar",
+      "title": "​❤️ Why 'Tujh Mein Rab Dikhta Hai' Remains an Iconic Bollywood Anthem",
+      "source_url": "https://youtu.be/qoq8B8ThgEM?si=pS7F7HRizP6B241k",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/qoq8B8ThgEM/hqdefault.jpg",
+      "published": 1,
+      "created_at": "2026-10-08T18:54:19.596Z",
+      "updated_at": "2026-10-08T19:27:28.579Z",
+      "media_type": "youtube",
+      "reviewLength": 13155,
+      "rowSha256": "1fe8e4d37aaa5693ee33fffa12ff2e5cf0320d2f443eb3d74a4dcea6c92c05f6"
+    },
+    {
+      "id": 86,
+      "slug": "luis-fonsi-despacito-ft-daddy-yankee",
+      "title": "Luis Fonsi - Despacito ft. Daddy Yankee",
+      "source_url": "https://youtu.be/kJQP7kiw5Fk?si=8ONfuKBO6tevKTiq",
+      "source_page_url": null,
+      "thumbnail_url": "https://i.ytimg.com/vi/kJQP7kiw5Fk/hqdefault.jpg",
+      "published": 1,
+      "created_at": "2026-10-03T16:54:10.360Z",
+      "updated_at": "2026-10-03T16:54:10.360Z",
+      "media_type": "youtube",
+      "reviewLength": 13122,
+      "rowSha256": "cfc75aa993e20fc29935ad154c42d9eceedafc687f2ce4c3b466532906d673d0"
+    }
+  ],
+  "holds": [
+    {
+      "id": 2,
+      "slug": "lab-review-1-player-test",
+      "published": 1,
+      "rowSha256": "3149ef177ccd0a7b6751413d05145edfd4604be47d1c72310864b1d2412448f7"
+    },
+    {
+      "id": 3,
+      "slug": "youtube-embed-experience-demo",
+      "published": 1,
+      "rowSha256": "02115a10c0adc71ea0e9e3678203e11120173c3a312fa45e582c77df62966a92"
+    },
+    {
+      "id": 8,
+      "slug": "saiyaara-a-cinematic-romance",
+      "published": 1,
+      "rowSha256": "16daec549dd3ceb92a8bff1712b43466b9c584370fbe1939a943da852808ad94"
+    },
+    {
+      "id": 30,
+      "slug": "the-majestic-giant-dog-is-it-a-lion-or-a-puppy",
+      "published": 1,
+      "rowSha256": "2e0d93f17be08903c14f78d9fe6193b3fd74081d5fd98ce63ba59eba0e34e65c"
+    },
+    {
+      "id": 46,
+      "slug": "saiyaara-song-dj-bass-boosted-shorts-ahaan-aneet-arijit-singh-mithoon-saiyaara-ahaanpanday",
+      "published": 1,
+      "rowSha256": "3e7c80106a82d38e4dc236477a10679b4ea94fb6dceac2e2b4236619fb62c6c8"
+    },
+    {
+      "id": 73,
+      "slug": "summer-inverted-7332342275151760642",
+      "published": 1,
+      "rowSha256": "b8197486cd7dcd3000fba38310552d232727f8941366a84b40c090c2cdda42fd"
+    },
+    {
+      "id": 81,
+      "slug": "top-5-most-viewed-tiktoks-ever-billions-of-views-explained",
+      "published": 1,
+      "rowSha256": "cce4aa422e0b42c5cc525f20af000e55c395b4d211defadef5b25ed07250d8dc"
+    },
+    {
+      "id": 108,
+      "slug": "dilscoop-shot-shorts-cricket",
+      "published": 1,
+      "rowSha256": "1634ad98b45b0743391e5215655c14932664fc095aa511a3cce38d6b8eb4de88"
+    },
+    {
+      "id": 183,
+      "slug": "why-silent-comedy-shorts-are-winning-the-secret-to-global-views",
+      "published": 1,
+      "rowSha256": "9d94d5864401b598308fbf9a6651adfd703e2b70e83b632a4b6b8ce3af70221d"
+    },
+    {
+      "id": 327,
+      "slug": "saiyaara-saiyaara-song-saiyaara-yrf-reels-officialteaser-sorts-ahaanpanday-viral",
+      "published": 1,
+      "rowSha256": "04c791b7060bae478d169901002a3cc4359043554967c54797481c13cd2f49a6"
+    },
+    {
+      "id": 328,
+      "slug": "saiyaara-reprise-female-full-song-ahaan-aneet-tanishk-faheem-arslan-shreya-irshad",
+      "published": 1,
+      "rowSha256": "ff2e45b84e6d7c08d894513a981f34c871a8a27992b8d18c420c5d98813fa797"
+    }
+  ],
+  "buckets": [
+    {
+      "first": 1,
+      "last": 53,
+      "rows": 50,
+      "sha256": "13fb6718c24966dd5f3148217a42798f186b8847732d64886b16ab0069ca3ae5"
+    },
+    {
+      "first": 54,
+      "last": 103,
+      "rows": 50,
+      "sha256": "238b66123487e0aa341186a9cde0d94a99f03c17403c9cc7d34e6c7921761515"
+    },
+    {
+      "first": 104,
+      "last": 159,
+      "rows": 50,
+      "sha256": "cccefb1e6be078ff0e543f320bc8f1117c17f03ca3b0a0303a0aefb2323212a0"
+    },
+    {
+      "first": 160,
+      "last": 213,
+      "rows": 50,
+      "sha256": "b57e2c4ca652c333d2df5cb30d474c942011c51a4adf180429235b68479cb682"
+    },
+    {
+      "first": 214,
+      "last": 263,
+      "rows": 50,
+      "sha256": "7925282bcf82f3a8dc789fe8b7584676a948e18c7e32e08c794d816f9dc7c76d"
+    },
+    {
+      "first": 264,
+      "last": 313,
+      "rows": 50,
+      "sha256": "b50ad771a147c58314b51539c0834d0ba3bf81dc22fc36642120387ec3c528dc"
+    },
+    {
+      "first": 314,
+      "last": 363,
+      "rows": 50,
+      "sha256": "cdc32130374900d6872e80279bfd3c5cd507a8bd6fb7bcc975c37392b7fa967c"
+    },
+    {
+      "first": 364,
+      "last": 413,
+      "rows": 50,
+      "sha256": "9cbef7cb6f473cd2cce2b042eb39f94dfa46ff9a94dabb5bdfbb5e14c7cc0148"
+    },
+    {
+      "first": 414,
+      "last": 463,
+      "rows": 50,
+      "sha256": "0e19916cbf7201a903bde63eb897ff9de1e81596174ea88e7e72e23195532c06"
+    },
+    {
+      "first": 464,
+      "last": 513,
+      "rows": 50,
+      "sha256": "1ce8c5601fc5e3485ec4ea3b49ce6db6ef87b51f1caa15b90b82e4deea7626ac"
+    },
+    {
+      "first": 514,
+      "last": 520,
+      "rows": 7,
+      "sha256": "0a93f1de1b30ee8e7878e496b826514192f236a2da715e910c972334088d65ea"
+    }
+  ],
+  "sourceMetadata": {
+    "success": true,
+    "result": {
+      "results": [],
+      "success": true,
+      "meta": {
+        "served_by": "v3-prod",
+        "served_by_region": "APAC",
+        "served_by_colo": "SIN",
+        "served_by_primary": true,
+        "timings": {
+          "sql_duration_ms": 0.2512
+        },
+        "duration": 0.2512,
+        "changes": 0,
+        "last_row_id": 0,
+        "changed_db": false,
+        "size_after": 6873088,
+        "rows_read": 20,
+        "rows_written": 0,
+        "total_attempts": 1
+      }
+    }
+  },
+  "preservation": {
+    "preflight": "docs/review-images/batch11-release-preflight-20261022.json",
+    "allNonCounterVideoFieldsUnchanged": true,
+    "rowsWritten": 0
+  },
+  "queueReconciliation": {
+    "queuedEntries": 435,
+    "currentPublished": 507,
+    "unreconciled": 72,
+    "limit": "Fresh inventory found72 unqueued published identities; output was intentionally not committed as partial/truncated identity data. Reconcile all72 before selecting the next batch."
+  },
+  "preexistingArtworkIdentityHold": {
+    "id": 308,
+    "reason": "Owner title changed; exact identity guard correctly disables the prior artwork and preview fallback. Source URL and owner D1 row preserved.",
+    "current": {
+      "id": 308,
+      "slug": "try-not-to-laugh-dogs-cats-and-animal-humour-672206",
+      "title": "Dogs Refuse Hidden Medicine — Funny Pet Reactions",
+      "source_url": "https://www.tiktok.com/@hayden.greene2/video/7698017351173672206",
+      "thumbnail_url": null,
+      "published": 1
+    }
+  }
+}
