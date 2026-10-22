@@ -72,7 +72,7 @@ test("watch first paint uses the selected illustration without changing owner te
   assert.match(html, /<h1>Owner review title<\/h1>/);
   assert.ok(html.includes("Owner review — final paragraph."));
   assert.doesNotMatch(html, /Last updated|<iframe|<video|"@type":"VideoObject"/);
-  assert.match(html, /\/watch\.js\?v=20261019-art-preview/);
+  assert.match(html, /\/watch\.js\?v=20261022-official-first/);
   assert.deepEqual(c.sqlite.prepare("SELECT * FROM videos ORDER BY id").all(), before);
   assert.deepEqual(c.sqlite.prepare("SELECT * FROM tiktok_oembed_cache").all(), metadata);
   const head = await render(c, "", { method: "HEAD" });
@@ -195,17 +195,17 @@ test("opt-in zero-request watch cards make no old-gateway refresh before or afte
   assert.equal(h.image.src, cover); assert.equal(h.kicker.textContent, illustrationLabel);
 });
 
-test("full watch script keeps the local image and label after refresh; Play remains user-initiated", async () => {
+test("watch uses server-rendered title and local cover without background refresh; Play remains user-initiated", async () => {
   const h = browserHarness();
   assert.equal(h.image.src, cover);
   assert.equal(h.opened.length, 0);
   h.resolve({ title: "Refreshed source title", thumbnail_url: providerPoster }); await settle();
-  assert.equal(h.title.textContent, "Refreshed source title");
+  assert.equal(h.title.textContent, "Original source title");
   assert.equal(h.image.src, cover);
   assert.equal(h.kicker.textContent, illustrationLabel);
   assert.deepEqual(h.calls, []);
   assert.equal(h.created.some(type => ["video", "iframe", "script"].includes(type)), false);
-  h.initialize(); assert.equal(h.serviceCalls.length, 1);
+  h.initialize(); assert.equal(h.serviceCalls.length, 0);
   h.buttons[0].click({ preventDefault() {} });
   assert.equal(h.opened.length, 1);
   assert.equal(h.opened[0].url, source);
@@ -221,7 +221,7 @@ test("failed local cover releases its label/contain style and uses a finite exis
     assert.equal(h.image.style.objectFit, "");
     assert.equal(h.image.dataset.tiktokOwnedCover, undefined);
     h.resolve({ thumbnail_url: providerPoster }); await settle();
-    assert.equal(h.image.src, providerPoster);
+    assert.equal(h.image.src, origin + fallback);
     h.error(); assert.equal(h.image.src, origin + fallback);
     const count = h.calls.length; h.error(); assert.equal(h.calls.length, count);
     assert.equal(h.calls.includes(cover), false);
@@ -229,7 +229,8 @@ test("failed local cover releases its label/contain style and uses a finite exis
 });
 
 test("refresh failure, detached cards and missing preview service do not remove the server cover", async () => {
-  const h = browserHarness(); h.reject(new Error("temporary metadata failure")); await settle();
+  const h = browserHarness(); await settle();
+  assert.equal(h.serviceCalls.length, 0, "the page never starts a background provider lookup");
   assert.equal(h.image.src, cover); assert.equal(h.kicker.textContent, illustrationLabel);
   const detached = browserHarness(); detached.card.isConnected = false;
   detached.resolve({ title: "Late title", thumbnail_url: providerPoster }); await settle();
@@ -238,10 +239,11 @@ test("refresh failure, detached cards and missing preview service do not remove 
   assert.equal(unavailable.image.src, cover); assert.equal(unavailable.serviceCalls.length, 0);
 });
 
-test("cards without an approved owned-cover marker retain provider refresh behavior", async () => {
+test("cards without an owned-cover marker use their server-rendered image without a background refresh", async () => {
   for (const owned of [null, "https://external.example/review-covers/fixture.webp", `${cover}?not-approved=1`, "/media/uploads/fixture.webp"]) {
     const h = browserHarness({ owned });
+    const initiallyRenderedImage = h.image.src;
     h.resolve({ thumbnail_url: providerPoster }); await settle();
-    assert.equal(h.image.src, providerPoster);
+    assert.equal(h.image.src, initiallyRenderedImage);
   }
 });

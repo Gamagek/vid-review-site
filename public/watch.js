@@ -110,17 +110,10 @@ function initializeTikTokPreviewCard() {
     });
   });
 
-  // The opt-in cached oEmbed player fetches only after a deliberate Play click.
-  if (card.dataset.tiktokZeroRequest === "1") return;
-  void api.getMetadata(share.url).then((payload) => {
-    if (!card.isConnected) return;
-    if (title && payload.title) title.textContent = payload.title;
-    if (author && payload.author_name) author.textContent = payload.author_name;
-    if (description && payload.description) description.textContent = payload.description;
-    if (image && payload.thumbnail_url && (!ownedCover || ownedCoverFailed)) image.src = payload.thumbnail_url;
-  }).catch(() => {
-    // The server-rendered cached card remains fully usable if metadata refresh fails.
-  });
+  // The server renders the cached creator/title/description and first-party poster.
+  // Never make an extra oEmbed/gateway request at page start: metadata refresh is
+  // maintained separately by the server's bounded backfill. Proposal's isolated
+  // cached player continues to fetch only on the deliberate Play action.
 }
 
 function initializeHlsPlayback() {

@@ -1024,6 +1024,37 @@ test("caches TikTok oEmbed gateway metadata durably in D1 for 24 hours", async (
     globalThis.fetch = originalFetch;
   }
 });
+test("TikTok metadata upstream makes at most one lookup per video in 24h across stale requests", async () => {
+  const context = createTestContext({ TIKTOK_OEMBED_GATEWAY: "https://tiktok-oembed-gateway.gkasunc.workers.dev/" });
+  const share = "https://www.tiktok.com/@dailytest/video/7552567024304540959";
+  const originalFetch = globalThis.fetch;
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls++;
+    return Response.json({ type: "video", title: "Verified post", author_name: "dailytest",
+      author_url: "https://www.tiktok.com/@dailytest", description: "Source supplied caption" });
+  };
+  try {
+    const url = "/api/tiktok/embed?url=" + encodeURIComponent(share);
+    const first = await send(context, url);
+    assert.equal(first.status, 200);
+    assert.equal(calls, 1);
+    context.sqlite.prepare("UPDATE tiktok_oembed_cache SET fetched_at = ? WHERE video_id = ?")
+      .run(new Date(Date.now() - 2 * 86400000).toISOString(), "7552567024304540959");
+    const repeated = await send(context, url);
+    assert.equal(repeated.status, 200);
+    assert.equal((await repeated.json()).cache_source, "d1-stale");
+    assert.equal(calls, 1, "stale page reads must not trigger a second upstream lookup today");
+    context.sqlite.prepare("UPDATE app_settings SET setting_value = '0' WHERE setting_key = ?")
+      .run("tiktok_oembed_daily_lease:7552567024304540959");
+    const refreshed = await send(context, url);
+    assert.equal(refreshed.status, 200);
+    assert.equal(calls, 2, "a released lease permits the next scheduled metadata lookup");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("accepts nested TikTok oEmbed payloads from the Cloudflare gateway", async () => {
   const context = createTestContext({
     TIKTOK_OEMBED_GATEWAY: "https://tiktok-oembed-gateway.gkasunc.workers.dev/",
@@ -1970,7 +2001,7 @@ test("renders the current Vid.Best TikTok gateway architecture as metadata-only 
 
   const previewService = readFileSync(new URL("../public/tiktok-preview-service.js", import.meta.url), "utf8");
   assert.doesNotMatch(previewService, /www\.tiktok\.com\/embed\.js/);
-  assert.doesNotMatch(previewService, /\/player\/v1\//);
+  assert.match(previewService, /\/player\/v1\//);
   assert.match(previewService, /gatewayWatchUrl/);
   assert.match(previewService, /tiktok-oembed-gateway\.gkasunc\.workers\.dev\/watch/);
   assert.match(previewService, /createElement\(["']iframe["']\)/);

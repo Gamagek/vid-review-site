@@ -621,6 +621,22 @@ function unwrapTikTokOEmbedPayload(payload) {
   return null;
 }
 
+// Server-side daily lease: prevents simultaneous edge isolates from issuing
+// multiple outbound metadata lookups for the same public TikTok post.
+// Existing Saiyaara Tagembed and Proposal cached-oEmbed flows remain untouched.
+async function claimTikTokDailyMetadataLookup(env, videoId) {
+  if (!env.DB || videoId === "7603012203595320584" || videoId === "7669587518156705056") return true;
+  const now = Date.now();
+  const until = now + 24 * 60 * 60 * 1000;
+  const result = await env.DB.prepare(
+    `INSERT INTO app_settings (setting_key, setting_value)
+     VALUES (?, ?)
+     ON CONFLICT(setting_key) DO UPDATE SET setting_value = excluded.setting_value
+     WHERE CAST(app_settings.setting_value AS INTEGER) <= ?`,
+  ).bind("tiktok_oembed_daily_lease:" + videoId, String(until), now).run();
+  return Number(result?.meta?.changes || 0) === 1;
+}
+
 const tikTokMetadataRequests = new WeakMap();
 async function fetchTikTokPreview(env, share, options = {}) {
   const canonical = normalizeTikTokShareUrl(share);
@@ -659,6 +675,15 @@ async function fetchTikTokPreviewOnce(env, share, options = {}) {
       const error = new AppError(503, "TikTok preview is cooling down. Please try later.", null, { "Retry-After": String(remaining) });
       error.cooldown = true;
       throw error;
+    }
+    const claimed = await claimTikTokDailyMetadataLookup(env, videoId);
+    if (!claimed) {
+      if (durable && Date.parse(durable.fetched_at) + 7 * 86400000 > Date.now()) {
+        return tikTokPreviewFromRow(durable, "d1-stale");
+      }
+      const dailyError = new AppError(503, "A TikTok metadata refresh was already attempted today.", null, { "Retry-After": "3600" });
+      dailyError.cooldown = true; // A per-video lease must never place every creator on global cooldown.
+      throw dailyError;
     }
     const gatewayUrl = buildTikTokOEmbedGatewayUrl(env, canonicalShare);
     const response = await fetch(gatewayUrl, {
@@ -3196,9 +3221,9 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css?v=20261022-source-pairs-watermark1">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
-  ${video.provider === "tiktok" ? '<script src="/tiktok-oembed-cache.js?v=20261018-replay" defer></script><script src="/tiktok-preview-service.js?v=20261018-replay" defer></script>' : ""}
+  ${video.provider === "tiktok" ? '<script src="/tiktok-oembed-cache.js?v=20261018-replay" defer></script><script src="/tiktok-preview-service.js?v=20261022-official-first" defer></script>' : ""}
   ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>' : ""}
-  <script src="/watch.js?v=20261019-art-preview" defer></script>
+  <script src="/watch.js?v=20261022-official-first" defer></script>
   <link rel="stylesheet" href="/swipe-viewer.css?v=20261008-gateway1">
   <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-cache2" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
@@ -3394,7 +3419,7 @@ function renderMedia(video, playbackOrigin, viewer = false) {
     const previewDescription = cleanText(
       preview.description,
       260,
-      "Preview details are cached by Vid.Best. Choose Play to check video availability.",
+      "Select Play to watch this post. Some videos may be unavailable in embeds.",
     );
     // Keep the selected, reviewed cover separate from provider-cached metadata.
     const ownedCover = ownedTikTokWatchCover(video, playbackOrigin);
