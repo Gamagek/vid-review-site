@@ -112,7 +112,9 @@
     const panel = card.el.querySelector("[data-tiktok-fallback]");
     if (!panel) return;
     const cached = panel.querySelector('[data-tiktok-fallback-mode="oembed"]');
-    if (cached) cached.hidden = !api.oembedFallbackUrl?.(source);
+    const official = panel.querySelector('[data-tiktok-fallback-mode="official"]');
+    if (cached) cached.hidden = card.tiktokMode === "oembed" || !api.oembedFallbackUrl?.(source);
+    if (official) official.hidden = card.tiktokMode === "official";
     panel.hidden = false;
   }
   // All alternate iframes are mounted only after a deliberate user click.
@@ -201,6 +203,15 @@
         }
       }
       if (!desired(card)) return;
+      card.tiktokFallbackSource = source;
+      // The Portainer/Node /status handler currently times out. For ordinary
+      // TikTok posts, start with the official provider player rather than
+      // waiting 10 seconds on a gateway known to be unreliable.
+      // Keep all four owner reference IDs on their existing player paths.
+      if (!window.VidBestTikTok?.isReferenceVideo?.(source)) {
+        switchTikTokSwipePlayer(card, "official");
+        return;
+      }
       const target = window.VidBestTikTok?.gatewayWatchUrl(source);
       if (!target) {
         message(card, "This TikTok sharing URL is invalid or gateway playback is unavailable.");
@@ -237,7 +248,6 @@
           clearTimeout(card.tiktokFallbackTimer);
           card.tiktokFallbackTimer = null;
         }
-        if (!card.playing && desired(card)) clearTimeout(timer);
         refreshPlayback(card); updatePreparation();
       });
       iframe.addEventListener("load", () => {
@@ -251,14 +261,8 @@
         offerTikTokSwipeFallback(card, source);
       }, { once: true });
       iframe.src = target;
-      if (!window.VidBestTikTok?.isReferenceVideo?.(source)) {
-        card.tiktokFallbackTimer = setTimeout(() => {
-          card.tiktokFallbackTimer = null;
-          if (card.frame !== iframe || !desired(card) || card.playing) return;
-          message(card, "The gateway has not confirmed playback. Choose another player below.");
-          offerTikTokSwipeFallback(card, source);
-        }, 14000);
-      }
+      // Reference posts retain their established gateway path. The ordinary
+      // posts above never invoke it automatically.
       return;
     }
     if (isSaiyaara(card)) {
@@ -333,7 +337,9 @@
   }
   function updateHint(card) {
     card.el.querySelector(".swipe-play-hint").textContent = card.el.classList.contains("is-tiktok-gateway")
-      ? "Tap the gateway video · ↑/↓ for next"
+      ? card.tiktokMode === "official" ? "Tap official TikTok · ↑/↓ for next"
+        : card.tiktokMode === "oembed" ? "Tap TikTok embed · ↑/↓ for next"
+        : "Tap gateway video · ↑/↓ for next"
       : isSaiyaara(card)
       ? "Use Tagembed video controls · ↑/↓ for next"
       : card.controllable
