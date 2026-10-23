@@ -36,7 +36,8 @@ FIELDS = (
 )
 PAGE_SIZE = 48
 MAX_VIDEOS = 5000
-MAX_PAYLOAD = 60 * 1024 * 1024
+# A fixed 48-slot ring limits disk use without deleting other Oracle files.
+MAX_PAYLOAD = 20 * 1024 * 1024
 
 
 def required(key):
@@ -137,6 +138,57 @@ def ensure():
     print("Started only the isolated backup helper; no replacement or stack update.")
 
 
+# Direct read-only D1 queries avoid returning a stale R2/edge-cache public listing.
+# This reuses the existing GitHub deployment Cloudflare token; it is never sent
+# to Portainer or written to disk. Stop on exhausted D1 quota.
+D1_ID = "d1a91eb2-1c41-44b8-aff1-24166f2c91f4"
+D1_COLUMNS = (
+    "id,slug,title,description,review_text,seo_title,seo_description,seo_tags,"
+    "thumbnail_url,source_url,source_page_url,embed_url,media_type,r2_key,"
+    "primary_category,subcategory,created_at,updated_at,featured,trending,views,published"
+)
+
+
+def d1_query(sql, params=()):
+    account = required("CLOUDFLARE_ACCOUNT_ID")
+    if not account.isalnum() or len(account) != 32:
+        raise RuntimeError("Cloudflare account ID invalid")
+    url = ("https://api.cloudflare.com/client/v4/accounts/" + account +
+           "/d1/database/" + D1_ID + "/query")
+    token = required("CLOUDFLARE_API_TOKEN")
+    payload = json.dumps({"sql": sql, "params": list(params)}).encode()
+    status, body = request(url, method="POST", data=payload, headers={
+        "Authorization": "Bearer " + token, "Content-Type": "application/json",
+        "Accept": "application/json",
+    }, timeout=35)
+    if status != 200 or len(body) > 15 * 1024 * 1024:
+        raise RuntimeError("D1 read quota or Cloudflare query failed; last Oracle snapshot preserved")
+    data = json.loads(body)
+    results = data.get("result")
+    if not data.get("success") or not isinstance(results, list) or len(results) != 1 or (
+        results[0].get("success") is False
+    ) or not isinstance(results[0].get("results"), list):
+        raise RuntimeError("D1 query rejected; last Oracle snapshot preserved")
+    return results[0]["results"]
+
+
+def d1_public_page(offset):
+    total_rows = d1_query("SELECT COUNT(*) AS total FROM videos WHERE published=1")
+    if len(total_rows) != 1:
+        raise RuntimeError("D1 count unavailable")
+    total = int(total_rows[0]["total"])
+    rows = d1_query(
+        "SELECT " + D1_COLUMNS +
+        " FROM videos WHERE published=1 ORDER BY created_at DESC,id DESC LIMIT ? OFFSET ?",
+        [PAGE_SIZE, offset],
+    )
+    for row in rows:
+        if row.get("published") != 1:
+            raise RuntimeError("Unexpected nonpublic D1 record")
+        row["published"] = True
+    return total, rows
+
+
 def read_public_page(offset):
     query = urllib.parse.urlencode({"sort": "newest", "limit": PAGE_SIZE, "offset": offset})
     status, body = request(SOURCE + "/api/videos?" + query, headers={
@@ -195,7 +247,7 @@ def make_sqlite(records, destination, created_at):
         ])
         db.executemany("INSERT INTO meta VALUES (?, ?)", [
             ("captured_at", created_at), ("record_count", str(len(records))),
-            ("source", SOURCE + "/api/videos"), ("scope", "public-published-only"),
+            ("source", "Cloudflare D1 direct, published-only"), ("scope", "public-published-only"),
         ])
         db.commit()
         if db.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
@@ -221,7 +273,7 @@ def archive(files):
 def sync():
     if preflight() != "running":
         raise RuntimeError("Helper must be Running; no implicit start or recreation during sync")
-    records = snapshot_records()
+    records = snapshot_records(d1_public_page)
     created = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     with tempfile.TemporaryDirectory() as folder:
         path = pathlib.Path(folder) / "snapshot.sqlite"
@@ -230,8 +282,9 @@ def sync():
     if len(binary) > MAX_PAYLOAD:
         raise RuntimeError("SQLite snapshot too large; old snapshots preserved")
     digest = hashlib.sha256(binary).hexdigest()
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    name = "vidbest-public-" + stamp + "-" + digest[:12] + ".sqlite"
+    # Fixed rolling slots (4h x 48 = 8 days). Other files/volumes are never pruned.
+    slot = int(time.time() // (4 * 60 * 60)) % 48
+    name = "vidbest-public-slot-" + str(slot).zfill(2) + ".sqlite"
     manifest_name = name + ".json"
     manifest = {
         "format": "vidbest-public-sqlite-v1", "filename": name,
