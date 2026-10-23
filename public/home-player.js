@@ -192,7 +192,7 @@ function safeCachedTikTokHoverSource(value) {
     const url = new URL(value, location.origin);
     return url.origin === location.origin && !url.search && !url.hash &&
       url.pathname.startsWith("/media/uploads/") &&
-      !url.pathname.includes("..") && /\\.(?:mp4|webm)$/i.test(url.pathname)
+      !url.pathname.includes("..") && (url.pathname.toLowerCase().endsWith(".mp4") || url.pathname.toLowerCase().endsWith(".webm"))
       ? url.pathname : "";
   } catch { return ""; }
 }
