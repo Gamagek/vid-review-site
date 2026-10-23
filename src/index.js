@@ -4183,7 +4183,7 @@ async function videoSitemapResponse(request, env, page) {
   const base = getBaseUrl(request, env);
   const result = await env.DB.prepare(
     `SELECT v.id, v.slug, v.title, v.description, v.seo_description, v.thumbnail_url,
-            v.embed_url, v.source_url, v.media_type, v.created_at, v.updated_at,
+            v.primary_category, v.embed_url, v.source_url, v.media_type, v.created_at, v.updated_at,
             m.source_published_at, m.source_duration
      FROM videos v
      LEFT JOIN video_source_metadata m ON m.video_id = v.id
