@@ -240,13 +240,14 @@ test("category sitemap includes existing canonical pagination without drafts or 
   ]) {
     assert.ok(xml.includes(`<loc>${url}</loc>`), `Missing category sitemap URL: ${url}`);
   }
-  assert.doesNotMatch(xml, /category\\/technology\\?page=4|category\\/music/);
+  assert.ok(!xml.includes("category/technology?page=4"));
+  assert.ok(!xml.includes("category/music"));
   assert.equal((xml.match(/<url>/g) || []).length, 3);
   // Only the main category has a known aggregate edit date. No fake per-page lastmod.
   assert.equal((xml.match(/<lastmod>/g) || []).length, 1);
   const page3 = await request(context, "https://vid.best/category/technology?page=3");
   assert.equal(page3.status, 200);
-  assert.match(await page3.text(), /<link rel="canonical" href="https:\\/\\/vid\\.best\\/category\\/technology\\?page=3">/);
+  assert.ok((await page3.text()).includes('<link rel="canonical" href="https://vid.best/category/technology?page=3">'));
   const nonexistent = await request(context, "https://vid.best/category/technology?page=4");
   assert.equal(nonexistent.status, 404);
 });
