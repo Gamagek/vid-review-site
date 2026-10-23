@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 import seoWorker from "../src/seo-edge.js";
-import { stableTikTokImage } from "../src/tiktok-image.js";
+import { stableTikTokImage, cachedOriginalTikTokImage, crawlableTikTokSourceImage } from "../src/tiktok-image.js";
 
 const migrations = [
   "0001_initial.sql",
@@ -792,7 +792,8 @@ test("image/video sitemaps and watch metadata use stable first-party TikTok post
   assert.equal(stableTikTokImage({ media_type:"tiktok", source_url:source, thumbnail_url:expired }), url);
   assert.doesNotMatch(images, /x-expires|x-signature|tiktok-draft-image/);
   assert.doesNotMatch(video, /x-expires|x-signature|tiktok-draft-image/);
-  assert.match(images,/id=7654628449142770958/);
+  // The missing poster remains usable on-screen, but it is not a video frame.
+  assert.doesNotMatch(images,/id=7654628449142770958/);
   assert.match(video,/id=7654628449142770958/);
   // The original owner's metadata is NOT rewritten merely for SEO.
   const unchanged = context.sqlite.prepare("SELECT thumbnail_url FROM videos WHERE slug='tiktok-stable-image'").get();
@@ -803,6 +804,40 @@ test("image/video sitemaps and watch metadata use stable first-party TikTok post
   assert.match(owned,/https:\/\/vid\.best\/review-covers\/owner-original\.webp/);
 });
 
+
+test("actual R2 TikTok source frames enter both image catalogs and video XML without touching editorial assets", async () => {
+  const context = createContext();
+  const id = "7611111111111111111";
+  const original = "https://vid.best/media/uploads/tiktok-thumbnails/" + id + ".img";
+  const wrong = "https://vid.best/media/uploads/tiktok-thumbnails/7622222222222222222.img";
+  const source = "https://www.tiktok.com/@creator/video/" + id;
+  const insert = context.sqlite.prepare(
+    "INSERT INTO videos (slug,title,source_url,media_type,primary_category,subcategory,description,thumbnail_url,published) VALUES (?, ?, ?, 'tiktok', 'Funny & Comedy', 'Memes & Compilation', 'Original image review', ?, 1)"
+  );
+  insert.run("real-tiktok-source", "Actual TikTok source", source, original);
+  insert.run("wrong-tiktok-source", "Mismatched TikTok",
+    "https://www.tiktok.com/@creator/video/7633333333333333333", wrong);
+  const row = { media_type:"tiktok", primary_category:"Funny & Comedy", source_url:source, thumbnail_url:original };
+  assert.equal(cachedOriginalTikTokImage(row), original);
+  assert.equal(stableTikTokImage(row), original);
+  assert.equal(crawlableTikTokSourceImage(row), original);
+  assert.equal(cachedOriginalTikTokImage({ ...row, thumbnail_url: wrong }), "");
+  assert.equal(cachedOriginalTikTokImage({ ...row, thumbnail_url: "https://evil.test/media/uploads/tiktok-thumbnails/" + id + ".img" }), "");
+  assert.equal(cachedOriginalTikTokImage({ ...row, thumbnail_url: original + "?token=expired" }), "");
+  assert.equal(crawlableTikTokSourceImage({ ...row, thumbnail_url: null }), "");
+
+  const images = await (await request(context, "https://vid.best/sitemaps/images-1.xml")).text();
+  const sources = await (await request(context, "https://vid.best/sitemaps/images-source-1.xml")).text();
+  const videos = await (await request(context, "https://vid.best/sitemaps/videos-1.xml")).text();
+  for (const xml of [images, sources, videos]) {
+    assert.ok(xml.includes(original), "Real R2 original missing from XML");
+    assert.ok(!xml.includes(wrong), "Wrong-video source cover must never appear in XML");
+  }
+  assert.ok(videos.includes("<video:thumbnail_loc>" + original + "</video:thumbnail_loc>"));
+  assert.ok(!sources.includes("wrong-tiktok-source"));
+  assert.ok(videos.includes("/watch/wrong-tiktok-source"), "Review page must remain discoverable");
+  assert.equal(context.sqlite.prepare("SELECT thumbnail_url FROM videos WHERE slug='real-tiktok-source'").get().thumbnail_url, original);
+});
 
 test("category pagination is crawlable, page-canonical, and preserves publication dates", async () => {
   const context = createContext();
