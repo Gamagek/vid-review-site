@@ -38,7 +38,14 @@ function policyFor(request) {
     allowed = ["category", "subcategory", "q", "sort", "featured", "trending", "limit", "offset"];
     const query = url.searchParams.get("q") || "";
     const offset = Number(url.searchParams.get("offset") || 0);
-    snapshot = !query && Number.isInteger(offset) && offset >= 0 && offset <= 48;
+    const limit = Number(url.searchParams.get("limit") || 18);
+    // Only a tiny, known set of anonymous public searches gets durable R2 snapshots.
+    // Arbitrary user searches and combinations remain edge-only (no durable storage).
+    const boundedSearch = ["tiktok", "youtube", "facebook"].includes(query) &&
+      [...url.searchParams.keys()].every((name) => ["q", "limit", "offset"].includes(name)) &&
+      Number.isInteger(limit) && limit >= 1 && limit <= 24 && offset === 0;
+    snapshot = Number.isInteger(offset) && offset >= 0 &&
+      ((!query && offset <= 48) || boundedSearch);
   } else if (path === "/api/home/mini-feed") {
     // This route includes private saves and personalized recommendations for members.
     if (/(?:^|;)\s*__Host-vidbest_member=/.test(request.headers.get("Cookie") || "")) return null;
