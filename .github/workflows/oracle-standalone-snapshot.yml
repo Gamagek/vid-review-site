@@ -48,6 +48,8 @@ jobs:
     timeout-minutes: 15
     environment: portainer-production
     env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       PORTAINER_URL: ${{ vars.PORTAINER_URL }}
       PORTAINER_ENDPOINT_ID: ${{ vars.PORTAINER_ENDPOINT_ID }}
       PORTAINER_API_KEY: ${{ secrets.PORTAINER_API_KEY }}
@@ -61,6 +63,8 @@ jobs:
       - name: Refuse missing authentication
         shell: bash
         run: |
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
           test -n "$PORTAINER_URL"
           test -n "$PORTAINER_API_KEY"
           test -n "$CF_ACCESS_CLIENT_ID"
