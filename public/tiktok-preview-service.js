@@ -217,8 +217,7 @@
       '    <p data-tiktok-dialog-description>Loading cached TikTok details…</p>',
       '    <p class="tiktok-preview-dialog-status" data-tiktok-dialog-status role="status" aria-live="polite"></p>',
       '    <div class="tiktok-preview-dialog-actions">',
-      '      <button type="button" class="button ghost" data-tiktok-dialog-alternate hidden>Try alternate player</button>',
-       '      <button type="button" class="button ghost" data-tiktok-dialog-oembed hidden>Try cached TikTok embed</button>',
+      '      <button type="button" class="button ghost" data-tiktok-dialog-alternate hidden>Try cached TikTok embed</button>',
       '      <button type="button" class="button ghost" data-tiktok-dialog-cancel>Close player</button>',
       '    </div>',
       '  </div>',
@@ -237,13 +236,11 @@
     dialog.querySelector("[data-tiktok-dialog-alternate]").addEventListener("click", () => {
       const source = parse(activeSource);
       if (!dialog.open || !source || cachePlayerUrl(source.url)) return;
-      const next = dialog.dataset.playerMode === "official" ? "gateway" : "official";
+      // The Portainer-backed gateway is currently timing out. Do not route
+      // a normal alternate-player click to that backend. Proposal's isolated
+      // metadata-backed TikTok embed is offered on demand instead.
+      const next = dialog.dataset.playerMode === "oembed" ? "official" : "oembed";
       mountGatewayPlayer(dialog, source, activePreview, next);
-    });
-    dialog.querySelector("[data-tiktok-dialog-oembed]")?.addEventListener("click", () => {
-      const source = parse(activeSource);
-      if (!dialog.open || !source || !oembedFallbackUrl(source.url)) return;
-      mountGatewayPlayer(dialog, source, activePreview, "oembed");
     });
     dialog.addEventListener("click", (event) => {
       if (event.target === dialog) close();
@@ -266,16 +263,14 @@
     const host = dialog.querySelector("[data-tiktok-embed-host]");
     const status = dialog.querySelector("[data-tiktok-dialog-status]");
     const alternate = dialog.querySelector("[data-tiktok-dialog-alternate]");
-    const cachedFallback = dialog.querySelector("[data-tiktok-dialog-oembed]");
     const protectedCachePlayer = Boolean(cachePlayerUrl(share.url));
     const selectedMode = protectedCachePlayer ? "cache" : mode;
     dialog.dataset.playerMode = selectedMode;
     if (alternate) {
-      alternate.hidden = protectedCachePlayer;
-      alternate.textContent = selectedMode === "official" ? "Try alternate player" : "Return to official player";
+      alternate.hidden = protectedCachePlayer || !oembedFallbackUrl(share.url);
+      alternate.textContent = selectedMode === "oembed"
+        ? "Return to official TikTok player" : "Try cached TikTok embed";
     }
-    if (cachedFallback) cachedFallback.hidden =
-      protectedCachePlayer || selectedMode === "oembed" || !oembedFallbackUrl(share.url);
     if (document.hidden) {
       renderUnavailable(dialog, "Return to this tab to load the gateway player.");
       status.textContent = "The tab is inactive.";
@@ -340,7 +335,9 @@
         ? "TikTok has not confirmed readiness. You can try the alternate player or open the original."
         : selectedMode === "cache"
           ? "TikTok's cached embed has not reported playback. The original source is available."
-          : "The gateway is taking longer to load. You can return to TikTok's player.";
+          : selectedMode === "oembed"
+            ? "The cached TikTok embed has not confirmed playback. Try the official player or source."
+            : "The optional gateway is unavailable. Return to the official TikTok player.";
     }, PLAYER_TIMEOUT);
   }
 
