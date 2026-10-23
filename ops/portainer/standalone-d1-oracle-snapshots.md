@@ -86,3 +86,57 @@ website failover deployment.
 
 The other recovery PRs (#267, #270, #272) and existing production deployment
 were deliberately not merged, rebased, modified or deployed by this work.
+
+
+## Additional emergency R2 resilience (staged, not deployed)
+
+On 2026-10-23, the Cloudflare connector copied and read back 502 / 502
+published Vid.Best records to the existing PRIVATE vid-assets bucket.
+Verified immutable object:
+vidbest-resilience-20261023/20261023T1210Z/published-library.json
+Pointer:
+vidbest-resilience-public/latest.json
+
+This is an emergency *published-only* copy, not an Oracle mirror or D1 SQL export.
+No live Worker was changed during that copy. No private/member/admin tables were
+copied and the D1 SELECTs performed no D1 writes.
+
+The additional staged source files are:
+- src/d1-r2-emergency.js: R2 read-only response ONLY after existing public
+  anonymous GET handler throws or returns >= 500. Covers selected /api/videos,
+  /api/videos/:slug, /watch/:slug, /videos and category paths. Member cookies,
+  Authorization, mutations and admin paths MUST NEVER use it.
+- src/d1-r2-capture.js: existing Cloudflare 15-minute cron can refresh a bounded
+  7-day rotating published-only R2 library at UTC 00:00/04:00/08:00/12:00/
+  16:00/20:00. It reads D1 and writes R2 only. A failed capture preserves
+  prior pointer. The flag D1_PUBLIC_FALLBACK_CAPTURE=1 is staged in wrangler.toml.
+- test/d1-r2-emergency.test.js: privacy, escaping, staleness, schedule and
+  failure-path regression coverage.
+
+**The R2 emergency fallback is NOT deployed to production yet.**
+Normal website behavior and production Worker version are unchanged.
+During D1 outage, it provides degraded review text and links to original
+videos, not a full interactive player, and does not accept comments, saves,
+views or reactions. Backup copies expire for serving after seven days; HTML
+older than 24 hours is noindex. Do not promise zero downtime.
+
+## Portainer control-plane blocker
+
+Existing GitHub Actions read-only Portainer recheck:
+https://github.com/Gamagek/vid-review-site/actions/runs/39764728631
+- Cloudflare Access Client ID identity verified.
+- GET /api/stacks/27 HTTP 200.
+- GET /api/stacks/27/file HTTP 200.
+- GET /api/endpoints/3/docker/containers/json timed out repeatedly after 45s.
+- Docker endpoint metadata and version checks also unavailable.
+- Public Vid.Best Worker and gateway HTTP 200.
+
+The isolated existing helper cannot be safely started or populated by GitHub
+Actions until Docker API connectivity has been restored and rechecked.
+Do NOT use the legacy video-site updater to bypass this, and do NOT restart
+production stacks to solve it. No Oracle copy has yet been verified.
+
+Deployment is blocked until freeze reconciliation, exact-head CI checks,
+read-only Oracle preflight, private-API/credentials review, and verified
+rollback. Merging this PR triggers the existing GitHub Cloudflare deployment;
+that is a production change and requires separate safety review.
