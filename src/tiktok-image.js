@@ -32,7 +32,13 @@ export function verifiedTikTokSourceImage(row, origin = FIRST_PARTY) {
   try {
     const saved = new URL(String(row.thumbnail_url || ""), origin);
     const canonical = new URL("/media/uploads/tiktok-thumbnails/" + id + ".img", origin);
-    return saved.href === canonical.href ? canonical.href : "";
+    if (saved.href === canonical.href) return canonical.href;
+    // The owner may deliberately choose an original or editorial review cover.
+    // It remains the published video poster, not a claimed TikTok frame.
+    // Registered conceptual illustrations stay in their separate media fields.
+    if (saved.origin === new URL(origin).origin && !saved.search && !saved.hash &&
+        /^\/review-covers\/[a-z0-9_-]+\.(?:jpe?g|png|webp|avif)$/i.test(saved.pathname)) return saved.href;
+    return "";
   } catch { return ""; }
 }
 
