@@ -853,11 +853,11 @@ test("category pagination is crawlable, page-canonical, and preserves publicatio
 test("Hunt for Gollum editorial page shows both original illustrations and sitemap image associations", async () => {
   const payload = JSON.parse(readFileSync(new URL("../content/editorial-quality/2026-10-23-hunt-for-gollum.json", import.meta.url), "utf8"));
   const ctx = createContext();
-  ctx.sqlite.prepare(\`INSERT INTO videos
+  ctx.sqlite.prepare(`INSERT INTO videos
     (id, slug, title, source_url, source_page_url, embed_url, media_type,
      primary_category, subcategory, description, review_text, seo_title,
      seo_description, seo_tags, thumbnail_url, published, created_at)
-    VALUES (522,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?)\`).run(
+    VALUES (522,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?)`).run(
     payload.slug, payload.title, payload.source_url, payload.source_page_url,
     payload.embed_url, payload.media_type, payload.primary_category,
     payload.subcategory, payload.description, payload.review_text, payload.seo_title,
