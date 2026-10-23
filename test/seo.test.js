@@ -848,3 +848,51 @@ test("category pagination is crawlable, page-canonical, and preserves publicatio
   assert.equal(pageOneRedirect.status, 301);
   assert.equal(pageOneRedirect.headers.get("Location"), "https://vid.best/category/technology");
 });
+
+
+test("Hunt for Gollum editorial page shows both original illustrations and sitemap image associations", async () => {
+  const payload = JSON.parse(readFileSync(new URL("../content/editorial-quality/2026-10-23-hunt-for-gollum.json", import.meta.url), "utf8"));
+  const ctx = createContext();
+  ctx.sqlite.prepare(`INSERT INTO videos
+    (id, slug, title, source_url, embed_url, media_type,
+     primary_category, subcategory, description, review_text, seo_title,
+     seo_description, seo_tags, thumbnail_url, published, created_at)
+    VALUES (522,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?)`).run(
+    payload.slug, payload.title, payload.source_url,
+    payload.embed_url, payload.media_type, payload.primary_category,
+    payload.subcategory, payload.description, payload.review_text, payload.seo_title,
+    payload.seo_description, JSON.stringify(payload.seo_tags), payload.thumbnail_url,
+    "2026-10-23T18:20:14.392Z"
+  );
+  ctx.sqlite.prepare("INSERT INTO video_source_metadata (video_id,source_published_at,source_duration) VALUES (522,?,?)")
+    .run("2009-05-08", "PT39M7S");
+
+  const watch = await request(ctx, "https://vid.best/watch/" + payload.slug,
+    { headers: { "User-Agent": "VidBest-SEO-Audit/1.0" } });
+  assert.equal(watch.status, 200);
+  const html = await watch.text();
+  assert.match(html, /<link rel="canonical" href="https:\/\/vid\.best\/watch\/the-hunt-for-gollum-2009-aragorn-fan-film-review"/);
+  assert.match(html, /9H09xnhlCQU/);
+  assert.match(html, /data-review-image="conceptual"/);
+  assert.match(html, /data-review-image="artwork"/);
+  assert.match(html, /review-artwork\/hunt-for-gollum-river-pursuit-v1\.svg/);
+  assert.match(html, /review-artwork\/hunt-for-gollum-rangers-moonlit-path-v1\.svg/);
+  assert.match(html, /not a captured frame/i);
+  assert.match(html, /Adam Langston and Andrew Skrabutenas/);
+  assert.match(html, /Adrian Webster plays Aragorn, not Arithir/);
+  assert.ok(!/noindex/i.test(watch.headers.get("X-Robots-Tag") || ""));
+  const graph = JSON.parse(html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)[1])["@graph"];
+  const video = graph.find(item => item["@type"] === "VideoObject");
+  const page = graph.find(item => item["@type"] === "WebPage");
+  assert.equal(video.uploadDate, "2009-05-08");
+  assert.equal(video.duration, "PT39M7S");
+  assert.equal(page.datePublished, "2026-10-23T18:20:14.392Z");
+
+  const imageXml = await (await request(ctx, "https://vid.best/sitemaps/images-editorial-1.xml")).text();
+  assert.ok(imageXml.includes("https://vid.best/watch/" + payload.slug));
+  assert.ok(imageXml.includes("https://vid.best/review-artwork/hunt-for-gollum-rangers-moonlit-path-v1.svg"));
+  assert.ok(imageXml.includes("https://vid.best/review-artwork/hunt-for-gollum-river-pursuit-v1.svg"));
+  const combinedXml = await (await request(ctx, "https://vid.best/sitemaps/images-1.xml")).text();
+  assert.ok(combinedXml.includes("https://vid.best/review-artwork/hunt-for-gollum-river-pursuit-v1.svg"));
+  assert.ok(combinedXml.includes("https://vid.best/review-artwork/hunt-for-gollum-rangers-moonlit-path-v1.svg"));
+});

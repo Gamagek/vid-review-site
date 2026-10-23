@@ -3094,6 +3094,11 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   // Artwork remains a separate illustration; no poster or player field is rewritten.
   const sourceReviewPreview = reviewSourcePreview(video, thumbnail, baseUrl);
   const sourceReviewImage = sourceReviewPreview?.url !== reviewImage ? sourceReviewPreview?.url : "";
+  // Two independent conceptual images may accompany a new review when a
+  // genuine source capture is not available; never label artwork as footage.
+  const companionReviewImage = !sourceReviewImage && illustration?.companionImage
+    ? `${baseUrl}${illustration.companionImage.path}` : "";
+  const firstSidebarImage = sourceReviewImage || companionReviewImage;
   const dualImageSchema = [512, 513].includes(Number(video.id)) && video.media_type !== "raw" && Boolean(sourceReviewImage && illustration);
   // A Vid.Best review's creation date is not the original third-party video's
   // publication date. Google requires the *video* date when it is known.
@@ -3278,21 +3283,21 @@ function renderWatchHtml(video, request, env, scriptNonce) {
       </nav>` : ""}
       <a class="source-link" href="${escapeHtml(video.source_page_url || video.source_url)}" target="_blank" rel="noopener noreferrer nofollow">Open original source ↗</a>
     </article>
-    ${sourceReviewImage ? `<aside class="watch-review-images" aria-label="Source preview and conceptual review artwork">
-      <figure class="watch-review-art glass-panel" data-review-image="source" aria-label="Source preview image">
-        <a href="${escapeHtml(sourceReviewImage)}" target="_blank" rel="noopener noreferrer" aria-label="View source preview image">
-          <img src="${escapeHtml(sourceReviewImage)}" alt="${escapeHtml(`${video.title} — publisher preview image`)}" width="${sourceReviewPreview.width}" height="${sourceReviewPreview.height}" loading="lazy" decoding="async">
+    ${firstSidebarImage ? `<aside class="watch-review-images" aria-label="${sourceReviewImage ? "Source preview and conceptual review artwork" : "Two conceptual review illustrations"}">
+      <figure class="watch-review-art glass-panel" data-review-image="${sourceReviewImage ? "source" : "conceptual"}" aria-label="${sourceReviewImage ? "Source preview image" : "Conceptual companion illustration"}">
+        <a href="${escapeHtml(firstSidebarImage)}" target="_blank" rel="noopener noreferrer" aria-label="${sourceReviewImage ? "View source preview image" : "View conceptual review artwork"}">
+          <img src="${escapeHtml(firstSidebarImage)}" alt="${escapeHtml(sourceReviewImage ? `${video.title} — publisher preview image` : (illustration?.companionImage?.alt || `${video.title} — imagined review scene`))}" width="${sourceReviewImage ? sourceReviewPreview.width : illustration.companionImage.width}" height="${sourceReviewImage ? sourceReviewPreview.height : illustration.companionImage.height}" loading="lazy" decoding="async">
         </a>
-        <figcaption>Source/publisher preview image.</figcaption>
+        <figcaption>${escapeHtml(sourceReviewImage ? "Source/publisher preview image." : illustration.companionImage.caption)}</figcaption>
       </figure>` : ""}
-    ${reviewImage ? `<figure class="watch-review-art glass-panel"${sourceReviewImage ? ' data-review-image="artwork"' : ""} aria-label="Review image">
+    ${reviewImage ? `<figure class="watch-review-art glass-panel"${firstSidebarImage ? ' data-review-image="artwork"' : ""} aria-label="Review image">
       <a${illustration ? ' class="watch-review-artwork-link"' : ""} href="${escapeHtml(reviewImage)}" target="_blank" rel="noopener noreferrer" aria-label="View review preview image">
         <img src="${escapeHtml(reviewImage)}" alt="${escapeHtml(illustration?.alt || `${video.title} — review preview image`)}" width="${illustration?.width || 640}" height="${illustration?.height || 360}" loading="lazy" decoding="async">
         ${illustration?.displayWatermark === 'vid.best' ? '<span class="watch-review-watermark" aria-hidden="true">vid.best</span>' : ""}
       </a>
       <figcaption>${escapeHtml(illustration?.caption || "Preview artwork for this review. The original video remains with its publisher.")}</figcaption>
     </figure>` : ""}
-    ${sourceReviewImage ? "</aside>" : ""}
+    ${firstSidebarImage ? "</aside>" : ""}
     </div><!-- review-body -->
     <section class="comments-panel glass-panel">
       <h2>Community comments</h2>

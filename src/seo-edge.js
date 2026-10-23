@@ -462,12 +462,15 @@ async function splitImageSitemapPage(env, page, kind) {
   if (page > 1 && !rows.length) return new Response("Image sitemap not found", { status: 404 });
   const entries = rows.map(row => {
     const illustration = kind === "editorial" ? reviewIllustration(row) : null;
-    const imageUrl = kind === "editorial" ?
-      (illustration ? `${CANONICAL_ORIGIN}${illustration.path}` : "") :
-      crawlableImageUrl(row);
-    if (!imageUrl) return "";
+    const imageUrls = kind === "editorial" ?
+      (illustration ? [illustration.path, illustration.companionImage?.path].filter(Boolean)
+        .map(path => `${CANONICAL_ORIGIN}${path}`) : []) :
+      [crawlableImageUrl(row)].filter(Boolean);
+    if (!imageUrls.length) return "";
     const canonical = `${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}`;
-    return `<url><loc>${escapeXml(canonical)}</loc><image:image><image:loc>${escapeXml(imageUrl)}</image:loc></image:image></url>`;
+    return `<url><loc>${escapeXml(canonical)}</loc>${imageUrls.map(imageUrl =>
+      `<image:image><image:loc>${escapeXml(imageUrl)}</image:loc></image:image>`
+    ).join("")}</url>`;
   }).join("");
   // Keep empty guessed sitemap segments out of the crawl inventory.
   if (!entries) return new Response("No images in this sitemap segment", { status: 404 });
@@ -488,7 +491,7 @@ async function imageSitemapPage(env, page) {
   if (page > 1 && !rows.length) return new Response("Image sitemap not found", { status: 404 });
   const entries = rows.map((row) => {
     const illustration = reviewIllustration(row);
-    const imageUrls = [...new Set([crawlableImageUrl(row), illustration ? `${CANONICAL_ORIGIN}${illustration.path}` : ""].filter(Boolean))];
+    const imageUrls = [...new Set([crawlableImageUrl(row), illustration ? `${CANONICAL_ORIGIN}${illustration.path}` : "", illustration?.companionImage ? `${CANONICAL_ORIGIN}${illustration.companionImage.path}` : ""].filter(Boolean))];
     if (!imageUrls.length) return "";
     const canonical = `${CANONICAL_ORIGIN}/watch/${encodeURIComponent(row.slug)}`;
     return `<url><loc>${escapeXml(canonical)}</loc>${imageUrls.map((imageUrl) => `<image:image><image:loc>${escapeXml(imageUrl)}</image:loc></image:image>`).join("")}</url>`;
