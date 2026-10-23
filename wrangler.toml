@@ -11,6 +11,8 @@ MAX_UPLOAD_BYTES = "104857600"
 MAX_AUTO_CACHE_BYTES = "104857600"
 TIKTOK_OEMBED_REFRESH_ON_PUBLISH = "1"
 TIKTOK_OEMBED_BACKFILL_BATCH = "3"
+# After a reviewed production release, snapshot published public records every 4 hours.
+D1_PUBLIC_FALLBACK_CAPTURE = "1"
 TIKTOK_OEMBED_GATEWAY = "https://tiktok-oembed-gateway.gkasunc.workers.dev/"
 
 [assets]
