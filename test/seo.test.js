@@ -829,9 +829,10 @@ test("actual R2 TikTok source frames enter both image catalogs and video XML wit
   const images = await (await request(context, "https://vid.best/sitemaps/images-1.xml")).text();
   const sources = await (await request(context, "https://vid.best/sitemaps/images-source-1.xml")).text();
   const videos = await (await request(context, "https://vid.best/sitemaps/videos-1.xml")).text();
-  for (const xml of [images, sources, videos]) {
-    assert.ok(xml.includes(original), "Real R2 original missing from XML");
-    assert.ok(!xml.includes(wrong), "Wrong-video source cover must never appear in XML");
+  for (const [name, xml] of Object.entries({ images, sources, videos })) {
+    assert.ok(xml.includes(original), "Real R2 original missing from " + name);
+    assert.ok(!xml.includes(wrong),
+      "Wrong-video source cover leaked into " + name + ": " + xml.slice(Math.max(0, xml.indexOf(wrong) - 250), xml.indexOf(wrong) + wrong.length + 160));
   }
   assert.ok(videos.includes("<video:thumbnail_loc>" + original + "</video:thumbnail_loc>"));
   assert.ok(!sources.includes("wrong-tiktok-source"));
