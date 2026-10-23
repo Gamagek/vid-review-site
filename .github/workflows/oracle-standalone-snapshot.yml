@@ -1,6 +1,13 @@
 name: Isolated Oracle public SQLite snapshot (no stack modifications)
 
 on:
+  # Staging branch: PRE-FLIGHT READ ONLY. No production Worker or stack deployment.
+  push:
+    branches:
+      - feat/isolated-d1-oracle-snapshot-automation-20261023
+    paths:
+      - '.github/workflows/oracle-standalone-snapshot.yml'
+      - 'scripts/oracle-standalone-snapshot.py'
   pull_request:
     paths:
       - 'scripts/oracle-standalone-snapshot.py'
