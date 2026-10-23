@@ -217,6 +217,40 @@ test("only substantive category hubs enter the category sitemap", async () => {
 });
 
 
+test("category sitemap includes existing canonical pagination without drafts or fabricated timestamps", async () => {
+  const context = createContext();
+  const insert = context.sqlite.prepare(`
+    INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, published)
+    VALUES (?, ?, ?, 'raw', 'Technology', 'Web Development', ?)`);
+  for (let i = 1; i <= 61; i += 1) {
+    insert.run(`pagination-${i}`, `Review ${i}`, `https://example.com/${i}.mp4`, 1);
+  }
+  insert.run("hidden-draft", "Draft", "https://example.com/draft.mp4", 0);
+  context.sqlite.prepare(`
+    INSERT INTO videos (slug, title, source_url, media_type, primary_category, subcategory, published)
+    VALUES ('music-only', 'Music', 'https://example.com/music.mp4', 'raw', 'Music', 'Music Videos', 1)`).run();
+
+  const response = await request(context, "https://vid.best/sitemaps/categories.xml");
+  assert.equal(response.status, 200);
+  const xml = await response.text();
+  for (const url of [
+    "https://vid.best/category/technology",
+    "https://vid.best/category/technology?page=2",
+    "https://vid.best/category/technology?page=3",
+  ]) {
+    assert.ok(xml.includes(`<loc>${url}</loc>`), `Missing category sitemap URL: ${url}`);
+  }
+  assert.doesNotMatch(xml, /category\\/technology\\?page=4|category\\/music/);
+  assert.equal((xml.match(/<url>/g) || []).length, 3);
+  // Only the main category has a known aggregate edit date. No fake per-page lastmod.
+  assert.equal((xml.match(/<lastmod>/g) || []).length, 1);
+  const page3 = await request(context, "https://vid.best/category/technology?page=3");
+  assert.equal(page3.status, 200);
+  assert.match(await page3.text(), /<link rel="canonical" href="https:\\/\\/vid\\.best\\/category\\/technology\\?page=3">/);
+  const nonexistent = await request(context, "https://vid.best/category/technology?page=4");
+  assert.equal(nonexistent.status, 404);
+});
+
 test("video pages expose a crawlable category breadcrumb", async () => {
   const context = createContext();
   context.sqlite.prepare(
