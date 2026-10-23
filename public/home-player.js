@@ -25,6 +25,11 @@ const previewState = {
   warmObserver: null,
   activeCleanup: null,
   tiktokMetadataRequested: new Set(),
+  tiktokHoverCandidate: null,
+  tiktokHoverTimer: null,
+  tiktokHoverActive: null,
+  tiktokHoverVideo: null,
+  tiktokHoverStarts: 0,
   facebookControllers: new Map(),
   facebookUnavailable: new Set(),
   facebookRotationTimer: null,
@@ -57,10 +62,11 @@ function initializePreviews() {
   decorateVideoCards();
   void loadCachedTikTokFacadePreviews();
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) stopPreview();
+    if (document.hidden) { stopPreview(); stopCachedTikTokHover(); }
     else chooseVisibleCandidate();
   });
   window.addEventListener("pagehide", () => {
+    stopCachedTikTokHover();
     stopPreview();
     for (const controller of previewState.facebookControllers.values()) controller.destroy();
     previewState.facebookControllers.clear();
@@ -142,10 +148,23 @@ function decorateVideoCards() {
         return;
       }
       renderTikTokFacade(card);
+      // Only an existing, authorized same-origin R2 MP4/WebM may produce a
+      // moving mini preview. Normal TikTok cards remain lightweight posters.
+      if (safeCachedTikTokHoverSource(card.dataset.tiktokHoverSrc)) {
+        media.addEventListener("pointerenter", (event) => {
+          if (event.pointerType !== "touch") queueCachedTikTokHover(card, 250);
+        });
+        media.addEventListener("pointerleave", () => stopCachedTikTokHover(card));
+        media.addEventListener("focusin", () => queueCachedTikTokHover(card, 250));
+        media.addEventListener("focusout", (event) => {
+          if (!media.contains(event.relatedTarget)) stopCachedTikTokHover(card);
+        });
+      }
       media.addEventListener("click", (event) => {
         if (event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         if (!parseTikTokShareUrl(card.dataset.videoSource)) return;
         event.preventDefault();
+        stopCachedTikTokHover(card);
         activateTikTokPreviewCard(card);
       });
       previewState.observer?.observe(card);
@@ -162,6 +181,86 @@ function decorateVideoCards() {
     media.addEventListener("blur", () => cancelCandidate(card));
     previewState.observer?.observe(card);
   });
+}
+
+const MAX_CACHED_TIKTOK_HOVERS = 4; // Per page view, not per-scroll or per-tile.
+const CACHED_TIKTOK_HOVER_SECONDS = 5;
+
+function safeCachedTikTokHoverSource(value) {
+  try {
+    if (!value) return "";
+    const url = new URL(value, location.origin);
+    return url.origin === location.origin && !url.search && !url.hash &&
+      url.pathname.startsWith("/media/uploads/") &&
+      !url.pathname.includes("..") && /\\.(?:mp4|webm)$/i.test(url.pathname)
+      ? url.pathname : "";
+  } catch { return ""; }
+}
+
+function stopCachedTikTokHover(card = null) {
+  if (previewState.tiktokHoverCandidate && (!card || previewState.tiktokHoverCandidate === card)) {
+    clearTimeout(previewState.tiktokHoverTimer);
+    previewState.tiktokHoverTimer = null;
+    previewState.tiktokHoverCandidate = null;
+  }
+  if (previewState.tiktokHoverActive && (!card || previewState.tiktokHoverActive === card)) {
+    const video = previewState.tiktokHoverVideo;
+    if (video) {
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+      video.remove();
+    }
+    previewState.tiktokHoverActive = null;
+    previewState.tiktokHoverVideo = null;
+  }
+}
+
+function queueCachedTikTokHover(card, delay = 650) {
+  const source = safeCachedTikTokHoverSource(card?.dataset.tiktokHoverSrc);
+  if (!source || !card.isConnected || !previewsAllowed() || document.hidden ||
+      !isNearViewport(card) || card.dataset.tiktokHoverAttempted === "1" ||
+      previewState.tiktokHoverStarts >= MAX_CACHED_TIKTOK_HOVERS ||
+      previewState.tiktokHoverActive === card || previewState.tiktokHoverCandidate === card) return;
+  stopCachedTikTokHover();
+  previewState.tiktokHoverCandidate = card;
+  previewState.tiktokHoverTimer = setTimeout(() => {
+    previewState.tiktokHoverTimer = null;
+    if (previewState.tiktokHoverCandidate !== card) return;
+    previewState.tiktokHoverCandidate = null;
+    if (!card.isConnected || document.hidden || !previewsAllowed() || !isNearViewport(card)) return;
+    const surface = card.querySelector(".preview-surface");
+    if (!surface || previewState.tiktokHoverStarts >= MAX_CACHED_TIKTOK_HOVERS) return;
+    card.dataset.tiktokHoverAttempted = "1";
+    previewState.tiktokHoverStarts += 1;
+    const video = document.createElement("video");
+    video.className = "tiktok-cached-muted-hover";
+    video.muted = true;
+    video.defaultMuted = true;
+    video.autoplay = false;
+    video.playsInline = true;
+    video.preload = "none";
+    video.controls = false;
+    video.disablePictureInPicture = true;
+    video.setAttribute("aria-hidden", "true");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("muted", "");
+    previewState.tiktokHoverActive = card;
+    previewState.tiktokHoverVideo = video;
+    video.addEventListener("playing", () => {
+      if (previewState.tiktokHoverVideo === video) video.classList.add("is-playing");
+    });
+    video.addEventListener("timeupdate", () => {
+      if (video.currentTime >= CACHED_TIKTOK_HOVER_SECONDS) stopCachedTikTokHover(card);
+    });
+    video.addEventListener("error", () => stopCachedTikTokHover(card), { once: true });
+    surface.append(video);
+    // src is assigned only on genuine hover/focus or sustained mobile visibility.
+    // No TikTok network request, metadata background job, or cache-fill request.
+    video.src = source;
+    const playing = video.play();
+    if (playing?.catch) playing.catch(() => stopCachedTikTokHover(card));
+  }, delay);
 }
 
 function previewsAllowed() {
@@ -210,8 +309,12 @@ function parseTikTokShareUrl(value) {
 function handleVisibility(entries) {
   entries.forEach((entry) => {
     const card = entry.target.closest?.(".video-tile") || entry.target;
-    previewState.visibility.set(card, entry.isIntersecting ? entry.intersectionRatio : 0);
-
+    const ratio = entry.isIntersecting ? entry.intersectionRatio : 0;
+    previewState.visibility.set(card, ratio);
+    if (card.dataset.videoProvider === "tiktok" && safeCachedTikTokHoverSource(card.dataset.tiktokHoverSrc)) {
+      if (ratio < 0.12) stopCachedTikTokHover(card);
+      else if (ratio >= 0.78 && navigator.maxTouchPoints > 0) queueCachedTikTokHover(card, 950);
+    }
   });
   chooseVisibleCandidate();
 }
@@ -866,6 +969,7 @@ function ownedTikTokCover(card) {
 }
 
 function renderTikTokFacade(card) {
+  stopCachedTikTokHover(card);
   const surface = card.querySelector(".preview-surface");
   const status = card.querySelector(".preview-status");
   const share = parseTikTokShareUrl(card.dataset.videoSource);
