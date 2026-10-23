@@ -240,7 +240,7 @@
       const next = dialog.dataset.playerMode === "official" ? "gateway" : "official";
       mountGatewayPlayer(dialog, source, activePreview, next);
     });
-    dialog.querySelector("[data-tiktok-dialog-oembed]").addEventListener("click", () => {
+    dialog.querySelector("[data-tiktok-dialog-oembed]")?.addEventListener("click", () => {
       const source = parse(activeSource);
       if (!dialog.open || !source || !oembedFallbackUrl(source.url)) return;
       mountGatewayPlayer(dialog, source, activePreview, "oembed");
