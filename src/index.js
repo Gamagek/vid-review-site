@@ -6,6 +6,8 @@ import { tikTokZeroRequestPlayer } from "./tiktok-zero-request-cache.js";
 import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStatus } from "./tiktok-cache-jobs.js";
 import { tikTokCacheCandidate } from "./admin-tiktok-cache.js";
 import { isCachedTikTokThumbnail, thumbnailKey } from "./tiktok-thumbnail-cache.js";
+import { fetchPublicTikTokOpenGraphThumbnail } from "./tiktok-page-thumbnail.js";
+import { verifiedTikTokSourceImage, preservedTikTokReference } from "./tiktok-image.js";
 import { facebookPosterUrl, readFacebookPoster, facebookPlaceholderResponse } from "./facebook-posters.js";
 import { stableTikTokImage } from "./tiktok-image.js";
 import { queueFacebookPreview, runFacebookPreviewJobs, attachFacebookPreviews, facebookPreviewStatus } from "./facebook-preview-jobs.js";
@@ -720,6 +722,15 @@ async function fetchTikTokPreviewOnce(env, share, options = {}) {
     const stale = gatewayPayload?.stale === true;
     if (stale && (!Number.isFinite(fetchedAt) || fetchedAt + 7 * 86400000 <= Date.now())) throw new AppError(503, "Cached TikTok details have expired");
 
+    // Use official oEmbed metadata first. This narrow HTML/og:image fallback
+    // is disabled by default, and runs at most within the existing once-per-day
+    // per-video lease. A 429 or a failed oEmbed request does not trigger it.
+    const officialImage = normalizeTikTokThumbnailUrl(metadata?.thumbnail_url);
+    const fallbackImage = !officialImage && !isCachedTikTokThumbnail(durable?.thumbnail_url)
+      && String(env.TIKTOK_THUMBNAIL_HTML_FALLBACK || "0") === "1"
+      && !preservedTikTokReference(videoId)
+        ? await fetchPublicTikTokOpenGraphThumbnail(canonicalShare) : null;
+
     const preview = {
       video_id: videoId,
       title: cleanText(metadata?.title, 160, "TikTok video"),
@@ -728,7 +739,7 @@ async function fetchTikTokPreviewOnce(env, share, options = {}) {
       author_url: normalizeTikTokAuthorUrl(metadata?.author_url),
       description: cleanText(metadata?.description || metadata?.video_description || metadata?.text, 260),
       thumbnail_url: isCachedTikTokThumbnail(durable?.thumbnail_url)
-        ? durable.thumbnail_url : normalizeTikTokThumbnailUrl(metadata?.thumbnail_url),
+        ? durable.thumbnail_url : (officialImage || fallbackImage),
       cache_source: stale ? "gateway-stale" : "gateway",
       fetched_at: Number.isFinite(fetchedAt) && fetchedAt <= Date.now() ? new Date(fetchedAt).toISOString() : new Date().toISOString(),
     };
