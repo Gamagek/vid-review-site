@@ -1,0 +1,81 @@
+name: Isolated Oracle public SQLite snapshot (no stack modifications)
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/oracle-standalone-snapshot.py'
+      - 'test/test_oracle_standalone_snapshot.py'
+      - '.github/workflows/oracle-standalone-snapshot.yml'
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: 'preflight = read-only; ensure = start already-created helper; sync = write published-only SQLite snapshot'
+        required: true
+        type: choice
+        options:
+          - preflight
+          - ensure
+          - sync
+        default: preflight
+  schedule:
+    - cron: '17 */4 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vidbest-isolated-oracle-public-snapshot
+  cancel-in-progress: false
+
+jobs:
+  tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Test SQLite snapshot validation (no external calls)
+        run: python3 -m unittest discover -s test -p 'test_oracle_standalone_snapshot.py' -v
+      - name: Python syntax
+        run: python3 -m py_compile scripts/oracle-standalone-snapshot.py
+
+  oracle-public-only:
+    # No Portainer API calls from pull request code or an unreviewed branch.
+    if: github.event_name != 'pull_request'
+    needs: tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: portainer-production
+    env:
+      PORTAINER_URL: ${{ vars.PORTAINER_URL }}
+      PORTAINER_ENDPOINT_ID: ${{ vars.PORTAINER_ENDPOINT_ID }}
+      PORTAINER_API_KEY: ${{ secrets.PORTAINER_API_KEY }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      ALLOW_HELPER_START: ${{ inputs.operation == 'ensure' && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Refuse missing authentication
+        shell: bash
+        run: |
+          test -n "$PORTAINER_URL"
+          test -n "$PORTAINER_API_KEY"
+          test -n "$CF_ACCESS_CLIENT_ID"
+          test -n "$CF_ACCESS_CLIENT_SECRET"
+          test "$PORTAINER_ENDPOINT_ID" = '3'
+      - name: Safe operation on existing helper only
+        shell: bash
+        env:
+          REQUESTED_OPERATION: ${{ inputs.operation || 'preflight' }}
+        run: |
+          set -euo pipefail
+          operation="$REQUESTED_OPERATION"
+          if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then operation=sync; fi
+          case "$operation" in
+            preflight|ensure|sync) ;;
+            *) echo "Unrecognized operation"; exit 1 ;;
+          esac
+          python3 scripts/oracle-standalone-snapshot.py --mode "$operation"
