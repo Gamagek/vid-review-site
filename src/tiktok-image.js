@@ -36,6 +36,22 @@ export function cachedOriginalTikTokImage(row, origin = FIRST_PARTY) {
   } catch { return ""; }
 }
 
+// Source-image XML should describe a real, stable image instead of the
+// generic "TikTok / Cached Preview" SVG. A video with no stored/curated image
+// remains crawlable via its normal HTML links, but does not masquerade as a
+// source still. The four reference posts keep their previous XML behavior.
+export function crawlableTikTokSourceImage(row, origin = FIRST_PARTY) {
+  if (isPreservedTikTokThumbnailReference(row)) return stableTikTokImage(row, origin);
+  const saved = cachedOriginalTikTokImage(row, origin);
+  if (saved) return saved;
+  try {
+    const image = new URL(stableTikTokImage(row, origin), origin);
+    if (image.origin === origin && !image.search && !image.hash &&
+        /^\/review-covers\/[a-z0-9_-]+\.(?:jpe?g|png|webp|avif)$/i.test(image.pathname)) return image.href;
+  } catch {}
+  return "";
+}
+
 export function stableTikTokImage(row, origin = FIRST_PARTY) {
   const original = String(row?.thumbnail_url || "").trim();
   if (String(row?.media_type || row?.provider || "").toLowerCase() !== "tiktok") return original;
