@@ -3137,8 +3137,6 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     ...(video.source_duration ? { duration: video.source_duration } : {}),
     ...(video.provider === "facebook" && getSafeFacebookEmbedUrl(video) ? { embedUrl: getSafeFacebookEmbedUrl(video) } : video.embed_url && video.provider !== "tiktok" ? { embedUrl: preparePlaybackEmbed(video.embed_url, playbackOrigin) } : {}),
     ...(mediaFileUrl && !video.embed_url && video.provider !== "tiktok" ? { contentUrl: mediaFileUrl } : {}),
-    ...(video.provider === "tiktok" && tiktokId && !preservedTikTokReference(video.source_url)
-      ? { embedUrl: `https://www.tiktok.com/player/v1/${tiktokId}` } : {}),
     ...(tags.length ? { keywords: tags.join(", ") } : {}),
     ...(video.primary_category ? { genre: [video.primary_category, video.subcategory].filter(Boolean) } : {}),
     // Site page views are not verified video plays. Do not claim WatchActions,
