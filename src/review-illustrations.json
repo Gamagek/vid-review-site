@@ -1932,5 +1932,26 @@
     "caption": "Conceptual review artwork, not a frame from the source video. The 2025 lettering follows the upload’s title.",
     "bytes": 257410,
     "sha256": "44d8c8408b0fbb5d3d3ad55f28965e2db6152a3d5b98914c284fb99b2ce1396b"
+  },
+  {
+    "id": 522,
+    "slug": "the-hunt-for-gollum-2009-aragorn-fan-film-review",
+    "sourceUrl": "https://www.youtube.com/watch?v=9H09xnhlCQU",
+    "expectedTitle": "The Hunt for Gollum (2009) — Aragorn's Search | Fan Film Review",
+    "path": "/review-artwork/hunt-for-gollum-rangers-moonlit-path-v1.svg",
+    "width": 1280,
+    "height": 720,
+    "alt": "Original conceptual artwork of a hooded ranger tracking a dark mountain valley in moonlight; fictional visual interpretation, not a film frame",
+    "caption": "Original illustrated interpretation of a Ranger's nocturnal pursuit, not a captured frame or official film poster.",
+    "bytes": 10815,
+    "displayWatermark": "vid.best",
+    "companionImage": {
+      "path": "/review-artwork/hunt-for-gollum-river-pursuit-v1.svg",
+      "width": 1280,
+      "height": 720,
+      "alt": "Original conceptual artwork of a small fantasy creature beside a dark river and torch-lit pursuers; not film footage",
+      "caption": "Original conceptual illustration of a riverbank pursuit; not a captured frame from the film.",
+      "bytes": 8896
+    }
   }
 ]
