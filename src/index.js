@@ -3098,6 +3098,10 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   const thumbnail = video.provider === "tiktok"
     ? stableTikTokImage(video, baseUrl)
     : video.thumbnail_url ? absoluteUrl(video.thumbnail_url, baseUrl) : "";
+  // The fallback SVG poster is useful for humans but is not evidence of a
+  // real TikTok video thumbnail. Do not claim it as one to Google Search.
+  const searchThumbnail = video.provider === "tiktok" && !preservedTikTokReference(video.source_url)
+    ? verifiedTikTokSourceImage(video, baseUrl) : thumbnail;
   const tags = Array.isArray(video.seo_tags) ? video.seo_tags.slice(0, 20) : [];
   const illustration = reviewIllustration(video);
   const reviewImage = illustration ? `${baseUrl}${illustration.path}` : thumbnail;
@@ -3126,13 +3130,15 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     "@id": `${canonical}#video`,
     name: watchDisplayTitle(video),
     description,
-    ...(thumbnail ? { thumbnailUrl: [thumbnail] } : {}),
+    ...(searchThumbnail ? { thumbnailUrl: [searchThumbnail] } : {}),
     ...(uploadDate ? { uploadDate } : {}),
     url: canonical,
     mainEntityOfPage: canonical,
     ...(video.source_duration ? { duration: video.source_duration } : {}),
     ...(video.provider === "facebook" && getSafeFacebookEmbedUrl(video) ? { embedUrl: getSafeFacebookEmbedUrl(video) } : video.embed_url && video.provider !== "tiktok" ? { embedUrl: preparePlaybackEmbed(video.embed_url, playbackOrigin) } : {}),
     ...(mediaFileUrl && !video.embed_url && video.provider !== "tiktok" ? { contentUrl: mediaFileUrl } : {}),
+    ...(video.provider === "tiktok" && tiktokId && !preservedTikTokReference(video.source_url)
+      ? { embedUrl: `https://www.tiktok.com/player/v1/${tiktokId}` } : {}),
     ...(tags.length ? { keywords: tags.join(", ") } : {}),
     ...(video.primary_category ? { genre: [video.primary_category, video.subcategory].filter(Boolean) } : {}),
     // Site page views are not verified video plays. Do not claim WatchActions,
@@ -4208,7 +4214,8 @@ async function videoSitemapResponse(request, env, page) {
     const canonical = `${base}/watch/${encodeURIComponent(row.slug)}`;
     const provider = detectMediaProvider(row);
     const thumbnail = provider === "tiktok"
-      ? stableTikTokImage(row, base)
+      ? (preservedTikTokReference(row.source_url)
+        ? stableTikTokImage(row, base) : verifiedTikTokSourceImage(row, base))
       : row.thumbnail_url
         ? absoluteUrl(provider === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url, base) : "";
     const description = cleanText(row.seo_description || row.description || `Discover ${row.title} on Vid.Best.`, 180);
