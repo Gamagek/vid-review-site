@@ -52,7 +52,7 @@
     const el = document.createElement("article"); el.className = "swipe-card";
     el.setAttribute("aria-label", video.title); el.dataset.videoId = video.id;
     el.innerHTML = `<div class="swipe-media"><div class="swipe-frame-host"></div><button type="button" class="swipe-gesture" data-play aria-label="Play or pause. Swipe vertically for another video."><span class="swipe-play-hint">Tap to play · Swipe for next</span></button></div>
-      <footer class="swipe-footer"><div class="swipe-player-actions"><button type="button" data-play aria-label="Play video">▶ Play</button><button type="button" data-sound aria-label="Unmute video">🔇 Sound</button><button type="button" data-controls aria-expanded="false" aria-controls="swipe-controls-${video.id}">Player controls</button></div>
+      <footer class="swipe-footer"><div class="swipe-player-actions"><button type="button" data-play aria-label="Play video">▶ Play</button><button type="button" data-sound aria-label="Unmute video">🔇 Sound</button><button type="button" data-controls aria-expanded="false" aria-controls="swipe-controls-${video.id}">Player controls</button></div><div class="swipe-tiktok-fallback-controls" data-tiktok-fallback hidden><button type="button" data-tiktok-fallback-mode="official">Try official TikTok player</button><button type="button" data-tiktok-fallback-mode="oembed">Try cached TikTok embed</button></div>
       <section class="swipe-mini-controls" id="swipe-controls-${video.id}" aria-label="Compact player controls" hidden><div class="swipe-timeline"><span data-time>0:00 / 0:00</span><span data-quality>Preparing…</span><input type="range" data-seek aria-label="Video position" min="0" max="1" step="1" value="0" disabled></div><div class="swipe-control-options"><button type="button" data-skip="-10" aria-label="Back 10 seconds" disabled>↶ 10s</button><button type="button" data-skip="10" aria-label="Forward 10 seconds" disabled>10s ↷</button><button type="button" data-original aria-pressed="false">Original controls</button></div><p class="swipe-controls-help">Swipe on the video for next. Original controls include captions and settings.</p></section>
       <h2></h2><p class="swipe-count"></p><div class="swipe-engagement" aria-label="Video reactions"><button type="button" data-reaction="like" aria-label="Like video" aria-pressed="false"></button><button type="button" data-reaction="love" aria-label="Love video" aria-pressed="false"></button><button type="button" data-reaction="useful" aria-label="Mark video useful" aria-pressed="false"></button><button type="button" data-review aria-expanded="false">⌃ Review</button></div><div class="swipe-interests"><button type="button" data-interest="more">＋ More like this</button><button type="button" data-interest="less">− Fewer like this</button></div><p class="swipe-status" role="status">Preparing video…</p></footer>`;
     el.querySelector("h2").textContent = video.title;
@@ -90,6 +90,12 @@
   }
   function destroyPlayer(card) {
     card.stopGatewayObserver?.(); card.stopGatewayObserver = null;
+    clearTimeout(card.tiktokFallbackTimer);
+    card.tiktokFallbackTimer = null;
+    card.tiktokFallbackSource = null;
+    card.tiktokMode = null;
+    const fallbackActions = card.el.querySelector("[data-tiktok-fallback]");
+    if (fallbackActions) fallbackActions.hidden = true;
     card.loadToken = null; card.host.replaceChildren(); card.frame = null; card.ready = false; card.bridge = false;
     card.loading = null; card.suspended = null; card.playing = false; card.actualMuted = true; card.soundBlocked = false;
     card.seconds = 0; card.duration = 0;
@@ -98,6 +104,81 @@
     card.el.querySelector(".swipe-mini-controls").hidden = true;
     card.el.querySelector("[data-original]").setAttribute("aria-pressed", "false");
     refreshPlayback(card); refreshTimeline(card);
+  }
+
+  function offerTikTokSwipeFallback(card, source) {
+    const api = window.VidBestTikTok;
+    if (!api?.parse?.(source) || api.isReferenceVideo?.(source) || !desired(card)) return;
+    const panel = card.el.querySelector("[data-tiktok-fallback]");
+    if (!panel) return;
+    const cached = panel.querySelector('[data-tiktok-fallback-mode="oembed"]');
+    if (cached) cached.hidden = !api.oembedFallbackUrl?.(source);
+    panel.hidden = false;
+  }
+  // All alternate iframes are mounted only after a deliberate user click.
+  // Reuse the on-demand official and isolated Proposal-style cached embed URLs;
+  // a loaded cross-origin document is never counted as video playback.
+  function switchTikTokSwipePlayer(card, mode) {
+    const source = card.tiktokFallbackSource;
+    const api = window.VidBestTikTok;
+    if (!opened || !desired(card) || !api?.parse?.(source) || api.isReferenceVideo?.(source)) return;
+    const target = mode === "official" ? api.officialPlayerUrl?.(source)
+      : mode === "oembed" ? api.oembedFallbackUrl?.(source) : null;
+    if (!target) return;
+    card.stopGatewayObserver?.();
+    card.stopGatewayObserver = null;
+    clearTimeout(card.tiktokFallbackTimer);
+    card.tiktokFallbackTimer = null;
+    const frame = document.createElement("iframe");
+    frame.className = "swipe-tiktok-gateway";
+    frame.title = mode === "official" ? "TikTok official player" : "TikTok cached oEmbed fallback";
+    frame.loading = "eager";
+    frame.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
+    frame.allowFullscreen = true;
+    frame.referrerPolicy = mode === "official" ? "strict-origin-when-cross-origin" : "no-referrer";
+    card.frame = frame;
+    card.ready = false;
+    card.playing = false;
+    card.controllable = false;
+    card.tiktokMode = mode;
+    card.el.classList.add("is-interactive", "is-tiktok-gateway");
+    card.host.replaceChildren(frame);
+    updateHint(card);
+    message(card, mode === "official" ? "Loading the official TikTok player…" : "Loading on-demand cached TikTok embed…");
+    card.stopGatewayObserver = mode === "official"
+      ? api.observeOfficialPlayer(frame, data => {
+          if (card.frame !== frame || !desired(card)) return;
+          if (data.state === "playing") {
+            card.ready = true;
+            card.playing = true;
+            clearTimeout(card.tiktokFallbackTimer);
+            scheduleCount(card);
+          } else if (data.state === "error") {
+            card.ready = false;
+            offerTikTokSwipeFallback(card, source);
+          } else if (data.state === "ready") card.ready = true;
+          message(card, data.state === "playing" ? "Playing with the official TikTok player."
+            : data.state === "ready" ? "Tap the official player to begin."
+            : "TikTok could not play the video. Other options remain available.");
+          refreshPlayback(card);
+        })
+      : api.observeGateway(frame, source, data => {
+          if (card.frame !== frame || !desired(card)) return;
+          if (data.state === "error") offerTikTokSwipeFallback(card, source);
+          message(card, data.message || "TikTok's cached embed may still be loading. Tap inside the frame.");
+        }, "oembed");
+    frame.addEventListener("error", () => {
+      if (card.frame !== frame) return;
+      message(card, "This player could not load. Try the other option.");
+      offerTikTokSwipeFallback(card, source);
+    }, { once: true });
+    frame.src = target;
+    card.tiktokFallbackTimer = setTimeout(() => {
+      card.tiktokFallbackTimer = null;
+      if (card.frame !== frame || !desired(card) || card.playing) return;
+      message(card, "Playback has not been confirmed. You can try the other player.");
+      offerTikTokSwipeFallback(card, source);
+    }, 14000);
   }
   async function prepareCard(card) {
     if (card.frame || card.loading || !opened) return;
@@ -125,6 +206,8 @@
         message(card, "This TikTok sharing URL is invalid or gateway playback is unavailable.");
         return;
       }
+      card.tiktokFallbackSource = source;
+      card.tiktokMode = "gateway";
       const iframe = document.createElement("iframe");
       iframe.className = "swipe-tiktok-gateway";
       iframe.title = card.video.title || "TikTok gateway player";
@@ -146,7 +229,14 @@
         if (data.state === "playing") {
           card.ready = true;
           if (desired(card)) scheduleCount(card);
-        } else if (data.state === "error") { card.ready = false; }
+        } else if (data.state === "error") {
+          card.ready = false;
+          offerTikTokSwipeFallback(card, source);
+        }
+        if (card.playing) {
+          clearTimeout(card.tiktokFallbackTimer);
+          card.tiktokFallbackTimer = null;
+        }
         if (!card.playing && desired(card)) clearTimeout(timer);
         refreshPlayback(card); updatePreparation();
       });
@@ -156,9 +246,19 @@
         updatePreparation();
       }, { once: true });
       iframe.addEventListener("error", () => {
-        if (card.frame === iframe) message(card, "The video gateway could not load. No automatic retry.");
+        if (card.frame !== iframe) return;
+        message(card, "The video gateway could not load. No automatic retry.");
+        offerTikTokSwipeFallback(card, source);
       }, { once: true });
       iframe.src = target;
+      if (!window.VidBestTikTok?.isReferenceVideo?.(source)) {
+        card.tiktokFallbackTimer = setTimeout(() => {
+          card.tiktokFallbackTimer = null;
+          if (card.frame !== iframe || !desired(card) || card.playing) return;
+          message(card, "The gateway has not confirmed playback. Choose another player below.");
+          offerTikTokSwipeFallback(card, source);
+        }, 14000);
+      }
       return;
     }
     if (isSaiyaara(card)) {
@@ -406,6 +506,10 @@
     if (button.hasAttribute("data-controls")) { toggleControls(card); return; }
     if (button.hasAttribute("data-original")) { setOriginalControls(card, !card.el.classList.contains("is-interactive")); return; }
     if (button.hasAttribute("data-skip")) { sendCommand(card, { type: "seek", seconds: card.seconds + Number(button.dataset.skip) }, true); return; }
+    if (button.hasAttribute("data-tiktok-fallback-mode")) {
+      switchTikTokSwipePlayer(card, button.dataset.tiktokFallbackMode);
+      return;
+    }
     if (button.hasAttribute("data-retry")) { destroyPlayer(card); void prepareCard(card); return; }
     if (button.hasAttribute("data-play")) {
       if (!card.controllable) { toggleControls(card); return; }
