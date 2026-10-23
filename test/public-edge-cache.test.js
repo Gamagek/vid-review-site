@@ -268,3 +268,46 @@ test("anonymous public mini-feed is cacheable but any cookie bypasses shared JSO
     }
   } finally { globalThis.caches = previous; }
 });
+
+
+test("bounded provider search survives a cold edge via R2 without another D1 query", async () => {
+  const previous = globalThis.caches;
+  globalThis.caches = { default: createCache() };
+  try {
+    const ctx = createContext(), env = { BUCKET: createR2() };
+    const request = new Request("https://vid.best/api/videos?q=tiktok&limit=18&offset=0");
+    const first = await cachedPublicResponse(request, env, ctx, publicVideos);
+    assert.equal(first.headers.get("X-VidBest-Edge-Cache"), "MISS");
+    await ctx.flush();
+    assert.equal(env.BUCKET.objects.size, 1);
+    globalThis.caches = { default: createCache() };
+    let calledD1 = false;
+    const replay = await cachedPublicResponse(request, env, ctx, () => {
+      calledD1 = true;
+      throw new Error("D1 daily read limit exceeded");
+    });
+    assert.equal(calledD1, false);
+    assert.equal(replay.headers.get("X-VidBest-Edge-Cache"), "R2-FRESH");
+    assert.equal(replay.headers.get("Cache-Control"), "no-store");
+    assert.equal((await replay.json()).videos[0].slug, "verified-review");
+    await ctx.flush();
+  } finally { globalThis.caches = previous; }
+});
+
+test("arbitrary, combined and oversized searches never create durable R2 snapshots", async () => {
+  const previous = globalThis.caches;
+  globalThis.caches = { default: createCache() };
+  try {
+    const ctx = createContext(), env = { BUCKET: createR2() };
+    for (const query of [
+      "q=private-person&limit=18", "q=tiktok&category=Music",
+      "q=tiktok&limit=48", "q=tiktok&offset=18", "q=TikTok&limit=18",
+    ]) {
+      const response = await cachedPublicResponse(
+        new Request("https://vid.best/api/videos?" + query), env, ctx, publicVideos);
+      assert.equal(response.status, 200);
+    }
+    await ctx.flush();
+    assert.equal(env.BUCKET.objects.size, 0);
+  } finally { globalThis.caches = previous; }
+});
