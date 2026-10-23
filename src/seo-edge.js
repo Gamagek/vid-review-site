@@ -3,7 +3,7 @@ import { signedLegacyV5Page } from "./legacy-v5-signer.js";
 import edgeWorker from "./edge.js";
 import { facebookPosterUrl } from "./facebook-posters.js";
 import { reviewIllustration, reviewSourcePreview } from "./review-illustrations.js";
-import { stableTikTokImage } from "./tiktok-image.js";
+import { stableTikTokImage, verifiedTikTokSourceImage, preservedTikTokReference } from "./tiktok-image.js";
 import { dailyWeeklyBestResponse, dailyWeeklyBestSitemap } from "./daily-weekly-best.js";
 
 const CANONICAL_ORIGIN = "https://vid.best";
@@ -439,7 +439,11 @@ async function imageSitemapIndex(env) {
 }
 
 function crawlableImageUrl(row) {
-  const thumbnail = publicThumbnail(row);
+  // Generic text-only fallback SVG is not a video frame. Publish only the
+  // verified, ID-matched first-party cover in the TikTok SOURCE image sitemap.
+  // The separate editorial sitemap continues to index all existing artworks.
+  const thumbnail = row.media_type === "tiktok" && !preservedTikTokReference(row.source_url)
+    ? verifiedTikTokSourceImage(row, CANONICAL_ORIGIN) : publicThumbnail(row);
   const candidate = reviewSourcePreview(row, thumbnail, CANONICAL_ORIGIN)?.url || thumbnail;
   try {
     const url = new URL(candidate);

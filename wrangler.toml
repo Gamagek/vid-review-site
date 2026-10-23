@@ -11,6 +11,10 @@ MAX_UPLOAD_BYTES = "104857600"
 MAX_AUTO_CACHE_BYTES = "104857600"
 TIKTOK_OEMBED_REFRESH_ON_PUBLISH = "1"
 TIKTOK_OEMBED_BACKFILL_BATCH = "3"
+# Opt-in only after confirming provider access terms. Public Open Graph
+# metadata fallback is one request/video/day maximum, after valid oEmbed
+# returns without an image. Never use proxies, CAPTCHAs or private APIs.
+TIKTOK_THUMBNAIL_HTML_FALLBACK = "0"
 TIKTOK_OEMBED_GATEWAY = "https://tiktok-oembed-gateway.gkasunc.workers.dev/"
 
 [assets]

@@ -70,7 +70,10 @@ export async function processTikTokThumbnailJobs(env, { limit = 3 } = {}) {
   const candidates = await env.DB.prepare(`SELECT v.id, c.video_id, c.thumbnail_url FROM videos v
     JOIN tiktok_oembed_cache c ON v.source_url LIKE '%/video/' || c.video_id || '%'
     WHERE v.media_type = 'tiktok' AND v.published = 1 AND c.thumbnail_url IS NOT NULL
-      AND c.video_id NOT IN ('7332342275151760642', '7669587518156705056')
+      AND c.video_id NOT IN (
+        '7603012203595320584', '7332342275151760642',
+        '7578945803910270230', '7669587518156705056'
+      )
       AND c.thumbnail_url NOT LIKE 'https://vid.best/media/uploads/tiktok-thumbnails/%'
     ORDER BY c.fetched_at DESC LIMIT 100`).all();
   const outcomes = [];

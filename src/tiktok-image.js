@@ -8,11 +8,51 @@ const FIRST_PARTY = "https://vid.best";
 const TIKTOK_ID = /\/video\/(\d{15,25})(?:[/?#]|$)/;
 const OWNED_IMAGE = /^\/(?:review-covers\/[a-z0-9_-]+\.(?:jpe?g|png|webp|avif)|media\/uploads\/tiktok-thumbnails\/\d{15,25}\.img)$/i;
 
+// Existing owner-approved exception players and thumbnail presentations.
+const REFERENCE_IDS = new Set([
+  "7603012203595320584", // Proposal
+  "7332342275151760642", // Summer Inverted
+  "7578945803910270230", // Top 5
+  "7669587518156705056", // Saiyaara
+]);
+
+export function preservedTikTokReference(value) {
+  const string = String(value || "");
+  const id = REFERENCE_IDS.has(string) ? string : string.match(TIKTOK_ID)?.[1];
+  return Boolean(id && REFERENCE_IDS.has(id));
+}
+
+// A cached-poster URL may return a synthetic SVG when R2 has no genuine cover.
+// For search engines, claim a TikTok SOURCE thumbnail only when D1 confirms
+// the stable, first-party copy of that exact TikTok ID. Zero R2 HEAD/D1 reads.
+export function verifiedTikTokSourceImage(row, origin = FIRST_PARTY) {
+  if (String(row?.media_type || row?.provider || "").toLowerCase() !== "tiktok") return "";
+  const id = String(row.source_url || "").match(TIKTOK_ID)?.[1];
+  if (!id || preservedTikTokReference(id)) return "";
+  try {
+    const saved = new URL(String(row.thumbnail_url || ""), origin);
+    const canonical = new URL("/media/uploads/tiktok-thumbnails/" + id + ".img", origin);
+    if (saved.href === canonical.href) return canonical.href;
+    // The owner may deliberately choose an original or editorial review cover.
+    // It remains the published video poster, not a claimed TikTok frame.
+    // Registered conceptual illustrations stay in their separate media fields.
+    const curatedCoverAllowed = row.primary_category !== "Funny & Comedy" &&
+      row.slug !== "saiyaara-a-cinematic-romance" &&
+      row.slug !== "summer-inverted-7332342275151760642";
+    if (curatedCoverAllowed && saved.origin === new URL(origin).origin &&
+        !saved.search && !saved.hash && !saved.username && !saved.password &&
+        /^\/review-covers\/[a-z0-9_-]+\.(?:jpe?g|png|webp|avif)$/i.test(saved.pathname)) return saved.href;
+    return "";
+  } catch { return ""; }
+}
+
 export function stableTikTokImage(row, origin = FIRST_PARTY) {
   const original = String(row?.thumbnail_url || "").trim();
   if (String(row?.media_type || row?.provider || "").toLowerCase() !== "tiktok") return original;
   const id = String(row?.source_url || "").match(TIKTOK_ID)?.[1];
   if (!id) return original;
+  const cachedSourceImage = verifiedTikTokSourceImage(row, origin);
+  if (cachedSourceImage) return cachedSourceImage;
   const ownedCoverAllowed = row?.primary_category !== "Funny & Comedy" &&
     row?.slug !== "saiyaara-a-cinematic-romance" &&
     row?.slug !== "summer-inverted-7332342275151760642";
