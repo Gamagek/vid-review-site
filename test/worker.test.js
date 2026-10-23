@@ -566,7 +566,11 @@ test("TikTok popup and swipe add only deliberate cached-oEmbed fallbacks with mu
   assert.match(player, /function mountGatewayPlayer\(dialog, share, token, mode = "official"\)/);
   assert.match(player, /function oembedFallbackUrl\(value\)/);
   assert.match(player, /REFERENCE_TIKTOK_IDS\.has\(share\.id\)/);
-  assert.match(player, /data-tiktok-dialog-oembed hidden/);
+  assert.match(player, /data-tiktok-dialog-alternate hidden/);
+  assert.match(player, /dialog\.dataset\.playerMode === "oembed" \? "official" : "oembed"/);
+  assert.doesNotMatch(player, /dialog\.dataset\.playerMode === "official" \? "gateway"/);
+  assert.match(swipe, /if \(!window\.VidBestTikTok\?\.isReferenceVideo\?\.\(source\)\)/);
+  assert.match(swipe, /switchTikTokSwipePlayer\(card, "official"\)/);
   assert.match(player, /selectedMode === "oembed" \? oembedFallbackUrl\(share\.url\)/);
   assert.match(swipe, /offerTikTokSwipeFallback\(card, source\)/);
   assert.match(swipe, /data-tiktok-fallback hidden/);
