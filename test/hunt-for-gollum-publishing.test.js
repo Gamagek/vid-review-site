@@ -15,7 +15,7 @@ test("single-film editorial payload keeps authentic identity, full review and ca
   assert.ok(payload.review_text.includes("Adrian Webster plays Aragorn"));
   assert.ok(payload.review_text.includes("Arithir is a separate supporting Ranger"));
   assert.ok(payload.review_text.includes("Adam Langston and Andrew Skrabutenas"));
-  assert.ok(payload.review_text.includes("not an official Warner Bros. feature"));
+  assert.match(payload.review_text, /not an official Warner Bros[.] feature/);
   assert.ok(payload.seo_description.length <= 180);
   assert.equal(payload.source_duration, "PT39M7S");
   assert.equal(payload.original_film_release_date, "2009-05-03");
