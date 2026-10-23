@@ -43,7 +43,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Test SQLite snapshot validation (no external calls)
-        run: python3 -m unittest discover -s test -p 'test_oracle_standalone_snapshot.py' -v
+        run: python3 -m unittest discover -s test -p 'test_oracle_*.py' -v
       - name: Python syntax
         run: python3 -m py_compile scripts/oracle-standalone-snapshot.py
 
