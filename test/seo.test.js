@@ -848,3 +848,14 @@ test("category pagination is crawlable, page-canonical, and preserves publicatio
   assert.equal(pageOneRedirect.status, 301);
   assert.equal(pageOneRedirect.headers.get("Location"), "https://vid.best/category/technology");
 });
+
+test("ads.txt uses quota-independent static asset routing and retains its authorized seller", () => {
+  const config = readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
+  const ads = readFileSync(new URL("../public/ads.txt", import.meta.url), "utf8");
+
+  // All existing application routes remain Worker-first; only the small, public
+  // root ads.txt file bypasses the Worker and cannot consume D1 or Worker quota.
+  assert.match(config, /^directory = "\.\/public"$/m);
+  assert.match(config, /^run_worker_first = \["\/\*", "!\/ads\.txt"\]$/m);
+  assert.equal(ads, "google.com, pub-4485257027995607, DIRECT, f08c47fec0942fa0\n");
+});
