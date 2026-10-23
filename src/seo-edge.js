@@ -624,6 +624,14 @@ async function enrichHomepageHtml(html, env) {
   return output;
 }
 
+export function needsSupplementalRelatedReviews(html) {
+  const markup = String(html || "");
+  // watchPage() already renders editorial related links. Do not issue a second
+  // category-wide D1 query for a duplicate list at the SEO enrichment layer.
+  return !/\bid=["']vidbest-related-reviews["']/i.test(markup) &&
+    !/<nav\b[^>]*\bclass=["'][^"']*\brelated-reviews\b[^"']*["']/i.test(markup);
+}
+
 async function enrichWatchHtml(html, env) {
   let output = String(html);
   const categoryRegex = /"item":"https:\/\/vid\.best\/\?category=([^"]+)"/g;
@@ -649,7 +657,7 @@ async function enrichWatchHtml(html, env) {
     output = output.replace("</head>", '<style id="vidbest-seo-breadcrumb-style">.vidbest-seo-breadcrumb{max-width:1200px;margin:12px auto 0;padding:0 24px;font-size:13px;opacity:.82}.vidbest-seo-breadcrumb a{text-decoration:none}.vidbest-seo-breadcrumb a:hover{text-decoration:underline}</style></head>');
   }
   const id = Number(output.match(/data-video-id="(\d+)"/)?.[1] || 0);
-  if (id && breadcrumbCategory && !output.includes('id="vidbest-related-reviews"')) {
+  if (id && breadcrumbCategory && needsSupplementalRelatedReviews(output)) {
     try {
       const related = await env.DB.prepare(
         `SELECT slug, title FROM videos WHERE published = 1 AND id != ?

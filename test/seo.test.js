@@ -649,7 +649,16 @@ test('source-associated review covers drive social images while preserving video
       assert.equal((sidebar.match(/<img /g) || []).length, 2);
     }
     assert.match(html, /<div class="watch-review-body">\s*<article class="watch-copy glass-panel">/);
-    assert.ok(html.indexOf('<!-- review-body -->') < html.indexOf('id="vidbest-related-reviews"'));
+    // Either the review itself supplies related links, or the SEO fallback does;
+    // never require two separate related-review blocks and extra D1 work.
+    const hasEditorialRelated = html.includes('class="related-reviews"');
+    const hasSeoFallbackRelated = html.includes('id="vidbest-related-reviews"');
+    assert.ok(hasEditorialRelated || hasSeoFallbackRelated, 'related review links are available');
+    if (hasEditorialRelated) {
+      assert.equal(hasSeoFallbackRelated, false, 'avoid duplicate related links and D1 lookup');
+    } else {
+      assert.ok(html.indexOf('<!-- review-body -->') < html.indexOf('id="vidbest-related-reviews"'));
+    }
     assert.match(html, /Owner listing remains unchanged/);
     assert.match(html, /Substantial original owner text/);
     const graph=JSON.parse(html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)[1])['@graph'];
