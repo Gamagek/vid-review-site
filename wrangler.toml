@@ -16,7 +16,10 @@ TIKTOK_OEMBED_GATEWAY = "https://tiktok-oembed-gateway.gkasunc.workers.dev/"
 [assets]
 directory = "./public"
 binding = "ASSETS"
-run_worker_first = true
+# Preserve Worker-first dynamic routes, but let /ads.txt reach globally cached
+# Static Assets without any Worker invocation or D1 dependency.
+# This is also available if the Worker daily request quota is exhausted.
+run_worker_first = ["/*", "!/ads.txt"]
 
 [triggers]
 crons = ["*/15 * * * *", "17 3 * * *"]
