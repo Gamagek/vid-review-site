@@ -3246,13 +3246,13 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <meta name="twitter:image" content="${escapeHtml(reviewImage)}">
   ${illustration ? `<meta name="twitter:image:alt" content="${escapeHtml(illustration.alt)}">` : ""}
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/styles.css?v=20261022-source-pairs-watermark1">
+  <link rel="stylesheet" href="/styles.css?v=20261024-cached-hover1">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
-  ${video.provider === "tiktok" ? '<script src="/tiktok-oembed-cache.js?v=20261018-replay" defer></script><script src="/tiktok-preview-service.js?v=20261022-official-first" defer></script>' : ""}
+  ${video.provider === "tiktok" ? '<script src="/tiktok-oembed-cache.js?v=20261018-replay" defer></script><script src="/tiktok-preview-service.js?v=20261024-fallback1" defer></script>' : ""}
   ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>' : ""}
   <script src="/watch.js?v=20261022-official-first" defer></script>
-  <link rel="stylesheet" href="/swipe-viewer.css?v=20261008-gateway1">
-  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-cache2" defer></script>
+  <link rel="stylesheet" href="/swipe-viewer.css?v=20261024-fallback1">
+  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261024-fallback1" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
   ${video.provider === "tiktok" ? '<!-- Standard TikTok player requests use the Cloudflare-signed Portainer gateway after a user action. -->' : ""}
 </head>
