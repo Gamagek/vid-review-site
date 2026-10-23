@@ -1322,6 +1322,27 @@ function parseTags(value, fallback = []) {
   return [...new Set(tags.map((tag) => cleanText(tag, 40)).filter(Boolean))].slice(0, 20);
 }
 
+// Preserve the four owner-selected reference TikTok player arrangements.
+const PRESERVED_TIKTOK_PLAYER_IDS = new Set([
+  "7603012203595320584", // Proposal: isolated cached-oEmbed embed
+  "7332342275151760642", // Summer Inverted
+  "7578945803910270230", // Top five most viewed TikToks
+  "7669587518156705056", // Saiyaara: direct Tagembed
+]);
+
+// Muted home hover previews can ONLY use a pre-existing, certified first-party
+// video object. Never download TikTok source bytes, scrape TikTok or start
+// a player to populate preview media. No additional D1 or R2 HEAD reads.
+function authorizedTikTokHoverClip(row, provider) {
+  if (provider !== "tiktok" || !row?.published || !Number(row.redistribution_certified)) return null;
+  const videoId = String(row.source_url || "").match(/\/video\/(\d{15,25})(?:[/?#]|$)/)?.[1];
+  if (!videoId || PRESERVED_TIKTOK_PLAYER_IDS.has(videoId)) return null;
+  const key = String(row.r2_key || "");
+  if (!key.startsWith("uploads/") || key.includes("..") || key.includes("\\") ||
+      !/\.(?:mp4|webm)$/i.test(key) || key.length > 500) return null;
+  return `/media/${encodeR2Key(key)}`;
+}
+
 async function serializeVideo(row, env) {
   if (!row) return null;
   const provider = detectMediaProvider(row);
@@ -1338,6 +1359,7 @@ async function serializeVideo(row, env) {
     thumbnail_url: provider === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url || instagramThumbnail || null,
     // Public cards get a stable preview hint, without rewriting editor data.
     preview_poster_url: provider === "tiktok" ? previewArtwork?.path || stableTikTokImage(row) : null,
+    cached_hover_preview_url: authorizedTikTokHoverClip(row, provider),
     review_artwork_url: artwork?.path || null,
     review_artwork_alt: artwork?.alt || null,
     review_preview_url: previewArtwork?.path || null,
