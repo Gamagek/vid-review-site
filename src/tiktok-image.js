@@ -67,8 +67,14 @@ export function stableTikTokImage(row, origin = FIRST_PARTY) {
   try {
     if (original && ownedCoverAllowed) {
       const image = new URL(original, origin);
+      // Never interpret a stored cover belonging to a different TikTok ID as
+      // the current video's image — including in sitemap queries that select
+      // only a subset of columns and omit primary_category.
+      const cachedVideoPath = image.pathname.startsWith("/media/uploads/tiktok-thumbnails/");
+      const matchesVideo = image.pathname === `/media/uploads/tiktok-thumbnails/${id}.img`;
       if (image.origin === origin && !image.search && !image.hash &&
-          !image.username && !image.password && OWNED_IMAGE.test(image.pathname)) {
+          !image.username && !image.password && OWNED_IMAGE.test(image.pathname) &&
+          (!cachedVideoPath || matchesVideo)) {
         return image.href;
       }
     }
