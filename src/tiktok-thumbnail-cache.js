@@ -1,4 +1,5 @@
 // Curated thumbnails only. No arbitrary image proxy and no dependency on Portainer.
+import { PRESERVED_TIKTOK_THUMBNAIL_IDS } from "./tiktok-image.js";
 export const thumbnailKey = id => `uploads/tiktok-thumbnails/${id}.img`;
 export const isCachedTikTokThumbnail = value => /^https:\/\/vid\.best\/media\/uploads\/tiktok-thumbnails\/\d{15,25}\.img$/.test(String(value || ''));
 const TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']);
@@ -24,7 +25,20 @@ function validImage(bytes, type) {
 export async function cacheTikTokThumbnail(env, row) {
   const id = String(row.video_id || '');
   const source = validThumbnailSource(row.thumbnail_url);
-  if (!/^\d{15,25}$/.test(id) || !source) throw new Error('Invalid TikTok thumbnail source');
+  // Never try to fetch a different creator's cover or change the four
+  // reference playback strategies. No TikTok video requests, only a validated
+  // publisher-supplied CDN thumbnail when it is already in metadata.
+  let sourceId = "";
+  try {
+    const link = new URL(String(row.source_url || ""));
+    if (link.protocol === "https:" && ["www.tiktok.com", "tiktok.com"].includes(link.hostname) &&
+        !link.port && !link.username && !link.password) {
+      sourceId = link.pathname.match(/^\/@[A-Za-z0-9_.]{1,32}\/video\/(\d{15,25})\/?$/)?.[1] || "";
+    }
+  } catch {}
+  if (!/^\d{15,25}$/.test(id) || sourceId !== id ||
+      PRESERVED_TIKTOK_THUMBNAIL_IDS.includes(id) || !source)
+    throw new Error('Invalid or excluded TikTok thumbnail source');
   const key = thumbnailKey(id);
   const existing = await env.BUCKET.head(key);
   if (!existing || !TYPES.has(existing.httpMetadata?.contentType)) {
@@ -67,16 +81,23 @@ export async function cacheTikTokThumbnail(env, row) {
 
 export async function processTikTokThumbnailJobs(env, { limit = 3 } = {}) {
   if (!env.DB || !env.BUCKET) return [];
-  const candidates = await env.DB.prepare(`SELECT v.id, c.video_id, c.thumbnail_url FROM videos v
+  const candidates = await env.DB.prepare(`SELECT v.id, v.source_url, c.video_id, c.thumbnail_url FROM videos v
     JOIN tiktok_oembed_cache c ON v.source_url LIKE '%/video/' || c.video_id || '%'
     WHERE v.media_type = 'tiktok' AND v.published = 1 AND c.thumbnail_url IS NOT NULL
-      AND c.video_id NOT IN ('7332342275151760642', '7669587518156705056')
+      AND c.video_id NOT IN ('7603012203595320584', '7332342275151760642',
+                            '7578945803910270230', '7669587518156705056')
       AND c.thumbnail_url NOT LIKE 'https://vid.best/media/uploads/tiktok-thumbnails/%'
     ORDER BY c.fetched_at DESC LIMIT 100`).all();
   const outcomes = [];
   for (const row of candidates.results || []) {
     if (outcomes.length >= Math.max(1, Math.min(4, Number(limit) || 3))) break;
-    if (!validThumbnailSource(row.thumbnail_url)) continue;
+    if (PRESERVED_TIKTOK_THUMBNAIL_IDS.includes(String(row.video_id || "")) ||
+        !validThumbnailSource(row.thumbnail_url)) continue;
+    // The old LIKE join is only an efficient candidate hint; this exact
+    // source-id check prevents linking a cover to a different video.
+    if (!String(row.source_url || "").match(
+      new RegExp("/video/" + row.video_id + "/?$")
+    )) continue;
     // Shared 24-hour retry lease: failed CDN requests cannot run every 15-minute cron.
     const lease = await env.DB.prepare(`INSERT INTO app_settings (setting_key, setting_value) VALUES (?, ?)
       ON CONFLICT(setting_key) DO UPDATE SET setting_value = excluded.setting_value

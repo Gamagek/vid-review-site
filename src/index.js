@@ -7,7 +7,7 @@ import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStat
 import { tikTokCacheCandidate } from "./admin-tiktok-cache.js";
 import { isCachedTikTokThumbnail, thumbnailKey } from "./tiktok-thumbnail-cache.js";
 import { facebookPosterUrl, readFacebookPoster, facebookPlaceholderResponse } from "./facebook-posters.js";
-import { stableTikTokImage } from "./tiktok-image.js";
+import { stableTikTokImage, crawlableTikTokSourceImage, isPreservedTikTokThumbnailReference } from "./tiktok-image.js";
 import { queueFacebookPreview, runFacebookPreviewJobs, attachFacebookPreviews, facebookPreviewStatus } from "./facebook-preview-jobs.js";
 import {
   requestMemberLogin,
@@ -4183,7 +4183,7 @@ async function videoSitemapResponse(request, env, page) {
   const base = getBaseUrl(request, env);
   const result = await env.DB.prepare(
     `SELECT v.id, v.slug, v.title, v.description, v.seo_description, v.thumbnail_url,
-            v.embed_url, v.source_url, v.media_type, v.created_at, v.updated_at,
+            v.primary_category, v.embed_url, v.source_url, v.media_type, v.created_at, v.updated_at,
             m.source_published_at, m.source_duration
      FROM videos v
      LEFT JOIN video_source_metadata m ON m.video_id = v.id
@@ -4210,9 +4210,23 @@ async function videoSitemapResponse(request, env, page) {
         : row.embed_url
           ? preparePlaybackEmbed(row.embed_url, base)
           : "";
+    const illustration = reviewIllustration(row);
+    // A video landing page and its illustration remain in the sitemap. For
+    // non-reference TikToks, only the original R2 image or an audited source
+    // still may be described as a source image; do not index a generic SVG as
+    // the video's actual captured frame.
+    let sourceImage = reviewSourcePreview(row, thumbnail, base)?.url || thumbnail;
+    if (provider === "tiktok" && !isPreservedTikTokThumbnailReference(row)) {
+      sourceImage = crawlableTikTokSourceImage(row, base);
+      if (!sourceImage && illustration?.sourceImage?.url) {
+        const audited = reviewSourcePreview(row, illustration.sourceImage.url, base)?.url || "";
+        sourceImage = audited.startsWith(base + "/review-source-images/") ? audited : "";
+      }
+    }
+    const videoThumbnail = provider === "tiktok" && sourceImage ? sourceImage : thumbnail;
     let videoEntry = "";
     // Unknown third-party URLs are landing pages, not video:content_loc.
-    if (thumbnail && (playerUrl || mediaFileUrl)) {
+    if (videoThumbnail && (playerUrl || mediaFileUrl)) {
       const location = playerUrl
         ? `<video:player_loc allow_embed="yes">${escapeXml(playerUrl)}</video:player_loc>`
         : `<video:content_loc>${escapeXml(mediaFileUrl)}</video:content_loc>`;
@@ -4220,10 +4234,9 @@ async function videoSitemapResponse(request, env, page) {
       const publicationValue = row.source_published_at || (provider === "r2" ? row.created_at : "");
       const publicationDate = publicationValue
         ? `<video:publication_date>${escapeXml(publicationValue)}</video:publication_date>` : "";
-      videoEntry = `<video:video><video:thumbnail_loc>${escapeXml(thumbnail)}</video:thumbnail_loc><video:title>${escapeXml(row.title)}</video:title><video:description>${escapeXml(description)}</video:description>${location}${publicationDate}${duration ? `<video:duration>${duration}</video:duration>` : ""}</video:video>`;
+      videoEntry = `<video:video><video:thumbnail_loc>${escapeXml(videoThumbnail)}</video:thumbnail_loc><video:title>${escapeXml(row.title)}</video:title><video:description>${escapeXml(description)}</video:description>${location}${publicationDate}${duration ? `<video:duration>${duration}</video:duration>` : ""}</video:video>`;
     }
-    const illustration = reviewIllustration(row);
-    const imageEntry = [...new Set([reviewSourcePreview(row, thumbnail, base)?.url || thumbnail,
+    const imageEntry = [...new Set([sourceImage,
       illustration ? `${base}${illustration.path}` : ""].filter(Boolean))]
       .map((image) => `<image:image><image:loc>${escapeXml(image)}</image:loc></image:image>`).join("");
     // Only emit valid, timezone-qualified W3C lastmod; do not guess a timezone for legacy timestamps.
