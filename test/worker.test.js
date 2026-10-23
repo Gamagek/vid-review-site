@@ -525,6 +525,67 @@ test("the requested proposal source opts into the cache player without content, 
   assert.deepEqual(c.sqlite.prepare("SELECT * FROM videos").all(), before);
 });
 
+test("licensed first-party TikTok hover previews exclude all four reference videos and do not mutate data", async t => {
+  const c = createTestContext(); t.after(() => c.sqlite.close());
+  const insert = c.sqlite.prepare(`
+    INSERT INTO videos (slug,title,source_url,media_type,primary_category,subcategory,
+                        description,published,r2_key,redistribution_certified)
+    VALUES (?, ?, ?, 'tiktok', 'Social Media & Trending', 'TikTok Viral Challenges',
+            'Review remains unchanged', 1, ?, ?)`);
+  const sources = [
+    ["permitted-owned-preview", "https://www.tiktok.com/@owner/video/7611111111111111111", 1],
+    ["not-certified", "https://www.tiktok.com/@other/video/7622222222222222222", 0],
+    ["proposal-exclusion", "https://www.tiktok.com/@sujicomedyedit_007/video/7603012203595320584", 1],
+    ["summer-exclusion", "https://www.tiktok.com/@looooooooch/video/7332342275151760642", 1],
+    ["top5-exclusion", "https://www.tiktok.com/@toop5_/video/7578945803910270230", 1],
+    ["saiyaara-exclusion", "https://www.tiktok.com/@saiyaara.4ever/video/7669587518156705056", 1],
+  ];
+  for (const [slug, url, licensed] of sources) {
+    insert.run(slug, slug, url, "uploads/tiktok-previews/owned-clip.mp4", licensed);
+  }
+  const before = c.sqlite.prepare("SELECT slug,source_url,r2_key,redistribution_certified,published FROM videos ORDER BY id").all();
+  const response = await send(c, "/api/videos?limit=18&sort=newest");
+  assert.equal(response.status, 200);
+  const { videos } = await response.json();
+  assert.equal(videos.length, sources.length);
+  const bySlug = new Map(videos.map(v => [v.slug, v]));
+  assert.equal(bySlug.get("permitted-owned-preview")?.cached_hover_preview_url,
+    "/media/uploads/tiktok-previews/owned-clip.mp4");
+  for (const [slug] of sources.slice(1)) {
+    assert.equal(bySlug.get(slug)?.cached_hover_preview_url, null, slug);
+  }
+  assert.deepEqual(c.sqlite.prepare("SELECT slug,source_url,r2_key,redistribution_certified,published FROM videos ORDER BY id").all(), before);
+});
+
+test("TikTok popup and swipe add only deliberate cached-oEmbed fallbacks with muted R2-only hover", () => {
+  const player = readFileSync(new URL("../public/tiktok-preview-service.js", import.meta.url), "utf8");
+  const swipe = readFileSync(new URL("../public/swipe-viewer.js", import.meta.url), "utf8");
+  const home = readFileSync(new URL("../public/home-player.js", import.meta.url), "utf8");
+  const app = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
+
+  assert.match(player, /function mountGatewayPlayer\(dialog, share, token, mode = "official"\)/);
+  assert.match(player, /function oembedFallbackUrl\(value\)/);
+  assert.match(player, /REFERENCE_TIKTOK_IDS\.has\(share\.id\)/);
+  assert.match(player, /data-tiktok-dialog-alternate hidden/);
+  assert.match(player, /dialog\.dataset\.playerMode === "oembed" \? "official" : "oembed"/);
+  assert.doesNotMatch(player, /dialog\.dataset\.playerMode === "official" \? "gateway"/);
+  assert.match(swipe, /if \(!window\.VidBestTikTok\?\.isReferenceVideo\?\.\(source\)\)/);
+  assert.match(swipe, /switchTikTokSwipePlayer\(card, "official"\)/);
+  assert.match(player, /selectedMode === "oembed" \? oembedFallbackUrl\(share\.url\)/);
+  assert.match(swipe, /offerTikTokSwipeFallback\(card, source\)/);
+  assert.match(swipe, /data-tiktok-fallback hidden/);
+  assert.match(swipe, /data-tiktok-fallback-mode="official"/);
+  assert.match(swipe, /data-tiktok-fallback-mode="oembed"/);
+  assert.match(swipe, /api\.isReferenceVideo\?\.\(source\)/);
+  assert.match(home, /MAX_CACHED_TIKTOK_HOVERS = 4/);
+  assert.match(home, /CACHED_TIKTOK_HOVER_SECONDS = 5/);
+  assert.match(home, /video\.preload = "none"/);
+  assert.match(home, /video\.muted = true/);
+  assert.match(home, /video\.src = source/);
+  assert.match(home, /\/media\/uploads\//);
+  assert.match(app, /card\.dataset\.tiktokHoverSrc = video\.cached_hover_preview_url \|\| ""/);
+});
+
 test("Facebook mini preview stays separate from the original-quality watch player", async () => {
   const context = createTestContext();
   context.sqlite.prepare(
@@ -2391,8 +2452,8 @@ test("canonical Saiyaara renders direct iframe URL but swipe remains metadata-on
   const html = await page.text();
   assert.match(html, /saiyaara-tagembed-player/);
   assert.ok(html.includes('data-saiyaara-player="1"'));
-  assert.ok(html.includes("/swipe-viewer.js?v=20261008-cache2"));
-  assert.ok(html.includes("/swipe-viewer.css?v=20261008-gateway1"));
+  assert.ok(html.includes("/swipe-viewer.js?v=20261024-fallback1"));
+  assert.ok(html.includes("/swipe-viewer.css?v=20261024-fallback1"));
   assert.ok(html.includes('class="saiyaara-tagembed-frame"'));
   assert.ok(html.includes('src="https://widget.tagembed.com/2236794?postId=5592899&amp;caption=1&amp;header=1"'));
   assert.ok(html.includes('allow="autoplay; fullscreen; picture-in-picture; encrypted-media"'));
