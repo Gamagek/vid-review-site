@@ -1,4 +1,5 @@
 import { cachedPublicResponse } from "./public-edge-cache.js";
+import { syncJuicerFeedCache } from "./juicer-feed-cache.js";
 import { signedLegacyV5Page } from "./legacy-v5-signer.js";
 import edgeWorker from "./edge.js";
 import { facebookPosterUrl } from "./facebook-posters.js";
@@ -803,5 +804,14 @@ export default {
     await response.body?.cancel();
     return new Response(null, { status: response.status, statusText: response.statusText, headers: response.headers });
   },
-  scheduled(...args) { return seoWorker.scheduled(...args); }
+  scheduled(event, env, ctx) {
+    // Dedicated 06:00 Asia/Colombo R2-only metadata snapshot, disabled unless
+    // JUICER_API_KEY was explicitly installed as a Cloudflare secret.
+    if (event?.cron === "30 0 * * *" && env.JUICER_API_KEY && ctx?.waitUntil) {
+      ctx.waitUntil(syncJuicerFeedCache(env).catch(error => {
+        console.warn("[juicer-cache] metadata refresh unavailable:", error.message);
+      }));
+    }
+    return seoWorker.scheduled(event, env, ctx);
+  }
 };

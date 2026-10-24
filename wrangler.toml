@@ -12,6 +12,7 @@ MAX_AUTO_CACHE_BYTES = "104857600"
 TIKTOK_OEMBED_REFRESH_ON_PUBLISH = "1"
 TIKTOK_OEMBED_BACKFILL_BATCH = "3"
 TIKTOK_OEMBED_GATEWAY = "https://tiktok-oembed-gateway.gkasunc.workers.dev/"
+JUICER_FEED_ID = "460118"
 
 [assets]
 directory = "./public"
@@ -19,7 +20,7 @@ binding = "ASSETS"
 run_worker_first = true
 
 [triggers]
-crons = ["*/15 * * * *", "17 3 * * *"]
+crons = ["*/15 * * * *", "17 3 * * *", "30 0 * * *"]
 
 [[d1_databases]]
 binding = "DB"
