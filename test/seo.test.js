@@ -896,3 +896,128 @@ test("Hunt for Gollum editorial page shows both original illustrations and sitem
   assert.ok(combinedXml.includes("https://vid.best/review-artwork/hunt-for-gollum-river-pursuit-v1.svg"));
   assert.ok(combinedXml.includes("https://vid.best/review-artwork/hunt-for-gollum-rangers-moonlit-path-v1.svg"));
 });
+
+
+test("Fantastic Beasts collection server-renders only published reviewed videos in playlist order", async () => {
+  const context = createContext();
+  const ids = ["Y9dr2zw-TXQ", "guPCBCXrCrs", "DaM_wL1ZOM4", "Dgvb78SQqLY", "yKN2PasVT3c"];
+  const insert = context.sqlite.prepare(`
+    INSERT INTO videos (slug,title,source_url,media_type,primary_category,subcategory,
+      description,published,created_at,thumbnail_url)
+    VALUES (?,?,?,'youtube','Entertainment, Movies & Games','Film Reviews',?,?,
+      '2026-10-24T18:21:29.779Z',?)`);
+  for (const [i,id] of [...ids].reverse().entries()) {
+    insert.run("playlist-" + id.toLowerCase().replace(/[^a-z0-9]+/g, "-"), i === 0 ? "A <script>alert(1)</script> & review" : "Review " + id,
+      "https://www.youtube.com/watch?v=" + id,
+      "Factual & independently reviewed <story>", 1,
+      i === 0 ? "javascript:alert(1)" : null);
+  }
+  insert.run("playlist-unpublished", "Unpublished draft",
+    "https://www.youtube.com/watch?v=" + ids[0], "Draft", 0, null);
+
+  const before = context.sqlite.prepare("SELECT id,slug,title,source_url,created_at,published,thumbnail_url FROM videos ORDER BY id").all();
+  const response = await request(context, "https://vid.best/playlist/fantastic-beasts-video-collection");
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("Content-Type"), /text\/html/);
+  assert.match(response.headers.get("X-Robots-Tag"), /index,follow/);
+  assert.match(response.headers.get("Content-Security-Policy"), /frame-src https:\/\/www\.youtube\.com https:\/\/www\.youtube-nocookie\.com/);
+  assert.doesNotMatch(response.headers.get("Content-Security-Policy"), /script-src[^;]*unsafe-inline/);
+
+  const html = await response.text();
+  assert.match(html, /<title>Fantastic Beasts Playlist &amp; Scene-by-Scene Reviews \| Vid\.Best<\/title>/);
+  assert.match(html, /rel="canonical" href="https:\/\/vid\.best\/playlist\/fantastic-beasts-video-collection"/);
+  assert.match(html, /class="playlist-review-card"/);
+  assert.match(html, /Published 24 Oct 2026/);
+  assert.doesNotMatch(html, /Unpublished draft|playlist-unpublished/);
+  assert.doesNotMatch(html, /src="javascript:/);
+  assert.ok(!html.includes("<iframe"), "initial HTML may not load a YouTube iframe");
+  assert.ok(!html.includes("autoplay=1"), "initial page must not trigger playlist playback");
+  assert.match(html, /script src="\/playlist-fantastic-beasts\.js" defer/);
+  assert.match(html, /Factual &amp; independently reviewed &lt;story&gt;/);
+  assert.match(html, /A &lt;script&gt;alert\(1\)&lt;\/script&gt; &amp; review/);
+  assert.ok(!html.includes('<script>alert(1)</script>'));
+  for (const id of ids) assert.ok(html.includes('href="https://vid.best/watch/playlist-' + id.toLowerCase().replace(/[^a-z0-9]+/g, "-") + '"'));
+  let last = -1;
+  for (const id of ids) {
+    const next = html.indexOf("/watch/playlist-" + id.toLowerCase().replace(/[^a-z0-9]+/g, "-"));
+    assert.ok(next > last, "playlist order must follow curated source IDs, not D1 row order");
+    last = next;
+  }
+  assert.deepEqual(context.sqlite.prepare("SELECT id,slug,title,source_url,created_at,published,thumbnail_url FROM videos ORDER BY id").all(),
+    before, "rendering must never update dates, metadata, published flags or images");
+
+  const payload = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
+  assert.ok(payload);
+  const graph = JSON.parse(payload)["@graph"];
+  const list = graph.find(node => node["@type"] === "ItemList");
+  assert.equal(list.numberOfItems, 5);
+  assert.deepEqual(list.itemListElement.map(item => item.position), [1,2,3,4,5]);
+  assert.equal(graph.find(node => node["@type"] === "BreadcrumbList").itemListElement.length, 2);
+  assert.ok(!graph.some(node => node["@type"] === "VideoObject"), "do not claim an invented composite video");
+});
+
+test("Fantastic Beasts playlist canonicalization, HEAD, sitemap and internal discovery links", async () => {
+  const context = createContext();
+  for (const path of [
+    "/playlist/fantastic-beasts-video-collection/",
+    "/playlist/fantastic-beasts-video-collection?utm_source=search",
+  ]) {
+    const response = await request(context, "https://vid.best" + path);
+    assert.equal(response.status, 301, path);
+    assert.equal(response.headers.get("Location"), "https://vid.best/playlist/fantastic-beasts-video-collection");
+  }
+  const head = await request(context, "https://vid.best/playlist/fantastic-beasts-video-collection", { method: "HEAD" });
+  assert.equal(head.status, 200);
+  assert.equal(await head.text(), "");
+  assert.match(head.headers.get("Content-Type"), /text\/html/);
+
+  const pages = await request(context, "https://vid.best/sitemaps/pages.xml");
+  const pagesXml = await pages.text();
+  assert.match(pagesXml, /https:\/\/vid\.best\/playlist\/fantastic-beasts-video-collection/);
+  const sitemap = await request(context, "https://vid.best/sitemap.xml");
+  assert.match(await sitemap.text(), /https:\/\/vid\.best\/sitemaps\/pages\.xml/);
+  const home = await request(context, "https://vid.best/");
+  assert.match(await home.text(), /Fantastic Beasts playlist/);
+});
+
+test("Fantastic Beasts reviews cross-link to the collection without changing their stored text or date", async () => {
+  const context = createContext();
+  const source = "https://www.youtube.com/watch?v=Y9dr2zw-TXQ";
+  const insert = context.sqlite.prepare(`
+    INSERT INTO videos (slug,title,source_url,media_type,primary_category,subcategory,
+      description,review_text,published,created_at)
+    VALUES ('fantastic-beasts-secrets-dumbledore-first-official-trailer-review',
+      'Trailer review',?,'youtube','Entertainment, Movies & Games','Movie Trailers',
+      'Source breakdown','Original untouched review',1,'2026-10-24T18:21:29.779Z')`);
+  insert.run(source);
+  const preserved = "SELECT id,slug,title,source_url,created_at,updated_at,description,review_text,seo_title,seo_description,seo_tags,thumbnail_url,published FROM videos WHERE source_url=?";
+  const rowBefore = context.sqlite.prepare(preserved).get(source);
+  const response = await request(context, "https://vid.best/watch/fantastic-beasts-secrets-dumbledore-first-official-trailer-review");
+  assert.equal(response.status, 200);
+  assert.match(await response.text(), /id="vidbest-playlist-backlink"[\s\S]*?playlist\/fantastic-beasts-video-collection/);
+  // The pre-existing watch page is allowed to count views; its editorial and
+  // publication fields must not be changed by adding a playlist backlink.
+  assert.deepEqual(context.sqlite.prepare(preserved).get(source), rowBefore);
+});
+
+test("playlist fails closed on D1 outage and does not publish an indexable empty collection", async () => {
+  const context = createContext({ DB: { prepare() { throw new Error("D1 not available"); } } });
+  const response = await request(context, "https://vid.best/playlist/fantastic-beasts-video-collection");
+  assert.equal(response.status, 503);
+  assert.match(response.headers.get("X-Robots-Tag"), /noindex/);
+  assert.equal(response.headers.get("Retry-After"), "60");
+  assert.doesNotMatch(await response.text(), /playlist-review-card/);
+});
+
+test("playlist player is user-triggered and new styles/scripts do not ship inline executable HTML", () => {
+  const script = readFileSync(new URL("../public/playlist-fantastic-beasts.js", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../public/playlist-fantastic-beasts.css", import.meta.url), "utf8");
+  assert.match(script, /button\.addEventListener\("click"/);
+  assert.match(script, /document\.createElement\("iframe"\)/);
+  assert.match(script, /listType=playlist&list=PLfDrdp3ebgGt_Ew5TiazwOx4U-VBZv10S/);
+  assert.match(script, /shell\.replaceChildren\(iframe\)/);
+  assert.doesNotMatch(script, /\bfetch\s*\(|\bXMLHttpRequest\b|navigator\.sendBeacon\s*\(/);
+  assert.match(css, /aspect-ratio: 16 \/ 9/);
+  assert.match(css, /min-height: 200px/);
+  assert.match(css, /@media \(max-width: 720px\)/);
+});
