@@ -5,6 +5,7 @@ import { facebookPosterUrl } from "./facebook-posters.js";
 import { reviewIllustration, reviewSourcePreview } from "./review-illustrations.js";
 import { stableTikTokImage } from "./tiktok-image.js";
 import { dailyWeeklyBestResponse, dailyWeeklyBestSitemap } from "./daily-weekly-best.js";
+import { FANTASTIC_BEASTS_ROUTE, FANTASTIC_BEASTS_REVIEW_SLUGS, handleFantasticBeastsPlaylist } from "./playlist-fantastic-beasts.js";
 
 const CANONICAL_ORIGIN = "https://vid.best";
 const LEGACY_HOSTS = new Set(["home.vid.best", "www.vid.best"]);
@@ -566,7 +567,7 @@ async function videoIndexPage(request, env) {
 }
 
 async function pagesSitemap() {
-  const body = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${escapeXml(CANONICAL_ORIGIN + "/")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/videos")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/privacy")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/terms")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/about")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/editorial")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/contact")}</loc></url></urlset>`;
+  const body = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${escapeXml(CANONICAL_ORIGIN + "/")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/videos")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + FANTASTIC_BEASTS_ROUTE)}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/privacy")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/terms")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/about")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/editorial")}</loc></url><url><loc>${escapeXml(CANONICAL_ORIGIN + "/contact")}</loc></url></urlset>`;
   return new Response(body, {
     headers: standardHeaders("application/xml; charset=utf-8", "public, max-age=900")
   });
@@ -597,7 +598,7 @@ async function enrichHomepageHtml(html, env) {
   if (!output.includes("vidbest-seo-topic-nav")) {
     const nav = `<nav id="vidbest-seo-topic-nav" class="vidbest-seo-topic-nav" aria-label="Explore video review categories">
       <strong>Explore video reviews by topic:</strong>
-      <span>${homepageTopicLinks(categories)}${categories.length ? " · " : ""}<a href="${CANONICAL_ORIGIN}/videos">Browse all videos</a></span>
+      <span>${homepageTopicLinks(categories)}${categories.length ? " · " : ""}<a href="${CANONICAL_ORIGIN}/videos">Browse all videos</a> · <a href="${CANONICAL_ORIGIN + FANTASTIC_BEASTS_ROUTE}">Fantastic Beasts playlist</a></span>
     </nav>`;
     output = output.replace("</footer>", `${nav}</footer>`);
   }
@@ -624,7 +625,7 @@ async function enrichHomepageHtml(html, env) {
   return output;
 }
 
-async function enrichWatchHtml(html, env) {
+async function enrichWatchHtml(html, env, pathname = "") {
   let output = String(html);
   const categoryRegex = /"item":"https:\/\/vid\.best\/\?category=([^"]+)"/g;
   output = output.replace(categoryRegex, (match, encodedCategory) => {
@@ -663,6 +664,16 @@ async function enrichWatchHtml(html, env) {
       // Optional recommendations must not hide the review when unavailable.
     }
   }
+  // Cross-link only the five already published, individually indexed reviews.
+  // No additional D1 query, no video/content/date change and no duplicate page.
+  const reviewSlug = pathname.startsWith("/watch/") ? pathname.slice("/watch/".length) : "";
+  if (FANTASTIC_BEASTS_REVIEW_SLUGS.includes(reviewSlug) &&
+      output.includes("</main>") && !output.includes('id="vidbest-playlist-backlink"')) {
+    output = output.replace("</main>",
+      '<nav id="vidbest-playlist-backlink" class="vidbest-seo-breadcrumb" aria-label="Related playlist"><a href="' +
+      CANONICAL_ORIGIN + FANTASTIC_BEASTS_ROUTE +
+      '">🪄 Watch the Fantastic Beasts playlist and browse related reviews</a></nav></main>');
+  }
   return output;
 }
 
@@ -696,7 +707,7 @@ async function passThroughHome(request, env, ctx) {
   }
 
   const rawHtml = await response.text();
-  const watchHtml = url.pathname.startsWith("/watch/") ? await enrichWatchHtml(rawHtml, env) : rawHtml;
+  const watchHtml = url.pathname.startsWith("/watch/") ? await enrichWatchHtml(rawHtml, env, url.pathname) : rawHtml;
   let html = url.pathname === "/" && response.ok ? await enrichHomepageHtml(watchHtml, env) : watchHtml;
   if (filteredHome) {
     html = html.replace(/<meta\s+name="robots"\s+content="[^"]*"\s*\/?\s*>/i,
@@ -729,12 +740,17 @@ const seoWorker = {
 
     if (["GET", "HEAD"].includes(request.method)) {
       const normalizedPath = url.pathname === "/index.html" ? "/"
-        : /^\/(?:videos|privacy|terms|about|editorial|contact|category\/[^/]+|watch\/[^/]+)\/$/.test(url.pathname)
+        : /^\/(?:videos|privacy|terms|about|editorial|contact|category\/[^/]+|watch\/[^/]+|playlist\/fantastic-beasts-video-collection)\/$/.test(url.pathname)
           ? url.pathname.slice(0, -1) : url.pathname;
       if (normalizedPath !== url.pathname) {
         url.pathname = normalizedPath;
         return Response.redirect(url.toString(), 301);
       }
+    }
+
+    // Dedicated, single-iframe YouTube playlist route; all video reviews stay individual.
+    if (url.pathname === FANTASTIC_BEASTS_ROUTE && ["GET", "HEAD"].includes(request.method)) {
+      return handleFantasticBeastsPlaylist(request, env);
     }
 
     if (url.pathname === "/watch-v5" && ["GET", "HEAD"].includes(request.method)) {
