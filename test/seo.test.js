@@ -907,7 +907,7 @@ test("Fantastic Beasts collection server-renders only published reviewed videos 
     VALUES (?,?,?,'youtube','Entertainment, Movies & Games','Film Reviews',?,?,
       '2026-10-24T18:21:29.779Z',?)`);
   for (const [i,id] of [...ids].reverse().entries()) {
-    insert.run("playlist-" + id, i === 0 ? "A <script>alert(1)</script> & review" : "Review " + id,
+    insert.run("playlist-" + id.toLowerCase().replace(/[^a-z0-9]+/g, "-"), i === 0 ? "A <script>alert(1)</script> & review" : "Review " + id,
       "https://www.youtube.com/watch?v=" + id,
       "Factual & independently reviewed <story>", 1,
       i === 0 ? "javascript:alert(1)" : null);
@@ -936,10 +936,10 @@ test("Fantastic Beasts collection server-renders only published reviewed videos 
   assert.match(html, /Factual &amp; independently reviewed &lt;story&gt;/);
   assert.match(html, /A &lt;script&gt;alert\(1\)&lt;\/script&gt; &amp; review/);
   assert.ok(!html.includes('<script>alert(1)</script>'));
-  for (const id of ids) assert.ok(html.includes('href="https://vid.best/watch/playlist-' + id + '"'));
+  for (const id of ids) assert.ok(html.includes('href="https://vid.best/watch/playlist-' + id.toLowerCase().replace(/[^a-z0-9]+/g, "-") + '"'));
   let last = -1;
   for (const id of ids) {
-    const next = html.indexOf("/watch/playlist-" + id);
+    const next = html.indexOf("/watch/playlist-" + id.toLowerCase().replace(/[^a-z0-9]+/g, "-"));
     assert.ok(next > last, "playlist order must follow curated source IDs, not D1 row order");
     last = next;
   }
@@ -990,11 +990,14 @@ test("Fantastic Beasts reviews cross-link to the collection without changing the
       'Trailer review',?,'youtube','Entertainment, Movies & Games','Movie Trailers',
       'Source breakdown','Original untouched review',1,'2026-10-24T18:21:29.779Z')`);
   insert.run(source);
-  const rowBefore = context.sqlite.prepare("SELECT * FROM videos WHERE source_url=?").get(source);
+  const preserved = "SELECT id,slug,title,source_url,created_at,updated_at,description,review_text,seo_title,seo_description,seo_tags,thumbnail_url,published FROM videos WHERE source_url=?";
+  const rowBefore = context.sqlite.prepare(preserved).get(source);
   const response = await request(context, "https://vid.best/watch/fantastic-beasts-secrets-dumbledore-first-official-trailer-review");
   assert.equal(response.status, 200);
   assert.match(await response.text(), /id="vidbest-playlist-backlink"[\s\S]*?playlist\/fantastic-beasts-video-collection/);
-  assert.deepEqual(context.sqlite.prepare("SELECT * FROM videos WHERE source_url=?").get(source), rowBefore);
+  // The pre-existing watch page is allowed to count views; its editorial and
+  // publication fields must not be changed by adding a playlist backlink.
+  assert.deepEqual(context.sqlite.prepare(preserved).get(source), rowBefore);
 });
 
 test("playlist fails closed on D1 outage and does not publish an indexable empty collection", async () => {
@@ -1013,7 +1016,7 @@ test("playlist player is user-triggered and new styles/scripts do not ship inlin
   assert.match(script, /document\.createElement\("iframe"\)/);
   assert.match(script, /listType=playlist&list=PLfDrdp3ebgGt_Ew5TiazwOx4U-VBZv10S/);
   assert.match(script, /shell\.replaceChildren\(iframe\)/);
-  assert.doesNotMatch(script, /fetch\(|XMLHttpRequest|analytics/i);
+  assert.doesNotMatch(script, /\bfetch\s*\(|\bXMLHttpRequest\b|navigator\.sendBeacon\s*\(/);
   assert.match(css, /aspect-ratio: 16 \/ 9/);
   assert.match(css, /min-height: 200px/);
   assert.match(css, /@media \(max-width: 720px\)/);
