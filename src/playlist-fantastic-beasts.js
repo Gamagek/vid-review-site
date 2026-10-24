@@ -19,6 +19,14 @@ export const FANTASTIC_BEASTS_REVIEW_IDS = Object.freeze([
   "yKN2PasVT3c",
 ]);
 const REVIEW_URLS = FANTASTIC_BEASTS_REVIEW_IDS.map(id => "https://www.youtube.com/watch?v=" + id);
+export const FANTASTIC_BEASTS_REVIEW_SLUGS = Object.freeze([
+  "fantastic-beasts-secrets-dumbledore-first-official-trailer-review",
+  "grindelwald-vs-dumbledore-blood-pact-duel-scene-analysis",
+  "fantastic-beasts-secrets-dumbledore-second-official-trailer-review",
+  "fantastic-beasts-secrets-dumbledore-man-of-recaps-story-review",
+  "credence-vs-albus-dumbledore-fantastic-beasts-confrontation-review",
+]);
+
 
 const TITLE = "Fantastic Beasts Playlist & Scene-by-Scene Reviews | Vid.Best";
 const SUMMARY = "Watch a curated Fantastic Beasts YouTube playlist in one player, then explore original reviews of the trailers, Grindelwald's duel, Credence's confrontation and a film recap.";
