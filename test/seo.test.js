@@ -936,7 +936,7 @@ test("Fantastic Beasts collection server-renders only published reviewed videos 
   assert.match(html, /Factual &amp; independently reviewed &lt;story&gt;/);
   assert.match(html, /A &lt;script&gt;alert\(1\)&lt;\/script&gt; &amp; review/);
   assert.ok(!html.includes('<script>alert(1)</script>'));
-  for (const id of ids) assert.match(html, new RegExp("href=\\"https:\\/\\/vid\\.best\\/watch\\/playlist-" + id));
+  for (const id of ids) assert.ok(html.includes('href="https://vid.best/watch/playlist-' + id + '"'));
   let last = -1;
   for (const id of ids) {
     const next = html.indexOf("/watch/playlist-" + id);
