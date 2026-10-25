@@ -1953,5 +1953,28 @@
       "caption": "Original conceptual illustration of a riverbank pursuit; not a captured frame from the film.",
       "bytes": 8896
     }
+  },
+  {
+    "id": 292,
+    "slug": "tom-holland-reaction-style-laugh-challenge-089351",
+    "sourceUrl": "https://www.tiktok.com/@tom.laugh.react/video/7572238931136089351",
+    "expectedTitle": "Tom Holland Reaction-Style Laugh Challenge",
+    "path": "/review-illustrations/tom-holland-reaction-style-laugh-challenge-089351-anime-illustration-v1.webp",
+    "width": 400,
+    "height": 210,
+    "alt": "Conceptual anime reaction-montage art depicting a green tablet, family comedy and figure skating; not video footage",
+    "caption": "Conceptual review artwork. This is not a frame from the source TikTok video.",
+    "bytes": 11698,
+    "sha256": "11b18ee73b235a83e001dc98666fe8bbd8f19c4a442ed4d99b166d19b4b830fa",
+    "displayWatermark": "vid.best",
+    "companionImage": {
+      "path": "/review-illustrations/tom-holland-reaction-style-laugh-challenge-089351-editorial-reconstruction-v1.webp",
+      "width": 400,
+      "height": 210,
+      "alt": "Conceptual editorial reconstruction of laughter, a family scene, a green tablet and pair figure skating; not video footage",
+      "caption": "Conceptual editorial reconstruction. This is not a frame from the source TikTok video.",
+      "bytes": 9566,
+      "sha256": "94958b184459c4ca26d6987f6c66909ca1fd70e553481f3d528b4745b3f6e953"
+    }
   }
 ]
