@@ -3,6 +3,7 @@ import { parseInstagramUrl } from "../public/instagram-utils.js";
 import { reviewIllustration, reviewSourcePreview, reviewPreviewIllustration, tikTokReviewPreviewIllustration, reviewIllustrationRedirect } from "./review-illustrations.js";
 import { isLikelyCrawler } from "./crawlers.js";
 import { tikTokZeroRequestPlayer } from "./tiktok-zero-request-cache.js";
+import { juicerCachedMetadata, juicerCacheStatus, juicerCacheSyncEndpoint } from "./juicer-feed-cache.js";
 import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStatus } from "./tiktok-cache-jobs.js";
 import { tikTokCacheCandidate } from "./admin-tiktok-cache.js";
 import { isCachedTikTokThumbnail, thumbnailKey } from "./tiktok-thumbnail-cache.js";
@@ -228,6 +229,9 @@ async function route(request, env, ctx) {
     return tikTokEmbedModel(request, env);
   }
   if (path === "/api/tiktok/oembed-player" && ["GET", "HEAD"].includes(request.method)) return tikTokZeroRequestPlayer(request);
+  // Metadata-only R2 cache. The official player remains hosted by TikTok.
+  const juicerVideo = path.match(/^\/api\/tiktok\/juicer-cache\/(\d{15,25})$/);
+  if (juicerVideo && request.method === "GET") return juicerCachedMetadata(request, env, juicerVideo[1]);
   if (path === "/api/tiktok/cached-previews" && request.method === "GET") {
     return tikTokCachedPreviewBatch(request, env);
   }
@@ -339,6 +343,15 @@ async function route(request, env, ctx) {
     const response = json({ success: true });
     response.headers.append("Set-Cookie", clearAdminSessionCookie());
     return response;
+  }
+
+  if (path === "/api/admin/juicer-cache/status" && request.method === "GET") {
+    await requireAdmin(request, env);
+    return juicerCacheStatus(env);
+  }
+  if (path === "/api/admin/juicer-cache/sync" && request.method === "POST") {
+    await requireAdmin(request, env);
+    return juicerCacheSyncEndpoint(request,env);
   }
 
   if (path === "/api/admin/videos" && request.method === "GET") {
