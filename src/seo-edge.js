@@ -3,7 +3,7 @@ import { signedLegacyV5Page } from "./legacy-v5-signer.js";
 import edgeWorker from "./edge.js";
 import { facebookPosterUrl } from "./facebook-posters.js";
 import { reviewIllustration, reviewSourcePreview } from "./review-illustrations.js";
-import { stableTikTokImage } from "./tiktok-image.js";
+import { stableTikTokImage, crawlableTikTokSourceImage, isPreservedTikTokThumbnailReference } from "./tiktok-image.js";
 import { dailyWeeklyBestResponse, dailyWeeklyBestSitemap } from "./daily-weekly-best.js";
 import { FANTASTIC_BEASTS_ROUTE, FANTASTIC_BEASTS_REVIEW_SLUGS, handleFantasticBeastsPlaylist } from "./playlist-fantastic-beasts.js";
 
@@ -440,7 +440,20 @@ async function imageSitemapIndex(env) {
 }
 
 function crawlableImageUrl(row) {
-  const thumbnail = publicThumbnail(row);
+  let thumbnail = publicThumbnail(row);
+  // The review artwork remains in its independent editorial sitemap. A TikTok
+  // source-image sitemap entry must be an actual stored/curated source image,
+  // not the generic SVG emitted by /api/tiktok/cached-poster on an R2 miss.
+  if (row.media_type === "tiktok" && !isPreservedTikTokThumbnailReference(row)) {
+    thumbnail = crawlableTikTokSourceImage(row, CANONICAL_ORIGIN);
+    if (!thumbnail) {
+      const captured = reviewIllustration(row)?.sourceImage;
+      const verifiedCopy = captured?.url
+        ? reviewSourcePreview(row, captured.url, CANONICAL_ORIGIN)?.url : "";
+      thumbnail = verifiedCopy?.startsWith(CANONICAL_ORIGIN + "/review-source-images/")
+        ? verifiedCopy : "";
+    }
+  }
   const candidate = reviewSourcePreview(row, thumbnail, CANONICAL_ORIGIN)?.url || thumbnail;
   try {
     const url = new URL(candidate);
