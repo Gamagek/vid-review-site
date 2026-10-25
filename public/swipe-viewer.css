@@ -21,6 +21,24 @@
 .swipe-player-actions { display:flex; gap:6px; flex-wrap:wrap; margin:0 0 9px; }
 .swipe-player-actions button { flex:1 0 auto; background:#101928; font-size:13px; min-height:44px; padding:7px 9px; }
 .swipe-player-actions [aria-expanded="true"] { border-color:#61dec4; background:#173d3c; color:#9bffe9; }
+/* Recovery controls remain hidden unless the existing gateway is actually
+   unresponsive or reports an error. The four references stay unchanged. */
+.swipe-tiktok-fallback-controls[hidden],
+.swipe-tiktok-fallback-controls button[hidden] { display: none !important; }
+.swipe-tiktok-fallback-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 10px;
+}
+.swipe-tiktok-fallback-controls button {
+  flex: 1 1 140px;
+  min-height: 44px;
+  font-size: 12px;
+  background: #16293c;
+  border: 1px solid #45838c;
+}
+
 .swipe-mini-controls { padding:10px; margin:0 0 10px; border:1px solid #ffffff26; border-radius:12px; background:#101928; }
 .swipe-timeline { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:2px 8px; font-size:12px; font-variant-numeric:tabular-nums; }
 .swipe-timeline [data-quality] { text-align:right; color:#9ec6ce; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }

@@ -1322,6 +1322,27 @@ function parseTags(value, fallback = []) {
   return [...new Set(tags.map((tag) => cleanText(tag, 40)).filter(Boolean))].slice(0, 20);
 }
 
+// Preserve the four owner-selected reference TikTok player arrangements.
+const PRESERVED_TIKTOK_PLAYER_IDS = new Set([
+  "7603012203595320584", // Proposal: isolated cached-oEmbed embed
+  "7332342275151760642", // Summer Inverted
+  "7578945803910270230", // Top five most viewed TikToks
+  "7669587518156705056", // Saiyaara: direct Tagembed
+]);
+
+// Muted home hover previews can ONLY use a pre-existing, certified first-party
+// video object. Never download TikTok source bytes, scrape TikTok or start
+// a player to populate preview media. No additional D1 or R2 HEAD reads.
+function authorizedTikTokHoverClip(row, provider) {
+  if (provider !== "tiktok" || !row?.published || !Number(row.redistribution_certified)) return null;
+  const videoId = String(row.source_url || "").match(/\/video\/(\d{15,25})(?:[/?#]|$)/)?.[1];
+  if (!videoId || PRESERVED_TIKTOK_PLAYER_IDS.has(videoId)) return null;
+  const key = String(row.r2_key || "");
+  if (!key.startsWith("uploads/") || key.includes("..") || key.includes("\\") ||
+      !/\.(?:mp4|webm)$/i.test(key) || key.length > 500) return null;
+  return `/media/${encodeR2Key(key)}`;
+}
+
 async function serializeVideo(row, env) {
   if (!row) return null;
   const provider = detectMediaProvider(row);
@@ -1338,6 +1359,7 @@ async function serializeVideo(row, env) {
     thumbnail_url: provider === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url || instagramThumbnail || null,
     // Public cards get a stable preview hint, without rewriting editor data.
     preview_poster_url: provider === "tiktok" ? previewArtwork?.path || stableTikTokImage(row) : null,
+    cached_hover_preview_url: authorizedTikTokHoverClip(row, provider),
     review_artwork_url: artwork?.path || null,
     review_artwork_alt: artwork?.alt || null,
     review_preview_url: previewArtwork?.path || null,
@@ -3224,13 +3246,13 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   <meta name="twitter:image" content="${escapeHtml(reviewImage)}">
   ${illustration ? `<meta name="twitter:image:alt" content="${escapeHtml(illustration.alt)}">` : ""}
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/styles.css?v=20261022-source-pairs-watermark1">
+  <link rel="stylesheet" href="/styles.css?v=20261024-cached-hover1">
   <script type="application/ld+json" nonce="${scriptNonce}">${jsonForHtml(schema)}</script>
-  ${video.provider === "tiktok" ? '<script src="/tiktok-oembed-cache.js?v=20261018-replay" defer></script><script src="/tiktok-preview-service.js?v=20261022-official-first" defer></script>' : ""}
+  ${video.provider === "tiktok" ? '<script src="/tiktok-oembed-cache.js?v=20261018-replay" defer></script><script src="/tiktok-preview-service.js?v=20261024-fallback1" defer></script>' : ""}
   ${saiyaaraWidget ? '<script src="/saiyaara-tagembed.js?v=20261008-4" defer></script>' : ""}
   <script src="/watch.js?v=20261022-official-first" defer></script>
-  <link rel="stylesheet" href="/swipe-viewer.css?v=20261008-gateway1">
-  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261008-cache2" defer></script>
+  <link rel="stylesheet" href="/swipe-viewer.css?v=20261024-fallback1">
+  <script src="/${viewer ? "swipe-player-bridge" : "swipe-viewer"}.js?v=20261024-fallback1" defer></script>
   ${video.provider === "instagram" ? '<link rel="stylesheet" href="/instagram-player.css"><script type="module" src="/instagram-player.js"></script>' : ""}
   ${video.provider === "tiktok" ? '<!-- Standard TikTok player requests use the Cloudflare-signed Portainer gateway after a user action. -->' : ""}
 </head>

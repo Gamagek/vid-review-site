@@ -411,6 +411,9 @@ function buildVideoCard(video) {
   card.dataset.reviewPreview = video.review_preview_url || "";
   card.dataset.reviewArtworkAlt = video.review_artwork_alt || "";
   card.dataset.tiktokPoster = video.preview_poster_url || "";
+  // Server supplies this only for existing, redistribution-certified R2 videos.
+  // No TikTok fetch or provider embed is involved in a mini tile preview.
+  card.dataset.tiktokHoverSrc = video.cached_hover_preview_url || "";
   card.dataset.videoEmbed = video.embed_url || "";
   card.dataset.videoThumbnail = video.thumbnail_url || "";
   card.dataset.facebookPreviewTitle = video.facebook_preview_title || "";
