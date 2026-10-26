@@ -627,6 +627,7 @@ function formatNumber(value) {
 function formatDate(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Date unavailable";
-  try { return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(date); }
+  // Match the stored UTC publication calendar date and server-rendered category cards.
+  try { return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(date); }
   catch (error) { return date.toISOString().slice(0, 10); }
 }

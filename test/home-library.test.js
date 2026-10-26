@@ -180,3 +180,20 @@ test("a lost response body is a connection failure and history errors do not rem
   const h = harness(); h.scope.history.replaceState = () => { throw new Error("Browser storage restriction"); };
   await h.scope.initialize(); assert.equal(h.state.videos.length, 2); assert.equal(h.get("#empty-state").hidden, true);
 });
+
+test("library publication dates use their original UTC calendar day", () => {
+  const h = harness();
+  let options;
+  h.scope.Intl = {
+    DateTimeFormat(locale, opts) {
+      options = opts;
+      return new Intl.DateTimeFormat("en-US", opts);
+    },
+  };
+  const createdAt = "2026-10-26T18:53:04.986Z";
+  const displayed = h.scope.formatDate(createdAt);
+  assert.equal(options.timeZone, "UTC");
+  assert.equal(displayed, "Oct 26, 2026");
+  assert.equal(createdAt, "2026-10-26T18:53:04.986Z");
+  assert.equal(h.scope.formatDate("invalid"), "Date unavailable");
+});
