@@ -639,7 +639,7 @@ test('source-associated review covers drive social images while preserving video
     if (art.displayWatermark === 'vid.best') {
       assert.match(html, /<span class="watch-review-watermark" aria-hidden="true">vid\.best<\/span>/);
     }
-    if (art.sourceImage) {
+    if (art.sourceImage && art.sourceImage.kind!=='video_frame') {
       const sidebar = html.match(/<aside class="watch-review-images"[\s\S]*?<\/aside>/)?.[0];
       assert.ok(sidebar, 'audited dual-image pages retain a separate source/artwork column');
       assert.ok(sidebar.indexOf('data-review-image="source"') < sidebar.indexOf('data-review-image="artwork"'));
@@ -679,7 +679,7 @@ test('source-associated review covers drive social images while preserving video
 test('unchanged first-party source copies pair with artwork in HTML and every matching image catalog', async (t) => {
   t.mock.method(globalThis,'fetch',async()=>{throw Error('No provider traffic');});
   const paired=JSON.parse(readFileSync(new URL('../src/review-illustrations.json',import.meta.url)))
-    .filter(item=>item.sourceImage?.path);
+    .filter(item=>item.sourceImage?.path && item.sourceImage.kind!=='video_frame');
   const context=createContext();
   for(const art of paired) {
     context.sqlite.prepare(`INSERT INTO videos

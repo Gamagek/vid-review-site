@@ -1,6 +1,7 @@
 import { analyzeYoutubeDraftWithGemini } from "./gemini-youtube-analysis.js";
 import { parseInstagramUrl } from "../public/instagram-utils.js";
 import { reviewIllustration, reviewSourcePreview, reviewPreviewIllustration, tikTokReviewPreviewIllustration, reviewIllustrationRedirect } from "./review-illustrations.js";
+import { reviewGrounding, relatedEditorialReviews } from "./review-grounding.js";
 import { isLikelyCrawler } from "./crawlers.js";
 import { tikTokZeroRequestPlayer } from "./tiktok-zero-request-cache.js";
 import { maybeQueueAdminTikTokCache, retryAdminTikTokCache, adminTikTokCacheStatus } from "./tiktok-cache-jobs.js";
@@ -3099,7 +3100,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
   const companionReviewImage = !sourceReviewImage && illustration?.companionImage
     ? `${baseUrl}${illustration.companionImage.path}` : "";
   const firstSidebarImage = sourceReviewImage || companionReviewImage;
-  const dualImageSchema = [512, 513].includes(Number(video.id)) && video.media_type !== "raw" && Boolean(sourceReviewImage && illustration);
+  const dualImageSchema = ([512, 513].includes(Number(video.id)) || sourceReviewPreview?.kind === 'video_frame') && video.media_type !== "raw" && Boolean(sourceReviewImage && illustration);
   // A Vid.Best review's creation date is not the original third-party video's
   // publication date. Google requires the *video* date when it is known.
   const uploadDate = video.source_published_at || (video.provider === "r2" ? video.created_at : "");
@@ -3184,7 +3185,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
         ...(sourceAttribution ? { isBasedOn: sourceAttribution } : {}),
         ...(reviewImage ? { image: dualImageSchema ? [
           { "@type": "ImageObject", contentUrl: sourceReviewImage,
-            caption: "Source/publisher preview image, not original Vid.Best artwork.",
+            caption: sourceReviewPreview.caption || "Source/publisher preview image, not original Vid.Best artwork.",
             width: sourceReviewPreview.width, height: sourceReviewPreview.height },
           { "@type": "ImageObject", contentUrl: reviewImage,
             caption: illustration.caption, width: illustration.width, height: illustration.height }
@@ -3274,6 +3275,8 @@ function renderWatchHtml(video, request, env, scriptNonce) {
         <p id="interest-status" class="form-status" role="status"></p>
       </div>
       ${video.review_text ? `<section class="review-copy"><h2>Review & discovery notes</h2>${Number(video.id) > 10 && video.media_type !== "raw" ? editorialReviewParagraphs(video.review_text, REVIEW_TEXT_MAX_LENGTH) : paragraphs(video.review_text, REVIEW_TEXT_MAX_LENGTH)}</section>` : ""}
+      ${reviewGrounding(video, illustration, escapeHtml)}
+      ${relatedEditorialReviews(video, illustration, escapeHtml)}
       ${video.transcript ? `<details class="transcript-panel"><summary>Read transcript</summary><div>${paragraphs(video.transcript)}</div></details>` : ""}
       <p class="review-source-note">Vid.Best provides commentary on external media, not a claim of original video authorship. <a href="/editorial">How our reviews work</a>.</p>
       ${video.relatedEditorialReviews?.length ? `<nav class="related-reviews" aria-label="Related video reviews">
@@ -3286,9 +3289,9 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     ${firstSidebarImage ? `<aside class="watch-review-images" aria-label="${sourceReviewImage ? "Source preview and conceptual review artwork" : "Two conceptual review illustrations"}">
       <figure class="watch-review-art glass-panel" data-review-image="${sourceReviewImage ? "source" : "conceptual"}" aria-label="${sourceReviewImage ? "Source preview image" : "Conceptual companion illustration"}">
         <a href="${escapeHtml(firstSidebarImage)}" target="_blank" rel="noopener noreferrer" aria-label="${sourceReviewImage ? "View source preview image" : "View conceptual review artwork"}">
-          <img src="${escapeHtml(firstSidebarImage)}" alt="${escapeHtml(sourceReviewImage ? `${video.title} — publisher preview image` : (illustration?.companionImage?.alt || `${video.title} — imagined review scene`))}" width="${sourceReviewImage ? sourceReviewPreview.width : illustration.companionImage.width}" height="${sourceReviewImage ? sourceReviewPreview.height : illustration.companionImage.height}" loading="lazy" decoding="async">
+          <img src="${escapeHtml(firstSidebarImage)}" alt="${escapeHtml(sourceReviewImage ? (sourceReviewPreview.alt || `${video.title} — publisher preview image`) : (illustration?.companionImage?.alt || `${video.title} — imagined review scene`))}" width="${sourceReviewImage ? sourceReviewPreview.width : illustration.companionImage.width}" height="${sourceReviewImage ? sourceReviewPreview.height : illustration.companionImage.height}" loading="lazy" decoding="async">
         </a>
-        <figcaption>${escapeHtml(sourceReviewImage ? "Source/publisher preview image." : illustration.companionImage.caption)}</figcaption>
+        <figcaption>${escapeHtml(sourceReviewImage ? (sourceReviewPreview.caption || "Source/publisher preview image.") : illustration.companionImage.caption)}</figcaption>
       </figure>` : ""}
     ${reviewImage ? `<figure class="watch-review-art glass-panel"${firstSidebarImage ? ' data-review-image="artwork"' : ""} aria-label="Review image">
       <a${illustration ? ' class="watch-review-artwork-link"' : ""} href="${escapeHtml(reviewImage)}" target="_blank" rel="noopener noreferrer" aria-label="View review preview image">

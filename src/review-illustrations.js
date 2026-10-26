@@ -1,5 +1,6 @@
 import illustrations from "./review-illustrations.json" with { type: "json" };
 import { thumbnailKey } from "./tiktok-thumbnail-cache.js";
+import { capturedReviewFrame } from "./review-captured-frame.js";
 
 // Separate editorial artwork; never substitute these for a source video poster.
 // Owner source/title/slug changes disable a stale association without touching D1.
@@ -35,7 +36,15 @@ export function reviewIllustration(row) {
 // A later owner poster edit immediately wins; never repoint VideoObject or D1.
 export function reviewSourcePreview(row, sourceUrl, origin) {
   const image = reviewIllustration(row)?.sourceImage;
-  if (!image || !sourceUrl) return null;
+  if (!image) return null;
+  if (image.kind === 'video_frame') {
+    const captured=capturedReviewFrame(row,image,sourceUrl,origin);
+    if(captured)return captured;
+    // A later owner poster wins while an outdated frame stays hidden.
+    try{const current=new URL(sourceUrl);return current.protocol==='https:'&&!current.username&&!current.password
+      ?{url:current.href,width:640,height:360}:null;}catch{return null;}
+  }
+  if (!sourceUrl) return null;
   try {
     const source = new URL(sourceUrl);
     if (source.protocol !== 'https:' || source.username || source.password) return null;

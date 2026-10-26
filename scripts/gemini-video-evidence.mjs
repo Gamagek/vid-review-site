@@ -1,55 +1,59 @@
 #!/usr/bin/env node
-// Analyze an explicitly supplied public YouTube video using Gemini; never publish.
+// Manual Gemini-only audiovisual editorial packages. No production writes or scheduler.
 import { parseArgs } from 'node:util';
-import { mkdirSync, writeFileSync } from 'node:fs';
-const {values}=parseArgs({options:{url:{type:'string'},'video-id':{type:'string'},model:{type:'string',default:'gemini-3.8-flash'},out:{type:'string',default:'gemini-evidence.json'}}});
-const raw=values.url||'',u=new URL(raw);
-const host=u.hostname.toLowerCase();
-if(!['youtube.com','www.youtube.com','m.youtube.com','youtu.be'].includes(host))throw Error('Public YouTube URL required');
-const id=host==='youtu.be'?u.pathname.slice(1):u.pathname.startsWith('/shorts/')?u.pathname.split('/')[2]:u.pathname==='/watch'?u.searchParams.get('v'):null;
-if(!/^[\w-]{11}$/.test(id||''))throw Error('Invalid YouTube video ID');
-if(!/^gemini-[\w.-]+$/.test(values.model))throw Error('Invalid Gemini model');
-if(!process.env.GEMINI_API_KEY)throw Error('Missing GEMINI_API_KEY secret');
-const source='https://www.youtube.com/watch?v='+id;
-const prompt='Analyze the actual video, including observable scenes, on-screen text and clearly audible speech. Return JSON only: {accessible:boolean,observed_scenes:[{timestamp:string,description:string}],audio_summary:string,uncertainties:[string],editorial_outline:[{heading:string,notes:string}],suggested_title:string,suggested_description:string,seo_title:string,seo_description:string,seo_tags:[string]}. If video unavailable, accessible=false and do not invent details. Be precise; no fabricated quotes, scene descriptions or claims of human viewing. Distinguish effects and editing from real-world events. Editorial outline should have 3–6 substantive sections only if evidence supports them.';
-const apiRoot='https://generativelanguage.googleapis.com/v1beta/models';
-const headers={'Content-Type':'application/json','x-goog-api-key':process.env.GEMINI_API_KEY};
-const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-async function availableModels(){
-  const r=await fetch(apiRoot+'?pageSize=100',{headers:{'x-goog-api-key':process.env.GEMINI_API_KEY},signal:AbortSignal.timeout(20000)});
-  if(!r.ok)throw Error('Gemini models.list HTTP '+r.status);
-  const data=await r.json();
-  return (data.models||[]).filter(m=>m.supportedGenerationMethods?.includes('generateContent')).map(m=>m.name.replace(/^models\\//,''));
-}
-const candidates=[...new Set([values.model,...(process.env.GEMINI_FALLBACK_MODELS||'').split(',').map(x=>x.trim()).filter(Boolean)])];
-const supported=await availableModels();
-const choices=candidates.filter(m=>supported.includes(m));
-console.log('Available generateContent models:',supported.join(', '));
-if(!choices.length)throw Error('None of the requested models are available. Choose one of the listed models in the workflow input.');
-let response,selected;
-for(const model of choices){
-  for(let attempt=0;attempt<3;attempt++){
-    response=await fetch(apiRoot+'/'+encodeURIComponent(model)+':generateContent',{method:'POST',headers,body:JSON.stringify({contents:[{parts:[{file_data:{file_uri:source}},{text:prompt}]}],generationConfig:{temperature:0.2,responseMimeType:'application/json',maxOutputTokens:4500}}),signal:AbortSignal.timeout(120000)});
-    selected=model;
-    if(response.ok)break;
-    if(![429,500,502,503,504].includes(response.status))break;
-    if(attempt<2)await wait([3000,9000][attempt]);
-  }
-  if(response.ok)break;
-  if(![429,500,502,503,504].includes(response.status))break;
-}
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { editorialQueue, editorialSource, sourceIdentity, sha256, baseline } from './editorial/core.mjs';
+import { exportCatalog } from './editorial/catalog.mjs';
+import { GeminiClient } from './editorial/gemini.mjs';
+import { analyzeRecord, existingPackages, writeSummary } from './editorial/pipeline.mjs';
 
-if(!response.ok){
-  const body=(await response.text()).slice(0,1800).replace(/AIza[\\w-]+/g,'[REDACTED_API_KEY]');
-  throw Error('Gemini API HTTP '+response.status+': '+body+' (no draft written)');
+const {values}=parseArgs({options:{catalog:{type:'string'},url:{type:'string'},'video-id':{type:'string'},
+  model:{type:'string',default:'gemini-3.8-flash'},limit:{type:'string',default:'1'},
+  'output-dir':{type:'string',default:'editorial-output'},'local-file':{type:'string'},'plan-only':{type:'boolean'},out:{type:'string'}}});
+if (!/^[1-5]$/.test(values.limit)) throw Error('--limit must be 1–5');
+if (values['video-id'] && !/^[1-9]\d*$/.test(values['video-id'])) throw Error('Invalid Vid.Best ID');
+const snapshot = values.catalog ? {rows:JSON.parse(await readFile(values.catalog,'utf8')),meta:{mode:'supplied_snapshot',request_count:0,rows_written:0}} : await exportCatalog();
+const rows = snapshot.rows;
+let id = values['video-id'] ? Number(values['video-id']) : undefined;
+if (values.url) {
+  const source=sourceIdentity(values.url);
+  const matches=rows.filter(r=>{try{return editorialSource(r).url===source.url;}catch{return false;}});
+  const selected=id===undefined?matches:matches.filter(r=>r.id===id);
+  if (selected.length !== 1) throw Error('URL must match exactly one catalog record; use its Vid.Best ID to disambiguate duplicate sources');
+  id=selected[0].id;
 }
-const payload=await response.json();
-const candidate=payload.candidates?.[0];
-if(candidate?.finishReason&&candidate.finishReason!=='STOP')throw Error('Incomplete Gemini output: '+candidate.finishReason);
-const txt=candidate?.content?.parts?.map(p=>p.text||'').join('')||'';
-const analysis=JSON.parse(txt);
-if(analysis.accessible!==true||!Array.isArray(analysis.observed_scenes)||analysis.observed_scenes.length===0)throw Error('Insufficient verified video evidence; no draft written');
-const output={video_id:values['video-id']||null,source_url:source,model:selected,generated_at:new Date().toISOString(),verified:false,requires_editorial_review:true,analysis};
-mkdirSync('editorial/gemini-evidence',{recursive:true});
-writeFileSync(values.out,JSON.stringify(output,null,2)+'\n',{flag:'w'});
-console.log('Evidence draft created; no D1 writes. Scenes:',analysis.observed_scenes.length);
+if(values['local-file'] && id===undefined)throw Error('A local media file requires an exact --video-id or catalog-matched --url');
+const out=resolve(values['output-dir']); await mkdir(out,{recursive:true});
+const previous=(await existingPackages(out)).filter(p=>rows.some(r=>r.id===p.baseline.id &&
+  ['source_url','title','slug','created_at','review_sha256','metadata_sha256'].every(k=>baseline(r)[k]===p.baseline[k])));
+const completed=previous.map(p=>p.baseline.id);
+const queue=editorialQueue(rows,{limit:Number(values.limit),id,completed});
+if(!queue.length)throw Error('No eligible unprocessed YouTube/TikTok reviews in this snapshot');
+if (values['plan-only']) {
+  await writeFile(out+'/queue.json',JSON.stringify({catalog:snapshot.meta,production_writes:0,queue:queue.map(r=>({id:r.id,title:r.title,
+    review_words:r.review_text.match(/[\p{L}\p{N}]+/gu)?.length||0,source:editorialSource(r).url,created_at:r.created_at,
+    download_authorized:r.analysis_download_authorized===true||Number(r.redistribution_certified)===1}))},null,2)+'\n');
+  console.log(`Planned ${queue.length} reviews, shortest first; no media/API generation or writes.`);
+} else {
+  const client=new GeminiClient();
+  const requested=[...new Set([values.model,...(process.env.GEMINI_FALLBACK_MODELS||'').split(',').map(s=>s.trim()).filter(Boolean)])];
+  const models=await client.models(requested);
+  const imageRequested=(process.env.GEMINI_IMAGE_MODEL||'').split(',').map(x=>x.trim()).filter(Boolean);
+  if(imageRequested.some(x=>!/^gemini-[\w.-]+$/.test(x)))throw Error('Invalid image model configuration');
+  const imageModels=(imageRequested.length?imageRequested:[...client.available].filter(n=>/image/.test(n)).sort((a,b)=>Number(/flash/.test(b))-Number(/flash/.test(a))||b.localeCompare(a))).filter(n=>client.available.has(n)).slice(0,2);
+  if(!imageModels.length)throw Error('No available image model; configure GEMINI_IMAGE_MODEL before media analysis');
+  const packages=[...previous],failures=[];
+  for(const row of queue){
+    try{
+      const p=await analyzeRecord(row,rows,{out,models,imageModels,client,localFile:values['local-file']});
+      packages.push(p); console.log(`ID ${row.id}: evidence, review and two images ready for editorial review; media deleted.`);
+    }catch(error){
+      failures.push({id:row.id,reason:String(error.message).replace(/https?:\/\/\S+/g,'[URL]').slice(0,350)});
+      console.log(`ID ${row.id}: blocked; no publication. See summary.`);
+    }
+  }
+  const summary=await writeSummary(out,packages,rows,failures,snapshot.meta);
+  if(values.out)await writeFile(values.out,JSON.stringify(summary,null,2)+'\n');
+  if(failures.length)process.exitCode=1;
+}
