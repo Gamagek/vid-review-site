@@ -3,6 +3,22 @@ import { copyFile, readFile, stat, writeFile } from 'node:fs/promises';
 import { join, resolve, sep } from 'node:path';
 import { sha256, editorialSource } from './core.mjs';
 
+export function mediaFailureReason(stderr) {
+  const checks=[
+    [/confirm.{0,60}not a bot|bot detection|verify.{0,30}human/i,'source_human_verification'],
+    [/HTTP Error 429|Too Many Requests/i,'source_rate_limited'],
+    [/HTTP Error (?:401|403)|login required|sign in|account required/i,'source_access_restricted'],
+    [/Requested format.{0,30}not available|No video formats found/i,'source_format_unavailable'],
+    [/Unsupported URL/i,'source_url_unsupported'],
+    [/No module named|command not found|not installed/i,'media_tool_missing'],
+    [/JavaScript runtime|challenge solving failed/i,'javascript_runtime_unavailable'],
+    [/Video unavailable|video is not available|private video|has been removed/i,'source_unavailable'],
+    [/Invalid data found|Invalid argument/i,'invalid_media_or_arguments'],
+    [/timed out|unable to download|urlopen|connection|unable to extract/i,'source_fetch_failed'],
+  ];
+  return checks.find(([pattern])=>pattern.test(stderr))?.[1]||'unclassified_media_error';
+}
+
 export function run(command, args, { timeout = 600000 } = {}) {
   return new Promise((resolvePromise, reject) => {
     const child = spawn(command, args, { stdio: ['ignore', 'pipe', 'pipe'], shell: false });
@@ -13,7 +29,7 @@ export function run(command, args, { timeout = 600000 } = {}) {
     child.stderr.on('data', b => { if (stderr.length < 20000) stderr += b; });
     child.on('close', code => { clearTimeout(timer); code === 0 ? resolvePromise(stdout) :
       // Downloader/FFmpeg output can contain signed URLs; never put it in logs/artifacts.
-      reject(Error(`${command} failed (exit ${code}); no media published`)); });
+      reject(Error(`${command} failed (${mediaFailureReason(stderr)}; exit ${code}); no media published`)); });
   });
 }
 
