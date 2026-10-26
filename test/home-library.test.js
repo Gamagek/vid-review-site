@@ -185,7 +185,7 @@ test("library publication dates use their original UTC calendar day", () => {
   const h = harness();
   let options;
   h.scope.Intl = {
-    DateTimeFormat(locale, opts) {
+    DateTimeFormat: function(locale, opts) {
       options = opts;
       return new Intl.DateTimeFormat("en-US", opts);
     },
