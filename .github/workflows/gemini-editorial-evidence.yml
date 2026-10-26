@@ -3,11 +3,11 @@ on:
   workflow_dispatch:
     inputs:
       youtube_url:
-        description: 'Public YouTube watch or Shorts URL'
-        required: true
+        description: 'Optional exact YouTube/TikTok URL; blank selects shortest reviews first'
+        required: false
         type: string
       vidbest_id:
-        description: 'Optional Vid.Best video ID (for tracking only)'
+        description: 'Optional exact Vid.Best video ID; must match the catalog source'
         required: false
         type: string
       model:
@@ -15,6 +15,20 @@ on:
         required: true
         default: 'gemini-3.8-flash'
         type: string
+      limit:
+        description: 'Maximum reviews in this manual run (1–5)'
+        required: true
+        default: '1'
+        type: choice
+        options: ['1', '2', '3', '4', '5']
+      catalog_path:
+        description: 'Optional repository JSON catalog path; blank performs one read-only D1 export'
+        required: false
+        type: string
+      plan_only:
+        description: 'Inspect queue without downloading media or calling Gemini'
+        default: true
+        type: boolean
 permissions:
   contents: read
 concurrency:
@@ -22,27 +36,62 @@ concurrency:
   cancel-in-progress: false
 jobs:
   evidence:
-    runs-on: ubuntu-latest
-    timeout-minutes: 8
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: '22'
       - name: Validate syntax
-        run: node --check scripts/gemini-video-evidence.mjs
-      - name: Analyze public YouTube video (draft only)
+        run: |
+          node --check scripts/gemini-video-evidence.mjs
+          node --test test/editorial-pipeline.test.js
+      - name: Install temporary media tools
+        if: ${{ !inputs.plan_only }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install --yes --no-install-recommends ffmpeg
+          python3 -m pip install 'yt-dlp[default]==2026.10.21'
+      - name: Prepare evidence-qualified editorial packages (draft only)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           INPUT_URL: ${{ inputs.youtube_url }}
           INPUT_ID: ${{ inputs.vidbest_id }}
           INPUT_MODEL: ${{ inputs.model }}
           GEMINI_FALLBACK_MODELS: ${{ vars.GEMINI_FALLBACK_MODELS }}
+          GEMINI_IMAGE_MODEL: ${{ vars.GEMINI_IMAGE_MODEL }}
+          VIDBEST_GEMINI_JOURNAL: ${{ runner.temp }}/vidbest-gemini-files.json
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          INPUT_LIMIT: ${{ inputs.limit }}
+          INPUT_CATALOG: ${{ inputs.catalog_path }}
+          INPUT_PLAN_ONLY: ${{ inputs.plan_only }}
         run: |
-          test -n "$GEMINI_API_KEY" || { echo 'Configure GEMINI_API_KEY repository secret'; exit 1; }
-          node scripts/gemini-video-evidence.mjs --url "$INPUT_URL" --video-id "$INPUT_ID" --model "$INPUT_MODEL" --out gemini-evidence.json
-      - uses: actions/upload-artifact@v4
+          set -euo pipefail
+          args=(--model "$INPUT_MODEL" --limit "$INPUT_LIMIT" --output-dir editorial-output)
+          if [[ -n "$INPUT_URL" ]]; then args+=(--url "$INPUT_URL"); fi
+          if [[ -n "$INPUT_ID" ]]; then args+=(--video-id "$INPUT_ID"); fi
+          if [[ -n "$INPUT_CATALOG" ]]; then
+            [[ "$INPUT_CATALOG" != /* && "$INPUT_CATALOG" != *..* && "$INPUT_CATALOG" == *.json ]] || { echo 'Use a repository JSON catalog path'; exit 1; }
+            args+=(--catalog "$INPUT_CATALOG")
+          fi
+          if [[ "$INPUT_PLAN_ONLY" == true ]]; then args+=(--plan-only); fi
+          node scripts/gemini-video-evidence.mjs "${args[@]}"
+      - name: Remove temporary media even after failure
+        if: always()
+        run: find "${TMPDIR:-/tmp}" -maxdepth 1 -type d -name 'vidbest-editorial-*' -exec rm -rf -- {} +
+      - name: Delete run-owned Gemini uploads after interruption
+        if: always()
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          VIDBEST_GEMINI_JOURNAL: ${{ runner.temp }}/vidbest-gemini-files.json
+        run: node scripts/cleanup-editorial-files.mjs
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: always()
         with:
           name: gemini-editorial-evidence
-          path: gemini-evidence.json
+          path: editorial-output/
+          include-hidden-files: false
+          if-no-files-found: warn
           retention-days: 7
