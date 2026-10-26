@@ -19,8 +19,9 @@ let id = values['video-id'] ? Number(values['video-id']) : undefined;
 if (values.url) {
   const source=sourceIdentity(values.url);
   const matches=rows.filter(r=>{try{return editorialSource(r).url===source.url;}catch{return false;}});
-  if (matches.length !== 1 || id !== undefined && matches[0].id !== id) throw Error('URL must match exactly one catalog record and the supplied Vid.Best ID');
-  id=matches[0].id;
+  const selected=id===undefined?matches:matches.filter(r=>r.id===id);
+  if (selected.length !== 1) throw Error('URL must match exactly one catalog record; use its Vid.Best ID to disambiguate duplicate sources');
+  id=selected[0].id;
 }
 if(values['local-file'] && id===undefined)throw Error('A local media file requires an exact --video-id or catalog-matched --url');
 const out=resolve(values['output-dir']); await mkdir(out,{recursive:true});

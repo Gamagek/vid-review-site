@@ -47,6 +47,17 @@ test('exact source identity rejects deceptive URLs and normalizes only known vid
   for(const u of ['https://youtube.com.evil.test/watch?v=abcdefghijk','http://youtu.be/abcdefghijk','https://user:pass@youtu.be/abcdefghijk','https://youtu.be/abc','https://www.tiktok.com/@creator'])assert.throws(()=>sourceIdentity(u));
 });
 
+test('an explicit Vid.Best ID disambiguates duplicate sources in the offline CLI plan',async()=>{
+  const work=await mkdtemp(join(tmpdir(),'av-cli-'));
+  try{
+    const catalog=join(work,'catalog.json'),out=join(work,'out');await writeFile(catalog,JSON.stringify([row(31),row(32)]));
+    const result=spawnSync(process.execPath,['scripts/gemini-video-evidence.mjs','--catalog',catalog,'--url','https://youtu.be/abcdefghijk','--video-id','32','--plan-only','--output-dir',out],
+      {cwd:new URL('../',import.meta.url),encoding:'utf8',timeout:5000});
+    assert.equal(result.status,0,result.stderr);const plan=JSON.parse(await readFile(join(out,'queue.json'),'utf8'));
+    assert.equal(plan.queue[0].id,32);assert.equal(plan.catalog.request_count,0);assert.equal(plan.production_writes,0);
+  }finally{await rm(work,{recursive:true,force:true});}
+});
+
 test('audio, silence, timestamp range and segment offsets must match actual media',()=>{
   assert.equal(validateObservations(raw,{...segment,start:600}).scenes[0].seconds,601);
   assert.throws(()=>validateObservations({...raw,audio_access:false},segment),/Audio/);
