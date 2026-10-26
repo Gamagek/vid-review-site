@@ -694,7 +694,33 @@ function mountFacebookIframeFallback(card, surface, embedUrl) {
   iframe.allowFullscreen = true;
   iframe.setAttribute("playsinline", "true");
 
-  surface.replaceChildren(iframe);
+  // An iframe load is asynchronous. Keep the cached poster and the tap
+  // affordance in place while Facebook is still building its remote player.
+  // The iframe is behind the poster and is only revealed after load.
+  const poster = surface.querySelector(".facebook-facade-poster");
+  const play = surface.querySelector(".facebook-facade-play");
+  if (poster && play) {
+    poster.hidden = false;
+    play.hidden = false;
+    iframe.style.opacity = "0";
+    surface.replaceChildren(iframe, poster, play);
+    iframe.addEventListener("load", () => {
+      if (previewState.activeCard !== card || !iframe.isConnected) return;
+      iframe.style.opacity = "1";
+      poster.hidden = true;
+      play.hidden = true;
+    }, { once: true });
+    iframe.addEventListener("error", () => {
+      // Do not let an unavailable Facebook embed replace the stable poster.
+      poster.hidden = false;
+      play.hidden = false;
+      iframe.style.opacity = "0";
+      const status = card.querySelector(".preview-status");
+      if (status) status.textContent = "Facebook preview unavailable · Open review";
+    }, { once: true });
+  } else {
+    surface.replaceChildren(iframe);
+  }
   surface.style.opacity = "1";
   card.classList.add("facebook-direct-player-ready");
   card.dataset.facebookPlayerMounted = "1";

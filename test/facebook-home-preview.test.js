@@ -68,8 +68,16 @@ test("Facebook poster appears immediately; a visible tile starts its muted offic
   h.scope.handleVisibility([{ target: h.card, isIntersecting: true, intersectionRatio: 0.9 }]);
   assert.equal(h.timers.size, 1);
   [...h.timers.values()][0]();
-  const iframe = h.surface.children[0], url = new URL(iframe.src);
+  const poster = h.surface.children.find(node => node.className === "facebook-facade-poster");
+  const iframe = h.surface.children.find(node => node.className === "facebook-direct-player");
+  assert.equal(poster.hidden, false, "cached poster stays visible while iframe loads");
+  assert.equal(iframe.style.opacity, "0", "a blank loading iframe must not flash");
+  const url = new URL(iframe.src);
   assert.equal(url.hostname, "www.facebook.com");
+  iframe.isConnected = true;
+  iframe.listeners.get("load")();
+  assert.equal(iframe.style.opacity, "1");
+  assert.equal(poster.hidden, true, "reveal video after iframe loads");
   assert.equal(url.searchParams.get("autoplay"), "true");
   assert.equal(url.searchParams.get("muted"), "true");
   assert.equal(url.searchParams.get("href"), "https://www.facebook.com/reel/123");
@@ -244,4 +252,11 @@ test("explicit sound cancels automatic rotation; hiding the page cancels the que
   assert.equal(h.scope.testState.activeCard, null);
   assert.equal(h.scope.testState.facebookRotationTimer, null);
   assert.equal(h.scope.testState.soundCard, null);
+});
+
+test("Facebook only uses a 16:9 poster and hides the broken loading strip", () => {
+  const css = readFileSync(new URL("../public/home-player.css", import.meta.url), "utf8");
+  assert.match(css, /data-video-provider="facebook"\] \.tile-media\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9;/);
+  assert.match(css, /data-video-provider="facebook"\] \.facebook-facade-poster\s*\{[^}]*object-fit:\s*cover;/);
+  assert.match(css, /data-video-provider="facebook"\] \.preview-status\s*\{[^}]*clip-path:\s*inset\(50%\)/);
 });
