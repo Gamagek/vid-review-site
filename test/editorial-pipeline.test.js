@@ -10,7 +10,7 @@ import {editorialQueue,sourceIdentity,editorialSource,validateObservations,valid
 import {GeminiClient,groundingSources} from '../scripts/editorial/gemini.mjs';
 import {exportCatalog} from '../scripts/editorial/catalog.mjs';
 import {analyzeRecord} from '../scripts/editorial/pipeline.mjs';
-import {acquire,segments,capture,run} from '../scripts/editorial/media.mjs';
+import {acquire,segments,capture,run,mediaFailureReason} from '../scripts/editorial/media.mjs';
 import {guardedSql,prepare} from '../scripts/prepare-editorial-package.mjs';
 import {capturedReviewFrame} from '../src/review-captured-frame.js';
 import {reviewGrounding} from '../src/review-grounding.js';
@@ -219,6 +219,13 @@ test('full package and source preparation preserve identities and reject an edit
 });
 
 const hasFfmpeg=spawnSync('ffmpeg',['-version'],{stdio:'ignore'}).status===0;
+test('media errors expose a safe failure category without source URLs, keys or private diagnostics',()=>{
+  const secret='https://example.invalid/video?token=private';
+  assert.equal(mediaFailureReason("ERROR Sign in to confirm you're not a bot "+secret),'source_human_verification');
+  assert.equal(mediaFailureReason('ERROR Requested format is not available '+secret),'source_format_unavailable');
+  assert.equal(mediaFailureReason('No module named yt_dlp '+secret),'media_tool_missing');
+  assert.equal(mediaFailureReason(secret),'unclassified_media_error');
+});
 test('real FFmpeg retains video, audio and timeline; captures a real JPEG and denies uncertified copies',{skip:!hasFfmpeg},async()=>{
   const work=await mkdtemp(join(tmpdir(),'av-ffmpeg-'));const input=join(work,'fixture.mp4');
   try{
