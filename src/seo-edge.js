@@ -340,11 +340,21 @@ function verifiedSitemapLastmod(value) {
 
 async function categorySitemap(env) {
   const stats = await categoryStats(env);
+  // Category pages beyond page 1 are indexable canonical pages with unique reviews.
+  // Advertise only existing pagination URLs; derive counts from categoryStats() so
+  // this does not add any D1 reads or crawl impossible/high-offset pages.
   const entries = stats
     .filter((row) => Number(row?.total || 0) >= MIN_INDEXABLE_CATEGORY_VIDEOS)
-    .map((row) =>
-      `<url><loc>${escapeXml(categoryUrl(row.primary_category))}</loc>${verifiedSitemapLastmod(row.lastmod)}</url>`
-    )
+    .flatMap((row) => {
+      const base = categoryUrl(row.primary_category);
+      const pageCount = Math.ceil(Number(row.total) / CATEGORY_PAGE_SIZE);
+      return Array.from({ length: pageCount }, (_, index) => {
+        const canonical = index === 0 ? base : `${base}?page=${index + 1}`;
+        // No page-specific edit timestamp is known for later pages.
+        const lastmod = index === 0 ? verifiedSitemapLastmod(row.lastmod) : "";
+        return `<url><loc>${escapeXml(canonical)}</loc>${lastmod}</url>`;
+      });
+    })
     .join("");
   const body = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries}</urlset>`;
   return new Response(body, {
