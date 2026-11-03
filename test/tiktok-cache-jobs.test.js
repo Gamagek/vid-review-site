@@ -129,18 +129,36 @@ test('cron leaves uncertified, protected and owner-direct-source jobs alone', as
   }
 });
 
+test('the four owner reference IDs are never downloaded by the thumbnail cron', async t => {
+  const { env, db } = fixture(t);
+  for (const ref of [
+    videoId, '7603012203595320584', '7332342275151760642',
+    '7669587518156705056'
+  ]) {
+    db.prepare("UPDATE videos SET source_url=? WHERE id=81").run('https://www.tiktok.com/@owner/video/' + ref);
+    db.prepare("DELETE FROM tiktok_oembed_cache").run();
+    db.prepare("INSERT INTO tiktok_oembed_cache VALUES (?, ?, ?)").run(ref,
+      'https://p16.tiktokcdn.com/cover.jpg', new Date().toISOString());
+    assert.deepEqual(await processTikTokThumbnailJobs(env), []);
+  }
+});
+
 test('thumbnail caching uses bounded validated images, retains titles separately, and reuses R2', async t => {
   const { env, db, objects } = fixture(t);
   const url = 'https://p16.tiktokcdn.com/cover.jpg';
-  db.prepare('INSERT INTO tiktok_oembed_cache VALUES (?, ?, ?)').run(videoId, url, new Date().toISOString());
+  // The owner's Top 5 reference (videoId above) is intentionally excluded.
+  // Exercise the ordinary TikTok thumbnail pipeline with a different ID.
+  const imageId = '7611111111111111111';
+  db.prepare('UPDATE videos SET source_url=? WHERE id=81').run('https://www.tiktok.com/@owner/video/' + imageId);
+  db.prepare('INSERT INTO tiktok_oembed_cache VALUES (?, ?, ?)').run(imageId, url, new Date().toISOString());
   const image = new Uint8Array([255,216,255,224,0,0]);
   let calls = 0;
   globalThis.fetch = async (_, options) => { calls++; assert.equal(options.redirect, 'manual');
     return new Response(image, { headers: { 'Content-Type': 'image/jpeg' } }); };
   assert.equal((await processTikTokThumbnailJobs(env))[0].status, 'complete');
-  assert.equal(objects.get(thumbnailKey(videoId)).size, image.length);
+  assert.equal(objects.get(thumbnailKey(imageId)).size, image.length);
   assert.match(db.prepare('SELECT thumbnail_url FROM videos').get().thumbnail_url, /vid\.best\/media\/uploads\/tiktok-thumbnails/);
-  await cacheTikTokThumbnail(env, { id: 81, video_id: videoId, thumbnail_url: url });
+  await cacheTikTokThumbnail(env, { id: 81, video_id: imageId, thumbnail_url: url });
   assert.equal(calls, 1);
   assert.deepEqual(await processTikTokThumbnailJobs(env), []);
 });
@@ -148,7 +166,9 @@ test('thumbnail caching uses bounded validated images, retains titles separately
 test('thumbnail errors keep original metadata and cooldown prevents repeated CDN requests', async t => {
   const { env, db, objects } = fixture(t);
   const url = 'https://p16.tiktokcdn.com/cover.jpg';
-  db.prepare('INSERT INTO tiktok_oembed_cache VALUES (?, ?, ?)').run(videoId, url, new Date().toISOString());
+  const imageId = '7611111111111111111';
+  db.prepare('UPDATE videos SET source_url=? WHERE id=81').run('https://www.tiktok.com/@owner/video/' + imageId);
+  db.prepare('INSERT INTO tiktok_oembed_cache VALUES (?, ?, ?)').run(imageId, url, new Date().toISOString());
   let calls = 0;
   globalThis.fetch = async () => { calls++; return new Response('<html>Access Denied</html>', { headers: { 'Content-Type': 'image/jpeg' } }); };
   assert.equal((await processTikTokThumbnailJobs(env))[0].status, 'failed');

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 import seoWorker from "../src/seo-edge.js";
-import { stableTikTokImage } from "../src/tiktok-image.js";
+import { stableTikTokImage, verifiedTikTokSourceImage } from "../src/tiktok-image.js";
 
 const migrations = [
   "0001_initial.sql",
@@ -422,8 +422,8 @@ test("a directory database failure returns retryable 503 instead of an empty ind
 test("video sitemap uses TikTok player locations and only verified video publication dates", async () => {
   const context = createContext();
   context.sqlite.prepare(`INSERT INTO videos
-    (slug,title,source_url,media_type,primary_category,subcategory,description,published)
-    VALUES ('tiktok-map','TikTok review','https://www.tiktok.com/@creator/video/1234567890123456789','tiktok','Technology','Web Development','Useful video',1)`).run();
+    (slug,title,source_url,media_type,primary_category,subcategory,description,thumbnail_url,published)
+    VALUES ('tiktok-map','TikTok review','https://www.tiktok.com/@creator/video/1234567890123456789','tiktok','Technology','Web Development','Useful video','https://vid.best/media/uploads/tiktok-thumbnails/1234567890123456789.img',1)`).run();
   let xml = await (await request(context, 'https://vid.best/sitemaps/videos-1.xml')).text();
   const entry = text => text.match(/<url><loc>https:\/\/vid.best\/watch\/tiktok-map<\/loc>[\s\S]*?<\/url>/)[0];
   assert.match(entry(xml), /<video:player_loc allow_embed="yes">https:\/\/www.tiktok.com\/player\/v1\/1234567890123456789/);
@@ -792,8 +792,11 @@ test("image/video sitemaps and watch metadata use stable first-party TikTok post
   assert.equal(stableTikTokImage({ media_type:"tiktok", source_url:source, thumbnail_url:expired }), url);
   assert.doesNotMatch(images, /x-expires|x-signature|tiktok-draft-image/);
   assert.doesNotMatch(video, /x-expires|x-signature|tiktok-draft-image/);
-  assert.match(images,/id=7654628449142770958/);
-  assert.match(video,/id=7654628449142770958/);
+  // Missing sources still have crawlable watch URLs, but a generic text-only
+  // fallback graphic must not be presented to Google as source footage.
+  assert.doesNotMatch(images,/id=7654628449142770958/);
+  assert.doesNotMatch(video,/video:thumbnail_loc>https:\/\/vid\.best\/api\/tiktok\/cached-poster\?id=7654628449142770958/);
+  assert.match(video,/watch\/tiktok-missing-image/);
   // The original owner's metadata is NOT rewritten merely for SEO.
   const unchanged = context.sqlite.prepare("SELECT thumbnail_url FROM videos WHERE slug='tiktok-stable-image'").get();
   assert.equal(unchanged.thumbnail_url, expired);
@@ -803,6 +806,40 @@ test("image/video sitemaps and watch metadata use stable first-party TikTok post
   assert.match(owned,/https:\/\/vid\.best\/review-covers\/owner-original\.webp/);
 });
 
+
+test("real TikTok source images appear in video, source-image sitemaps and VideoObject without changing original artwork", async () => {
+  const context = createContext();
+  const id = "7611111111111111111";
+  const source = "https://www.tiktok.com/@creator/video/" + id;
+  const cached = "https://vid.best/media/uploads/tiktok-thumbnails/" + id + ".img";
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug,title,source_url,media_type,primary_category,subcategory,description,thumbnail_url,published)
+    VALUES ('real-tiktok-cover','Real TikTok cover',?,'tiktok','Funny & Comedy',
+            'Memes & Compilation','Accurate source review',?,1)`).run(source,cached);
+
+  const row = context.sqlite.prepare("SELECT * FROM videos WHERE slug='real-tiktok-cover'").get();
+  assert.equal(verifiedTikTokSourceImage(row), cached);
+  assert.equal(stableTikTokImage(row), cached, "actual R2 image wins over the placeholder even for comedy");
+  const sourceXml = await (await request(context,"https://vid.best/sitemaps/images-source-1.xml")).text();
+  const videoXml = await (await request(context,"https://vid.best/sitemaps/videos-1.xml")).text();
+  assert.ok(sourceXml.includes("<image:loc>" + cached + "</image:loc>"));
+  assert.ok(videoXml.includes("<video:thumbnail_loc>" + cached + "</video:thumbnail_loc>"));
+  assert.ok(videoXml.includes("<video:player_loc allow_embed=\"yes\">https://www.tiktok.com/player/v1/" + id));
+  const original = context.sqlite.prepare("SELECT thumbnail_url FROM videos WHERE slug='real-tiktok-cover'").get();
+  assert.equal(original.thumbnail_url,cached);
+
+  // A separate record has no real thumbnail: its watch URL remains in the
+  // sitemap but Google must not receive a misleading generic video thumbnail.
+  context.sqlite.prepare(`INSERT INTO videos
+    (slug,title,source_url,media_type,primary_category,subcategory,description,published)
+    VALUES ('no-real-cover','No real cover','https://www.tiktok.com/@creator/video/7622222222222222222',
+            'tiktok','Funny & Comedy','Memes & Compilation','Editorial review',1)`).run();
+  const noRealXml = await (await request(context,"https://vid.best/sitemaps/videos-1.xml")).text();
+  assert.match(noRealXml,/watch\/no-real-cover/);
+  const entry = noRealXml.match(/<url><loc>https:\/\/vid\.best\/watch\/no-real-cover<\/loc>[\s\S]*?<\/url>/)?.[0] || "";
+  assert.ok(entry, "review still indexed as a canonical page");
+  assert.doesNotMatch(entry, /video:thumbnail_loc|video:video/);
+});
 
 test("category pagination is crawlable, page-canonical, and preserves publication dates", async () => {
   const context = createContext();
