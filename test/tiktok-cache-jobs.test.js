@@ -131,24 +131,31 @@ test('cron leaves uncertified, protected and owner-direct-source jobs alone', as
 
 test('thumbnail caching uses bounded validated images, retains titles separately, and reuses R2', async t => {
   const { env, db, objects } = fixture(t);
+  // Top 5 is one of the four protected references. Exercise the original
+  // thumbnail worker against a non-reference source instead.
+  const thumbnailId = '7611111111111111111';
+  const thumbnailShare = 'https://www.tiktok.com/@testcreator/video/' + thumbnailId;
   const url = 'https://p16.tiktokcdn.com/cover.jpg';
-  db.prepare('INSERT INTO tiktok_oembed_cache VALUES (?, ?, ?)').run(videoId, url, new Date().toISOString());
+  db.prepare("INSERT INTO videos (id,source_url,media_type) VALUES (82,?,'tiktok')").run(thumbnailShare);
+  db.prepare('INSERT INTO tiktok_oembed_cache VALUES (?, ?, ?)').run(thumbnailId, url, new Date().toISOString());
   const image = new Uint8Array([255,216,255,224,0,0]);
   let calls = 0;
   globalThis.fetch = async (_, options) => { calls++; assert.equal(options.redirect, 'manual');
     return new Response(image, { headers: { 'Content-Type': 'image/jpeg' } }); };
   assert.equal((await processTikTokThumbnailJobs(env))[0].status, 'complete');
-  assert.equal(objects.get(thumbnailKey(videoId)).size, image.length);
-  assert.match(db.prepare('SELECT thumbnail_url FROM videos').get().thumbnail_url, /vid\.best\/media\/uploads\/tiktok-thumbnails/);
-  await cacheTikTokThumbnail(env, { id: 81, video_id: videoId, thumbnail_url: url });
+  assert.equal(objects.get(thumbnailKey(thumbnailId)).size, image.length);
+  assert.match(db.prepare('SELECT thumbnail_url FROM videos WHERE id=82').get().thumbnail_url, /vid\.best\/media\/uploads\/tiktok-thumbnails/);
+  await cacheTikTokThumbnail(env, { id: 82, video_id: thumbnailId, source_url: thumbnailShare, thumbnail_url: url });
   assert.equal(calls, 1);
   assert.deepEqual(await processTikTokThumbnailJobs(env), []);
 });
 
 test('thumbnail errors keep original metadata and cooldown prevents repeated CDN requests', async t => {
   const { env, db, objects } = fixture(t);
+  const thumbnailId = '7611111111111111111';
   const url = 'https://p16.tiktokcdn.com/cover.jpg';
-  db.prepare('INSERT INTO tiktok_oembed_cache VALUES (?, ?, ?)').run(videoId, url, new Date().toISOString());
+  db.prepare("INSERT INTO videos (id,source_url,media_type) VALUES (82,?,'tiktok')").run('https://www.tiktok.com/@testcreator/video/' + thumbnailId);
+  db.prepare('INSERT INTO tiktok_oembed_cache VALUES (?, ?, ?)').run(thumbnailId, url, new Date().toISOString());
   let calls = 0;
   globalThis.fetch = async () => { calls++; return new Response('<html>Access Denied</html>', { headers: { 'Content-Type': 'image/jpeg' } }); };
   assert.equal((await processTikTokThumbnailJobs(env))[0].status, 'failed');
