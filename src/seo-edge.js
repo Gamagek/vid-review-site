@@ -1,3 +1,5 @@
+import { emergencyPublicFallback } from "./d1-r2-emergency.js";
+import { maybeCapturePublishedD1 } from "./d1-r2-capture.js";
 import { cachedPublicResponse } from "./public-edge-cache.js";
 import { signedLegacyV5Page } from "./legacy-v5-signer.js";
 import edgeWorker from "./edge.js";
@@ -809,15 +811,31 @@ export default {
       response = await cachedPublicResponse(request, env, ctx, () => seoWorker.fetch(request, env, ctx));
       if (!response) response = await seoWorker.fetch(request, env, ctx);
     } catch (error) {
+      // Anonymous published public data can survive D1 errors using the verified
+      // private R2 library. Never expose it to authenticated requests or mutations.
+      const fallback = await emergencyPublicFallback(request, env);
+      if (fallback) return fallback;
       const path = new URL(request.url).pathname;
       if (!["GET", "HEAD"].includes(request.method) || !/^\/(?:videos|category\/[^/]+|(?:image-)?sitemap\.xml|sitemaps\/[^/]+\.xml)$/.test(path)) throw error;
       console.error("Public SEO response unavailable");
       response = htmlResponse('<meta name="robots" content="noindex"><h1>Temporarily unavailable</h1>', 503, "noindex,follow");
       response.headers.set("Retry-After", "60");
     }
+    // Some application handlers return 5xx rather than throwing for D1
+    // quota (7500) or availability failures; treat both paths consistently.
+    if (response.status >= 500) {
+      const fallback = await emergencyPublicFallback(request, env);
+      if (fallback) response = fallback;
+    }
     if (request.method !== "HEAD") return response;
     await response.body?.cancel();
     return new Response(null, { status: response.status, statusText: response.statusText, headers: response.headers });
   },
-  scheduled(...args) { return seoWorker.scheduled(...args); }
+  scheduled(controller, env, ctx) {
+    // Existing provider, cache and cleanup jobs remain unchanged.
+    const existing = seoWorker.scheduled(controller, env, ctx);
+    // Optional bounded public-only D1 -> R2 refresh, disabled without an explicit flag.
+    const emergency = maybeCapturePublishedD1(controller, env, ctx);
+    return emergency || existing;
+  }
 };
