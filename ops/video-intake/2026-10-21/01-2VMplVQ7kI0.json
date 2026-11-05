@@ -1,0 +1,78 @@
+{
+  "intake_batch": "2026-10-21-new-38",
+  "intake_sequence": 1,
+  "intended_new_items": 38,
+  "publication_date_sri_lanka": "2026-10-21",
+  "stage": "draft_on_hold",
+  "prerequisite": "D1 quota reset plus backup, unique video-id/URL/slug check and baseline count verification",
+  "original_user_evidence": {
+    "video_id": "2VMplVQ7kI0",
+    "source_url": "https://youtube.com/shorts/2VMplVQ7kI0?si=sVyYvhiA80tgV41L",
+    "original_video_title": "#trend",
+    "creator_name_reported": "Tom react",
+    "duration_seconds_reported": 41,
+    "scenes_reported": [
+      "Bedroom foot tap startles a man who appears asleep, woman in blue saree",
+      "Woman tasting food from steel bowl makes coughing or gagging expression",
+      "Watermelon at a street fruit cart with exaggerated facial expression",
+      "Two men playfully scuffle on a white-sheet bed",
+      "Blanket-covered bedroom nudge and theatrical head-holding reaction",
+      "White cream or powder is thrown and lands on a woman's face in front of curtains"
+    ],
+    "evidence_status": "Descriptions and timestamps supplied by the user, not independently verified by direct playback",
+    "reaction_panel_identities": "Unverified; do not publish specific celebrity identity claims",
+    "audible_speech": "Hindi exclamations reported; incomplete lines intentionally not quoted as definitive transcript"
+  },
+  "vidbest_insert_payload": {
+    "slug": "bedroom-foot-tap-watermelon-gag-and-cream-toss",
+    "title": "Bedroom Foot-Tap, Watermelon Gag & Cream Toss Finale",
+    "source_url": "https://www.youtube.com/shorts/2VMplVQ7kI0",
+    "media_type": "youtube",
+    "embed_url": "https://www.youtube.com/embed/2VMplVQ7kI0",
+    "primary_category": "Funny & Comedy",
+    "subcategory": "Memes & Compilation",
+    "description": "😂 A quiet bedroom turns chaotic after a playful foot tap, followed by an awkward kitchen tasting moment, a watermelon-cart gesture, bed-based slapstick and a white cream-or-powder toss. A laughing reaction panel connects six quick comedy scenes into one energetic YouTube Short.",
+    "review_text": "1. A Bedroom Foot-Tap Surprise\n\nThe first sketch plays on the contrast between a quiet bedroom and a sudden jolt of movement. A woman in a blue saree sits on a decorated bed and taps the foot of a man who appears to be asleep. His startled response turns a small gesture into an oversized comic reaction. The timing matters more than any elaborate trick: the setup is calm, the interruption is quick, and the reaction gives the scene its punchline.\n\n2. An Awkward Kitchen Taste Test\n\nThe next joke moves to a kitchen, where a woman tries something from a stainless-steel bowl. Her expression changes sharply, followed by coughing and an exaggerated look of discomfort. Kitchen clatter and comic audio cues heighten the moment. The clip does not establish exactly what she tastes, so the humour rests on the visible surprise rather than an invented explanation about the food.\n\n3. A Watermelon Gesture at a Street Cart\n\nA short outdoor sequence shifts the mood again. A man near a fruit vendor's cart holds or balances a watermelon close to his face while pulling an animated expression. It is a brief visual gag that needs almost no dialogue. Its strength is the contrast with the indoor skits around it: the scenery changes, the prop becomes the focus, and the compilation moves straight on before the joke wears thin.\n\n4. Bedroom Scuffles and a Blanket Skit\n\nTwo further bedroom moments return the video to playful physical comedy. In one, two men tumble and scuffle across a bed covered in white sheets, with thuds and movement supplying the rhythm. Another shows a woman and man beneath a colourful blanket; a nudge prompts the man to clutch his head and react theatrically. These are staged-looking comedic encounters, but the clip alone does not establish how the scenes were produced or whether every reaction was rehearsed.\n\n5. The White Cream or Powder Finale\n\nThe final scene places a man with a plate in front of a curtain backdrop. He tosses a white substance into the air, and it lands across a woman's face. The sudden burst and startled visual result provide the largest slapstick moment in the sequence. Whether the material is cream, powder, or a mixture is not clear enough to state confidently. That uncertainty does not weaken the joke: the timing, flying material and unexpected result are what make it memorable.\n\n6. How the Reaction-Panel Editing Shapes the Humour\n\nThroughout the Short, a trio of laughing viewers appears in the upper portion of the vertical split-screen. Their visible amusement, together with bursts of laughter, Hindi exclamations and upbeat meme-style audio, connects otherwise unrelated mini-sketches. The reaction footage functions as a pacing device: one joke ends, another starts, and the panel keeps the same playful tone. The viewers' identities are not established by the supplied evidence, so this review does not rely on celebrity-name claims.\n\nFinal Verdict\n\nThis rapid comedy compilation works by changing locations and comic devices without abandoning its basic formula. A bedroom startle, a kitchen tasting face, an expressive watermelon moment, bed-based slapstick and a messy final toss each offer a different sort of surprise. The split-screen laughter ties them together, making the result an energetic try-not-to-laugh-style Short rather than a single continuous story.",
+    "seo_title": "Bedroom Foot-Tap Prank, Watermelon Gag & Cream Toss",
+    "seo_description": "A bedroom foot-tap surprise, kitchen taste-test gag, watermelon gesture and messy cream toss collide in a fast-paced split-screen comedy Short.",
+    "seo_tags": [
+      "bedroom foot tap surprise",
+      "blue saree bedroom prank",
+      "kitchen tasting gag",
+      "watermelon vendor comedy",
+      "white sheet bed scuffle",
+      "colorful blanket reaction skit",
+      "white cream toss finale",
+      "split screen laughing viewers",
+      "fast paced reaction compilation",
+      "Tom react prank montage",
+      "Hindi comedy sound effects",
+      "messy face prank ending"
+    ],
+    "featured": false,
+    "trending": false,
+    "published": false
+  },
+  "thumbnail_plan": {
+    "use_verified_thumbnail_only": true,
+    "avoid_unverified_maxres_and_unnecessary_generic_hqdefault": true,
+    "status": "verify provider poster or existing permitted artwork before setting a custom thumbnail"
+  },
+  "safety": {
+    "no_update_existing_videos": true,
+    "no_delete": true,
+    "never_modify_earliest_10_or_raw_media": true,
+    "duplicate_key": "youtube:2VMplVQ7kI0",
+    "do_not_assign_existing_d1_id": true,
+    "preserve_original_publication_date_of_all_existing_records": true,
+    "article_date_only_until_publish": "2026-10-21",
+    "do_not_claim_creator_or_reaction_panel_identities_verified": true
+  },
+  "publishing_hold": {
+    "enabled": true,
+    "require_explicit_user_release": true,
+    "db_insert_allowed": false,
+    "reason": "Owner explicitly requested all six new videos remain drafts until they say to publish.",
+    "publication_date_note": "2026-10-21 was the originally requested publication date, not evidence of actual publication."
+  }
+}
