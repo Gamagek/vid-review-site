@@ -1,4 +1,5 @@
 import { analyzeYoutubeDraftWithGemini } from "./gemini-youtube-analysis.js";
+import { importGeminiReview } from "./gemini-drive-review-import.js";
 import { parseInstagramUrl } from "../public/instagram-utils.js";
 import { reviewIllustration, reviewSourcePreview, reviewPreviewIllustration, tikTokReviewPreviewIllustration, reviewIllustrationRedirect } from "./review-illustrations.js";
 import { reviewGrounding, relatedEditorialReviews } from "./review-grounding.js";
@@ -384,6 +385,11 @@ async function route(request, env, ctx) {
   if (match && request.method === "POST") {
     await requireAdmin(request, env);
     return analyzeYoutubeDraftWithGemini(request, env, Number(match[1]));
+  }
+
+  if (path === "/api/admin/gemini-review-import" && request.method === "POST") {
+    await requireAdmin(request, env);
+    return importGeminiReview(request, env);
   }
 
   if (path === "/api/ai/analyze-media" && request.method === "POST") {
