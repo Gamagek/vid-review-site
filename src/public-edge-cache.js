@@ -3,7 +3,7 @@ import illustrations from "./review-illustrations.json" with { type: "json" };
 // Public response cache: Cloudflare edge first, durable R2 snapshot second, D1 last.
 // Never cache member sessions, mutations, error responses, or private headers.
 // The browser receives no-store even when the edge holds a fresh copy.
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2-cache-safety";
 // A new artwork release must not inherit a fresh XML snapshot missing its images.
 // This non-security fingerprint only versions XML keys; API/browser policy is unchanged.
 const IMAGE_CATALOG_REVISION = illustrations.reduce((hash, item) => {
@@ -27,6 +27,8 @@ function policyFor(request) {
   // Never intercept HTTP/www canonical redirects with a cached 200 response.
   if (url.protocol !== "https:" || url.hostname !== "vid.best") return null;
   const path = url.pathname;
+  // Any cookie can change session-sensitive JSON behavior; bypass all shared caches.
+  if ((path === "/api/videos" || path === "/api/home/mini-feed") && request.headers.has("Cookie")) return null;
   let kind = "";
   let snapshot = true;
   let allowed = [];
@@ -197,12 +199,15 @@ async function resolveMiss(request, env, ctx, handler, policy) {
     if (saved) return browserResponse(fromSnapshot(saved), "R2-STALE");
     throw error;
   }
+  // A no-store/private origin response must NEVER enter edge or R2, including JSON.
   if (!response.ok || response.headers.has("Set-Cookie") ||
-    /(?:^|,)\s*(?:private|no-store)\b/i.test(response.headers.get("Cache-Control") || "") &&
-      policy.kind !== "json") {
+    /(?:^|,)\s*(?:private|no-store)\b/i.test(response.headers.get("Cache-Control") || "")) {
     if (response.status >= 500 && saved) return browserResponse(fromSnapshot(saved), "R2-STALE");
     return response;
   }
+  // Require an explicit origin public directive before caching JSON responses.
+  // The browser still receives no-store via browserResponse() on a cacheable response.
+  if (policy.kind === "json" && !/(?:^|,)\s*public\b/i.test(response.headers.get("Cache-Control") || "")) return response;
   const type = response.headers.get("Content-Type") || "";
   if ((policy.kind === "json" && !type.includes("application/json")) ||
     (policy.kind === "html" && !type.includes("text/html")) ||

@@ -39,11 +39,11 @@ function publicVideos() {
     pagination: { offset: 0, limit: 18, total: 1 },
   }), {
     status: 200,
-    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+    headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=0, s-maxage=300" },
   });
 }
 
-test("artwork XML releases ignore the previous catalog snapshot while public API cache keys stay stable", async () => {
+test("cache safety revision rejects old API and artwork cache keys", async () => {
   const previous = globalThis.caches;
   const cache = createCache();
   globalThis.caches = { default: cache };
@@ -60,10 +60,13 @@ test("artwork XML releases ignore the previous catalog snapshot while public API
     assert.match(await response.text(), /Current artwork catalog/);
     assert.equal(xmlQueries, 1);
     await ctx.flush();
-    const api = await cachedPublicResponse(new Request("https://vid.best/api/videos"), {}, ctx, () => {
-      throw new Error("The existing public API cache must survive artwork publication");
+    const api = await cachedPublicResponse(new Request("https://vid.best/api/videos"), {}, ctx, publicVideos);
+    assert.equal(api.headers.get("X-VidBest-Edge-Cache"), "MISS");
+    await ctx.flush();
+    const newVersionHit = await cachedPublicResponse(new Request("https://vid.best/api/videos"), {}, ctx, () => {
+      throw new Error("Newly populated cache should avoid a second D1 call");
     });
-    assert.equal(api.headers.get("X-VidBest-Edge-Cache"), "HIT");
+    assert.equal(newVersionHit.headers.get("X-VidBest-Edge-Cache"), "HIT");
   } finally { globalThis.caches = previous; }
 });
 
@@ -207,5 +210,61 @@ test("R2 replay never refreshes the snapshot timestamp, allowing D1 refresh afte
     assert.equal(freshFromR2.headers.get("X-VidBest-Edge-Cache"), "R2-FRESH");
     await ctx.flush();
     assert.equal(JSON.parse(env.BUCKET.objects.get(key)).timestamp, oldSnapshot.timestamp);
+  } finally { globalThis.caches = previous; }
+});
+
+
+test("private, no-store and unmarked JSON responses never populate shared caches", async () => {
+  const previous = globalThis.caches;
+  globalThis.caches = { default: createCache() };
+  try {
+    const env = { BUCKET: createR2() };
+    const ctx = createContext();
+    for (const [index, cacheControl] of ["private, no-store", "no-store", "private, max-age=60", "max-age=30", "public, no-store"].entries()) {
+      const request = new Request(`https://vid.best/api/videos?limit=18&offset=${index}`);
+      let queries = 0;
+      const handler = () => {
+        queries++;
+        return new Response(JSON.stringify({ videos: [{ id: index + 12, slug: "test" }] }), {
+          headers: { "Content-Type": "application/json", "Cache-Control": cacheControl },
+        });
+      };
+      const first = await cachedPublicResponse(request, env, ctx, handler);
+      assert.equal(first.headers.get("X-VidBest-Edge-Cache"), null, cacheControl);
+      await ctx.flush();
+      const second = await cachedPublicResponse(request, env, ctx, handler);
+      assert.equal(second.headers.get("X-VidBest-Edge-Cache"), null, cacheControl);
+      assert.equal(queries, 2, cacheControl);
+      assert.equal(env.BUCKET.objects.size, 0, cacheControl);
+    }
+  } finally { globalThis.caches = previous; }
+});
+
+test("anonymous public mini-feed is cacheable but any cookie bypasses shared JSON cache", async () => {
+  const previous = globalThis.caches;
+  globalThis.caches = { default: createCache() };
+  try {
+    const ctx = createContext();
+    const env = { BUCKET: createR2() };
+    const request = new Request("https://vid.best/api/home/mini-feed?limit=6");
+    let calls = 0;
+    const anonymous = () => {
+      calls++;
+      return new Response(JSON.stringify({
+        authenticated: false,
+        sections: { for_you: [], most_watched: [], most_liked: [], saved: [] },
+      }), { headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=0, s-maxage=300" } });
+    };
+    const first = await cachedPublicResponse(request, env, ctx, anonymous);
+    assert.equal(first.headers.get("X-VidBest-Edge-Cache"), "MISS");
+    assert.equal(first.headers.get("Cache-Control"), "no-store");
+    await ctx.flush();
+    const second = await cachedPublicResponse(request, env, ctx, anonymous);
+    assert.equal(second.headers.get("X-VidBest-Edge-Cache"), "HIT");
+    assert.equal(calls, 1);
+    for (const cookie of ["randomPreference=1", "__Host-vidbest_member=secret"]) {
+      const signed = new Request(request, { headers: { Cookie: cookie } });
+      assert.equal(await cachedPublicResponse(signed, env, ctx, anonymous), null);
+    }
   } finally { globalThis.caches = previous; }
 });
