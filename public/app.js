@@ -629,7 +629,8 @@ function formatNumber(value) {
 function formatDate(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Date unavailable";
-  // Match the stored UTC publication calendar date and server-rendered category cards.
-  try { return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(date); }
+  // Publication timestamps include the Sri Lanka offset (+05:30). Display the same
+  // calendar date used by the publisher, rather than shifting late-evening times to UTC.
+  try { return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", timeZone: "Asia/Colombo" }).format(date); }
   catch (error) { return date.toISOString().slice(0, 10); }
 }
