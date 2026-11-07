@@ -181,19 +181,22 @@ test("a lost response body is a connection failure and history errors do not rem
   await h.scope.initialize(); assert.equal(h.state.videos.length, 2); assert.equal(h.get("#empty-state").hidden, true);
 });
 
-test("library publication dates preserve the Sri Lanka calendar day", () => {
+test("only the Beauty and the Beast playlist uses the Sri Lanka calendar day", () => {
   const h = harness();
-  let options;
+  const timeZones = [];
   h.scope.Intl = {
     DateTimeFormat: function(locale, opts) {
-      options = opts;
+      timeZones.push(opts.timeZone);
       return new Intl.DateTimeFormat("en-US", opts);
     },
   };
-  const createdAt = "2026-10-26T18:53:04.986Z";
-  const displayed = h.scope.formatDate(createdAt);
-  assert.equal(options.timeZone, "Asia/Colombo");
-  assert.equal(displayed, "Oct 27, 2026");
-  assert.equal(createdAt, "2026-10-26T18:53:04.986Z");
+  const createdAt = "2026-11-06T18:53:04.986Z";
+  const earlierVideo = { slug: "previous-review", created_at: createdAt };
+  const playlist = { slug: "beauty-and-the-beast-2017-50-part-playlist", created_at: createdAt };
+
+  assert.equal(h.scope.formatPublicationDate(earlierVideo), "Nov 6, 2026");
+  assert.equal(h.scope.formatPublicationDate(playlist), "Nov 7, 2026");
+  assert.deepEqual(timeZones, ["UTC", "Asia/Colombo"]);
+  assert.equal(createdAt, "2026-11-06T18:53:04.986Z");
   assert.equal(h.scope.formatDate("invalid"), "Date unavailable");
 });
