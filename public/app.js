@@ -429,7 +429,7 @@ function buildVideoCard(video) {
   card.querySelector(".views-count").textContent = `${formatNumber(video.views)} views`;
   const time = card.querySelector("time");
   time.dateTime = video.created_at;
-  time.textContent = formatDate(video.created_at);
+  time.textContent = formatPublicationDate(video);
 
   const image = card.querySelector(".tile-media img");
   image.loading = "lazy";
@@ -626,11 +626,16 @@ function formatNumber(value) {
   catch (error) { return String(number); }
 }
 
-function formatDate(value) {
+function formatPublicationDate(video) {
+  // Only the curated Beauty and the Beast playlist was intentionally published on Nov 7.
+  // All earlier homepage videos retain their original UTC calendar date (Nov 6).
+  const timeZone = video?.slug === "beauty-and-the-beast-2017-50-part-playlist" ? "Asia/Colombo" : "UTC";
+  return formatDate(video?.created_at, timeZone);
+}
+
+function formatDate(value, timeZone = "UTC") {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Date unavailable";
-  // Publication timestamps include the Sri Lanka offset (+05:30). Display the same
-  // calendar date used by the publisher, rather than shifting late-evening times to UTC.
-  try { return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", timeZone: "Asia/Colombo" }).format(date); }
+  try { return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", timeZone }).format(date); }
   catch (error) { return date.toISOString().slice(0, 10); }
 }
