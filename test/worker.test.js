@@ -26,6 +26,7 @@ const migrations = [
   "0022_facebook_readable_slugs.sql",
   "0030_facebook_preview_jobs.sql",
   "0050_five_comedy_review_refresh.sql",
+  "0051_youtube_curated_playlists.sql",
 ];
 
 class TestD1Statement {
@@ -142,6 +143,38 @@ async function login(context) {
     headers: { Authorization: `Bearer ${secret}`, "CF-Connecting-IP": "192.0.2.1" },
   });
 }
+
+test("renders a curated YouTube playlist inside one watch-page player", async () => {
+  const context = createTestContext();
+  const ids = ["ZtYoKYLN3kw", "FpY-OZkwvcc", "zaAghJcyS3M"];
+  context.sqlite.prepare(
+    `INSERT INTO videos (
+      slug, title, source_url, embed_url, media_type, playlist_video_ids,
+      primary_category, subcategory, description, published
+    ) VALUES (?, ?, ?, ?, 'youtube', ?, 'Entertainment, Movies & Games', 'Film Reviews', 'A curated film playlist.', 1)`,
+  ).run(
+    "beauty-and-the-beast-2017-playlist",
+    "Beauty and the Beast (2017) — Complete Film Playlist",
+    `https://www.youtube.com/watch?v=${ids[0]}`,
+    `https://www.youtube-nocookie.com/embed/${ids[0]}?rel=0&playsinline=1`,
+    JSON.stringify(ids),
+  );
+
+  const watch = await send(context, "/watch/beauty-and-the-beast-2017-playlist");
+  assert.equal(watch.status, 200);
+  const html = await watch.text();
+  assert.match(html, /youtube-nocookie\.com\/embed\/ZtYoKYLN3kw/);
+  assert.match(html, /playlist=FpY-OZkwvcc%2CzaAghJcyS3M/);
+  assert.match(html, /Playlist · 3 parts/);
+  assert.doesNotMatch(html, /PL0Xy_RWejpE7-NL2aYrR5693QZCjROeXz/);
+
+  const listing = await send(context, "/api/videos?limit=10");
+  assert.equal(listing.status, 200);
+  const payload = await listing.json();
+  const video = payload.videos.find((item) => item.slug === "beauty-and-the-beast-2017-playlist");
+  assert.deepEqual(video.playlist_video_ids, ids);
+  assert.equal(video.playlist_count, 3);
+});
 
 test("refreshes five comedy reviews while preserving their original dates and slugs", async () => {
   const context = createTestContext();
