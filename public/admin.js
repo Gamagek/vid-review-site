@@ -341,13 +341,13 @@ function updatePreview() {
   }
 
   const parsed = parseEmbed(target);
-  const playlistIds = ui.playlistVideoIds.value.trim().split(/[\\s,]+/).filter((id) => /^[A-Za-z0-9_-]{11}$/.test(id));
+  const playlistIds = ui.playlistVideoIds.value.trim().split(/[\s,]+/).filter((id) => /^[A-Za-z0-9_-]{11}$/.test(id));
   if (parsed.embed && playlistIds.length > 1) {
     try {
       const sourceUrl = new URL(target);
       const sourceId = sourceUrl.hostname === "youtu.be"
         ? sourceUrl.pathname.split("/").filter(Boolean)[0]
-        : (sourceUrl.searchParams.get("v") || sourceUrl.pathname.match(/\\/(?:embed|shorts|live)\\/([A-Za-z0-9_-]{11})/)?.[1]);
+        : (sourceUrl.searchParams.get("v") || sourceUrl.pathname.match(/\/(?:embed|shorts|live)\/([A-Za-z0-9_-]{11})/)?.[1]);
       if (sourceId === playlistIds[0]) {
         const previewUrl = new URL(parsed.embed);
         previewUrl.searchParams.set("playlist", playlistIds.slice(1).join(","));
@@ -954,7 +954,7 @@ async function saveVideo(event) {
   const payload = {
     title: ui.title.value,
     source_url: ui.sourceUrl.value,
-    playlist_video_ids: ui.playlistVideoIds.value.split(/[\\s,]+/).filter(Boolean),
+    playlist_video_ids: ui.playlistVideoIds.value.split(/[\s,]+/).filter(Boolean),
     source_page_url: ui.sourcePageUrl?.value || "",
     cache_source_url: ui.cacheSourceUrl?.value || "",
     r2_key: r2Key,
@@ -1179,6 +1179,7 @@ async function editVideo(video) {
   ui.editingId.value = video.id;
   ui.title.value = video.title || "";
   ui.sourceUrl.value = video.source_url || "";
+  ui.playlistVideoIds.value = Array.isArray(video.playlist_video_ids) ? video.playlist_video_ids.join(", ") : "";
   ui.sourcePageUrl.value = video.source_page_url || (video.media_type === "r2" ? "" : video.source_url || "");
   ui.cacheSourceUrl.value = video.cache_source_url || "";
   ui.r2Key.value = video.r2_key || "";
