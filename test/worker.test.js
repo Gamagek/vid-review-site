@@ -144,6 +144,26 @@ async function login(context) {
   });
 }
 
+test("publishes the Beauty and the Beast curated playlist once with the requested local date", () => {
+  const context = createTestContext();
+  context.sqlite.exec(readFileSync(new URL("../migrations/0052_publish_beauty_and_the_beast_playlist.sql", import.meta.url), "utf8"));
+  context.sqlite.exec(readFileSync(new URL("../migrations/0052_publish_beauty_and_the_beast_playlist.sql", import.meta.url), "utf8"));
+
+  const row = context.sqlite.prepare(
+    "SELECT slug, title, source_url, playlist_video_ids, published, created_at FROM videos WHERE slug = ?",
+  ).get("beauty-and-the-beast-2017-50-part-playlist");
+  assert.ok(row);
+  assert.equal(row.title, "Beauty and the Beast (2017) — 50-Part Film Playlist");
+  assert.equal(row.source_url, "https://www.youtube.com/watch?v=ZtYoKYLN3kw");
+  assert.equal(row.published, 1);
+  assert.equal(row.created_at, "2026-11-07T00:00:00+05:30");
+  const ids = JSON.parse(row.playlist_video_ids);
+  assert.equal(ids.length, 50);
+  assert.equal(ids[0], "ZtYoKYLN3kw");
+  assert.equal(ids[49], "AMcXIG0HrIU");
+  assert.equal(new Set(ids).size, 50);
+});
+
 test("renders a curated YouTube playlist inside one watch-page player", async () => {
   const context = createTestContext();
   const ids = ["ZtYoKYLN3kw", "FpY-OZkwvcc", "zaAghJcyS3M"];
