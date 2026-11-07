@@ -1323,6 +1323,54 @@ function parseTags(value, fallback = []) {
   return [...new Set(tags.map((tag) => cleanText(tag, 40)).filter(Boolean))].slice(0, 20);
 }
 
+function parseYoutubePlaylistVideoIds(value, { strict = false } = {}) {
+  let candidate = value;
+  if (typeof candidate === "string") {
+    const text = candidate.trim();
+    if (!text) return [];
+    if (text.startsWith("[")) {
+      try { candidate = JSON.parse(text); } catch {
+        if (strict) throw new AppError(400, "Playlist video IDs must be valid JSON or a comma-separated list");
+        return [];
+      }
+    } else {
+      candidate = text.split(/[\s,]+/).filter(Boolean);
+    }
+  }
+  if (!Array.isArray(candidate)) {
+    if (strict && candidate != null) throw new AppError(400, "Playlist video IDs must be a list");
+    return [];
+  }
+  const ids = candidate.map((item) => String(item || "").trim()).filter(Boolean);
+  if (strict && ids.length > 100) throw new AppError(400, "A YouTube playlist may contain up to 100 curated videos");
+  if (strict && ids.some((id) => !/^[A-Za-z0-9_-]{11}$/.test(id))) {
+    throw new AppError(400, "Every playlist item must be a valid 11-character YouTube video ID");
+  }
+  if (strict && new Set(ids).size !== ids.length) throw new AppError(400, "Playlist video IDs must not contain duplicates");
+  return ids.filter((id) => /^[A-Za-z0-9_-]{11}$/.test(id)).slice(0, 100);
+}
+
+function youtubePlaylistEmbedUrl(video, playbackOrigin) {
+  const ids = parseYoutubePlaylistVideoIds(video?.playlist_video_ids);
+  if (ids.length < 2 || String(video?.provider || video?.media_type || "").toLowerCase() !== "youtube") return "";
+  try {
+    const source = new URL(video.source_url);
+    const sourceId = extractYoutubeId(source, source.hostname.toLowerCase().replace(/^www\./, ""));
+    if (!sourceId || sourceId !== ids[0]) return "";
+    const embed = new URL(video.embed_url || `https://www.youtube-nocookie.com/embed/${sourceId}`);
+    const host = embed.hostname.toLowerCase().replace(/^www\./, "");
+    if (host !== "youtube-nocookie.com" && host !== "youtube.com") return "";
+    embed.pathname = `/embed/${sourceId}`;
+    embed.searchParams.set("playlist", ids.slice(1).join(","));
+    embed.searchParams.set("controls", "1");
+    embed.searchParams.set("loop", "0");
+    embed.searchParams.set("rel", "0");
+    return preparePlaybackEmbed(embed.toString(), playbackOrigin);
+  } catch {
+    return "";
+  }
+}
+
 async function serializeVideo(row, env) {
   if (!row) return null;
   const provider = detectMediaProvider(row);
@@ -1335,6 +1383,8 @@ async function serializeVideo(row, env) {
   return {
     ...row,
     provider,
+    playlist_video_ids: parseYoutubePlaylistVideoIds(row.playlist_video_ids),
+    playlist_count: parseYoutubePlaylistVideoIds(row.playlist_video_ids).length,
     embed_url: provider === "facebook" ? getSafeFacebookEmbedUrl(row) : row.embed_url,
     thumbnail_url: provider === "facebook" ? facebookPosterUrl(row) : row.thumbnail_url || instagramThumbnail || null,
     // Public cards get a stable preview hint, without rewriting editor data.
@@ -1926,13 +1976,13 @@ async function createVideo(request, env, ctx) {
 
   const row = await env.DB.prepare(
     `INSERT INTO videos (
-      slug, title, source_url, source_page_url, embed_url, media_type, r2_key,
+      slug, title, source_url, source_page_url, embed_url, media_type, playlist_video_ids, r2_key,
       redistribution_certified, redistribution_certified_at,
       cache_source_url, cache_status, cache_error, cache_attempts, cache_next_attempt_at, cached_at,
       primary_category, subcategory, description, review_text,
       seo_title, seo_description, seo_tags, thumbnail_url,
       featured, trending, published
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     RETURNING *`,
   ).bind(
     data.slug,
@@ -1941,6 +1991,7 @@ async function createVideo(request, env, ctx) {
     data.source_page_url,
     data.embed_url,
     data.media_type,
+    data.playlist_video_ids,
     data.r2_key,
     Number(data.redistribution_certified),
     data.redistribution_certified_at,
@@ -1991,7 +2042,7 @@ async function updateVideo(request, env, id, ctx) {
 
   const row = await env.DB.prepare(
     `UPDATE videos SET
-      slug = ?, title = ?, source_url = ?, source_page_url = ?, embed_url = ?, media_type = ?, r2_key = ?,
+      slug = ?, title = ?, source_url = ?, source_page_url = ?, embed_url = ?, media_type = ?, playlist_video_ids = ?, r2_key = ?,
       redistribution_certified = ?, redistribution_certified_at = ?,
       cache_source_url = ?, cache_status = ?, cache_error = ?, cache_attempts = ?, cache_next_attempt_at = ?, cached_at = ?,
       primary_category = ?, subcategory = ?, description = ?, review_text = ?,
@@ -2006,6 +2057,7 @@ async function updateVideo(request, env, id, ctx) {
     data.source_page_url,
     data.embed_url,
     data.media_type,
+    data.playlist_video_ids,
     data.r2_key,
     Number(data.redistribution_certified),
     data.redistribution_certified_at,
@@ -2124,6 +2176,19 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
   const suppliedR2Key = cleanText(body.r2_key, 500, existing?.r2_key || "");
   const suppliedSource = cleanText(body.source_url, 2000, existing?.source_url || "");
   const media = normalizeMedia(suppliedSource, suppliedR2Key, baseUrl);
+  const playlistVideoIds = parseYoutubePlaylistVideoIds(
+    body.playlist_video_ids === undefined ? existing?.playlist_video_ids : body.playlist_video_ids,
+    { strict: true },
+  );
+  if (playlistVideoIds.length) {
+    if (media.media_type !== "youtube") throw new AppError(400, "Curated playlist items are supported only for YouTube videos");
+    const sourceUrl = new URL(media.source_url);
+    const firstVideoId = extractYoutubeId(sourceUrl, sourceUrl.hostname.toLowerCase().replace(/^www\./, ""));
+    if (playlistVideoIds.length < 2) throw new AppError(400, "Add at least two YouTube video IDs for a playlist");
+    if (firstVideoId !== playlistVideoIds[0]) {
+      throw new AppError(400, "The first playlist ID must match the YouTube video URL in the media source field");
+    }
+  }
   const thumbnailCandidate = body.thumbnail_url === undefined ? existing?.thumbnail_url : body.thumbnail_url;
   const thumbnailText = cleanText(thumbnailCandidate, 2000);
   const customThumbnail = validateOptionalUrl(thumbnailText);
@@ -2177,6 +2242,7 @@ async function validateVideoPayload(body, existing, baseUrl, env) {
     source_page_url: sourcePageUrl,
     embed_url: media.embed_url,
     media_type: media.media_type,
+    playlist_video_ids: JSON.stringify(playlistVideoIds),
     r2_key: media.r2_key,
     redistribution_certified: redistributionCertified,
     redistribution_certified_at: redistributionCertifiedAt,
@@ -3089,6 +3155,9 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     ? stableTikTokImage(video, baseUrl)
     : video.thumbnail_url ? absoluteUrl(video.thumbnail_url, baseUrl) : "";
   const tags = Array.isArray(video.seo_tags) ? video.seo_tags.slice(0, 20) : [];
+  const playerEmbedUrl = video.provider === "youtube" && parseYoutubePlaylistVideoIds(video.playlist_video_ids).length > 1
+    ? youtubePlaylistEmbedUrl(video, playbackOrigin)
+    : (video.embed_url && video.provider !== "tiktok" ? preparePlaybackEmbed(video.embed_url, playbackOrigin) : "");
   const illustration = reviewIllustration(video);
   const reviewImage = illustration ? `${baseUrl}${illustration.path}` : thumbnail;
   // Audited dual-image entries keep the current owner/source preview first.
@@ -3121,7 +3190,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     url: canonical,
     mainEntityOfPage: canonical,
     ...(video.source_duration ? { duration: video.source_duration } : {}),
-    ...(video.provider === "facebook" && getSafeFacebookEmbedUrl(video) ? { embedUrl: getSafeFacebookEmbedUrl(video) } : video.embed_url && video.provider !== "tiktok" ? { embedUrl: preparePlaybackEmbed(video.embed_url, playbackOrigin) } : {}),
+    ...(video.provider === "facebook" && getSafeFacebookEmbedUrl(video) ? { embedUrl: getSafeFacebookEmbedUrl(video) } : playerEmbedUrl ? { embedUrl: playerEmbedUrl } : {}),
     ...(mediaFileUrl && !video.embed_url && video.provider !== "tiktok" ? { contentUrl: mediaFileUrl } : {}),
     ...(tags.length ? { keywords: tags.join(", ") } : {}),
     ...(video.primary_category ? { genre: [video.primary_category, video.subcategory].filter(Boolean) } : {}),
@@ -3260,7 +3329,7 @@ function renderWatchHtml(video, request, env, scriptNonce) {
     </section>
     <div class="watch-review-body">
     <article class="watch-copy glass-panel">
-      <div class="tile-badges"><span class="badge">${escapeHtml(video.primary_category)}</span><span class="badge secondary">${escapeHtml(video.subcategory)}</span></div>
+      <div class="tile-badges"><span class="badge">${escapeHtml(video.primary_category)}</span><span class="badge secondary">${escapeHtml(video.subcategory)}</span>${parseYoutubePlaylistVideoIds(video.playlist_video_ids).length > 1 ? `<span class="badge secondary">Playlist · ${parseYoutubePlaylistVideoIds(video.playlist_video_ids).length} parts</span>` : ""}</div>
       <h1>${escapeHtml(watchDisplayTitle(video))}</h1>
       <p class="lead">${escapeHtml(video.description)}</p>
       <p class="site-view-count">${Number(video.views) + (viewer ? 0 : 1)} Vid.Best views</p>
@@ -3460,7 +3529,9 @@ function renderMedia(video, playbackOrigin, viewer = false) {
   }
 
   if (video.embed_url) {
-    const embedUrl = preparePlaybackEmbed(video.embed_url, playbackOrigin);
+    const embedUrl = provider === "youtube"
+      ? (youtubePlaylistEmbedUrl(video, playbackOrigin) || preparePlaybackEmbed(video.embed_url, playbackOrigin))
+      : preparePlaybackEmbed(video.embed_url, playbackOrigin);
     if (embedUrl) {
       return `<iframe id="watch-media-frame" src="${escapeHtml(embedUrl)}" title="${escapeHtml(watchDisplayTitle(video))}" loading="eager" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups allow-forms"></iframe>`;
     }
@@ -4211,7 +4282,9 @@ async function videoSitemapResponse(request, env, page) {
       : provider === "facebook"
         ? getSafeFacebookEmbedUrl(row)
         : row.embed_url
-          ? preparePlaybackEmbed(row.embed_url, base)
+          ? (provider === "youtube"
+            ? (youtubePlaylistEmbedUrl(row, base) || preparePlaybackEmbed(row.embed_url, base))
+            : preparePlaybackEmbed(row.embed_url, base))
           : "";
     let videoEntry = "";
     // Unknown third-party URLs are landing pages, not video:content_loc.
