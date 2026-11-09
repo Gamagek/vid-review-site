@@ -3080,3 +3080,38 @@ test("server-rendered editorial reviews expose escaped, semantic topic headings 
   ).get();
   assert.deepEqual(after, before);
 });
+
+test("SEO category cards display the Sri Lanka publication calendar date", async () => {
+  const context = createTestContext();
+  const publishedAt = "2026-11-09T00:00:00+05:30";
+  context.sqlite.prepare(
+    "INSERT INTO videos (slug,title,source_url,embed_url,media_type,primary_category,subcategory," +
+    "description,thumbnail_url,published,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,1,?,?)"
+  ).run(
+    "colombo-date-test",
+    "Colombo publication date test",
+    "https://www.youtube.com/watch?v=colombodate",
+    "https://www.youtube.com/embed/colombodate",
+    "youtube",
+    "Funny & Comedy",
+    "Pranks",
+    "A test review for publication date rendering.",
+    "https://example.com/colombo-date.jpg",
+    publishedAt,
+    publishedAt,
+  );
+
+  const response = await seoEdge.fetch(
+    new Request("https://vid.best/category/funny-comedy"),
+    context.env,
+    context.ctx,
+  );
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /<time datetime="2026-11-09T00:00:00\+05:30">2026-11-09<\/time>/);
+  const stored = context.sqlite.prepare(
+    "SELECT created_at, updated_at FROM videos WHERE slug=?"
+  ).get("colombo-date-test");
+  assert.equal(stored.created_at, publishedAt);
+  assert.equal(stored.updated_at, publishedAt);
+});
