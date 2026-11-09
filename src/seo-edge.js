@@ -157,7 +157,18 @@ function categoryCard(row) {
   const dateValue = row.created_at || "";
   let dateText = "";
   try {
-    dateText = dateValue ? new Date(dateValue).toISOString().slice(0, 10) : "";
+    if (dateValue) {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Colombo",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).formatToParts(new Date(dateValue));
+      const dateParts = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+      dateText = dateParts.year && dateParts.month && dateParts.day
+        ? `${dateParts.year}-${dateParts.month}-${dateParts.day}`
+        : "";
+    }
   } catch {
     dateText = "";
   }
