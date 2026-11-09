@@ -757,7 +757,10 @@ function formatDate(value) {
   const date = new Date(value);
   return Number.isNaN(date.getTime())
     ? "Recently"
-    : new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(date);
+    : new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium",
+        timeZone: "Asia/Colombo",
+      }).format(date);
 }
 
 // VIDBEST FINAL PLAYER + AUDIO LAB v3

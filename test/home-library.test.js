@@ -181,7 +181,7 @@ test("a lost response body is a connection failure and history errors do not rem
   await h.scope.initialize(); assert.equal(h.state.videos.length, 2); assert.equal(h.get("#empty-state").hidden, true);
 });
 
-test("only the Beauty and the Beast playlist uses the Sri Lanka calendar day", () => {
+test("all homepage videos use the Sri Lanka publication calendar day", () => {
   const h = harness();
   const timeZones = [];
   h.scope.Intl = {
@@ -194,9 +194,9 @@ test("only the Beauty and the Beast playlist uses the Sri Lanka calendar day", (
   const earlierVideo = { slug: "previous-review", created_at: createdAt };
   const playlist = { slug: "beauty-and-the-beast-2017-50-part-playlist", created_at: createdAt };
 
-  assert.equal(h.scope.formatPublicationDate(earlierVideo), "Nov 6, 2026");
+  assert.equal(h.scope.formatPublicationDate(earlierVideo), "Nov 7, 2026");
   assert.equal(h.scope.formatPublicationDate(playlist), "Nov 7, 2026");
-  assert.deepEqual(timeZones, ["UTC", "Asia/Colombo"]);
+  assert.deepEqual(timeZones, ["Asia/Colombo", "Asia/Colombo"]);
   assert.equal(createdAt, "2026-11-06T18:53:04.986Z");
   assert.equal(h.scope.formatDate("invalid"), "Date unavailable");
 });
