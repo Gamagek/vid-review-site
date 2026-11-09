@@ -627,13 +627,11 @@ function formatNumber(value) {
 }
 
 function formatPublicationDate(video) {
-  // Only the curated Beauty and the Beast playlist was intentionally published on Nov 7.
-  // All earlier homepage videos retain their original UTC calendar date (Nov 6).
-  const timeZone = video?.slug === "beauty-and-the-beast-2017-50-part-playlist" ? "Asia/Colombo" : "UTC";
-  return formatDate(video?.created_at, timeZone);
+  // Publication dates are editorial calendar dates in Sri Lanka.
+  return formatDate(video?.created_at, "Asia/Colombo");
 }
 
-function formatDate(value, timeZone = "UTC") {
+function formatDate(value, timeZone = "Asia/Colombo") {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Date unavailable";
   try { return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric", timeZone }).format(date); }
