@@ -1,0 +1,2 @@
+const {renderVideo}=require('@revideo/renderer');
+renderVideo({projectFile:'./src/project.ts',settings:{viteConfig:{optimizeDeps:{include:["@revideo/core","@revideo/2d","@revideo/renderer/lib/client/render"],noDiscovery:true},resolve:{dedupe:["@revideo/core","@revideo/2d"]}},workers:1,logProgress:true,outDir:'./build',outFile:'overlay.mp4',puppeteer:{executablePath:process.env.CHROME_PATH||'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']}}}).then(()=>process.exit(0)).catch(e=>{console.error(e);process.exit(1)});

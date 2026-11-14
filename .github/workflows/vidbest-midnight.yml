@@ -1,0 +1,30 @@
+name: Render Midnight Shorts
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: animation/revideo/midnight
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Blender, audio and video tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends blender ffmpeg python3-numpy
+          python3 -c 'import numpy' || python3 -m pip install numpy
+      - name: Render the short
+        run: sh run.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: thunder-again
+          path: |
+            animation/revideo/midnight/build/Thunder_Again.mp4
+            animation/revideo/midnight/build/Thunder_Again.blend
+          retention-days: 2
